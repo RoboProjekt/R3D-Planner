@@ -4,13 +4,13 @@
 
 `r3d_planner` contains the runtime components of the R3D stack:
 
-- two alternative global A* planners for a Pickle graph or color-coded PCD;
+- a global A* planner that rebuilds its graph from a color-coded PCD;
 - a local Hesai point-cloud filter for obstacles, steps, and cliffs;
 - an RViz interface for 3D start/goal selection and `map -> odom`;
 - a simple 2D lookahead path follower that publishes `/cmd_vel`;
 - a static test TF for planning without a robot.
 
-This is an `ament_python` package. `setup.py` installs six executables and
+This is an `ament_python` package. `setup.py` installs five executables and
 `config/r3d_planner_params.yaml`. The package has no launch file.
 
 > **Safety:** `path_follower` publishes motion commands directly. Do not start
@@ -21,39 +21,17 @@ This is an `ament_python` package. `setup.py` installs six executables and
 
 | Executable | Node name | Purpose | Main interfaces |
 |---|---|---|---|
-| `global_planner` | `global_graph_planner` | A* on a Pickle/NetworkX graph | `/compute_path_to_pose`; `/global_path`, `/planned_path` |
-| `pcd_path_planner` | `global_graph_planner` | Reconstruct a graph from an analyzed RGB PCD and run A* | same interfaces as `global_planner` |
+| `pcd_path_planner` | `global_graph_planner` | Reconstruct a graph from an analyzed RGB PCD and run A* | `/compute_path_to_pose`; `/global_path`, `/planned_path` |
 | `local_filter` | `obstacle_cliff_filter` | Filter local LiDAR data and detect steps/cliffs | Hesai input; three local outputs |
 | `path_follower` | `r3d_path_follower` | 2D lookahead controller | `/global_path`, `/local/filtered_obstacles`, TF; `/cmd_vel` |
 | `rviz_interface` | `r3d_rviz_interface` | Initial calibration and RViz goal selection | three input topics, service, action client, TF |
 | `path_test` | `r3d_path_test` | Test without real odometry | static `odom -> base_link` TF |
 
-`global_planner` and `pcd_path_planner` are alternatives and must not run at
-the same time: their node name, action, and output topics are identical.
+## Global PCD planner
 
-## Global planners
-
-Both planners use `scipy.spatial.KDTree` to map start and goal positions to the
-nearest graph nodes, then search with A*. The result is returned through the
-Nav2 action and published as `nav_msgs/msg/Path`.
-
-### `global_planner` — Pickle input
-
-| Parameter | Default | Meaning |
-|---|---|---|
-| `map_dir` | `<share/r3d_preprocessor>/maps`; `/tmp` if package lookup fails | Base directory for relative map names |
-| `map_name` | `nav_graph.pkl` | Pickle filename or absolute path |
-
-The Pickle must contain at least `graph`, `origin`, and `voxel_size`. The
-preprocessor creates this format. The default does not work without an external
-map because `maps/` is not installed and no `nav_graph.pkl` is included.
-
-```bash
-ros2 run r3d_planner global_planner --ros-args \
-  -p map_name:=/absolute/path/nav_graph_....pkl
-```
-
-### `pcd_path_planner` — analyzed PCD input
+`pcd_path_planner` uses `scipy.spatial.KDTree` to map start and goal positions
+to the nearest graph nodes, then searches with A*. The result is returned
+through the Nav2 action and published as `nav_msgs/msg/Path`.
 
 | Parameter | Default | Unit/meaning |
 |---|---|---|
@@ -79,8 +57,8 @@ ros2 run r3d_planner pcd_path_planner --ros-args \
 
 | Topic | Type | Publisher | Consumer/purpose |
 |---|---|---|---|
-| `/planned_path` | `visualization_msgs/msg/Marker` | one planner | RViz; Pickle=`CUBE_LIST`, PCD=`LINE_STRIP` |
-| `/global_path` | `nav_msgs/msg/Path` | one planner | `path_follower` |
+| `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | RViz `LINE_STRIP` |
+| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external Hesai driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional external Nav2 costmap |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no subscriber in this repository |
@@ -96,7 +74,7 @@ All publishers and subscriptions created here use QoS depth 10.
 
 | Name | Type | Server | Client/purpose |
 |---|---|---|---|
-| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | exactly one global planner | `rviz_interface` or external client |
+| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | `pcd_path_planner` | `rviz_interface` or external client |
 | `/recalibrate_pose` | `std_srvs/srv/Trigger` | `rviz_interface` | Reset internal calibration state |
 
 See `points.txt` for a direct action example. Start and goal headers must use

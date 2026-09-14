@@ -59,9 +59,8 @@ The non-ROS libraries used by the implementation are:
 |---|---|
 | NumPy | Voxel, point-cloud, and geometry operations |
 | SciPy (`scipy.spatial.KDTree`) | Locate the graph node nearest to a start or goal |
-| NetworkX | Undirected navigation graph and Pickle serialization |
+| NetworkX | In-memory navigation graph reconstructed from the analyzed PCD |
 | Open3D | Read, voxelize, color, and write PCD data |
-| `pickle` | Python standard library; not a separately installable dependency |
 
 The previous guide recommended global `pip` installations and a NumPy pin.
 Mixing pip packages into an apt-managed ROS Python environment is prone to
@@ -110,7 +109,7 @@ rosdep update
 ```
 
 The current `package.xml` files contain keys that rosdep cannot resolve
-(`pickle`, `numpy`, and, depending on the rosdep database, `scipy`) while also
+(`numpy` and, depending on the rosdep database, `scipy`) while also
 omitting several modules that the source imports. Therefore, an unchanged
 
 ```bash
@@ -124,7 +123,7 @@ explicit exclusions:
 ```bash
 cd ~/r3d_ws
 rosdep install --from-paths src --ignore-src -r -y \
-  --skip-keys="pickle numpy scipy"
+  --skip-keys="numpy scipy"
 ```
 
 This metadata problem is recorded in `docs/KNOWN_ISSUES.md`; it was not fixed
@@ -151,12 +150,12 @@ ros2 pkg executables r3d_planner
 
 ### Static and isolated validation results
 
-- All 21 Python and setup files were parsed successfully with Python's AST
+- All 18 retained Python and setup files were parsed successfully with Python's AST
   parser.
 - Both `package.xml` files are well-formed XML.
 - `colcon` discovers both packages.
 - Package-level tests: PEP257 passes in both packages and the copyright test is
-  skipped. Flake8 reports 286 findings in `r3d_preprocessor` and 200 in
+  skipped. Flake8 reports 151 findings in `r3d_preprocessor` and 166 in
   `r3d_planner`.
 - Running both test directories together from the repository root fails during
   collection because both packages use test-module names such as
@@ -191,7 +190,7 @@ not corrected during the documentation phase.
 
 ## 6. Prepare a map
 
-### Variant A: color-coded PCD
+### Generate the color-coded PCD
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -221,22 +220,6 @@ overwrite the input. Later, pass the same voxel size and minimum/maximum step
 heights to the planner because the PCD does not expose those values as planner-
 readable metadata.
 
-### Variant B: Pickle graph
-
-Use the same parameter set with `pcd_to_graph` to generate a NetworkX graph:
-
-```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args \
-  -p pcd_path:=/absolute/path/map.pcd \
-  -p voxel_size_cm:=5.0 \
-  -p min_step_height_cm:=5.0 \
-  -p max_step_height_cm:=25.0
-```
-
-The output is written beside the PCD with a descriptive `nav_graph_*.pkl`
-filename. It contains the graph, origin, voxel size, robot radius, and obstacle
-voxels. Load Pickle files only from trusted sources.
-
 ## 7. Runtime variants and startup order
 
 There are no launch files. Run each command in a separate terminal after
@@ -251,7 +234,7 @@ sourcing ROS and the workspace.
      -p pcd_path:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
    ```
 
-2. Start exactly one planner:
+2. Start the PCD planner:
 
    ```bash
    ros2 run r3d_planner pcd_path_planner --ros-args \
@@ -278,22 +261,6 @@ Alternatively, send an action directly using the example in
 `r3d_planner/points.txt`. Start and goal coordinates must already be expressed
 in map coordinates.
 
-### Pickle variant
-
-Run this instead of `pcd_path_planner`:
-
-```bash
-ros2 run r3d_planner global_planner --ros-args \
-  -p map_name:=/absolute/path/nav_graph_....pkl
-```
-
-Optionally visualize the same graph:
-
-```bash
-ros2 run r3d_preprocessor voxel_map_publisher --ros-args \
-  -p graph_path:=/absolute/path/nav_graph_....pkl
-```
-
 ### Hardware operation
 
 At minimum, complete these runtime checks before starting motion components:
@@ -308,7 +275,7 @@ The intended process order is:
 
 1. external LiDAR driver and odometry/robot state;
 2. `pcd_server`, optionally for visualization;
-3. exactly one of `global_planner` or `pcd_path_planner`;
+3. `pcd_path_planner`;
 4. `local_filter`;
 5. `rviz_interface` or another action client;
 6. `path_follower` **only after motion safety has been approved**.
@@ -359,8 +326,8 @@ configuration.
   RGB-classified output from `pcd_analyser`.
 - **No `map -> base_link`:** Check `map -> odom` and `odom -> base_link`
   independently. Use `path_test` only without real odometry.
-- **No action response:** Confirm that exactly one global planner is running
-  and that it loaded the map successfully.
+- **No action response:** Confirm that `pcd_path_planner` is running and loaded
+  the map successfully.
 - **rosdep errors:** Install the documented apt dependencies and use the
   explicit `--skip-keys` list.
 - **Incorrect LiDAR filter output:** Verify the PointCloud2 field layout and

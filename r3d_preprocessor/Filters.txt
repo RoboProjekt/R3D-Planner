@@ -1,7 +1,7 @@
 # Offline Map Analysis Parameters
 
-The complete package documentation is in `README.txt`. Both `pcd_analyser` and
-`pcd_to_graph` accept the following parameters.
+The complete package documentation is in `README.txt`. `pcd_analyser` accepts
+the following parameters.
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
@@ -44,6 +44,4 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args \
 | `fill_plane_search_radius` | 2 | voxels | Plane-fill neighborhood radius |
 | `fill_plane_min_neighbors` | 4 | count | Required traversable neighbors for filling |
 
-`pcd_analyser` writes `<input>_analysed.pcd`; `pcd_to_graph` writes a
-parameterized `nav_graph_*.pkl` beside the input file.
-
+`pcd_analyser` writes `<input>_analysed.pcd` beside the input file.

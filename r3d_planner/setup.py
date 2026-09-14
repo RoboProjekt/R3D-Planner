@@ -25,7 +25,6 @@ setup(
     entry_points={
         'console_scripts': [
             # Das registriert die Executables für 'ros2 run'
-            'global_planner = r3d_planner.r3d_global_planner:main',
             'local_filter = r3d_planner.r3d_local_filter:main',
             'path_follower = r3d_planner.r3d_path_follower:main',
             'rviz_interface = r3d_planner.r3d_rviz_interface:main',

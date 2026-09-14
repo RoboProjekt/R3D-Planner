@@ -1,17 +1,31 @@
-# Audit of Previous Documentation Against the Code
+# Documentation Audit for the PCD-only V2 Branch
 
-Audit date: 2026-09-14. Every existing README and the supplementary
-`Filters.txt` were compared with `package.xml`, `setup.py`, YAML, and all Python
-nodes. No functional code was changed.
+Audit date: 2026-09-14. Documentation was compared again with the V2 source,
+entry points, package manifests, YAML, and retained maps.
 
-| File | Previous content | Finding against current code | Documentation update |
-|---|---|---|---|
-| `README_r3d_planner.txt` | Short installation list with global pip commands, only the PCD workflow, and `/home/basti/...` paths | PCD executable names were current, but dependencies, build/sourcing, TF, safety, Pickle workflow, and absence of launch files were missing; the global pip environment is inconsistent on the analyzed machine | Replaced with a portable quick reference and links to complete guides |
-| `r3d_preprocessor/README.txt` | Described `pcd_to_graph`, `voxel_map_publisher`, and `pcd_server`; claimed `/r3d_global_graph_edges` | Current publisher only emits `/r3d_global_voxel_map`; `pcd_analyser` and newer parameters were absent | Added nodes, topics, QoS, all parameters, both artifact paths, dependencies, and verified commands |
-| `r3d_planner/README.txt` | Mentioned only `global_planner` and `local_filter`; claimed a default `nav_graph.pkl` | Six executables exist; the default map is neither present nor installed; action, topics, service, TF, PCD planner, RViz interface, and path follower were missing | Replaced with a complete package reference and safety notes |
-| `r3d_preprocessor/Filters.txt` | Eight parameters and a stale absolute path | Both analysis nodes declare 15 parameters | Added all parameters with defaults, units, behavior, and portable example |
-| `r3d_planner/points.txt` | Action example and site-specific waypoints | Action name and type match the code; `planner_id` is not evaluated; coordinates remain site-specific data | Left unchanged and explained in the planner README |
+## V2 scope applied
 
-The previous repository also lacked a standalone installation guide, complete
-architecture description, and known-issues report. `INSTALL.md`,
-`docs/ARCHITECTURE.md`, and `docs/KNOWN_ISSUES.md` now provide them.
+V2 intentionally removes the persisted Pickle workflow while retaining package
+boundaries and existing PCD interfaces:
+
+| Removed component | Reason |
+|---|---|
+| `r3d_preprocessor/r3d_pcd_to_graph.py` and `pcd_to_graph` entry point | Generates `.pkl` graph artifacts |
+| `r3d_preprocessor/r3d_voxel_map_publisher.py` and entry point | Loads and visualizes `.pkl` artifacts |
+| `r3d_planner/r3d_global_planner.py` and `global_planner` entry point | Loads and plans from `.pkl` artifacts |
+| Matching tracked `.pyc` files | Generated artifacts belonging to removed modules |
+
+The retained path is:
+
+```text
+raw PCD -> pcd_analyser -> analyzed RGB PCD -> pcd_path_planner
+                              \-> pcd_server -> RViz
+```
+
+The root README, legacy quick reference, installation guide, package READMEs,
+parameter reference, architecture overview, and known-issues report were
+updated to describe only this PCD workflow. `r3d_planner/points.txt` remains
+unchanged because its action request is still valid for `pcd_path_planner`.
+
+No topics, services, actions, TF frame names, parameter names, YAML values, map
+files, or package directories were renamed.
