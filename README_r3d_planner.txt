@@ -1,19 +1,18 @@
 # R3D-Planner — Quick Reference
 
-The complete, code-verified repository documentation is in `README.md`.
-Installation, build, and startup instructions are in `INSTALL.md`; the complete
-interface and data-flow analysis is in `docs/ARCHITECTURE.md`; observed but
-unfixed problems are recorded in `docs/KNOWN_ISSUES.md`.
+Use `README.md` for the repository overview, `INSTALL.md` for setup and startup,
+`docs/ARCHITECTURE.md` for interfaces and data flow, and
+`docs/KNOWN_ISSUES.md` for unresolved problems.
 
-The current repository contains two `ament_python` packages:
+R3D-Planner consists of two `ament_python` packages:
 
 - `r3d_preprocessor`: produces either color-coded analyzed PCDs or NetworkX
   Pickle graphs from PCD maps and publishes maps for RViz.
 - `r3d_planner`: provides alternative PCD/Pickle A* planners, a local Hesai
   filter, an RViz interface, a simple `/cmd_vel` path follower, and a test TF.
 
-Analysis reference environment: Ubuntu 22.04, ROS 2 Humble, Python 3.10. The
-repository itself has no binding support matrix and contains no launch files.
+The supported ROS distribution is ROS 2 Humble. The stack has been implemented
+and tested on a Unitree Go2W. The repository contains no launch files.
 
 ## Build
 
@@ -57,4 +56,3 @@ In RViz, set the Fixed Frame to `map`. For `/map_pointcloud`, select
 `path_test` is exclusively for tests without real odometry. `path_follower` is
 deliberately not started here because it publishes directly to `/cmd_vel`.
 Read the hardware checks in `INSTALL.md` before enabling motion.
-

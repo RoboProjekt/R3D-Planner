@@ -1,9 +1,11 @@
 # R3D Navigation Stack Architecture
 
-## 1. System boundary
+## System boundary
 
-This document describes only the code present in this repository. A complete
-robot deployment also requires these external components:
+R3D-Planner separates map processing, global planning, local point-cloud
+filtering, RViz input, and path following into ROS 2 nodes. The complete stack
+has been integrated and tested on a Unitree Go2W. The Go2W runtime also
+supplies:
 
 - 3D LiDAR driver and sensor calibration;
 - odometry or state estimation publishing `odom -> base_link`;
@@ -11,7 +13,7 @@ robot deployment also requires these external components:
 - optional Nav2 bringup and costmap/controller plugins;
 - process supervision and safety-rated shutdown.
 
-## 2. Packages and dependency flow
+## Packages and dependency flow
 
 ```text
 r3d_preprocessor                         r3d_planner
@@ -46,9 +48,9 @@ Each package also contains the standard Ament Python resource file and three
 template tests for copyright, Flake8, and PEP257. There is no map metadata file,
 custom interface package, or launch configuration.
 
-## 3. Offline map processing
+## Offline map processing
 
-### Shared processing stages
+### Processing stages
 
 `pcd_analyser` and `pcd_to_graph` contain largely parallel implementations:
 
@@ -97,7 +99,7 @@ startup. It skips magenta points. Discrete node keys are computed by dividing
 coordinates by `voxel_size_cm` and rounding. Voxel size and step-height values
 must be supplied separately and must match preprocessing.
 
-## 4. Global planning
+## Global planning
 
 Both planner executables instantiate `global_graph_planner` and provide the
 `compute_path_to_pose` action:
@@ -117,7 +119,7 @@ Narrow-area metadata is encoded in `Path.poses[*].pose.orientation.z` (`1.0`
 for `narrow`, otherwise `0.0`) while `orientation.w` is always `1.0`. This is an
 internal protocol for `path_follower`, not a generally valid pose quaternion.
 
-## 5. Local perception
+## Local perception
 
 `obstacle_cliff_filter` assumes X forward, Y lateral, and Z upward:
 
@@ -135,7 +137,7 @@ All thresholds are Python constants rather than ROS parameters. When a step is
 detected, low points in its ROI are removed from the obstacle cloud. Fewer than
 30 floor points between X=0.7 and 1.2 m causes a virtual wall at X=0.7 m.
 
-## 6. RViz interaction and TF
+## RViz interaction and TF
 
 ```text
 /clicked_point + /initialpose -> XY match within 0.8 m -> static map -> odom
@@ -160,11 +162,12 @@ map
       └── base_link  external odometry, or path_test for tests only
 ```
 
-Runtime verification must establish that no other localization system publishes
-`map -> odom`, the robot publishes a time-correct `odom -> base_link`, the
-LiDAR frame is mounted as assumed, and map coordinates agree with `map`.
+The tested Go2W integration uses one publisher for `map -> odom`, supplies a
+time-correct `odom -> base_link`, and matches the assumed LiDAR orientation and
+`map` coordinates. Recheck these constraints after changing localization,
+odometry, or the sensor installation.
 
-## 7. Path following
+## Path following
 
 `r3d_path_follower` is a simple 2D lookahead controller:
 
@@ -181,7 +184,7 @@ The controller does not directly process path Z, `/stair_detect`, or the cliff
 wall. It completes a path at 0.2 m XY distance from the goal. Values are
 hard-coded.
 
-## 8. Node and executable mapping
+## Node and executable mapping
 
 | Package/executable | Node name | Behavior |
 |---|---|---|
@@ -198,7 +201,7 @@ hard-coded.
 
 `r3d_pcd_voxel_publisher.py` is present but not installed as a console script.
 
-## 9. Topics
+## Topics
 
 | Topic | Type | Publisher | Subscriber | QoS/purpose |
 |---|---|---|---|---|
@@ -215,9 +218,9 @@ hard-coded.
 | `/initialpose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | RViz/external | `rviz_interface` | initial calibration pose |
 | `/goal_pose` | `geometry_msgs/msg/PoseStamped` | RViz/external | `rviz_interface` | goal pose |
 
-The repository defines no topic remappings.
+No topic remappings are defined.
 
-## 10. Services and actions
+## Services and actions
 
 | Name | Type | Server | Client/purpose |
 |---|---|---|---|
@@ -227,7 +230,7 @@ The repository defines no topic remappings.
 There are no other application services or actions. ROS parameter services are
 not listed here.
 
-## 11. Parameters
+## Parameters
 
 ### Preprocessor (`pcd_analyser` and `pcd_to_graph`)
 
@@ -267,7 +270,7 @@ not listed here.
 `local_filter`, `path_follower`, and `rviz_interface` declare no application
 ROS parameters; their operating values are hard-coded.
 
-## 12. Nav2 configuration
+## Nav2 configuration
 
 `r3d_planner_params.yaml` is not a complete bringup. It contains:
 
@@ -278,9 +281,9 @@ ROS parameters; their operating values are hard-coded.
 - an MPPI `FollowPath` excerpt with X velocity -0.1–0.5 and critic settings.
 
 There is no configuration block for `cliff_virtual`. Placeholder comments
-remain, and no repository launch file loads this YAML.
+remain, and no launch file loads this YAML.
 
-## 13. Build and installation model
+## Build and installation
 
 Both packages install Python modules, their Ament resource index entry, and
 `package.xml`. `r3d_planner` also installs `config/*.yaml`.
