@@ -7,10 +7,10 @@ unfixed problems are recorded in `docs/KNOWN_ISSUES.md`.
 
 The current repository contains two `ament_python` packages:
 
-- `r3d_preprocessor`: produces either color-coded analyzed PCDs or NetworkX
-  Pickle graphs from PCD maps and publishes maps for RViz.
-- `r3d_planner`: provides alternative PCD/Pickle A* planners, a local Hesai
-  filter, an RViz interface, a simple `/cmd_vel` path follower, and a test TF.
+- `r3d_preprocessor`: produces color-coded analyzed PCDs and publishes them for
+  RViz.
+- `r3d_planner`: provides a PCD-based A* planner, a local Hesai filter, an RViz
+  interface, a simple `/cmd_vel` path follower, and a test TF.
 
 Analysis reference environment: Ubuntu 22.04, ROS 2 Humble, Python 3.10. The
 repository itself has no binding support matrix and contains no launch files.
@@ -57,4 +57,3 @@ In RViz, set the Fixed Frame to `map`. For `/map_pointcloud`, select
 `path_test` is exclusively for tests without real odometry. `path_follower` is
 deliberately not started here because it publishes directly to `/cmd_vel`.
 Read the hardware checks in `INSTALL.md` before enabling motion.
-

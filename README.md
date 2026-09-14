@@ -1,12 +1,11 @@
 # R3D-Planner
 
 R3D-Planner is a ROS 2 based 3D navigation stack for voxelized point clouds.
-The current implementation converts a PCD map either into a serialized
-NetworkX graph or into a color-coded PCD map, computes a three-dimensional A*
-path on that representation, and can follow the resulting path with a simple
-local controller. According to the original documentation, the target platform
-was a Unitree Go2W; general hardware compatibility has not been demonstrated by
-this repository.
+The V2 implementation converts a PCD map into a color-coded PCD map, rebuilds a
+NetworkX graph from that PCD in memory, computes a three-dimensional A* path,
+and can follow the path with a simple local controller. According to the
+original documentation, the target platform was a Unitree Go2W; general
+hardware compatibility has not been demonstrated by this repository.
 
 > **Status:** Research/thesis prototype. Before operating real hardware, verify
 > the TF tree, LiDAR coordinate system, safety chain, and `/cmd_vel` consumer.
@@ -24,7 +23,7 @@ verification.
 
 ```text
 R3D-Planner/
-├── r3d_preprocessor/       # Offline map analysis and map publishers
+├── r3d_preprocessor/       # Offline PCD analysis and PCD publisher
 │   ├── maps/               # Example PCD and analyzed example PCD
 │   └── r3d_preprocessor/   # Python nodes
 ├── r3d_planner/            # Planning, filtering, RViz UI, and path following
@@ -40,19 +39,14 @@ launch, URDF, RViz, or custom message/service/action files.
 
 | Package | Responsibility | Installed executables |
 |---|---|---|
-| `r3d_preprocessor` | Voxelize PCD data, classify traversability, generate a Pickle graph or color-coded PCD, and publish maps | `pcd_to_graph`, `pcd_analyser`, `voxel_map_publisher`, `pcd_server` |
-| `r3d_planner` | A* planning, local LiDAR filtering, RViz interaction, simple path following, and test TF | `global_planner`, `pcd_path_planner`, `local_filter`, `path_follower`, `rviz_interface`, `path_test` |
+| `r3d_preprocessor` | Voxelize PCD data, classify traversability, generate a color-coded PCD, and publish it | `pcd_analyser`, `pcd_server` |
+| `r3d_planner` | PCD-based A* planning, local LiDAR filtering, RViz interaction, simple path following, and test TF | `pcd_path_planner`, `local_filter`, `path_follower`, `rviz_interface`, `path_test` |
 
 ## Architecture at a glance
 
-The repository provides two alternative map/planner pipelines:
+V2 contains one PCD-only map/planner pipeline:
 
 ```text
-Pickle pipeline:
-raw PCD -> pcd_to_graph -> *.pkl -> global_planner
-                                -> voxel_map_publisher -> RViz
-
-PCD pipeline:
 raw PCD -> pcd_analyser -> *_analysed.pcd -> pcd_path_planner
                          \-> pcd_server -> RViz
 
@@ -71,20 +65,18 @@ LiDAR -> local_filter -> /local/filtered_obstacles
                                              /cmd_vel
 ```
 
-`global_planner` and `pcd_path_planner` are alternatives. Both use the node
-name `global_graph_planner`, provide `/compute_path_to_pose`, and publish the
-same path topics. They must not run at the same time. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the complete analysis.
+The former Pickle generator, Pickle marker publisher, and Pickle-based planner
+are intentionally absent from V2. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the complete PCD data flow.
 
 ## Main ROS interfaces
 
 | Name | Type | Producer | Consumer/purpose |
 |---|---|---|---|
-| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | one global planner | `rviz_interface` or external client |
-| `/global_path` | `nav_msgs/msg/Path` | one global planner | `path_follower` |
-| `/planned_path` | `visualization_msgs/msg/Marker` | one global planner | RViz |
+| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | `pcd_path_planner` | `rviz_interface` or external client |
+| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` |
+| `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | RViz |
 | `/map_pointcloud` | `sensor_msgs/msg/PointCloud2` | `pcd_server` | RViz/external components |
-| `/r3d_global_voxel_map` | `visualization_msgs/msg/Marker` | `voxel_map_publisher` | RViz |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external Hesai driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 integration |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no active subscriber in this repository |
@@ -172,13 +164,12 @@ The output is written beside the input as `map_analysed.pcd`. The planner
 interprets colors as follows: magenta = obstacle (skipped), cyan = narrow area,
 yellow = stair access, and other colors = floor.
 
-Alternatively, `pcd_to_graph` creates a `nav_graph_*.pkl` for
-`global_planner`. Load Pickle files only from trusted sources.
+V2 does not generate or load `.pkl` files. Its persisted map exchange format is
+the analyzed RGB PCD.
 
 ## Configuration
 
-- Pass offline analysis parameters to `pcd_analyser` or `pcd_to_graph` as ROS
-  parameters.
+- Pass offline analysis parameters to `pcd_analyser` as ROS parameters.
 - Pass planner map parameters as ROS parameters.
 - Thresholds in `local_filter`, controller values in `path_follower`, and the
   RViz matching radius are hard-coded Python values, not ROS parameters.

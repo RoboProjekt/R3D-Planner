@@ -4,13 +4,11 @@
 
 `r3d_preprocessor` is the offline map-processing package of the R3D stack. It
 reads 3D point clouds in PCD format, voxelizes and classifies them using robot
-dimensions, and produces either:
+dimensions, and produces a color-coded voxel point cloud
+(`*_analysed.pcd`).
 
-- a serialized NetworkX navigation graph (`*.pkl`), or
-- a color-coded voxel point cloud (`*_analysed.pcd`).
-
-The package can also publish PCD maps as `PointCloud2` or Pickle graphs as RViz
-markers. It contains no launch files or custom ROS interfaces.
+The package can publish PCD maps as `PointCloud2`. It contains no launch files
+or custom ROS interfaces.
 
 ## Build type and installation
 
@@ -24,7 +22,7 @@ See `../INSTALL.md` for dependencies and build commands.
 
 ## Processing model
 
-Both analysis paths load a PCD through Open3D. They can supplement floor points
+`pcd_analyser` loads a PCD through Open3D. It can supplement floor points
 using local point density, filter occupied voxels, and apply a cylindrical
 collision model. Voxels are classified as normally traversable (`floor`),
 traversable only with the smaller robot radius (`narrow`), or obstacles.
@@ -45,9 +43,7 @@ on their height difference.
 | Executable | Node name | Purpose | Input/output |
 |---|---|---|---|
 | `pcd_analyser` | `pcd_to_graph_node` | Analyze traversability and produce a color-coded PCD | reads `pcd_path`, writes `<name>_analysed.pcd` |
-| `pcd_to_graph` | `pcd_to_graph_node` | Analyze traversability and produce a NetworkX graph | reads `pcd_path`, writes `nav_graph_*.pkl` |
 | `pcd_server` | `pcd_publisher` | Publish one PCD as PointCloud2 | `/map_pointcloud` |
-| `voxel_map_publisher` | `voxel_map_publisher` | Publish Pickle graph nodes and obstacles as colored cubes | `/r3d_global_voxel_map` |
 
 `r3d_pcd_voxel_publisher.py` exists in the source tree but is not registered as
 a console script and therefore is not a regular `ros2 run` executable.
@@ -57,18 +53,13 @@ a console script and therefore is not a regular `ros2 run` executable.
 | Topic | Type | Publisher | QoS | Purpose |
 |---|---|---|---|---|
 | `/map_pointcloud` | `sensor_msgs/msg/PointCloud2` | `pcd_server` | depth 1, `TRANSIENT_LOCAL` | PCD in the fixed `map` frame; includes RGB if present |
-| `/r3d_global_voxel_map` | `visualization_msgs/msg/Marker` | `voxel_map_publisher` | depth 1, `TRANSIENT_LOCAL`, republished every 2 s | Graph nodes and obstacles as a `CUBE_LIST` in `map` |
 
 The package subscribes to no topics, provides no services or actions, and
 publishes no TF transforms.
 
-Contrary to the previous README, the current `voxel_map_publisher` does not
-publish `/r3d_global_graph_edges`; it only publishes
-`/r3d_global_voxel_map`.
-
 ## Analysis-node parameters
 
-`pcd_analyser` and `pcd_to_graph` declare the same parameters and defaults:
+`pcd_analyser` declares the following parameters and defaults:
 
 | Parameter | Default | Unit | Actual behavior |
 |---|---:|---|---|
@@ -95,7 +86,6 @@ publish `/r3d_global_graph_edges`; it only publishes
 | Executable | Parameter | Default | Behavior |
 |---|---|---|---|
 | `pcd_server` | `pcd_path` | `environment.pcd` | PCD to load and publish |
-| `voxel_map_publisher` | `graph_path` | empty | Pickle graph to load and visualize |
 
 ## Usage: color-coded PCD
 
@@ -135,46 +125,20 @@ ros2 run r3d_preprocessor pcd_server --ros-args \
 In RViz, use Fixed Frame `map`, PointCloud2 topic `/map_pointcloud`, display
 durability `Transient Local`, and color transformer `RGB8`.
 
-## Usage: Pickle graph
-
-```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args \
-  -p pcd_path:=/absolute/path/map.pcd \
-  -p voxel_size_cm:=5.0 \
-  -p min_step_height_cm:=5.0 \
-  -p max_step_height_cm:=25.0
-```
-
-The generated filename includes important settings, for example
-`nav_graph_step25_voxel5_dens10_minpts3_tol0.020_fillTrue_clear10_narrow30_rad40.pkl`.
-
-Visualize the graph:
-
-```bash
-ros2 run r3d_preprocessor voxel_map_publisher --ros-args \
-  -p graph_path:=/absolute/path/nav_graph_....pkl
-```
-
-The file is opened with `pickle.load`. Use only self-generated or otherwise
-trusted Pickle files.
-
 ## Dependencies
 
 ### Declared dependencies
 
-`rclpy`, `visualization_msgs`, `std_msgs`, `geometry_msgs`, `sensor_msgs`,
-`numpy`, and `pickle`.
+`rclpy`, `sensor_msgs`, and `numpy`.
 
 ### Additional imports used by the implementation
 
-Open3D and NetworkX. `pickle` is part of Python and not an external package.
-The current manifest is not fully rosdep-compatible; see `../INSTALL.md` and
-`../docs/KNOWN_ISSUES.md`.
+Open3D. The current manifest is not fully rosdep-compatible; see
+`../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
 
 ## Integration
 
 - `pcd_analyser` -> analyzed PCD -> `r3d_planner/pcd_path_planner`
-- `pcd_to_graph` -> Pickle graph -> `r3d_planner/global_planner`
-- `pcd_server` and `voxel_map_publisher` primarily support visualization.
+- `pcd_server` publishes the analyzed map for visualization.
 - Maps and markers are treated as belonging to `map`; no map transform is
   applied.

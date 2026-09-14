@@ -16,13 +16,11 @@ robot deployment also requires these external components:
 ```text
 r3d_preprocessor                         r3d_planner
 ----------------                         -----------
-raw PCD                                  analyzed PCD or Pickle graph
-  |                                        |
-  +-> color-coded PCD ---------------------+-> global A* planner
-  |                                        |       |
-  +-> NetworkX Pickle ---------------------+       +-> Nav2 action + Path
-                                                   |
-LiDAR (external) -> local filter -----------------+-> simple path follower
+raw PCD -> color-coded PCD --------------+-> global A* planner
+                                                   |       |
+LiDAR (external) -> local filter -----------------+-> Nav2 action + Path
+                                                           |
+                                                           +-> simple path follower
                                                           |
                                                           +-> /cmd_vel
 ```
@@ -50,7 +48,7 @@ custom interface package, or launch configuration.
 
 ### Shared processing stages
 
-`pcd_analyser` and `pcd_to_graph` contain largely parallel implementations:
+`pcd_analyser` performs these stages:
 
 1. Load a PCD with Open3D.
 2. Optionally supplement floor samples from point density in XY cells.
@@ -66,21 +64,6 @@ custom interface package, or launch configuration.
 
 Input coordinates are used without an external transform. The input map must
 already use the intended map coordinate system.
-
-### Pickle pipeline
-
-```text
-map.pcd
-  -> pcd_to_graph
-  -> nav_graph_step...voxel...pkl
-     {graph, origin, voxel_size, robot_radius, obstacles}
-  -> global_planner and/or voxel_map_publisher
-```
-
-`pcd_to_graph` builds an undirected NetworkX graph. Eight XY neighbors are
-connected when their height difference does not exceed the maximum step height.
-Flat edges use Euclidean 3D distance; narrow areas multiply cost by 1.2. Step
-edges multiply cost by 3.0. The Pickle preserves origin and voxel size.
 
 ### Color-coded PCD pipeline
 
@@ -99,7 +82,7 @@ must be supplied separately and must match preprocessing.
 
 ## 4. Global planning
 
-Both planner executables instantiate `global_graph_planner` and provide the
+`pcd_path_planner` instantiates `global_graph_planner` and provides the
 `compute_path_to_pose` action:
 
 1. Use a SciPy KDTree to map action start and goal positions to nearest graph
@@ -109,9 +92,8 @@ Both planner executables instantiate `global_graph_planner` and provide the
    result.
 4. Publish a `visualization_msgs/msg/Marker` on `/planned_path`.
 
-The Pickle planner publishes `CUBE_LIST`; the PCD planner publishes
-`LINE_STRIP`. Each output uses the goal request's frame string without checking
-or transforming coordinates.
+The planner publishes a `LINE_STRIP`. Each output uses the goal request's frame
+string without checking or transforming coordinates.
 
 Narrow-area metadata is encoded in `Path.poses[*].pose.orientation.z` (`1.0`
 for `narrow`, otherwise `0.0`) while `orientation.w` is always `1.0`. This is an
@@ -186,10 +168,7 @@ hard-coded.
 | Package/executable | Node name | Behavior |
 |---|---|---|
 | `r3d_preprocessor/pcd_analyser` | `pcd_to_graph_node` | One-shot PCD analysis; writes `_analysed.pcd` |
-| `r3d_preprocessor/pcd_to_graph` | `pcd_to_graph_node` | One-shot PCD analysis; writes `.pkl` |
 | `r3d_preprocessor/pcd_server` | `pcd_publisher` | Publishes one transient-local PCD and remains active |
-| `r3d_preprocessor/voxel_map_publisher` | `voxel_map_publisher` | Publishes Pickle content as a marker every 2 s |
-| `r3d_planner/global_planner` | `global_graph_planner` | Pickle-based action server |
 | `r3d_planner/pcd_path_planner` | `global_graph_planner` | PCD-based action server |
 | `r3d_planner/local_filter` | `obstacle_cliff_filter` | LiDAR filter |
 | `r3d_planner/path_follower` | `r3d_path_follower` | Path controller and `/cmd_vel` publisher |
@@ -203,9 +182,8 @@ hard-coded.
 | Topic | Type | Publisher | Subscriber | QoS/purpose |
 |---|---|---|---|---|
 | `/map_pointcloud` | `sensor_msgs/msg/PointCloud2` | `pcd_server` | external/RViz | depth 1, transient-local; frame `map` |
-| `/r3d_global_voxel_map` | `visualization_msgs/msg/Marker` | `voxel_map_publisher` | external/RViz | depth 1, transient-local; frame `map` |
-| `/planned_path` | `visualization_msgs/msg/Marker` | one planner | external/RViz | depth 10 |
-| `/global_path` | `nav_msgs/msg/Path` | one planner | `path_follower` | depth 10 |
+| `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | external/RViz | depth 10 |
+| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` | depth 10 |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` | depth 10 |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 | depth 10; retains input header |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | none internally | depth 10 |
@@ -222,14 +200,14 @@ The repository defines no topic remappings.
 | Name | Type | Server | Client/purpose |
 |---|---|---|---|
 | `/recalibrate_pose` | `std_srvs/srv/Trigger` | `rviz_interface` | external; return to calibration mode |
-| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | exactly one global planner | `rviz_interface` or external |
+| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | `pcd_path_planner` | `rviz_interface` or external |
 
 There are no other application services or actions. ROS parameter services are
 not listed here.
 
 ## 11. Parameters
 
-### Preprocessor (`pcd_analyser` and `pcd_to_graph`)
+### Preprocessor (`pcd_analyser`)
 
 | Parameter | Default | Unit | Effect |
 |---|---:|---|---|
@@ -256,9 +234,7 @@ not listed here.
 | Node | Parameter | Default | Effect |
 |---|---|---|---|
 | `pcd_server` | `pcd_path` | `environment.pcd` | PCD to publish |
-| `voxel_map_publisher` | `graph_path` | empty | Pickle to visualize |
-| both planners | `map_dir` | `<share/r3d_preprocessor>/maps`, fallback `/tmp` | Base directory for relative names |
-| `global_planner` | `map_name` | `nav_graph.pkl` | Pickle filename/path |
+| `pcd_path_planner` | `map_dir` | `<share/r3d_preprocessor>/maps`, fallback `/tmp` | Base directory for relative names |
 | `pcd_path_planner` | `map_name` | `map_analysed.pcd` | Analyzed PCD filename/path |
 | `pcd_path_planner` | `voxel_size_cm` | 5.0 | Reconstruction grid size |
 | `pcd_path_planner` | `min_step_height_cm` | 5.0 | Flat/step boundary |
