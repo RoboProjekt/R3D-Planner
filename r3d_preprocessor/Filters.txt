@@ -1,40 +1,49 @@
----- A List of all available Filters ----
+# Offline Map Analysis Parameters
 
-ros2 run r3d_preprocessor pcd_to_graph --ros-args \
-  -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/HomeLab_test1_LIO.pcd \
+The complete package documentation is in `README.txt`. Both `pcd_analyser` and
+`pcd_to_graph` accept the following parameters.
+
+```bash
+ros2 run r3d_preprocessor pcd_analyser --ros-args \
+  -p pcd_path:=/absolute/path/map.pcd \
   -p voxel_size_cm:=5.0 \
   -p max_step_height_cm:=25.0 \
   -p min_points_per_sqm:=10.0 \
-  -p min_points_per_voxel:=1 \
-  -p floor_height_tolerance:=0.03 \
+  -p min_points_per_voxel:=3 \
+  -p floor_height_tolerance:=0.02 \
   -p ground_fill:=true \
   -p robot_base_clearance_cm:=10.0 \
-  -p robot_narrow_radius_cm:=30.0
+  -p robot_narrow_radius_cm:=30.0 \
+  -p min_step_height_cm:=5.0 \
+  -p robot_radius_cm:=40.0 \
+  -p robot_height_cm:=80.0 \
+  -p analysis_grid_size_cm:=20.0 \
+  -p cluster_gap_threshold_cm:=20.0 \
+  -p fill_plane_iterations:=2 \
+  -p fill_plane_search_radius:=2 \
+  -p fill_plane_min_neighbors:=4
+```
 
+| Parameter | Default | Unit | Meaning |
+|---|---:|---|---|
+| `pcd_path` | `environment.pcd` | path | Input point cloud; `~` is expanded |
+| `voxel_size_cm` | 5.0 | cm | Output voxel edge length |
+| `max_step_height_cm` | 25.0 | cm | Maximum connectable step height |
+| `min_step_height_cm` | 5.0 | cm | Boundary between flat and step connections |
+| `min_points_per_sqm` | 10.0 | points/m² | Density threshold for floor filling |
+| `min_points_per_voxel` | 3 | points | Filter for weakly observed voxels |
+| `floor_height_tolerance` | 0.02 | m | Height tolerance for floor clusters |
+| `ground_fill` | `true` | boolean | Enable density and neighborhood filling |
+| `robot_base_clearance_cm` | 10.0 | cm | Lower start of the collision check |
+| `robot_narrow_radius_cm` | 30.0 | cm | Collision radius for narrow areas |
+| `robot_radius_cm` | 40.0 | cm | Normal robot collision radius |
+| `robot_height_cm` | 80.0 | cm | Collision cylinder height |
+| `analysis_grid_size_cm` | 20.0 | cm | XY cell size for density analysis |
+| `cluster_gap_threshold_cm` | 20.0 | cm | Gap used to separate vertical clusters |
+| `fill_plane_iterations` | 2 | count | Maximum plane-fill iterations |
+| `fill_plane_search_radius` | 2 | voxels | Plane-fill neighborhood radius |
+| `fill_plane_min_neighbors` | 4 | count | Required traversable neighbors for filling |
 
-pcd_path: Path to the .pcd file you want to load as base map
-
-voxel_size_cm: The size of the final voxels after running the package
-
-max_step_height_cm: Maximum height of an obstacle to be seen as a step/traversible area
-
-min_points_per_sqm: Only Areas (of 1 sqare meter) on the ground that have been hit by this amount of rays will be used for ground fill
-
-min_points_per_voxel: Filters the .pcd for artefacts and dynamic objects that haven't been scanned for to long (Number of hits)
-
-floor_height_tolerance: Amount of deviation of groundscans allowed for groundfill
-
-ground_fill: Boolean to disable ground filling algorithms if the scan is good enough
-
-robot_base_clearance_cm: The maximum ground deviation that is assigned traversible without changing the robot state (also dependent on voxel size)
-
-robot_narrow_radius_cm: The minimum width of the Robot (including some room for error) -> assigns voxels a limited rotation so that the robot wont rotate into objects
-
-
-
-
-
-
-
-
+`pcd_analyser` writes `<input>_analysed.pcd`; `pcd_to_graph` writes a
+parameterized `nav_graph_*.pkl` beside the input file.
 
