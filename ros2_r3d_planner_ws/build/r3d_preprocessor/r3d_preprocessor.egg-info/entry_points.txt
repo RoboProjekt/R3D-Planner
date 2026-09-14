@@ -1,0 +1,6 @@
+[console_scripts]
+pcd_analyser = r3d_preprocessor.r3d_pcd_analyser:main
+pcd_server = r3d_preprocessor.r3d_pcd_publisher:main
+pcd_to_graph = r3d_preprocessor.r3d_pcd_to_graph:main
+voxel_map_publisher = r3d_preprocessor.r3d_voxel_map_publisher:main
+

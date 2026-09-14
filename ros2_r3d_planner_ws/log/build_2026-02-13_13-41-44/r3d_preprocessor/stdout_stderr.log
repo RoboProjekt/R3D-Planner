@@ -1,0 +1,18 @@
+running develop
+running egg_info
+writing r3d_preprocessor.egg-info/PKG-INFO
+writing dependency_links to r3d_preprocessor.egg-info/dependency_links.txt
+writing entry points to r3d_preprocessor.egg-info/entry_points.txt
+writing requirements to r3d_preprocessor.egg-info/requires.txt
+writing top-level names to r3d_preprocessor.egg-info/top_level.txt
+reading manifest file 'r3d_preprocessor.egg-info/SOURCES.txt'
+writing manifest file 'r3d_preprocessor.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d-preprocessor.egg-link (link to .)
+Installing pcd_server script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+Installing pcd_to_graph script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+Installing voxel_map_publisher script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+
+Installed /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor
+running symlink_data
+symbolically linking /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -> /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/share/r3d_preprocessor/maps
