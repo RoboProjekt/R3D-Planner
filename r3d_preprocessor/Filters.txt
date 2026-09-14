@@ -1,7 +1,6 @@
 # Offline Map Analysis Parameters
 
-The complete package documentation is in `README.txt`. `pcd_analyser` accepts
-the following parameters.
+See `README.txt` for package behavior and integration. Run `pcd_analyser` with:
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \

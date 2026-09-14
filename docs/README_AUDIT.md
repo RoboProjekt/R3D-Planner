@@ -1,31 +1,28 @@
-# Documentation Audit for the PCD-only V2 Branch
+# V2 Documentation Scope
 
-Audit date: 2026-09-14. Documentation was compared again with the V2 source,
-entry points, package manifests, YAML, and retained maps.
-
-## V2 scope applied
-
-V2 intentionally removes the persisted Pickle workflow while retaining package
-boundaries and existing PCD interfaces:
-
-| Removed component | Reason |
-|---|---|
-| `r3d_preprocessor/r3d_pcd_to_graph.py` and `pcd_to_graph` entry point | Generates `.pkl` graph artifacts |
-| `r3d_preprocessor/r3d_voxel_map_publisher.py` and entry point | Loads and visualizes `.pkl` artifacts |
-| `r3d_planner/r3d_global_planner.py` and `global_planner` entry point | Loads and plans from `.pkl` artifacts |
-| Matching tracked `.pyc` files | Generated artifacts belonging to removed modules |
-
-The retained path is:
+V2 uses PCD files throughout the offline map and global-planning pipeline:
 
 ```text
 raw PCD -> pcd_analyser -> analyzed RGB PCD -> pcd_path_planner
                               \-> pcd_server -> RViz
 ```
 
-The root README, legacy quick reference, installation guide, package READMEs,
-parameter reference, architecture overview, and known-issues report were
-updated to describe only this PCD workflow. `r3d_planner/points.txt` remains
-unchanged because its action request is still valid for `pcd_path_planner`.
+`r3d_preprocessor` installs `pcd_analyser` and `pcd_server`.
+`r3d_planner` installs `pcd_path_planner`, `local_filter`, `path_follower`,
+`rviz_interface`, and `path_test`.
 
-No topics, services, actions, TF frame names, parameter names, YAML values, map
-files, or package directories were renamed.
+V2 does not include the Pickle graph generator, Pickle marker publisher, or
+Pickle-based planner. `r3d_planner/points.txt` remains a valid action request
+example for `pcd_path_planner`.
+
+The documentation is split by purpose:
+
+- `README.md` introduces the stack and provides a planning test.
+- `INSTALL.md` covers dependencies, build, map preparation, and startup.
+- `docs/ARCHITECTURE.md` documents data flow and ROS interfaces.
+- `docs/KNOWN_ISSUES.md` records implementation constraints and maintenance
+  work.
+- Each package README documents its nodes and parameters.
+
+Topics, services, actions, TF frames, parameters, YAML values, map files, and
+package names follow the interfaces defined by V2.
