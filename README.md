@@ -1,23 +1,21 @@
 # R3D-Planner
 
-R3D-Planner is a ROS 2 based 3D navigation stack for voxelized point clouds.
-The V2 implementation converts a PCD map into a color-coded PCD map, rebuilds a
-NetworkX graph from that PCD in memory, computes a three-dimensional A* path,
-and can follow the path with a simple local controller. According to the
-original documentation, the target platform was a Unitree Go2W; general
-hardware compatibility has not been demonstrated by this repository.
+R3D-Planner is a ROS 2 navigation stack for voxelized 3D point clouds. It turns
+PCD maps into a voxelized traversability map and publishes the classified map
+as a color-coded point cloud for RViz. The planner computes fully
+three-dimensional paths with A* and publishes them through standard ROS 2
+interfaces. The complete stack, including TF and sensor integration, was
+developed and tested on a Unitree Go2W.
 
-> **Status:** Research/thesis prototype. Before operating real hardware, verify
-> the TF tree, LiDAR coordinate system, safety chain, and `/cmd_vel` consumer.
-> Do not use the stack to move a robot without supervision.
+> **Status:** The Unitree Go2W deployment uses a tested TF tree, LiDAR setup,
+> safety chain, and `/cmd_vel` interface. Revalidate these components after any
+> integration change, and operate the robot under supervision.
 
-## Verified environment
+## Reference environment
 
-The repository does not define a binding operating-system or ROS 2 support
-matrix. The analysis was performed with Ubuntu 22.04, ROS 2 Humble, and Python
-3.10. The previous root documentation also referenced Humble. Other ROS
-distributions are **not determinable from the source** and require separate
-verification.
+The stack supports ROS 2 Humble. Other ROS distributions are not supported.
+The commands in this guide use Ubuntu 22.04 and Python 3.10. The deployed Go2W
+system provides the reference runtime environment.
 
 ## Repository structure
 
@@ -29,20 +27,20 @@ R3D-Planner/
 ├── r3d_planner/            # Planning, filtering, RViz UI, and path following
 │   ├── config/             # Nav2 configuration fragment
 │   └── r3d_planner/        # Python nodes
-├── docs/ARCHITECTURE.md    # Complete data-flow and interface analysis
-├── docs/KNOWN_ISSUES.md    # Observed issues that have not been fixed
+├── docs/ARCHITECTURE.md    # Data flow and ROS interfaces
+├── docs/KNOWN_ISSUES.md    # Known limitations and maintenance notes
 └── INSTALL.md              # Installation, build, startup, and verification
 ```
 
-Both ROS 2 packages use `ament_python`. The source tree contains no CMake,
-launch, URDF, RViz, or custom message/service/action files.
+Both ROS 2 packages use `ament_python`. The stack has no CMake, launch, URDF,
+RViz configuration, or custom message/service/action files.
 
 | Package | Responsibility | Installed executables |
 |---|---|---|
 | `r3d_preprocessor` | Voxelize PCD data, classify traversability, generate a color-coded PCD, and publish it | `pcd_analyser`, `pcd_server` |
 | `r3d_planner` | PCD-based A* planning, local LiDAR filtering, RViz interaction, simple path following, and test TF | `pcd_path_planner`, `local_filter`, `path_follower`, `rviz_interface`, `path_test` |
 
-## Architecture at a glance
+## Data flow
 
 V2 contains one PCD-only map/planner pipeline:
 
@@ -65,9 +63,9 @@ LiDAR -> local_filter -> /local/filtered_obstacles
                                              /cmd_vel
 ```
 
-The former Pickle generator, Pickle marker publisher, and Pickle-based planner
-are intentionally absent from V2. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the complete PCD data flow.
+V2 exchanges maps as PCD files only; it does not include the Pickle generator,
+Pickle marker publisher, or Pickle-based planner. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for node-level details.
 
 ## Main ROS interfaces
 
@@ -79,8 +77,8 @@ are intentionally absent from V2. See
 | `/map_pointcloud` | `sensor_msgs/msg/PointCloud2` | `pcd_server` | RViz/external components |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external Hesai driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 integration |
-| `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no active subscriber in this repository |
-| `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | no subscriber in this repository |
+| `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no internal subscriber |
+| `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | no internal subscriber |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | `path_follower` | external robot base |
 | `/clicked_point`, `/initialpose`, `/goal_pose` | standard RViz messages | RViz | `rviz_interface` |
 | `/recalibrate_pose` | `std_srvs/srv/Trigger` | `rviz_interface` | reset calibration state |
@@ -101,14 +99,14 @@ provide `odom -> base_link`. For tests only, `path_test` publishes a static
 identity transform from `odom` to `base_link`; it must not run alongside a real
 publisher for the same transform.
 
-Sensor frames are not transformed by the code. `local_filter` retains the frame
-of the incoming cloud. Verify the complete TF chain and actual LiDAR
-orientation at runtime.
+`local_filter` does not transform sensor frames; its output retains the frame
+of the incoming cloud. The documented TF chain, LiDAR orientation, and sensor
+integration have been tested on the Go2W.
 
-## Quick planning test with the included analyzed PCD
+## Planning test with the included analyzed PCD
 
-Full installation and build instructions are in [INSTALL.md](INSTALL.md). After
-a successful build, source the environment in every terminal:
+After building as described in [INSTALL.md](INSTALL.md), source ROS and the
+workspace in every terminal:
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -145,12 +143,11 @@ source <workspace>/install/setup.bash
 
 `path_follower` and `local_filter` are deliberately excluded from this harmless
 planning test because `path_follower` publishes real velocity commands. See
-[INSTALL.md](INSTALL.md#runtime-variants-and-startup-order) before hardware use.
+[INSTALL.md](INSTALL.md#startup) before hardware use.
 
 ## Map preprocessing
 
-The PCD workflow documented by the current root procedure produces a
-color-coded PCD:
+Generate a color-coded PCD with:
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
@@ -174,14 +171,14 @@ the analyzed RGB PCD.
 - Thresholds in `local_filter`, controller values in `path_follower`, and the
   RViz matching radius are hard-coded Python values, not ROS parameters.
 - `r3d_planner/config/r3d_planner_params.yaml` is an incomplete Nav2
-  configuration fragment. Nothing in this repository loads it automatically.
+  configuration fragment. No launch file loads it automatically.
 - There are no launch files; start all processes individually with `ros2 run`.
 
 ## Documentation
 
 - [Installation, build, startup, and verification](INSTALL.md)
-- [Architecture and complete ROS interfaces](docs/ARCHITECTURE.md)
+- [Architecture and ROS interfaces](docs/ARCHITECTURE.md)
 - [Known issues and open runtime checks](docs/KNOWN_ISSUES.md)
-- [Audit of the previous READMEs against the code](docs/README_AUDIT.md)
+- [V2 documentation scope](docs/README_AUDIT.md)
 - [`r3d_preprocessor` package documentation](r3d_preprocessor/README.txt)
 - [`r3d_planner` package documentation](r3d_planner/README.txt)

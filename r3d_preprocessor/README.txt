@@ -1,7 +1,5 @@
 # r3d_preprocessor
 
-## Overview
-
 `r3d_preprocessor` is the offline map-processing package of the R3D stack. It
 reads 3D point clouds in PCD format, voxelizes and classifies them using robot
 dimensions, and produces a color-coded voxel point cloud
@@ -45,8 +43,8 @@ on their height difference.
 | `pcd_analyser` | `pcd_to_graph_node` | Analyze traversability and produce a color-coded PCD | reads `pcd_path`, writes `<name>_analysed.pcd` |
 | `pcd_server` | `pcd_publisher` | Publish one PCD as PointCloud2 | `/map_pointcloud` |
 
-`r3d_pcd_voxel_publisher.py` exists in the source tree but is not registered as
-a console script and therefore is not a regular `ros2 run` executable.
+`r3d_pcd_voxel_publisher.py` has no console entry point and cannot be started
+with `ros2 run`.
 
 ## Topics
 
@@ -59,7 +57,7 @@ publishes no TF transforms.
 
 ## Analysis-node parameters
 
-`pcd_analyser` declares the following parameters and defaults:
+`pcd_analyser` declares these parameters:
 
 | Parameter | Default | Unit | Actual behavior |
 |---|---:|---|---|
@@ -69,7 +67,7 @@ publishes no TF transforms.
 | `max_step_height_cm` | 25.0 | cm | Largest height difference accepted as a step |
 | `min_points_per_sqm` | 10.0 | points/m² | Density value for floor filling; at least three points per analysis cell are required |
 | `min_points_per_voxel` | 3 | points | Minimum number of hits for an occupied voxel |
-| `floor_height_tolerance` | 0.02 | m | Z tolerance of a floor cluster; implementation checks `2*tolerance + 0.02 m` |
+| `floor_height_tolerance` | 0.02 | m | Z tolerance of a floor cluster; `pcd_analyser` checks `2*tolerance + 0.02 m` |
 | `ground_fill` | `true` | boolean | Enable density filling and neighborhood plane filling |
 | `robot_base_clearance_cm` | 10.0 | cm | Lower start of collision checks above the floor voxel |
 | `robot_narrow_radius_cm` | 30.0 | cm | Smaller collision radius for narrow-area detection |
@@ -131,14 +129,14 @@ durability `Transient Local`, and color transformer `RGB8`.
 
 `rclpy`, `sensor_msgs`, and `numpy`.
 
-### Additional imports used by the implementation
+### Additional runtime dependency
 
-Open3D. The current manifest is not fully rosdep-compatible; see
+Open3D. `package.xml` does not yet provide complete rosdep metadata; see
 `../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
 
 ## Integration
 
-- `pcd_analyser` -> analyzed PCD -> `r3d_planner/pcd_path_planner`
-- `pcd_server` publishes the analyzed map for visualization.
-- Maps and markers are treated as belonging to `map`; no map transform is
-  applied.
+`pcd_analyser` writes the analyzed PCD consumed by
+`r3d_planner/pcd_path_planner`. `pcd_server` publishes the same file for
+visualization. Both components treat its coordinates as `map` coordinates;
+neither applies a transform.
