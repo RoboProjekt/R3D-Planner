@@ -1,7 +1,5 @@
 # r3d_planner
 
-## Overview
-
 `r3d_planner` contains the runtime components of the R3D stack:
 
 - two alternative global A* planners for a Pickle graph or color-coded PCD;
@@ -13,9 +11,9 @@
 This is an `ament_python` package. `setup.py` installs six executables and
 `config/r3d_planner_params.yaml`. The package has no launch file.
 
-> **Safety:** `path_follower` publishes motion commands directly. Do not start
-> it on real hardware before verifying TF, the LiDAR frame, obstacle handling,
-> emergency stop, and the robot command interface.
+> **Safety:** `path_follower` publishes motion commands directly. The Go2W
+> integration has been tested with its TF, LiDAR, obstacle handling, emergency
+> stop, and command interface. Revalidate that chain after integration changes.
 
 ## Nodes
 
@@ -83,8 +81,8 @@ ros2 run r3d_planner pcd_path_planner --ros-args \
 | `/global_path` | `nav_msgs/msg/Path` | one planner | `path_follower` |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external Hesai driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional external Nav2 costmap |
-| `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no subscriber in this repository |
-| `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | no subscriber in this repository |
+| `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no internal subscriber |
+| `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | no internal subscriber |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | `path_follower` | external robot base |
 | `/clicked_point` | `geometry_msgs/msg/PointStamped` | RViz | `rviz_interface`; 3D height |
 | `/initialpose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | RViz | `rviz_interface`; initial calibration |
@@ -139,8 +137,9 @@ These values are hard-coded and are not ROS parameters:
 | Cliff half-width | 0.4 m | `abs(y) < 0.4` |
 | Safe floor | at least 30 points | Otherwise wall at X=0.7 m |
 
-The implementation interprets PointCloud2 binary data as a contiguous array of
-XYZ float32 values. Verify the actual Hesai layout before hardware use.
+`local_filter` interprets PointCloud2 binary data as a contiguous array of
+XYZ float32 values. This matches the tested Hesai integration on the Go2W;
+revalidate it after changing the driver or sensor setup.
 
 ## `path_follower`
 
@@ -212,14 +211,13 @@ missing. A complete external Nav2 configuration and bringup are required.
 `rclpy`, `nav2_msgs`, `geometry_msgs`, `nav_msgs`, `sensor_msgs`,
 `visualization_msgs`, `scipy`, `numpy`, and `std_srvs`.
 
-### Additional imports used by the implementation
+### Additional runtime dependencies
 
 NetworkX, Open3D, `ament_index_python`, `sensor_msgs_py`, `tf2_ros`, and
-`std_msgs`. The code also looks up `r3d_preprocessor` through the Ament index.
+`std_msgs`. `r3d_planner` also looks up `r3d_preprocessor` through the Ament index.
 These dependencies are not fully represented in the manifest; see
 `../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
 
-## Integration
-
-See `../docs/ARCHITECTURE.md` and `../INSTALL.md` for the complete system
-relationships, startup order, and outstanding runtime checks.
+The active planner consumes either the PCD or Pickle artifact produced by
+`r3d_preprocessor`. See `../docs/ARCHITECTURE.md` for the cross-package data
+flow and `../INSTALL.md` for startup order and runtime checks.

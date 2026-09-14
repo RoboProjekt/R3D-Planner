@@ -1,7 +1,7 @@
 # Offline Map Analysis Parameters
 
-The complete package documentation is in `README.txt`. Both `pcd_analyser` and
-`pcd_to_graph` accept the following parameters.
+See `README.txt` for package behavior and integration. Both analysis executables
+accept the same parameters; this example uses `pcd_analyser`:
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
@@ -46,4 +46,3 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args \
 
 `pcd_analyser` writes `<input>_analysed.pcd`; `pcd_to_graph` writes a
 parameterized `nav_graph_*.pkl` beside the input file.
-

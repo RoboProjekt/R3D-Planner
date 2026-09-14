@@ -1,7 +1,5 @@
 # r3d_preprocessor
 
-## Overview
-
 `r3d_preprocessor` is the offline map-processing package of the R3D stack. It
 reads 3D point clouds in PCD format, voxelizes and classifies them using robot
 dimensions, and produces either:
@@ -49,8 +47,8 @@ on their height difference.
 | `pcd_server` | `pcd_publisher` | Publish one PCD as PointCloud2 | `/map_pointcloud` |
 | `voxel_map_publisher` | `voxel_map_publisher` | Publish Pickle graph nodes and obstacles as colored cubes | `/r3d_global_voxel_map` |
 
-`r3d_pcd_voxel_publisher.py` exists in the source tree but is not registered as
-a console script and therefore is not a regular `ros2 run` executable.
+`r3d_pcd_voxel_publisher.py` has no console entry point and cannot be started
+with `ros2 run`.
 
 ## Topics
 
@@ -62,13 +60,12 @@ a console script and therefore is not a regular `ros2 run` executable.
 The package subscribes to no topics, provides no services or actions, and
 publishes no TF transforms.
 
-Contrary to the previous README, the current `voxel_map_publisher` does not
-publish `/r3d_global_graph_edges`; it only publishes
-`/r3d_global_voxel_map`.
+`voxel_map_publisher` publishes `/r3d_global_voxel_map`. It does not publish a
+separate graph-edge topic.
 
 ## Analysis-node parameters
 
-`pcd_analyser` and `pcd_to_graph` declare the same parameters and defaults:
+`pcd_analyser` and `pcd_to_graph` declare the same parameters:
 
 | Parameter | Default | Unit | Actual behavior |
 |---|---:|---|---|
@@ -78,7 +75,7 @@ publish `/r3d_global_graph_edges`; it only publishes
 | `max_step_height_cm` | 25.0 | cm | Largest height difference accepted as a step |
 | `min_points_per_sqm` | 10.0 | points/m² | Density value for floor filling; at least three points per analysis cell are required |
 | `min_points_per_voxel` | 3 | points | Minimum number of hits for an occupied voxel |
-| `floor_height_tolerance` | 0.02 | m | Z tolerance of a floor cluster; implementation checks `2*tolerance + 0.02 m` |
+| `floor_height_tolerance` | 0.02 | m | Z tolerance of a floor cluster; the analysis nodes check `2*tolerance + 0.02 m` |
 | `ground_fill` | `true` | boolean | Enable density filling and neighborhood plane filling |
 | `robot_base_clearance_cm` | 10.0 | cm | Lower start of collision checks above the floor voxel |
 | `robot_narrow_radius_cm` | 30.0 | cm | Smaller collision radius for narrow-area detection |
@@ -165,16 +162,16 @@ trusted Pickle files.
 `rclpy`, `visualization_msgs`, `std_msgs`, `geometry_msgs`, `sensor_msgs`,
 `numpy`, and `pickle`.
 
-### Additional imports used by the implementation
+### Additional runtime dependencies
 
 Open3D and NetworkX. `pickle` is part of Python and not an external package.
-The current manifest is not fully rosdep-compatible; see `../INSTALL.md` and
-`../docs/KNOWN_ISSUES.md`.
+`package.xml` does not yet provide complete rosdep metadata; see
+`../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
 
 ## Integration
 
-- `pcd_analyser` -> analyzed PCD -> `r3d_planner/pcd_path_planner`
-- `pcd_to_graph` -> Pickle graph -> `r3d_planner/global_planner`
-- `pcd_server` and `voxel_map_publisher` primarily support visualization.
-- Maps and markers are treated as belonging to `map`; no map transform is
-  applied.
+`pcd_analyser` writes the analyzed PCD consumed by `pcd_path_planner`.
+`pcd_to_graph` writes the Pickle graph consumed by `global_planner`.
+`pcd_server` and `voxel_map_publisher` publish the corresponding artifacts for
+visualization. All four components treat map coordinates as `map`; none applies
+a transform.

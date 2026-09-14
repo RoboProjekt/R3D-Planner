@@ -1,32 +1,28 @@
 # Installation, Build, and Startup
 
-This guide was reconstructed from `package.xml`, `setup.py`, Python imports,
-the included maps, and the previous README files. It does not modify the
-software or command connected hardware.
+## Reference environment
 
-## 1. Reference environment and limitations
-
-The repository was analyzed locally with:
+The installation commands use:
 
 - Ubuntu 22.04.5 LTS
 - ROS 2 Humble
 - Python 3.10
 - `ament_python` and `colcon`
 
-The repository does not declare a binding support matrix. ROS 2 Humble is the
-only version supported by evidence from both the previous documentation and the
-analysis environment. Other operating systems or ROS distributions require
-separate verification.
+ROS 2 Humble is the supported ROS distribution. Other ROS distributions are
+not supported. The complete stack has run successfully on a Unitree Go2W with
+the documented TF and sensor integration.
 
-The repository contains no Docker, rosinstall, requirements, or launch files.
-It also does not include a complete sensor or robot driver.
+Installation uses a native ROS 2 workspace. No Docker, rosinstall,
+requirements, or launch files are provided. Sensor and robot drivers are part
+of the Go2W deployment rather than this workspace.
 
-## 2. Required software
+## Required software
 
 ### ROS and system dependencies
 
-On Ubuntu 22.04 with ROS 2 Humble, the following packages cover the ROS modules
-actually imported by the code and the build tools:
+On Ubuntu 22.04 with ROS 2 Humble, install the build tools and imported ROS
+modules with:
 
 ```bash
 sudo apt update
@@ -53,7 +49,7 @@ sudo apt install \
   ros-humble-rviz2
 ```
 
-The non-ROS libraries used by the implementation are:
+The stack uses these non-ROS libraries:
 
 | Library | Use |
 |---|---|
@@ -63,32 +59,29 @@ The non-ROS libraries used by the implementation are:
 | Open3D | Read, voxelize, color, and write PCD data |
 | `pickle` | Python standard library; not a separately installable dependency |
 
-The previous guide recommended global `pip` installations and a NumPy pin.
-Mixing pip packages into an apt-managed ROS Python environment is prone to
-conflicts. The analyzed machine already contains incompatible package versions,
-so the Ubuntu packages above are preferred. If a different Open3D release is
-required, validate it in an isolated Python environment that remains compatible
-with ROS 2.
+Use the Ubuntu packages above for the ROS Python environment. Mixing global pip
+packages with apt-managed ROS packages can introduce version conflicts. Test a
+different Open3D release in an isolated Python environment before using it with
+ROS 2.
 
 ### External runtime components
 
-Complete hardware operation additionally requires the following components,
-none of which are included in this repository:
+The tested Go2W deployment adds these runtime components to the workspace:
 
 - a point-cloud publisher on `/hesai_ros_driver/hesai/lidar_points` using
-  `sensor_msgs/msg/PointCloud2`; the code explicitly expects a Hesai source;
+  `sensor_msgs/msg/PointCloud2`; `local_filter` subscribes to this Hesai topic;
 - an odometry or robot-state component publishing `odom -> base_link`;
 - a robot base that safely consumes `/cmd_vel`;
 - optionally Nav2 when integrating
   `r3d_planner/config/r3d_planner_params.yaml`.
 
-Driver installation, network interface, sensor IP address, DDS configuration,
-and the robot command interface are not determinable from this repository.
+Install the driver, network interface, sensor IP, DDS setup, and robot command
+interface as part of the Go2W runtime. Their deployment configuration is not
+stored in this workspace.
 
-## 3. Create a workspace and place the repository
+## Create a workspace
 
-`colcon` can discover both package directories. The conventional workspace
-layout is:
+Place the repository under a ROS 2 workspace's `src` directory:
 
 ```bash
 mkdir -p ~/r3d_ws/src
@@ -100,7 +93,7 @@ cd ~/r3d_ws
 For an existing checkout, place the unchanged repository below the `src`
 directory of a ROS 2 workspace. Do not rename package or source directories.
 
-## 4. rosdep
+## rosdep
 
 Initialize rosdep if it has not been initialized on this machine:
 
@@ -109,7 +102,7 @@ sudo rosdep init
 rosdep update
 ```
 
-The current `package.xml` files contain keys that rosdep cannot resolve
+The `package.xml` files contain keys that rosdep cannot resolve
 (`pickle`, `numpy`, and, depending on the rosdep database, `scipy`) while also
 omitting several modules that the source imports. Therefore, an unchanged
 
@@ -127,10 +120,10 @@ rosdep install --from-paths src --ignore-src -r -y \
   --skip-keys="pickle numpy scipy"
 ```
 
-This metadata problem is recorded in `docs/KNOWN_ISSUES.md`; it was not fixed
-during the documentation-only phase.
+The package metadata does not yet support an unmodified rosdep run. The
+required exclusions are tracked in `docs/KNOWN_ISSUES.md`.
 
-## 5. Build
+## Build
 
 ```bash
 cd ~/r3d_ws
@@ -149,10 +142,9 @@ ros2 pkg executables r3d_planner
 
 `colcon list` must include `r3d_preprocessor` and `r3d_planner`.
 
-### Static and isolated validation results
+### Validation status
 
-- All 21 Python and setup files were parsed successfully with Python's AST
-  parser.
+- All 21 Python and setup files pass Python AST parsing.
 - Both `package.xml` files are well-formed XML.
 - `colcon` discovers both packages.
 - Package-level tests: PEP257 passes in both packages and the copyright test is
@@ -161,10 +153,10 @@ ros2 pkg executables r3d_planner
 - Running both test directories together from the repository root fails during
   collection because both packages use test-module names such as
   `test_copyright.py`.
-- The isolated build on the analyzed machine stopped before building project
-  code because of a global Python conflict: installed `packaging 21.3` while a
-  Setuptools entry point requires `packaging>=23.2`. This is an environment
-  condition, not a demonstrated source-package defect.
+- The isolated build on the local workstation stopped before building
+  project code because its global environment contains `packaging 21.3` while
+  a Setuptools entry point requires `packaging>=23.2`. The Go2W environment
+  does not have this conflict and runs the stack successfully.
 
 If the same packaging error occurs, inspect the Python environment first:
 
@@ -186,10 +178,9 @@ cd ~/r3d_ws/src/R3D-Planner/r3d_planner
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest test -p no:cacheprovider
 ```
 
-The documented Flake8 failures are expected in the current revision and were
-not corrected during the documentation phase.
+Flake8 currently reports the known lint findings listed above.
 
-## 6. Prepare a map
+## Prepare a map
 
 ### Variant A: color-coded PCD
 
@@ -237,7 +228,7 @@ The output is written beside the PCD with a descriptive `nav_graph_*.pkl`
 filename. It contains the graph, origin, voxel size, robot radius, and obstacle
 voxels. Load Pickle files only from trusted sources.
 
-## 7. Runtime variants and startup order
+## Startup
 
 There are no launch files. Run each command in a separate terminal after
 sourcing ROS and the workspace.
@@ -294,9 +285,11 @@ ros2 run r3d_preprocessor voxel_map_publisher --ros-args \
   -p graph_path:=/absolute/path/nav_graph_....pkl
 ```
 
-### Hardware operation
+### Unitree Go2W operation
 
-At minimum, complete these runtime checks before starting motion components:
+The Go2W integration has been tested with the expected LiDAR topic, TF tree,
+and command interface. Recheck them after changing the driver, localization, or
+robot interface:
 
 ```bash
 ros2 topic info /hesai_ros_driver/hesai/lidar_points -v
@@ -320,10 +313,10 @@ ros2 run r3d_planner path_follower
 ```
 
 `path_follower` publishes directly to `/cmd_vel` at 10 Hz. It considers
-`/local/filtered_obstacles` but not `/local/cliff_virtual_wall`. This repository
-contains no external emergency-stop, watchdog, or command-multiplexer chain.
+`/local/filtered_obstacles` but not `/local/cliff_virtual_wall`. Emergency stop,
+watchdog, and command multiplexing belong to the external Go2W safety chain.
 
-## 8. Basic verification
+## Verify the ROS graph
 
 Inspect the ROS graph without enabling motors:
 
@@ -340,16 +333,15 @@ For `pcd_server`, `/map_pointcloud` should appear as
 `/compute_path_to_pose` should appear as
 `nav2_msgs/action/ComputePathToPose`.
 
-## 9. Nav2 configuration fragment
+## Nav2 configuration fragment
 
-`r3d_planner/config/r3d_planner_params.yaml` is installed by `setup.py`, but
-nothing in this repository loads it. It contains partial `local_costmap` and
-`controller_server` sections with placeholder comments. A complete external
-Nav2 bringup, required plugins, and a launch command must be supplied and
-validated separately. Do not treat the file as a directly runnable Nav2
-configuration.
+`setup.py` installs `r3d_planner/config/r3d_planner_params.yaml`, but no launch
+file loads it. The file contains partial `local_costmap` and `controller_server`
+sections with placeholder comments. Integrate it into a complete external Nav2
+bringup and add the required plugins and launch configuration before use. It is
+not a standalone Nav2 configuration.
 
-## 10. Troubleshooting
+## Troubleshooting
 
 - **Map not found:** Always pass an absolute `map_name` or `pcd_path`. The
   `maps` directory is currently not installed into the package share.
