@@ -1,0 +1,29 @@
+[0.454s] Invoking command in '/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor': PYTHONPATH=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/r3d_preprocessor build --build-base /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build install --record /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/install.log --single-version-externally-managed install_data
+[0.642s] running egg_info
+[0.642s] writing ../../build/r3d_preprocessor/r3d_preprocessor.egg-info/PKG-INFO
+[0.642s] writing dependency_links to ../../build/r3d_preprocessor/r3d_preprocessor.egg-info/dependency_links.txt
+[0.642s] writing entry points to ../../build/r3d_preprocessor/r3d_preprocessor.egg-info/entry_points.txt
+[0.643s] writing requirements to ../../build/r3d_preprocessor/r3d_preprocessor.egg-info/requires.txt
+[0.643s] writing top-level names to ../../build/r3d_preprocessor/r3d_preprocessor.egg-info/top_level.txt
+[0.643s] reading manifest file '../../build/r3d_preprocessor/r3d_preprocessor.egg-info/SOURCES.txt'
+[0.644s] writing manifest file '../../build/r3d_preprocessor/r3d_preprocessor.egg-info/SOURCES.txt'
+[0.644s] running build
+[0.645s] running build_py
+[0.645s] copying r3d_preprocessor/r3d_pcd_to_graph.py -> /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build/lib/r3d_preprocessor
+[0.645s] copying r3d_preprocessor/r3d_voxel_map_publisher.py -> /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build/lib/r3d_preprocessor
+[0.645s] running install
+[0.645s] running install_lib
+[0.645s] copying /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build/lib/r3d_preprocessor/r3d_pcd_to_graph.py -> /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor
+[0.646s] copying /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build/lib/r3d_preprocessor/r3d_voxel_map_publisher.py -> /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor
+[0.646s] byte-compiling /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor/r3d_pcd_to_graph.py to r3d_pcd_to_graph.cpython-310.pyc
+[0.648s] byte-compiling /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor/r3d_voxel_map_publisher.py to r3d_voxel_map_publisher.cpython-310.pyc
+[0.648s] running install_data
+[0.648s] running install_egg_info
+[0.649s] removing '/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor-0.0.1-py3.10.egg-info' (and everything under it)
+[0.649s] Copying ../../build/r3d_preprocessor/r3d_preprocessor.egg-info to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages/r3d_preprocessor-0.0.1-py3.10.egg-info
+[0.650s] running install_scripts
+[0.665s] Installing pcd_server script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+[0.665s] Installing pcd_to_graph script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+[0.665s] Installing voxel_map_publisher script to /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/r3d_preprocessor
+[0.665s] writing list of installed files to '/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/install.log'
+[0.682s] Invoked command in '/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor' returned '0': PYTHONPATH=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/install/r3d_preprocessor/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/r3d_preprocessor build --build-base /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/build install --record /home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/build/r3d_preprocessor/install.log --single-version-externally-managed install_data
