@@ -11,7 +11,8 @@ supplies:
 - odometry or state estimation publishing `odom -> base_link`;
 - robot hardware interface consuming `/cmd_vel`;
 - optional Nav2 bringup and costmap/controller plugins;
-- process supervision and safety-rated shutdown.
+- deployment-specific process supervision and motion-safety controls, which
+  are not implemented in this repository.
 
 ## Packages and dependency flow
 
@@ -142,7 +143,15 @@ Intended TF tree:
 map
  └── odom            rviz_interface (StaticTransformBroadcaster)
       └── base_link  external odometry, or path_test for tests only
+           └── hesai_lidar_link  external static transform
 ```
+
+The Go2W startup publishes `base_link -> hesai_lidar_link` using
+translation `(0.1384, 0, 0.1284)` and positional Euler arguments
+`(1.5708, 0, 0)`. It also publishes identity `body -> base_link`. Confirm the
+Euler convention of the installed Humble `static_transform_publisher` and the
+resulting axes with `tf2_echo`; `local_filter` processes the sensor-frame
+coordinates directly rather than transforming them into `base_link`.
 
 The tested Go2W integration uses one publisher for `map -> odom`, supplies a
 time-correct `odom -> base_link`, and matches the assumed LiDAR orientation and
@@ -220,7 +229,7 @@ not listed here.
 | `max_step_height_cm` | 25.0 | cm | Maximum connectable step height |
 | `min_points_per_sqm` | 10.0 | points/m² | Density threshold for synthesized floor |
 | `min_points_per_voxel` | 3 | points | Minimum points in an occupied voxel |
-| `floor_height_tolerance` | 0.02 | m | Floor-cluster Z tolerance |
+| `floor_height_tolerance` | 0.02 | m | Planarity term; accepted Z range is below `2*tolerance + 0.02 m` |
 | `ground_fill` | `true` | boolean | Enable density and neighborhood filling |
 | `robot_base_clearance_cm` | 10.0 | cm | Start height for collision checks |
 | `robot_narrow_radius_cm` | 30.0 | cm | Narrow-area radius |
