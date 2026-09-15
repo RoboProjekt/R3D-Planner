@@ -66,13 +66,16 @@ operations. Pickle support is part of Python.
 
 ### Workspace, rosdep, and build
 
+Replace every `<path-to-workspace>` placeholder below with the absolute path of
+your ROS 2 workspace before running a command.
+
 ```bash
-mkdir -p ~/r3d_ws/src
-cd ~/r3d_ws/src
+mkdir -p <path-to-workspace>/src
+cd <path-to-workspace>/src
 git clone git@github.com:RoboProjekt/R3D-Planner.git
 cd R3D-Planner
 git checkout V1
-cd ~/r3d_ws
+cd <path-to-workspace>
 ```
 
 The package manifests contain the unresolved rosdep keys `pickle`, `numpy`,
@@ -82,7 +85,7 @@ run rosdep with these exclusions:
 ```bash
 sudo rosdep init  # only on a new ROS installation
 rosdep update
-cd ~/r3d_ws
+cd <path-to-workspace>
 rosdep install --from-paths src --ignore-src -r -y \
   --skip-keys="pickle numpy scipy"
 ```
@@ -90,13 +93,14 @@ rosdep install --from-paths src --ignore-src -r -y \
 Build and source the workspace:
 
 ```bash
-cd ~/r3d_ws
+cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
 ```
 
-Source `/opt/ros/humble/setup.bash` and `~/r3d_ws/install/setup.bash` in every
+Source `/opt/ros/humble/setup.bash` and
+`<path-to-workspace>/install/setup.bash` in every
 terminal used below. See [INSTALL.md](INSTALL.md) for troubleshooting and the
 known package-metadata limitations.
 
@@ -138,7 +142,7 @@ This full invocation shows every configurable analysis parameter:
 
 ```bash
 ros2 run r3d_preprocessor pcd_to_graph --ros-args \
-  -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
   -p voxel_size_cm:=5.0 \
   -p max_step_height_cm:=25.0 \
   -p min_points_per_sqm:=10.0 \
@@ -170,25 +174,25 @@ the stated paths or replace `pcd_path` with their actual location.
 RoboLab map:
 
 ```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/RoboLab_map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/RoboLab_map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 HomeLab map:
 
 ```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 Included voxel map with the reduced density threshold:
 
 ```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 Unfiltered stair scan:
 
 ```bash
-ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/Stair_unfiltered.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=7 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_to_graph --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/Stair_unfiltered.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=7 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 ### Generate and inspect a color-coded PCD
@@ -198,7 +202,7 @@ parameters:
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
-  -p pcd_path:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
   -p voxel_size_cm:=5.0 \
   -p min_step_height_cm:=5.0 \
   -p max_step_height_cm:=25.0
@@ -209,7 +213,7 @@ The output is `voxel_05_minhits_7_analysed.pcd`. Publish any PCD on
 
 ```bash
 ros2 run r3d_preprocessor pcd_server --ros-args \
-  -p pcd_path:=~/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/HomeLab_test1_LIO.pcd
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/HomeLab_test1_LIO.pcd
 ```
 
 `pcd_server` has one parameter:
@@ -229,7 +233,7 @@ Publish a Pickle graph for RViz:
 
 ```bash
 ros2 run r3d_preprocessor voxel_map_publisher --ros-args \
-  -p graph_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/nav_graph_step25_voxel5_dens10_minpts1_tol0.030_fillFalse_clear10_narrow30_rad40.pkl
+  -p graph_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/nav_graph_step25_voxel5_dens10_minpts1_tol0.030_fillFalse_clear10_narrow30_rad40.pkl
 ```
 
 | Parameter | Default | Description |
@@ -240,7 +244,7 @@ Start the Pickle planner with an absolute path or a file below `map_dir`:
 
 ```bash
 ros2 run r3d_planner global_planner --ros-args \
-  -p map_name:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/nav_graph_step20_voxel5.pkl
+  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/nav_graph_step20_voxel5.pkl
 ```
 
 | Parameter | Default | Description |
@@ -255,7 +259,7 @@ Alternatively, start the PCD planner:
 
 ```bash
 ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
   -p voxel_size_cm:=5.0 \
   -p min_step_height_cm:=5.0 \
   -p max_step_height_cm:=25.0

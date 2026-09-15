@@ -83,11 +83,15 @@ stored in this workspace.
 
 Place the repository under a ROS 2 workspace's `src` directory:
 
+Replace `<path-to-workspace>` with the absolute path of the ROS 2 workspace in
+every command in this guide. Angle-bracket placeholders are not literal shell
+syntax and must not be copied unchanged.
+
 ```bash
-mkdir -p ~/r3d_ws/src
-cd ~/r3d_ws/src
+mkdir -p <path-to-workspace>/src
+cd <path-to-workspace>/src
 git clone <repository-url> R3D-Planner
-cd ~/r3d_ws
+cd <path-to-workspace>
 ```
 
 For an existing checkout, place the unchanged repository below the `src`
@@ -115,7 +119,7 @@ listed above, rosdep can process the remaining declared dependencies with
 explicit exclusions:
 
 ```bash
-cd ~/r3d_ws
+cd <path-to-workspace>
 rosdep install --from-paths src --ignore-src -r -y \
   --skip-keys="pickle numpy scipy"
 ```
@@ -126,7 +130,7 @@ required exclusions are tracked in `docs/KNOWN_ISSUES.md`.
 ## Build
 
 ```bash
-cd ~/r3d_ws
+cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
@@ -171,10 +175,10 @@ replace packages in the system Python environment.
 Run the existing tests separately without producing a Pytest cache:
 
 ```bash
-cd ~/r3d_ws/src/R3D-Planner/r3d_preprocessor
+cd <path-to-workspace>/src/R3D-Planner/r3d_preprocessor
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest test -p no:cacheprovider
 
-cd ~/r3d_ws/src/R3D-Planner/r3d_planner
+cd <path-to-workspace>/src/R3D-Planner/r3d_planner
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest test -p no:cacheprovider
 ```
 
@@ -186,7 +190,7 @@ Flake8 currently reports the known lint findings listed above.
 
 ```bash
 source /opt/ros/humble/setup.bash
-source ~/r3d_ws/install/setup.bash
+source <path-to-workspace>/install/setup.bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
   -p pcd_path:=/absolute/path/map.pcd \
   -p voxel_size_cm:=5.0 \
@@ -239,14 +243,14 @@ sourcing ROS and the workspace.
 
    ```bash
    ros2 run r3d_preprocessor pcd_server --ros-args \
-     -p pcd_path:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+     -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
    ```
 
 2. Start exactly one planner:
 
    ```bash
    ros2 run r3d_planner pcd_path_planner --ros-args \
-     -p map_name:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+     -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
      -p voxel_size_cm:=5.0 \
      -p min_step_height_cm:=5.0 \
      -p max_step_height_cm:=25.0
