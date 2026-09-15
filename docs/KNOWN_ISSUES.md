@@ -51,10 +51,12 @@ constraints that affect installation, integration, and future development.
   constants. PointCloud2 is interpreted as packed XYZ float32 without generally
   honoring fields, offsets, `point_step`, padding, or endianness. X forward, Y
   lateral, and Z up are assumed.
-- **Impact:** The layout and sensor orientation are verified on the Go2W, but a
-  driver or sensor change can cause incorrect decoding.
-- **Next step:** Revalidate the PointCloud2 layout and mounting orientation
-  whenever the Hesai integration changes.
+- **Impact:** The Go2W integration has been exercised, but the reference Hesai
+  configuration establishes only the topic and frame, not a packed 12-byte XYZ
+  contract. A cloud with intensity, padding, different offsets, or a different
+  `point_step` can be rejected or decoded incorrectly.
+- **Next step:** Inspect `fields`, `point_step`, endianness, and mounting axes on
+  the deployed Hesai topic and after every driver or sensor change.
 
 ## 6. Cliff and stair outputs have no internal consumer
 
@@ -64,8 +66,8 @@ constraints that affect installation, integration, and future development.
   `/local/filtered_obstacles`.
 - **Impact:** The standalone follower does not react directly to detected
   cliffs, and stair messages do not affect motion.
-- **Next step:** Keep the tested external Nav2 and safety integration active
-  whenever the standalone follower controls the robot.
+- **Next step:** Verify an external consumer for the cliff output before the
+  standalone follower controls the robot.
 
 ## 7. Path orientation is used as a narrow-area flag
 
@@ -106,10 +108,11 @@ constraints that affect installation, integration, and future development.
 - **Current behavior:** Values are hard-coded, path Z is ignored, TF errors are
   silently dropped, and `/cmd_vel` is published directly. Emergency stop,
   watchdog, command mux, action feedback, and cancellation are absent.
-- **Impact:** The tested Go2W deployment supplies the external safety chain.
-  Running `path_follower` without that integration remains hazardous.
-- **Next step:** Preserve and retest the Go2W command and stop chain after
-  changes to the controller or robot interface.
+- **Impact:** The inspected Go2W adapter forwards `/cmd_vel` to the Unitree
+  SportClient without implementing these protections. Running `path_follower`
+  without independently validated safeguards remains hazardous.
+- **Next step:** Verify command timeout, arbitration, velocity limits, and
+  emergency-stop behavior before motion and after controller/interface changes.
 
 ## 11. PCD metadata is insufficient for reproducible reconstruction
 

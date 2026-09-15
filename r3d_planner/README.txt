@@ -12,8 +12,9 @@ This is an `ament_python` package. `setup.py` installs five executables and
 `config/r3d_planner_params.yaml`. The package has no launch file.
 
 > **Safety:** `path_follower` publishes motion commands directly. The Go2W
-> integration has been tested with its TF, LiDAR, obstacle handling, emergency
-> stop, and command interface. Revalidate that chain after integration changes.
+> adapter forwards `/cmd_vel` to the Unitree SportClient without a timeout,
+> command mux, velocity clamp, or emergency-stop implementation. Validate these
+> safeguards externally before enabling motion.
 
 ## Nodes
 
@@ -115,9 +116,11 @@ These values are hard-coded and are not ROS parameters:
 | Cliff half-width | 0.4 m | `abs(y) < 0.4` |
 | Safe floor | at least 30 points | Otherwise wall at X=0.7 m |
 
-`local_filter` interprets PointCloud2 binary data as a contiguous array of
-XYZ float32 values. This matches the tested Hesai integration on the Go2W;
-revalidate it after changing the driver or sensor setup.
+`local_filter` interprets PointCloud2 binary data as contiguous 12-byte XYZ
+float32 records and ignores the message's declared fields, offsets,
+`point_step`, padding, and endianness. The Go2W integration has been exercised,
+but the reference Hesai configuration does not prove this binary layout. Check
+the live message layout and axes before relying on the filter.
 
 ## `path_follower`
 

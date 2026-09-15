@@ -2,7 +2,8 @@
 
 Use `README.md` for the repository overview, `INSTALL.md` for setup and startup,
 `docs/ARCHITECTURE.md` for interfaces and data flow, and
-`docs/KNOWN_ISSUES.md` for unresolved problems.
+`docs/KNOWN_ISSUES.md` for unresolved problems. The source-level validation
+against the original deployment is in `docs/REFERENCE_COMPARISON.md`.
 
 R3D-Planner consists of two `ament_python` packages:
 
@@ -16,8 +17,11 @@ and tested on a Unitree Go2W. The repository contains no launch files.
 
 ## Build
 
+Replace `<path-to-workspace>` with the absolute path of the ROS 2 workspace
+before running the commands.
+
 ```bash
-cd ~/r3d_ws
+cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
@@ -32,12 +36,12 @@ Run these commands in separate, sourced terminals:
 
 ```bash
 ros2 run r3d_preprocessor pcd_server --ros-args \
-  -p pcd_path:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
 ```
 
 ```bash
 ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
   -p voxel_size_cm:=5.0 \
   -p min_step_height_cm:=5.0 \
   -p max_step_height_cm:=25.0

@@ -22,6 +22,9 @@ The documentation is split by purpose:
 - `docs/ARCHITECTURE.md` documents data flow and ROS interfaces.
 - `docs/KNOWN_ISSUES.md` records implementation constraints and maintenance
   work.
+- `docs/REFERENCE_COMPARISON.md` records the source-level validation against
+  the original Go2W deployment repository and classifies every material
+  difference.
 - Each package README documents its nodes and parameters.
 
 Topics, services, actions, TF frames, parameters, YAML values, map files, and

@@ -12,6 +12,9 @@ The complete system was developed and tested on a Unitree Go2W, including the
 Hesai point-cloud input, TF tree, RViz workflow, local obstacle filter, and
 `/cmd_vel` interface. Other ROS distributions are not supported.
 
+The source-level comparison with the original deployment repository is in
+[`docs/REFERENCE_COMPARISON.md`](docs/REFERENCE_COMPARISON.md).
+
 V2 uses a PCD-only pipeline:
 
 ```text
@@ -29,6 +32,24 @@ The workspace contains two `ament_python` packages:
 |---|---|---|
 | `r3d_preprocessor` | Analyze and publish PCD maps | `pcd_analyser`, `pcd_server` |
 | `r3d_planner` | Global planning, local filtering, RViz input, path following, and test TF | `pcd_path_planner`, `local_filter`, `rviz_interface`, `path_follower`, `path_test` |
+
+### Robot-independent and Go2W-specific parts
+
+Offline PCD voxelization, traversability classification, graph reconstruction,
+A*, and the `ComputePathToPose` interface are independent of the Go2W hardware.
+The map can originate from any sensor pipeline that produces a PCD in the
+intended `map` coordinates. Robot radius, narrow radius, height, base clearance,
+voxel size, and step limits are ROS parameters during preprocessing; the PCD
+planner separately accepts voxel and step limits.
+
+The online layer is configured for the Go2W deployment: `local_filter` uses the
+fixed Hesai topic and sensor-axis assumptions, the TF consumers require
+`map`, `odom`, and `base_link`, and `path_follower` publishes fixed-limit
+`Twist` commands on `/cmd_vel`. A different robot must supply the same TF and
+message contracts or remap topics, and must retune dimensions and motion
+limits. Sensor/filter thresholds, controller limits, and frame names are source
+constants rather than ROS parameters, so adaptation is not configuration-only
+in the current implementation.
 
 ## Installation
 
@@ -67,13 +88,16 @@ operations.
 
 ### Workspace, rosdep, and build
 
+Replace every `<path-to-workspace>` placeholder below with the absolute path of
+your ROS 2 workspace before running a command.
+
 ```bash
-mkdir -p ~/r3d_ws/src
-cd ~/r3d_ws/src
+mkdir -p <path-to-workspace>/src
+cd <path-to-workspace>/src
 git clone git@github.com:RoboProjekt/R3D-Planner.git
 cd R3D-Planner
 git checkout V2
-cd ~/r3d_ws
+cd <path-to-workspace>
 ```
 
 The package manifests contain the unresolved rosdep key `numpy` and, depending
@@ -83,7 +107,7 @@ these exclusions:
 ```bash
 sudo rosdep init  # only on a new ROS installation
 rosdep update
-cd ~/r3d_ws
+cd <path-to-workspace>
 rosdep install --from-paths src --ignore-src -r -y \
   --skip-keys="numpy scipy"
 ```
@@ -91,13 +115,14 @@ rosdep install --from-paths src --ignore-src -r -y \
 Build and source the workspace:
 
 ```bash
-cd ~/r3d_ws
+cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
 ```
 
-Source `/opt/ros/humble/setup.bash` and `~/r3d_ws/install/setup.bash` in every
+Source `/opt/ros/humble/setup.bash` and
+`<path-to-workspace>/install/setup.bash` in every
 terminal used below. See [INSTALL.md](INSTALL.md) for troubleshooting and the
 known package-metadata limitations.
 
@@ -117,9 +142,9 @@ access, and magenta for obstacles.
 | `voxel_size_cm` | `5.0` | cm | Voxel edge length |
 | `max_step_height_cm` | `25.0` | cm | Largest height difference connected as a step |
 | `min_step_height_cm` | `5.0` | cm | Boundary between flat and step connections |
-| `min_points_per_sqm` | `10.0` | points/m² | Density threshold used by floor filling |
+| `min_points_per_sqm` | `10.0` | points/m² | Converted to a per-cell floor-fill threshold; at least three points are always required |
 | `min_points_per_voxel` | `3` | points | Minimum hits retained in an occupied voxel |
-| `floor_height_tolerance` | `0.02` | m | Z tolerance used to group floor samples |
+| `floor_height_tolerance` | `0.02` | m | Planarity term; a height cluster is filled when its Z range is below `2*tolerance + 0.02 m` |
 | `ground_fill` | `true` | bool | Enables density and neighborhood floor filling |
 | `robot_base_clearance_cm` | `10.0` | cm | Lower start of the collision check above the floor |
 | `robot_narrow_radius_cm` | `30.0` | cm | Reduced radius used to classify narrow passages |
@@ -139,7 +164,7 @@ on this branch.
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
-  -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
   -p voxel_size_cm:=5.0 \
   -p max_step_height_cm:=25.0 \
   -p min_points_per_sqm:=10.0 \
@@ -167,32 +192,32 @@ maps to the stated paths or replace `pcd_path` with their actual location.
 RoboLab map:
 
 ```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/RoboLab_map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/RoboLab_map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 HomeLab map:
 
 ```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 Included voxel map with the reduced density threshold:
 
 ```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 Unfiltered stair scan:
 
 ```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=/home/bauya/Desktop/R3D-Planner/ros2_r3d_planner_ws/src/r3d_preprocessor/maps/Stair_unfiltered.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=7 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/Stair_unfiltered.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=7 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 ### Publish the source or analyzed map
 
 ```bash
 ros2 run r3d_preprocessor pcd_server --ros-args \
-  -p pcd_path:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
 ```
 
 `pcd_server` publishes `/map_pointcloud` with transient-local durability:
@@ -213,7 +238,7 @@ preprocessing:
 
 ```bash
 ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=~/r3d_ws/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
   -p voxel_size_cm:=5.0 \
   -p min_step_height_cm:=5.0 \
   -p max_step_height_cm:=25.0
@@ -304,8 +329,10 @@ ros2 service call /recalibrate_pose std_srvs/srv/Trigger "{}"
 
 `path_follower` subscribes to `/global_path` and
 `/local/filtered_obstacles`, looks up `map -> base_link`, and publishes
-`/cmd_vel` at 10 Hz. Keep the tested Go2W emergency-stop, watchdog, and command
-multiplexer active whenever this node is running.
+`/cmd_vel` at 10 Hz. The Go2W adapter forwards this command directly
+to the Unitree SportClient and does not itself implement a watchdog, command
+multiplexer, velocity clamp, or emergency stop. Validate those deployment
+safeguards before enabling motion.
 
 For a planning-only TF test without robot odometry, use:
 
