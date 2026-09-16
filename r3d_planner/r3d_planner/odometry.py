@@ -1,3 +1,13 @@
+# =============================================================================
+# R3D-Planner
+#
+# Author:        Bastian Aumer
+# Last modified: 2026-09-16
+# Repository:    https://github.com/RoboProjekt/R3D-Planner
+#
+# Copyright (c) Bastian Aumer
+# =============================================================================
+
 """SLAM-independent Odometry input; global pose needs a separate map -> odom TF."""
 import math
 from geometry_msgs.msg import PoseStamped
