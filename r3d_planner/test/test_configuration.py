@@ -1,3 +1,13 @@
+# =============================================================================
+# R3D-Planner
+#
+# Author:        Bastian Aumer
+# Last modified: 2026-09-16
+# Repository:    https://github.com/RoboProjekt/R3D-Planner
+#
+# Copyright (c) Bastian Aumer
+# =============================================================================
+
 """Configuration and non-motion ROS integration tests (ROS 2 Humble)."""
 import copy
 from pathlib import Path

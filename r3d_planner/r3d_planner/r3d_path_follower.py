@@ -1,3 +1,13 @@
+# =============================================================================
+# R3D-Planner
+#
+# Author:        Bastian Aumer
+# Last modified: 2026-09-16
+# Repository:    https://github.com/RoboProjekt/R3D-Planner
+#
+# Copyright (c) Bastian Aumer
+# =============================================================================
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist

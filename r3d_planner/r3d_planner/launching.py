@@ -1,3 +1,13 @@
+# =============================================================================
+# R3D-Planner
+#
+# Author:        Bastian Aumer
+# Last modified: 2026-09-16
+# Repository:    https://github.com/RoboProjekt/R3D-Planner
+#
+# Copyright (c) Bastian Aumer
+# =============================================================================
+
 """Launch-time parameter forwarding shared by the two entry points."""
 from launch import LaunchDescription
 from launch.actions import OpaqueFunction, LogInfo

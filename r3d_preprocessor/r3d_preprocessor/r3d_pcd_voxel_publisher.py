@@ -1,3 +1,13 @@
+# =============================================================================
+# R3D-Planner
+#
+# Author:        Bastian Aumer
+# Last modified: 2026-09-14
+# Repository:    https://github.com/RoboProjekt/R3D-Planner
+#
+# Copyright (c) Bastian Aumer
+# =============================================================================
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
