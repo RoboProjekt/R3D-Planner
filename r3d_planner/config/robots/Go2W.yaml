@@ -1,0 +1,14 @@
+robot:
+  name: Go2W
+  geometry:
+    robot_height_cm: 80.0
+    robot_narrow_radius_cm: 30.0
+    robot_radius_cm: 40.0
+    robot_base_clearance_cm: 10.0
+  odometry:
+    topic: /lidar_odometry
+    odom_frame: odom
+    base_frame: base_link
+  topics:
+    pointcloud: /hesai_ros_driver/hesai/lidar_points
+    cmd_vel: /cmd_vel

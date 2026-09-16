@@ -1,5 +1,15 @@
 # Technical Comparison with Go2-W-Praxisphase
 
+## Historical scope: V2 snapshot
+
+This document records the comparison at the fixed V2 revision below. References
+to "current" in this historical report mean that snapshot, not V3.
+For active V3 behavior use [ARCHITECTURE.md](ARCHITECTURE.md) and
+[CONFIGURATION.md](CONFIGURATION.md). V3 adds YAML launch resolution, configurable
+robot interfaces and standard Odometry start selection; it validates request
+frames, honors `use_start`, and sends zero follower commands on pose loss.
+The planned external LiDAR-odometry fork is not implemented here.
+
 ## Scope and evidence
 
 This review compares the PCD-only `V2` branch of this repository with

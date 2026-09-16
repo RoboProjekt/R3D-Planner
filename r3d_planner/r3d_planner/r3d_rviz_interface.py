@@ -12,7 +12,11 @@ class RVizInterfaceNode(Node):
         super().__init__('r3d_rviz_interface')
         
         # --- PARAMETER & STATE ---
-        self.match_radius = 0.8
+        self.declare_parameter('match_radius', 0.8)
+        self.declare_parameter('publish_map_odom', True)
+        self.declare_parameter('map_frame', 'map')
+        self.declare_parameter('odom_frame', 'odom')
+        self.match_radius = self.get_parameter('match_radius').value
         self.initial_calibration_done = False # Der "Schalter" für deinen Workflow
         self.latest_point = None
 
@@ -28,11 +32,12 @@ class RVizInterfaceNode(Node):
         # --- ACTION & TF ---
         self.action_client = ActionClient(self, ComputePathToPose, '/compute_path_to_pose')
         self.tf_broadcaster = tf2_ros.StaticTransformBroadcaster(self)
-        self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
         self.get_logger().info("--- R3D RViz Smart Interface GESTARTET ---")
-        self.get_logger().info("Status: Warte auf ERSTE Kalibrierung (Startpunkt setzen)...")
+        if self.get_parameter('publish_map_odom').value:
+            self.get_logger().info('Waiting for initial map calibration.')
+        else:
+            self.get_logger().info('External global localization enabled; ready for point/goal pairs.')
 
     def recalibrate_callback(self, request, response):
         """Setzt das System zurück, um die Position neu zu kalibrieren."""
@@ -44,11 +49,14 @@ class RVizInterfaceNode(Node):
 
     def point_cb(self, msg):
         self.latest_point = msg
-        mode = "KALIBRIERUNG" if not self.initial_calibration_done else "ZIELSETZUNG"
+        mode = ('KALIBRIERUNG' if self.get_parameter('publish_map_odom').value
+                and not self.initial_calibration_done else 'ZIELSETZUNG')
         self.get_logger().info(f"📍 [{mode}] Punkt empfangen (Z={msg.point.z:.2f}).")
 
     def initial_pose_cb(self, msg):
         """Wird für die Kalibrierung (Startpunkt) genutzt."""
+        if not self.get_parameter('publish_map_odom').value:
+            return
         if self.initial_calibration_done:
             self.get_logger().info("ℹ️ Kalibrierung bereits aktiv. Nutze '2D Goal Pose' für neue Ziele.")
             return
@@ -72,7 +80,7 @@ class RVizInterfaceNode(Node):
 
     def goal_pose_cb(self, msg):
         """Wird für die Zielsetzung genutzt."""
-        if not self.initial_calibration_done:
+        if self.get_parameter('publish_map_odom').value and not self.initial_calibration_done:
             self.get_logger().warn("⚠️ Roboter noch nicht lokalisiert! Setze erst den Startpunkt.")
             return
 
@@ -94,9 +102,12 @@ class RVizInterfaceNode(Node):
     def publish_map_odom_tf(self, point, orientation):
         """Berechnet und setzt den statischen Offset zwischen Map und Odometrie."""
         t = TransformStamped()
+        if not self.get_parameter('publish_map_odom').value:
+            self.get_logger().info('External global localization owns map -> odom; calibration TF disabled.')
+            return
         t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = 'map'
-        t.child_frame_id = 'odom'
+        t.header.frame_id = self.get_parameter('map_frame').value
+        t.child_frame_id = self.get_parameter('odom_frame').value
         t.transform.translation.x = point.x
         t.transform.translation.y = point.y
         t.transform.translation.z = point.z
@@ -105,29 +116,18 @@ class RVizInterfaceNode(Node):
         self.get_logger().info("🗺️ TF 'map -> odom' fixiert. Odometrie ist nun synchronisiert.")
 
     def send_path_request(self, target_point, target_orientation):
-        """Startet die Pfadplanung von der AKTUELLEN Roboterposition (aus TF)."""
+        """Request planning using the planner's current Odometry input."""
         try:
-            # Wir holen uns die ECHTE aktuelle Position aus dem TF-Baum (Tracking!)
-            now = rclpy.time.Time()
-            trans = self.tf_buffer.lookup_transform('map', 'base_link', now, timeout=rclpy.duration.Duration(seconds=1.0))
-            
-            start_pose = PoseStamped()
-            start_pose.header.frame_id = 'map'
-            start_pose.pose.position.x = trans.transform.translation.x
-            start_pose.pose.position.y = trans.transform.translation.y
-            start_pose.pose.position.z = trans.transform.translation.z
-            start_pose.pose.orientation = trans.transform.rotation
-
             goal_pose = PoseStamped()
-            goal_pose.header.frame_id = 'map'
+            goal_pose.header.frame_id = self.get_parameter('map_frame').value
             goal_pose.pose.position.x = target_point.x
             goal_pose.pose.position.y = target_point.y
             goal_pose.pose.position.z = target_point.z
             goal_pose.pose.orientation = target_orientation
 
             goal_msg = ComputePathToPose.Goal()
-            goal_msg.use_start = True
-            goal_msg.start = start_pose
+            # The planner resolves the start from its standard Odometry input.
+            goal_msg.use_start = False
             goal_msg.goal = goal_pose
             goal_msg.planner_id = 'GridBased'
 

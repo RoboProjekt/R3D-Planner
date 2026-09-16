@@ -4,28 +4,32 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Path
 from sensor_msgs.msg import PointCloud2
 import sensor_msgs_py.point_cloud2 as pc2
-import tf2_ros
-from tf2_ros import Buffer, TransformListener
 import math
-import numpy as np
+from .odometry import OdometryInput
 
 class PathFollower(Node):
     def __init__(self):
         super().__init__('r3d_path_follower')
 
         # --- PARAMETER ---
-        self.lookahead_distance = 0.5  # Wie weit schaut der Roboter voraus (Meter)
-        self.max_linear_speed = 0.35   # Vorwärtsgeschwindigkeit (m/s)
-        self.max_angular_speed = 0.6   # Maximale Drehgeschwindigkeit (rad/s)
-        self.stop_distance = 0.6       # Bremsweg vor dynamischen Hindernissen (Meter)
-        self.goal_tolerance = 0.2      # Wann gilt das Ziel als erreicht?
+        defaults = {'lookahead_distance': 0.5, 'max_linear_speed': 0.35,
+                    'max_angular_speed': 0.6, 'stop_distance': 0.6, 'goal_tolerance': 0.2,
+                    'control_period_sec': 0.1, 'obstacle_x_min': 0.1,
+                    'obstacle_half_width': 0.3, 'max_angular_speed_narrow': 0.2,
+                    'angle_threshold': 0.5, 'steering_gain': 1.5,
+                    'narrow_speed_factor': 0.4, 'turning_speed_factor': 0.3,
+                    'cmd_vel_topic': '/cmd_vel'}
+        for key, value in defaults.items():
+            self.declare_parameter(key, value)
+            setattr(self, key, self.get_parameter(key).value)
+        self.odometry = OdometryInput(self)
 
         # --- VARIABLEN ---
         self.current_path = []
         self.obstacle_in_front = False
 
         # --- PUBLISHER & SUBSCRIBER ---
-        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.cmd_pub = self.create_publisher(Twist, self.cmd_vel_topic, 10)
         
         self.path_sub = self.create_subscription(
             Path, '/global_path', self.path_callback, 10)
@@ -34,11 +38,8 @@ class PathFollower(Node):
             PointCloud2, '/local/filtered_obstacles', self.obstacle_callback, 10)
 
         # --- TF (Transformationen) ---
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
-
         # --- CONTROL LOOP ---
-        self.timer = self.create_timer(0.1, self.control_loop) # 10 Hz
+        self.timer = self.create_timer(self.control_period_sec, self.control_loop)
         self.get_logger().info("R3D Path Follower gestartet! Warte auf Pfad...")
 
     def path_callback(self, msg):
@@ -50,7 +51,7 @@ class PathFollower(Node):
         
         for point in pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True):
             x, y, z = point
-            if 0.1 < x < self.stop_distance and abs(y) < 0.3:
+            if self.obstacle_x_min < x < self.stop_distance and abs(y) < self.obstacle_half_width:
                 obstacle_detected = True
                 break
                 
@@ -63,11 +64,11 @@ class PathFollower(Node):
 
     def get_robot_pose(self):
         try:
-            trans = self.tf_buffer.lookup_transform('map', 'base_link', rclpy.time.Time())
-            x = trans.transform.translation.x
-            y = trans.transform.translation.y
+            pose = self.odometry.map_pose().pose
+            x = pose.position.x
+            y = pose.position.y
             
-            q = trans.transform.rotation
+            q = pose.orientation
             siny_cosp = 2 * (q.w * q.z + q.x * q.y)
             cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
             yaw = math.atan2(siny_cosp, cosy_cosp)
@@ -89,6 +90,7 @@ class PathFollower(Node):
 
         rx, ry, ryaw = self.get_robot_pose()
         if rx is None:
+            self.cmd_pub.publish(msg)
             return
 
         goal_x = self.current_path[-1].pose.position.x
@@ -144,22 +146,22 @@ class PathFollower(Node):
         # --- NEU: Dynamische Bewegungskontrolle ---
         if is_narrow:
             # Engstellen-Modus (Sehr vorsichtig!)
-            max_ang_narrow = 0.2  
+            max_ang_narrow = self.max_angular_speed_narrow
             
-            if abs(angle_error) > 0.5:
+            if abs(angle_error) > self.angle_threshold:
                 # NUR auf der Stelle drehen, KEIN Vorwärtsfahren in der Tür!
                 msg.linear.x = 0.0 
-                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * 1.5))
+                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * self.steering_gain))
             else:
                 # Er ist gut ausgerichtet -> Langsam durchfahren
-                msg.linear.x = self.max_linear_speed * 0.4 
-                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * 1.5))
+                msg.linear.x = self.max_linear_speed * self.narrow_speed_factor
+                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * self.steering_gain))
         else:
             # Normaler Modus (Grüner Boden)
-            msg.angular.z = max(-self.max_angular_speed, min(self.max_angular_speed, angle_error * 1.5))
+            msg.angular.z = max(-self.max_angular_speed, min(self.max_angular_speed, angle_error * self.steering_gain))
             
-            if abs(angle_error) > 0.5: 
-                msg.linear.x = self.max_linear_speed * 0.3 
+            if abs(angle_error) > self.angle_threshold:
+                msg.linear.x = self.max_linear_speed * self.turning_speed_factor
             else:
                 msg.linear.x = self.max_linear_speed
 

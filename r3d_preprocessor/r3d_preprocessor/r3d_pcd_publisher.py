@@ -12,6 +12,7 @@ class PCDPublisher(Node):
         
         # Parameter für den Dateipfad
         self.declare_parameter('pcd_path', 'environment.pcd')
+        self.declare_parameter('map_frame', 'map')
         
         # QoS: TRANSIENT_LOCAL
         qos_profile = QoSProfile(depth=1)
@@ -61,7 +62,7 @@ class PCDPublisher(Node):
     def create_pc2_msg(self, points, colors):
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "map" 
+        msg.header.frame_id = self.get_parameter('map_frame').value
 
         # Basis-Layout (X, Y, Z)
         fields = [

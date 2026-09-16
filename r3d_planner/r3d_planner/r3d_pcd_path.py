@@ -13,6 +13,7 @@ from scipy.spatial import KDTree
 import os
 import networkx as nx
 from ament_index_python.packages import get_package_share_directory
+from .odometry import OdometryInput
 
 class GlobalGraphPlanner(Node):
     def __init__(self):
@@ -34,6 +35,14 @@ class GlobalGraphPlanner(Node):
         self.declare_parameter('voxel_size_cm', 5.0)
         self.declare_parameter('min_step_height_cm', 5.0)
         self.declare_parameter('max_step_height_cm', 25.0)
+        for key, value in {'robot_height_cm': 80.0, 'robot_narrow_radius_cm': 30.0,
+                           'robot_radius_cm': 40.0, 'robot_base_clearance_cm': 10.0,
+                           'narrow_cost_multiplier': 1.2, 'stair_cost_multiplier': 3.0,
+                           'path_line_width': 0.05, 'path_z_offset_voxels': 1.5}.items():
+            self.declare_parameter(key, value)
+        self.odometry = OdometryInput(self)
+        self.narrow_cost_multiplier = self.get_parameter('narrow_cost_multiplier').value
+        self.stair_cost_multiplier = self.get_parameter('stair_cost_multiplier').value
         
         self.voxel_size = self.get_parameter('voxel_size_cm').get_parameter_value().double_value / 100.0
         self.min_stair_height = self.get_parameter('min_step_height_cm').get_parameter_value().double_value / 100.0
@@ -131,11 +140,11 @@ class GlobalGraphPlanner(Node):
                                 weight = np.sqrt(dist_xy**2 + delta_z_meters**2)
                                 n_type = self.graph.nodes[(nx_idx, ny_idx, nz)]['type']
                                 if node_type == "narrow" or n_type == "narrow":
-                                    weight *= 1.2
+                                    weight *= self.narrow_cost_multiplier
                                 self.graph.add_edge(current_node, (nx_idx, ny_idx, nz), weight=weight)
                                 
                             elif self.min_stair_height < abs_delta_z <= self.max_stair_height:
-                                weight = np.sqrt(dist_xy**2 + delta_z_meters**2) * 3.0
+                                weight = np.sqrt(dist_xy**2 + delta_z_meters**2) * self.stair_cost_multiplier
                                 self.graph.add_edge(current_node, (nx_idx, ny_idx, nz), weight=weight)
 
             self.kdtree = KDTree(self.world_coords)
@@ -194,8 +203,26 @@ class GlobalGraphPlanner(Node):
             goal_handle.abort()
             return ComputePathToPose.Result()
 
-        start_node = self.get_nearest_node(goal_req.start.pose.position)
+        result = ComputePathToPose.Result()
+        map_frame = self.get_parameter('map_frame').value
+        try:
+            if goal_req.goal.header.frame_id != map_frame:
+                raise ValueError(f'Goal must be in {map_frame}')
+            if goal_req.use_start:
+                if goal_req.start.header.frame_id != map_frame:
+                    raise ValueError(f'Explicit start must be in {map_frame}')
+                start_pose = goal_req.start
+            else:
+                start_pose = self.odometry.map_pose()
+        except Exception as exc:
+            self.get_logger().error(f'Cannot determine planning start: {exc}')
+            goal_handle.abort()
+            return result
+        start_node = self.get_nearest_node(start_pose.pose.position)
         end_node = self.get_nearest_node(goal_req.goal.pose.position)
+        if start_node is None or end_node is None:
+            goal_handle.abort()
+            return result
         
         path_ids = self.a_star(start_node, end_node)
         
@@ -247,7 +274,7 @@ class GlobalGraphPlanner(Node):
         marker.action = Marker.ADD
         
         # Bei einer Linie bestimmt scale.x die Liniendicke
-        marker.scale.x = 0.05 
+        marker.scale.x = self.get_parameter('path_line_width').value
         
         # Farbe: Dunkelblau (RGB 0,0,128) und voll sichtbar (a=1.0)
         marker.color = ColorRGBA(r=0.0, g=0.0, b=0.5, a=1.0)
@@ -258,7 +285,7 @@ class GlobalGraphPlanner(Node):
             p.x = pos[0]
             p.y = pos[1]
             # Visueller Offset, damit der Pfad leicht über dem Boden schwebt
-            p.z = pos[2] + (self.voxel_size * 1.5) 
+            p.z = pos[2] + (self.voxel_size * self.get_parameter('path_z_offset_voxels').value)
             marker.points.append(p)
 
         self.pub_viz_path.publish(marker)

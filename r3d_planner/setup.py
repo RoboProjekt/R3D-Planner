@@ -14,6 +14,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         # Hier installieren wir die Config Datei, damit launch files sie finden
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config', 'robots'), glob('config/robots/*.yaml')),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
