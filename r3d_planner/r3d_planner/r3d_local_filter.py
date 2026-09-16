@@ -30,9 +30,19 @@ def create_cloud_xyz32(header, points):
 class ObstacleCliffFilter(Node):
     def __init__(self):
         super().__init__('obstacle_cliff_filter')
+        defaults = {'pointcloud_topic': '/hesai_ros_driver/hesai/lidar_points',
+                    'min_height': 0.05, 'max_height': 1.0, 'max_step_height': 0.22,
+                    'min_step_height': 0.06, 'cliff_width': 0.4, 'stair_roi_x_min': 0.7,
+                    'stair_roi_x_max': 1.1, 'stair_roi_width': 0.5,
+                    'min_reliable_distance': 0.65, 'stair_min_points': 50,
+                    'cliff_roi_x_min': 0.7, 'cliff_roi_x_max': 1.2,
+                    'cliff_min_ground_points': 30, 'cliff_wall_points': 20,
+                    'cliff_wall_height': 0.5}
+        for key, value in defaults.items():
+            self.declare_parameter(key, value)
         
         self.sub = self.create_subscription(
-            PointCloud2, '/hesai_ros_driver/hesai/lidar_points', self.pc_callback, 10)	# Adjust LIDAR Topic here 
+            PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback, 10)
         
         self.pub_obstacles = self.create_publisher(PointCloud2, '/local/filtered_obstacles', 10)
         self.pub_cliff = self.create_publisher(PointCloud2, '/local/cliff_virtual_wall', 10)
@@ -42,21 +52,14 @@ class ObstacleCliffFilter(Node):
 
         # --- PARAMETER ---
         # 1. Hindernis-Filter
-        self.min_height = 0.05      # Alles unter 5cm ist Boden/Teppich
-        self.max_height = 1.0       # Alles über 1m ist Decke
         
         # 2. Stufen-Parameter (Preprocessing sagt max 20cm)
-        self.max_step_height = 0.22 # Toleranz etwas über 20cm
-        self.min_step_height = 0.06 # Muss höher als min_height sein
         
         # 3. Klippen-Erkennung
-        self.cliff_dist = 0.6 
-        self.cliff_width = 0.4
         
         # 4. Stufen-Erkennung ROI (Region of Interest)
-        self.stair_roi_x_min = 0.7
-        self.stair_roi_x_max = 1.1
-        self.stair_roi_width = 0.5
+        for key in defaults:
+            setattr(self, key, self.get_parameter(key).value)
 
     def pc_callback(self, msg):
         # --- SCHRITT 1: DATEN LADEN (Zuerst!) ---
@@ -80,7 +83,7 @@ class ObstacleCliffFilter(Node):
         dist_sq = points[:, 0]**2 + points[:, 1]**2
         
         # Filter: Alles was näher als 0.65m ist, wird ignoriert (Rauschen am Rand der Totzone)
-        min_reliable_dist_sq = 0.65**2 
+        min_reliable_dist_sq = self.min_reliable_distance**2
         mask_reliable = dist_sq > min_reliable_dist_sq
         points = points[mask_reliable]
 
@@ -95,7 +98,7 @@ class ObstacleCliffFilter(Node):
         stair_candidate_points = points[mask_stair_roi & mask_step_height]
         
         is_stair = False
-        if len(stair_candidate_points) > 50:
+        if len(stair_candidate_points) > self.stair_min_points:
             avg_step_z = np.mean(stair_candidate_points[:, 2])
             avg_step_x = np.mean(stair_candidate_points[:, 0])
             
@@ -132,8 +135,8 @@ class ObstacleCliffFilter(Node):
         # Deine Totzone ist ca 0.6m. Der Filter oben löscht alles < 0.65m.
         # Also prüfen wir den Bereich von 0.7m bis 1.2m auf Boden.
         
-        check_start_x = 0.7
-        check_end_x = 1.2  # Wir schauen 50cm weit in den sichtbaren Bereich
+        check_start_x = self.cliff_roi_x_min
+        check_end_x = self.cliff_roi_x_max
         
         mask_roi_cliff_visible = (
             (points[:, 0] > check_start_x) & (points[:, 0] < check_end_x) & 
@@ -146,19 +149,19 @@ class ObstacleCliffFilter(Node):
         
         # Schwellwert anpassen: Da der Bereich weiter weg ist, sind die Punkte weniger dicht.
         # Wir senken den Threshold etwas zur Sicherheit.
-        MIN_SAFE_POINTS = 30 
+        MIN_SAFE_POINTS = self.cliff_min_ground_points
         
         if ground_points_count < MIN_SAFE_POINTS:
             # Wir sehen ab 0.7m keinen Boden mehr -> Klippe oder Loch voraus!
             # Wir bauen die Wand genau an die Grenze der Sichtbarkeit
             
-            y_fill = np.linspace(-self.cliff_width, self.cliff_width, 20)
-            cliff_wall = np.zeros((20, 3), dtype=np.float32)
+            y_fill = np.linspace(-self.cliff_width, self.cliff_width, self.cliff_wall_points)
+            cliff_wall = np.zeros((self.cliff_wall_points, 3), dtype=np.float32)
             
             # Wand muss bei 0.7m stehen (Beginn des sichtbaren Bereichs)
             cliff_wall[:, 0] = check_start_x 
             cliff_wall[:, 1] = y_fill
-            cliff_wall[:, 2] = 0.5
+            cliff_wall[:, 2] = self.cliff_wall_height
             
             self.pub_cliff.publish(create_cloud_xyz32(msg.header, cliff_wall))
             # Optional: Warnung nur ab und zu loggen, um Spam zu vermeiden

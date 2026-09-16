@@ -1,0 +1,76 @@
+robot_config: robots/Go2W.yaml
+
+# Paths are relative to this directory. The output is <input>_analysed.pcd.
+maps:
+  pcd_path: ../../r3d_preprocessor/maps/voxel_05_minhits_7.pcd
+  map_name: ../../r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+
+# Shared by analysis and graph reconstruction; never duplicate these per node.
+shared:
+  voxel_size_cm: 5.0
+  min_step_height_cm: 5.0
+  max_step_height_cm: 25.0
+
+preprocessing:
+  min_points_per_sqm: 10.0
+  min_points_per_voxel: 3
+  floor_height_tolerance: 0.02
+  ground_fill: true
+  analysis_grid_size_cm: 20.0
+  cluster_gap_threshold_cm: 20.0
+  fill_plane_iterations: 2
+  fill_plane_search_radius: 2
+  fill_plane_min_neighbors: 4
+
+planner:
+  map_frame: map
+  odometry_timeout_sec: 1.0
+  narrow_cost_multiplier: 1.2
+  stair_cost_multiplier: 3.0
+  path_line_width: 0.05
+  path_z_offset_voxels: 1.5
+
+components:
+  live_filter:
+    enabled: true
+  rviz_interface:
+    enabled: true
+
+# These are sensor-coordinate thresholds, NOT the offline graph step limits.
+live_filter:
+  min_height: 0.05
+  max_height: 1.0
+  min_step_height: 0.06
+  max_step_height: 0.22
+  cliff_width: 0.4
+  stair_roi_x_min: 0.7
+  stair_roi_x_max: 1.1
+  stair_roi_width: 0.5
+  min_reliable_distance: 0.65
+  stair_min_points: 50
+  cliff_roi_x_min: 0.7
+  cliff_roi_x_max: 1.2
+  cliff_min_ground_points: 30
+  cliff_wall_points: 20
+  cliff_wall_height: 0.5
+
+rviz_interface:
+  match_radius: 0.8
+  # Disable when another global localization node owns map -> odom.
+  publish_map_odom: true
+
+# Used only by the explicitly started follower.launch.py (can command motion).
+path_follower:
+  lookahead_distance: 0.5
+  max_linear_speed: 0.35
+  max_angular_speed: 0.6
+  stop_distance: 0.6
+  goal_tolerance: 0.2
+  control_period_sec: 0.1
+  obstacle_x_min: 0.1
+  obstacle_half_width: 0.3
+  max_angular_speed_narrow: 0.2
+  angle_threshold: 0.5
+  steering_gain: 1.5
+  narrow_speed_factor: 0.4
+  turning_speed_factor: 0.3

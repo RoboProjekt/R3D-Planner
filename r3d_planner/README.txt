@@ -1,204 +1,167 @@
 # r3d_planner
 
-`r3d_planner` contains the runtime components of the R3D stack:
+This ament_python package contains the PCD-based 3D A* planner, local point-cloud
+filter, RViz interface, planar path follower and static test TF node. The
+package boundaries and existing generic interface names are unchanged on V3.
 
-- a global A* planner that rebuilds its graph from a color-coded PCD;
-- a local Hesai point-cloud filter for obstacles, steps, and cliffs;
-- an RViz interface for 3D start/goal selection and `map -> odom`;
-- a simple 2D lookahead path follower that publishes `/cmd_vel`;
-- a static test TF for planning without a robot.
+## Configuration and startup
 
-This is an `ament_python` package. `setup.py` installs five executables and
-`config/r3d_planner_params.yaml`. The package has no launch file.
+The stable entry point is config/planner_config.yaml. robot_config selects a
+relative robots/<robot>.yaml. The default robots/Go2W.yaml owns robot dimensions,
+Odometry topic/frames and hardware cloud/command topics. The central file owns
+shared graph settings, map paths, preprocessing, perception and controller tuning.
 
-> **Safety:** `path_follower` publishes motion commands directly. The Go2W
-> adapter forwards `/cmd_vel` to the Unitree SportClient without a timeout,
-> command mux, velocity clamp, or emergency-stop implementation. Validate these
-> safeguards externally before enabling motion.
+```bash
+ros2 launch r3d_planner preprocessor.launch.py
+ros2 launch r3d_planner planner.launch.py
+```
+
+Preprocessing starts the existing node in r3d_preprocessor and exits after writing
+the analyzed map. Planner launch starts pcd_path_planner and independently starts
+local_filter and rviz_interface using components.live_filter.enabled and
+components.rviz_interface.enabled. Both booleans default to true. All four
+combinations work. No hardware driver, RViz GUI or motion controller is included.
+
+Optional analyzed-map display:
+
+```bash
+ros2 launch r3d_planner map.launch.py
+rviz2
+```
+
+Use --symlink-install for the initial build. Editing the central or robot YAML
+requires launch restart only, without rebuild or re-sourcing. New robot YAMLs
+also need no build. Copied installations must set R3D_CONFIG_DIR once to live
+source config. See ../docs/CONFIGURATION.md for all keys, units, validation,
+ownership and robot-selection instructions. Direct ros2 run is developer-only
+and does not automatically load the central YAML.
 
 ## Nodes
 
-| Executable | Node name | Purpose | Main interfaces |
-|---|---|---|---|
-| `pcd_path_planner` | `global_graph_planner` | Reconstruct a graph from an analyzed RGB PCD and run A* | `/compute_path_to_pose`; `/global_path`, `/planned_path` |
-| `local_filter` | `obstacle_cliff_filter` | Filter local LiDAR data and detect steps/cliffs | Hesai input; three local outputs |
-| `path_follower` | `r3d_path_follower` | 2D lookahead controller | `/global_path`, `/local/filtered_obstacles`, TF; `/cmd_vel` |
-| `rviz_interface` | `r3d_rviz_interface` | Initial calibration and RViz goal selection | three input topics, service, action client, TF |
-| `path_test` | `r3d_path_test` | Test without real odometry | static `odom -> base_link` TF |
-
-## Global PCD planner
-
-`pcd_path_planner` uses `scipy.spatial.KDTree` to map start and goal positions
-to the nearest graph nodes, then searches with A*. The result is returned
-through the Nav2 action and published as `nav_msgs/msg/Path`.
-
-| Parameter | Default | Unit/meaning |
+| Executable | Node name | Main interfaces |
 |---|---|---|
-| `map_dir` | `<share/r3d_preprocessor>/maps`; `/tmp` on lookup failure | Base directory |
-| `map_name` | `map_analysed.pcd` | RGB PCD filename or absolute path |
-| `voxel_size_cm` | 5.0 | Grid size in cm |
-| `min_step_height_cm` | 5.0 | Flat/step threshold |
-| `max_step_height_cm` | 25.0 | Maximum connectable step height |
+| pcd_path_planner | global_graph_planner | configured Odometry input; action server, /global_path and /planned_path |
+| local_filter | obstacle_cliff_filter | configured sensor cloud; obstacle, cliff and stair outputs |
+| rviz_interface | r3d_rviz_interface | RViz point/pose input; action client, reset service, optional map -> odom |
+| path_follower | r3d_path_follower | configured Odometry, global path and obstacles; configured velocity output |
+| path_test | r3d_path_test | static identity odom -> base_link, TF-only test helper |
 
-The planner requires colors. It skips magenta obstacles, recognizes cyan as a
-narrow area and yellow as stair access, and treats other colors as floor. Grid
-and step parameters must match those used by `pcd_analyser`.
+## Global planner and odometry
 
-```bash
-ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=/absolute/path/map_analysed.pcd \
-  -p voxel_size_cm:=5.0 \
-  -p min_step_height_cm:=5.0 \
-  -p max_step_height_cm:=25.0
-```
+The planner reconstructs an eight-neighbor weighted NetworkX graph from analyzed
+PCD points and RGB classes. Magenta obstacles are skipped, cyan identifies narrow
+areas, yellow identifies stair access; other colors are treated as floor.
+KDTree snaps start/goal to nearest nodes; A* uses straight-line 3D distance.
+Shared voxel/step values must match those used to generate the map. Geometry
+parameters are visible on the planner but do not alter an existing analyzed PCD:
+regenerate the artifact after geometry changes.
+
+The planner subscribes to nav_msgs/msg/Odometry on robot.odometry.topic
+(default /lidar_odometry), exposed as ROS parameter odometry_topic.
+header.frame_id and child_frame_id must match odom_frame and base_frame.
+SensorDataQoS permits reliable or best-effort publishers. Pose orientation must
+be valid and timestamps current. The planner uses map -> odom at the received
+timestamp to compute the global base pose. No TF is broadcast by the planner.
+
+For ComputePathToPose:
+
+- use_start=true uses the explicit start without Odometry/TF;
+- use_start=false obtains the online start from Odometry;
+- goal and explicit start headers must match planner.map_frame;
+- missing/stale/invalid Odometry or global TF aborts online requests;
+- planner_id is accepted but not evaluated; feedback/cancellation are unchanged.
+
+See ../README.md for complete offline/online action requests.
+Path orientations retain the legacy narrow-area flag (z=1,w=1 for narrow);
+generic pose consumers must not interpret it as a normalized quaternion.
 
 ## Topics
+
+| Topic | Type | Publisher | Subscriber |
+|---|---|---|---|
+| robot.odometry.topic (default /lidar_odometry) | nav_msgs/msg/Odometry | external estimator | planner and explicitly started follower |
+
 
 | Topic | Type | Publisher | Consumer/purpose |
 |---|---|---|---|
 | `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | RViz `LINE_STRIP` |
 | `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` |
-| `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external Hesai driver | `local_filter` |
+| robot-configured cloud (default `/hesai_ros_driver/hesai/lidar_points`) | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional external Nav2 costmap |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no internal subscriber |
 | `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | no internal subscriber |
-| `/cmd_vel` | `geometry_msgs/msg/Twist` | `path_follower` | external robot base |
+| robot-configured command (default `/cmd_vel`) | `geometry_msgs/msg/Twist` | `path_follower` | external robot base |
 | `/clicked_point` | `geometry_msgs/msg/PointStamped` | RViz | `rviz_interface`; 3D height |
 | `/initialpose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | RViz | `rviz_interface`; initial calibration |
 | `/goal_pose` | `geometry_msgs/msg/PoseStamped` | RViz | `rviz_interface`; goal pose |
 
-All publishers and subscriptions created here use QoS depth 10.
+Existing generic interfaces use depth 10. Odometry uses SensorDataQoS.
+
 
 ## Action and service
 
-| Name | Type | Server | Client/purpose |
-|---|---|---|---|
-| `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | `pcd_path_planner` | `rviz_interface` or external client |
-| `/recalibrate_pose` | `std_srvs/srv/Trigger` | `rviz_interface` | Reset internal calibration state |
+| Name | Type | Server |
+|---|---|---|
+| /compute_path_to_pose | nav2_msgs/action/ComputePathToPose | pcd_path_planner |
+| /recalibrate_pose | std_srvs/srv/Trigger | rviz_interface |
 
-See `points.txt` for a direct action example. Start and goal headers must use
-`map` because the planners do not transform request coordinates. The example's
-`planner_id: GridBased` is accepted but not evaluated by the action server.
-
-## TF frames
+## TF and global localization
 
 ```text
-map --(rviz_interface, static)--> odom --(external or path_test)--> base_link
+map -- global localization or optional RViz calibration --> odom
+odom -- external standard odometry source --> base_link
+base_link -- external sensor calibration --> sensor frames
 ```
 
-- `rviz_interface` publishes static `map -> odom` after initial calibration.
-- `path_follower` and `rviz_interface` require the composed
-  `map -> base_link` transform.
-- A real odometry stack must provide `odom -> base_link`.
-- `path_test` publishes static identity for `odom -> base_link`; use it only
-  when no real publisher supplies the transform.
-- `local_filter` does not transform clouds; outputs retain the input header and
-  sensor frame.
+The planner has no direct dependency on lidar_slam_ros2 or another estimator.
+The separate planned LiDAR-odometry fork is outside this repository.
+The odometry source owns odom -> base_link, not map -> base_link.
+Changing the Odometry topic supports other sources only when the base/odom
+message and TF contracts are satisfied.
 
-## `local_filter`
+Set rviz_interface.publish_map_odom=false when an external global localizer owns
+map -> odom. Point/goal pairs then work without initial calibration.
+With the default true, Publish Point plus 2D Pose Estimate performs the legacy
+calibration, then Publish Point plus 2D Goal Pose submits an online goal.
+That calibration assumes an identity odometric base pose; it is not a general
+global-localization method. The reset service changes state only.
 
-The filter assumes X points forward, Y sideways, and Z upward. It removes
-points within 0.65 m, searches for step candidates, publishes points in the
-obstacle height band, and creates a virtual wall when it sees too few floor
-points ahead.
+## Local filter
 
-These values are hard-coded and are not ROS parameters:
+All effective dead-zone, Z-band, ROI, point-count and synthetic-wall settings
+are ROS parameters supplied from the central live_filter section. The input
+topic comes from the selected robot YAML. Existing sensor-coordinate thresholds
+and algorithms are retained. Offline graph step limits and sensor-local step
+thresholds intentionally remain separate.
 
-| Value | Setting | Meaning |
-|---|---:|---|
-| Input | `/hesai_ros_driver/hesai/lidar_points` | Fixed topic |
-| `min_height` / `max_height` | 0.05 / 1.0 m | Obstacle height band |
-| `min_step_height` / `max_step_height` | 0.06 / 0.22 m | Step height band |
-| Step ROI X | 0.7–1.1 m | Region ahead of sensor |
-| Step ROI half-width | 0.5 m | `abs(y) < 0.5` |
-| Step threshold | more than 50 points | Triggers `/stair_detect` |
-| Cliff-check X | 0.7–1.2 m | Visible floor region |
-| Cliff half-width | 0.4 m | `abs(y) < 0.4` |
-| Safe floor | at least 30 points | Otherwise wall at X=0.7 m |
+The filter still assumes packed 12-byte XYZ float32 records and X-forward,
+Y-lateral, Z-up sensor axes; it does not generally decode PointCloud2 field
+metadata or transform clouds. Recheck the driver layout after a sensor change.
+Outputs keep the incoming header. Cliff and stair outputs have no internal
+motion-control consumer.
 
-`local_filter` interprets PointCloud2 binary data as contiguous 12-byte XYZ
-float32 records and ignores the message's declared fields, offsets,
-`point_step`, padding, and endianness. The Go2W integration has been exercised,
-but the reference Hesai configuration does not prove this binary layout. Check
-the live message layout and axes before relying on the filter.
-
-## `path_follower`
-
-The controller finds the closest path point and then a target at least 0.5 m
-ahead. It uses only XY and yaw. It detects narrow areas through an internal flag
-stored in `pose.orientation.z`.
-
-| Hard-coded value | Setting |
-|---|---:|
-| Lookahead | 0.5 m |
-| Maximum linear speed | 0.35 m/s |
-| Maximum angular speed | 0.6 rad/s |
-| Obstacle stop distance | 0.6 m |
-| Obstacle corridor | ±0.3 m |
-| Goal tolerance | 0.2 m |
-| Control period | 0.1 s (10 Hz) |
-| Narrow-area angular limit | 0.2 rad/s |
-| Narrow-area linear factor | 0.4 |
-
-With no path or a detected obstacle, the node publishes a zero Twist. On a TF
-failure, that control cycle publishes no new command. The controller does not
-subscribe to the cliff cloud or `/stair_detect`.
+## Explicit follower startup and safety
 
 ```bash
-ros2 run r3d_planner path_follower
+ros2 launch r3d_planner follower.launch.py
 ```
 
-## RViz workflow
+This separate launch can produce motion. It loads central path_follower settings
+and robot Odometry/command topics. It uses XY/yaw only, including the existing
+narrow-area flag. No path, detected obstacles or unavailable/stale global pose
+produces zero Twist. This is not an emergency stop or complete command watchdog.
 
-```bash
-ros2 run r3d_planner rviz_interface
-```
+The external Go2W command adapter directly forwards velocity and can change
+posture during startup. Independently validate watchdogs, command arbitration,
+emergency stop and cliff handling before enabling any motion.
 
-1. Select a 3D start point, including height, with **Publish Point**.
-2. Within 0.8 m in XY, use **2D Pose Estimate** to set orientation.
-3. The node publishes static `map -> odom` and switches to goal mode.
-4. Select the goal height with **Publish Point**.
-5. Within 0.8 m, set goal position and orientation with **2D Goal Pose**.
-6. The node reads `map -> base_link` as the start and sends an action request.
+## Dependencies and installation
 
-Reset the calibration state with:
-
-```bash
-ros2 service call /recalibrate_pose std_srvs/srv/Trigger "{}"
-```
-
-## Test operation without hardware
-
-```bash
-ros2 run r3d_planner path_test
-```
-
-This node only publishes a static identity transform from `odom` to
-`base_link`. It simulates neither movement nor changing odometry. Do not run it
-alongside real odometry.
-
-## YAML configuration
-
-`config/r3d_planner_params.yaml` is an incomplete Nav2 fragment that is not
-loaded automatically. It names `/local/filtered_obstacles` as a costmap
-observation source and contains an MPPI controller excerpt. Although
-`cliff_virtual` appears in `observation_sources`, its configuration block is
-missing. A complete external Nav2 configuration and bringup are required.
-
-## Dependencies
-
-### Declared in `package.xml`
-
-`rclpy`, `nav2_msgs`, `geometry_msgs`, `nav_msgs`, `sensor_msgs`,
-`visualization_msgs`, `scipy`, `numpy`, and `std_srvs`.
-
-### Additional runtime dependencies
-
-NetworkX, Open3D, `ament_index_python`, `sensor_msgs_py`, `tf2_ros`, and
-`std_msgs`. `r3d_planner` also looks up `r3d_preprocessor` through the Ament index.
-These dependencies are not fully represented in the manifest; see
-`../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
-
-The planner consumes the PCD produced by `r3d_preprocessor`. See
-`../docs/ARCHITECTURE.md` for the cross-package data flow and `../INSTALL.md`
-for startup order and runtime checks.
+ROS dependencies include rclpy, standard navigation/sensor/geometry messages,
+Nav2 actions, TF2, launch/launch_ros, ament_index_python and std_srvs.
+Python libraries include Open3D, NetworkX, NumPy, SciPy and PyYAML.
+r3d_preprocessor is the runtime PCD producer; no reverse dependency is added.
+setup.py installs modules, executables, launch/*.launch.py, config/*.yaml and
+config/robots/*.yaml. The legacy config/r3d_planner_params.yaml remains an
+unattached incomplete Nav2 fragment, not an active configuration entry point.
+See ../INSTALL.md and ../docs/KNOWN_ISSUES.md for metadata limitations.

@@ -2,260 +2,163 @@
 
 ## Overview and goals
 
-R3D-Planner is a ROS 2 Humble navigation stack for voxelized 3D point clouds.
-It analyzes PCD maps, classifies traversability, and stores the result as a
-color-coded PCD. The global planner builds a 3D graph from that map, computes
-fully three-dimensional paths with A*, and publishes them through
-`nav2_msgs/action/ComputePathToPose`.
+R3D-Planner is a ROS 2 Humble stack for navigation in voxelized 3D PCD maps.
+The preprocessor classifies clearance and traversability; the planner reconstructs
+a weighted 3D graph and computes A* paths through the standard
+`nav2_msgs/action/ComputePathToPose` action.
 
-The complete system was developed and tested on a Unitree Go2W, including the
-Hesai point-cloud input, TF tree, RViz workflow, local obstacle filter, and
-`/cmd_vel` interface. Other ROS distributions are not supported.
+The complete original navigation stack, including sensor integration and TF,
+has run successfully on a Unitree Go2W. V3 introduces centralized runtime
+configuration and a source-independent Odometry input. This refactor has
+non-motion workstation tests; it still needs deployment regression testing on
+the Go2W. Other ROS distributions are not supported.
 
-The source-level comparison with the original deployment repository is in
-[`docs/REFERENCE_COMPARISON.md`](docs/REFERENCE_COMPARISON.md).
-
-V2 uses a PCD-only pipeline:
-
-```text
-PCD map -> pcd_analyser -> *_analysed.pcd -> pcd_path_planner
-                              |
-                              +-> pcd_server -> RViz
-
-Hesai LiDAR -> local_filter -> path_follower -> /cmd_vel
-RViz input  -> rviz_interface -> /compute_path_to_pose
-```
-
-The workspace contains two `ament_python` packages:
-
-| Package | Purpose | Executables |
+| Package | Role | Executables |
 |---|---|---|
-| `r3d_preprocessor` | Analyze and publish PCD maps | `pcd_analyser`, `pcd_server` |
-| `r3d_planner` | Global planning, local filtering, RViz input, path following, and test TF | `pcd_path_planner`, `local_filter`, `rviz_interface`, `path_follower`, `path_test` |
+| `r3d_preprocessor` | PCD analysis and visualization | `pcd_analyser`, `pcd_server` |
+| `r3d_planner` | Planning, perception, RViz input and control | `pcd_path_planner`, `local_filter`, `rviz_interface`, `path_follower`, `path_test` |
 
-### Robot-independent and Go2W-specific parts
-
-Offline PCD voxelization, traversability classification, graph reconstruction,
-A*, and the `ComputePathToPose` interface are independent of the Go2W hardware.
-The map can originate from any sensor pipeline that produces a PCD in the
-intended `map` coordinates. Robot radius, narrow radius, height, base clearance,
-voxel size, and step limits are ROS parameters during preprocessing; the PCD
-planner separately accepts voxel and step limits.
-
-The online layer is configured for the Go2W deployment: `local_filter` uses the
-fixed Hesai topic and sensor-axis assumptions, the TF consumers require
-`map`, `odom`, and `base_link`, and `path_follower` publishes fixed-limit
-`Twist` commands on `/cmd_vel`. A different robot must supply the same TF and
-message contracts or remap topics, and must retune dimensions and motion
-limits. Sensor/filter thresholds, controller limits, and frame names are source
-constants rather than ROS parameters, so adaptation is not configuration-only
-in the current implementation.
+The pipeline is PCD-only. Pickle executables and external Pickle helper scripts
+from V1 are not available here.
 
 ## Installation
 
-The supported setup uses Ubuntu 22.04, ROS 2 Humble, and Python 3.10.
+Use Ubuntu 22.04, ROS 2 Humble and its Python 3.10 environment.
+Required libraries include Open3D, NetworkX, NumPy, SciPy and PyYAML; ROS inputs
+use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
+Sensor drivers, odometry, global localization and the robot command adapter
+remain external. No specific SLAM package is a dependency.
 
-### Dependencies
-
-```bash
-sudo apt update
-sudo apt install \
-  python3-colcon-common-extensions \
-  python3-rosdep \
-  python3-pip \
-  python3-numpy \
-  python3-scipy \
-  python3-networkx \
-  python3-open3d \
-  ros-humble-ament-index-python \
-  ros-humble-geometry-msgs \
-  ros-humble-nav-msgs \
-  ros-humble-nav2-msgs \
-  ros-humble-rclpy \
-  ros-humble-sensor-msgs \
-  ros-humble-sensor-msgs-py \
-  ros-humble-std-msgs \
-  ros-humble-std-srvs \
-  ros-humble-tf2-ros \
-  ros-humble-tf2-ros-py \
-  ros-humble-visualization-msgs \
-  ros-humble-rviz2
-```
-
-Open3D handles PCD data, NetworkX stores the in-memory navigation graph, SciPy
-supplies the nearest-node KDTree, and NumPy is used for point-cloud and geometry
-operations.
-
-### Workspace, rosdep, and build
-
-Replace every `<path-to-workspace>` placeholder below with the absolute path of
-your ROS 2 workspace before running a command.
+Install the apt dependencies listed in [INSTALL.md](INSTALL.md), then:
 
 ```bash
 mkdir -p <path-to-workspace>/src
 cd <path-to-workspace>/src
 git clone git@github.com:RoboProjekt/R3D-Planner.git
 cd R3D-Planner
-git checkout V2
-cd <path-to-workspace>
-```
-
-The package manifests contain the unresolved rosdep key `numpy` and, depending
-on the rosdep database, `scipy`. Install the packages above and run rosdep with
-these exclusions:
-
-```bash
-sudo rosdep init  # only on a new ROS installation
-rosdep update
-cd <path-to-workspace>
-rosdep install --from-paths src --ignore-src -r -y \
-  --skip-keys="numpy scipy"
-```
-
-Build and source the workspace:
-
-```bash
+git checkout V3
 cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
+sudo rosdep init  # only if not initialized on this machine
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y --skip-keys="numpy scipy"
 colcon build --symlink-install
 source install/setup.bash
 ```
 
-Source `/opt/ros/humble/setup.bash` and
-`<path-to-workspace>/install/setup.bash` in every
-terminal used below. See [INSTALL.md](INSTALL.md) for troubleshooting and the
-known package-metadata limitations.
+Replace angle-bracket placeholders before running commands. Source ROS and the
+workspace once in each new terminal. `--symlink-install` makes source
+configuration available at runtime, including newly added robot YAMLs.
+Editing YAML thereafter requires only stopping and restarting the affected launch,
+not rebuilding or sourcing again. Copied installations must set
+`R3D_CONFIG_DIR` once to the live source configuration directory; the loader
+rejects stale copied YAML rather than using it silently.
 
-## Using `r3d_preprocessor`
+## Configuration
 
-`pcd_analyser` loads a PCD map, voxelizes it, fills eligible floor gaps, checks
-robot clearance, and classifies traversable, narrow, stair, and obstacle
-voxels. It writes the result beside the source map as `<name>_analysed.pcd`.
-The output colors are green for floor, cyan for narrow areas, yellow for stair
-access, and magenta for obstacles.
+The stable entry point is `r3d_planner/config/planner_config.yaml`:
 
-### Preprocessor parameters
-
-| Parameter | Default | Unit | Description |
-|---|---:|---|---|
-| `pcd_path` | `environment.pcd` | path | Input PCD file; `~` is expanded |
-| `voxel_size_cm` | `5.0` | cm | Voxel edge length |
-| `max_step_height_cm` | `25.0` | cm | Largest height difference connected as a step |
-| `min_step_height_cm` | `5.0` | cm | Boundary between flat and step connections |
-| `min_points_per_sqm` | `10.0` | points/m² | Converted to a per-cell floor-fill threshold; at least three points are always required |
-| `min_points_per_voxel` | `3` | points | Minimum hits retained in an occupied voxel |
-| `floor_height_tolerance` | `0.02` | m | Planarity term; a height cluster is filled when its Z range is below `2*tolerance + 0.02 m` |
-| `ground_fill` | `true` | bool | Enables density and neighborhood floor filling |
-| `robot_base_clearance_cm` | `10.0` | cm | Lower start of the collision check above the floor |
-| `robot_narrow_radius_cm` | `30.0` | cm | Reduced radius used to classify narrow passages |
-| `robot_radius_cm` | `40.0` | cm | Normal collision radius |
-| `robot_height_cm` | `80.0` | cm | Height of the collision cylinder |
-| `analysis_grid_size_cm` | `20.0` | cm | XY cell size for density analysis |
-| `cluster_gap_threshold_cm` | `20.0` | cm | Vertical gap used to separate height clusters |
-| `fill_plane_iterations` | `2` | count | Maximum neighborhood-fill iterations |
-| `fill_plane_search_radius` | `2` | voxels | Search radius for plane filling |
-| `fill_plane_min_neighbors` | `4` | count | Required floor neighbors for filling |
-
-### Analyze a map
-
-This full invocation shows every configurable parameter. V2 uses
-`pcd_analyser`; the `pcd_to_graph` executable belongs to V1 and is not available
-on this branch.
-
-```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args \
-  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
-  -p voxel_size_cm:=5.0 \
-  -p max_step_height_cm:=25.0 \
-  -p min_points_per_sqm:=10.0 \
-  -p min_points_per_voxel:=1 \
-  -p floor_height_tolerance:=0.03 \
-  -p ground_fill:=false \
-  -p robot_base_clearance_cm:=10.0 \
-  -p robot_narrow_radius_cm:=30.0 \
-  -p min_step_height_cm:=5.0 \
-  -p robot_radius_cm:=40.0 \
-  -p robot_height_cm:=80.0 \
-  -p analysis_grid_size_cm:=20.0 \
-  -p cluster_gap_threshold_cm:=20.0 \
-  -p fill_plane_iterations:=2 \
-  -p fill_plane_search_radius:=2 \
-  -p fill_plane_min_neighbors:=4
+```text
+r3d_planner/config/
+├── planner_config.yaml
+├── robots/
+│   └── Go2W.yaml
+└── r3d_planner_params.yaml   # legacy Nav2 fragment, not loaded
 ```
 
-### Tested map configurations
+`robot_config: robots/Go2W.yaml` selects the robot. Robot geometry, odometry
+topic/frames, sensor input and command topic belong exclusively to that robot
+YAML. General settings belong to the central file; shared graph settings are
+forwarded to both analysis and planning. Unknown, duplicate or missing keys and
+invalid values fail at startup.
 
-These presets use the parameter combinations from the deployed map workflow.
-Only `voxel_05_minhits_7.pcd` is included in this repository. Copy the other
-maps to the stated paths or replace `pcd_path` with their actual location.
+| Central section | Ownership |
+|---|---|
+| `maps` | Input PCD and analyzed planning PCD; paths relative to the config directory |
+| `shared` | Voxel size and minimum/maximum graph step heights |
+| `preprocessing` | Density, voxel hit filtering, floor filling and clustering |
+| `planner` | Map frame, odometry age limit, graph costs and path visualization |
+| `components` | Independent Live Filter and RViz-interface launch switches |
+| `live_filter` | Sensor-coordinate perception thresholds |
+| `rviz_interface` | XY matching radius and optional calibration TF ownership |
+| `path_follower` | Lookahead, speed limits and controller thresholds; explicit motion launch only |
 
-RoboLab map:
+See [the full parameter reference](docs/CONFIGURATION.md) for names, units,
+validation, default values and adding a robot.
 
-```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/RoboLab_map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
-```
+## Using the preprocessor: select and analyze a map
 
-HomeLab map:
-
-```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/HomeLab_map1_lidar.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=10.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.03 -p ground_fill:=true -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
-```
-
-Included voxel map with the reduced density threshold:
-
-```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
-```
-
-Unfiltered stair scan:
-
-```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/Stair_unfiltered.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=7 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
-```
-
-### Publish the source or analyzed map
+Edit `maps.pcd_path` in `planner_config.yaml`. The included input is
+`r3d_preprocessor/maps/voxel_05_minhits_7.pcd`. Set `maps.map_name` to the
+corresponding `*_analysed.pcd`. Other RoboLab, HomeLab and stair maps are not
+included; provide your own PCD and change these two paths.
 
 ```bash
-ros2 run r3d_preprocessor pcd_server --ros-args \
-  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+ros2 launch r3d_planner preprocessor.launch.py
 ```
 
-`pcd_server` publishes `/map_pointcloud` with transient-local durability:
+This starts the existing one-shot `r3d_preprocessor/pcd_analyser` node.
+It voxelizes the input, filters weak voxels, checks robot clearance, optionally
+fills floors, and writes `<input-name>_analysed.pcd` beside the input.
+An existing output with that name is overwritten. It publishes no TF or topics.
+Green marks floor, cyan narrow clearance, yellow stair access and magenta
+obstacles.
 
-| Parameter | Default | Description |
+| Setting | Location | Meaning |
 |---|---|---|
-| `pcd_path` | `environment.pcd` | PCD file published in frame `map` |
+| `pcd_path` | `maps` | Source PCD to analyze |
+| `voxel_size_cm` | `shared` | Voxel edge length, cm |
+| `min_step_height_cm`, `max_step_height_cm` | `shared` | Flat boundary and largest step, cm |
+| `robot_height_cm` | robot `geometry` | Collision-cylinder height, cm |
+| `robot_narrow_radius_cm` | robot `geometry` | Tight clearance radius, cm |
+| `robot_radius_cm` | robot `geometry` | Normal safety radius, cm |
+| `robot_base_clearance_cm` | robot `geometry` | Collision check starts above the floor, cm |
+| `min_points_per_sqm`, `min_points_per_voxel` | `preprocessing` | Floor-fill density and occupied-voxel hit threshold |
+| `floor_height_tolerance`, `ground_fill` | `preprocessing` | Planarity tolerance in m and filling switch |
 
-In RViz, add a PointCloud2 display for `/map_pointcloud`, set durability to
-`Transient Local`, and use `RGB8` to display the traversability colors.
+Changing robot dimensions or processing settings requires analyzing the map again,
+but not rebuilding the workspace. A PCD does not carry configuration metadata:
+keep its generating YAML settings with the artifact. Selecting a robot does not
+reclassify an existing PCD automatically.
 
-## Using `r3d_planner`
-
-### Offline planning with an analyzed PCD
-
-Start the PCD planner with the same voxel and step values used during
-preprocessing:
+For an optional map display:
 
 ```bash
-ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
-  -p voxel_size_cm:=5.0 \
-  -p min_step_height_cm:=5.0 \
-  -p max_step_height_cm:=25.0
+ros2 launch r3d_planner map.launch.py
+rviz2
 ```
 
-| Parameter | Default | Description |
-|---|---|---|
-| `map_dir` | `<share/r3d_preprocessor>/maps`, fallback `/tmp` | Directory used for relative PCD names |
-| `map_name` | `map_analysed.pcd` | Color-coded PCD filename or absolute path |
-| `voxel_size_cm` | `5.0` | Reconstruction grid size; must match preprocessing |
-| `min_step_height_cm` | `5.0` | Flat-to-step boundary; must match preprocessing |
-| `max_step_height_cm` | `25.0` | Maximum connected step height; must match preprocessing |
+In RViz use fixed frame `map`, PointCloud2 topic `/map_pointcloud`,
+Transient Local durability and RGB8 coloring. The map launch loads the analyzed
+PCD selected in the central configuration.
 
-The default package map directory is not installed. Pass an absolute
-`map_name` or use the explicit workspace path above.
+## Using the planner: offline and online
 
-Send a 3D start and goal:
+```bash
+ros2 launch r3d_planner planner.launch.py
+```
+
+The launch always starts `pcd_path_planner` and independently starts the
+Live Filter and RViz interface according to:
+
+```yaml
+components:
+  live_filter:
+    enabled: true
+  rviz_interface:
+    enabled: true
+```
+
+All four true/false combinations are supported. These switches control node
+startup, not internal disabled logic. The RViz interface is a ROS node, not an
+RViz GUI plugin; start `rviz2` separately. The Path Follower and hardware
+drivers are never included automatically.
+
+### Offline planning
+
+Set both component flags to `false` for a minimal planner. Explicit start
+and goal poses must use `planner.map_frame` (default `map`). No odometry
+or TF is required for this request:
 
 ```bash
 ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "{
@@ -272,89 +175,77 @@ ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "
 }"
 ```
 
-The deployed HomeLab workflow also uses this site-specific request:
+Coordinates are examples; start and goal snap to the nearest traversable node.
+The action returns a Path and publishes `/global_path`; `/planned_path`
+provides a LINE_STRIP Marker. `planner_id` is accepted but not evaluated.
+
+### Online planning
+
+The robot YAML defines the standard input contract:
+
+```yaml
+odometry:
+  topic: /lidar_odometry
+  odom_frame: odom
+  base_frame: base_link
+```
+
+The external source publishes `nav_msgs/msg/Odometry` with
+`header.frame_id=odom`, `child_frame_id=base_link`, a valid pose and current
+timestamp. It owns `odom -> base_link`. A separate global localization
+source owns `map -> odom`. No odometry node should publish `map -> base_link`.
+The planner does not broadcast any TF and does not depend on
+`lidar_slam_ros2`, KISS-ICP, FAST-LIO or a particular estimator.
+
+Use `use_start: false` to plan from current odometry:
 
 ```bash
 ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "{
-  use_start: true,
-  start: {
-    header: {frame_id: 'map'},
-    pose: {position: {x: 0, y: 0, z: -0.3}, orientation: {w: 1.0}}
-  },
+  use_start: false,
   goal: {
     header: {frame_id: 'map'},
-    pose: {position: {x: -1, y: -10.24, z: -0.3}, orientation: {w: 1.0}}
-  },
-  planner_id: 'GridBased'
+    pose: {position: {x: 5.0, y: 0.0, z: 2.5}, orientation: {w: 1.0}}
+  }
 }"
 ```
 
-| Goal field | Description |
-|---|---|
-| `use_start` | Uses the supplied `start` pose when `true` |
-| `start` | 3D start pose in `map` coordinates |
-| `goal` | 3D goal pose in `map` coordinates |
-| `planner_id` | Accepted by the action interface but not evaluated by the planner |
+The planner transforms the odometry pose using `map -> odom` at its timestamp.
+Missing TF, mismatched frames, invalid or stale odometry aborts the request.
+Only the configured Odometry topic supplies the online pose; a TF-only source
+must also publish Odometry. `path_test` supplies test TF only and is not an
+online odometry simulator.
 
-The planner returns the path in the action result, publishes
-`nav_msgs/msg/Path` on `/global_path`, and publishes a `LINE_STRIP` Marker on
-`/planned_path`.
-
-### Online operation on the Go2W
-
-The online stack requires the tested Go2W components that publish the Hesai
-cloud on `/hesai_ros_driver/hesai/lidar_points`, provide
-`odom -> base_link`, and consume `/cmd_vel`.
-
-Start `pcd_path_planner`, then run:
-
-```bash
-ros2 run r3d_planner local_filter
-ros2 run r3d_planner rviz_interface
-ros2 run r3d_planner path_follower
-```
-
-`local_filter` publishes obstacles on `/local/filtered_obstacles`, a virtual
-cliff wall on `/local/cliff_virtual_wall`, and step detections on
-`/stair_detect`. It has no ROS parameters; its topic names and thresholds are
-defined in `r3d_local_filter.py`.
-
-`rviz_interface` combines **Publish Point** with **2D Pose Estimate** for
-initial calibration, publishes `map -> odom`, and sends the selected goal to
-`/compute_path_to_pose`. Reset its calibration state with:
+Enable RViz integration for point/pose goal pairs. With
+`rviz_interface.publish_map_odom: true`, first combine Publish Point and
+2D Pose Estimate for the existing calibration workflow. With an external global
+localizer, set it to `false`; no calibration TF is sent and goals can be
+selected directly through Publish Point and 2D Goal Pose. Keep exactly one
+`map -> odom` publisher. The legacy calibration assumes an identity
+odometric pose; do not use it as a replacement for global localization.
 
 ```bash
 ros2 service call /recalibrate_pose std_srvs/srv/Trigger "{}"
 ```
 
-`path_follower` subscribes to `/global_path` and
-`/local/filtered_obstacles`, looks up `map -> base_link`, and publishes
-`/cmd_vel` at 10 Hz. The Go2W adapter forwards this command directly
-to the Unitree SportClient and does not itself implement a watchdog, command
-multiplexer, velocity clamp, or emergency stop. Validate those deployment
-safeguards before enabling motion.
-
-For a planning-only TF test without robot odometry, use:
+For approved motion only:
 
 ```bash
-ros2 run r3d_planner path_test
+ros2 launch r3d_planner follower.launch.py
 ```
 
-`path_test` publishes a static identity `odom -> base_link`. Do not run it with
-the real odometry publisher.
-
-### V1-only commands
-
-`pcd_to_graph`, `voxel_map_publisher`, and `global_planner` load or create
-Pickle artifacts and are intentionally not part of V2. The external
-`r3d_planner_launch.sh` examples depend on that Pickle workflow and cannot be
-used with a clean V2 checkout. Use `pcd_analyser`, `pcd_server`, and
-`pcd_path_planner` as documented above.
+This starts the existing planar follower with central controller settings and
+the selected robot's Odometry and command topic. It publishes zero velocity
+when pose input is unavailable or stale. It is not a complete safety controller:
+path Z, cliff walls and stair detections do not directly control motion.
+Validate external watchdogs, arbitration, emergency stop and cliff handling
+before enabling the Go2W adapter, which may change posture on startup.
 
 ## Further documentation
 
-- [Detailed installation and troubleshooting](INSTALL.md)
-- [Architecture and ROS interfaces](docs/ARCHITECTURE.md)
-- [Known limitations and maintenance notes](docs/KNOWN_ISSUES.md)
-- [`r3d_preprocessor` reference](r3d_preprocessor/README.txt)
-- [`r3d_planner` reference](r3d_planner/README.txt)
+- [Installation and verification](INSTALL.md)
+- [Configuration reference](docs/CONFIGURATION.md)
+- [Architecture and interfaces](docs/ARCHITECTURE.md)
+- [Known limitations](docs/KNOWN_ISSUES.md)
+- [Preprocessor reference](r3d_preprocessor/README.txt)
+- [Planner reference](r3d_planner/README.txt)
+- [Historical V2 deployment comparison](docs/REFERENCE_COMPARISON.md)
