@@ -6,6 +6,8 @@
 # Repository:    https://github.com/RoboProjekt/R3D-Planner
 #
 # Copyright (c) Bastian Aumer
+# SPDX-FileCopyrightText: 2026 Bastian Aumer
+# SPDX-License-Identifier: Apache-2.0
 # =============================================================================
 
 """Resolve the two-level runtime configuration without generating ROS YAML."""
