@@ -243,14 +243,14 @@ sourcing ROS and the workspace.
 
    ```bash
    ros2 run r3d_preprocessor pcd_server --ros-args \
-     -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+     -p pcd_path:=/absolute/path/map_analysed.pcd
    ```
 
 2. Start exactly one planner:
 
    ```bash
    ros2 run r3d_planner pcd_path_planner --ros-args \
-     -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+     -p map_name:=/absolute/path/map_analysed.pcd \
      -p voxel_size_cm:=5.0 \
      -p min_step_height_cm:=5.0 \
      -p max_step_height_cm:=25.0

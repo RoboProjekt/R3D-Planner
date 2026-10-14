@@ -39,10 +39,17 @@ Pass map paths explicitly.
 
 | File | Content |
 |---|---|
-| `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | Binary PCD v0.7 with 602,619 points and XYZ, intensity, normal, and curvature fields (about 19 MB) |
-| `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | Binary PCD v0.7 with 556,586 XYZ/RGB-classified points (about 8.5 MB) |
 | `r3d_planner/config/r3d_planner_params.yaml` | Incomplete Nav2 costmap/MPPI configuration fragment |
 | `r3d_planner/points.txt` | Site-specific action CLI example and example waypoints |
+The original PCD examples were removed from this branch in a later local
+data-cleanup commit. Supply your own PCD inputs. The following inventory
+describes historical files only; they remain in earlier Git commits:
+
+| Historical file (absent from current tree) | Original content |
+|---|---|
+| `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | Binary PCD v0.7 with 602,619 points and XYZ, intensity, normal, and curvature fields (about 19 MB) |
+| `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | Binary PCD v0.7 with 556,586 XYZ/RGB-classified points (about 8.5 MB) |
+
 
 Each package also contains the standard Ament Python resource file and three
 template tests for copyright, Flake8, and PEP257. There is no map metadata file,
