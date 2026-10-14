@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-006 (Kartenentfernung, Lizenz-/Distributionsverifikation). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-007 (historische PDF-Baseline versioniert). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -22,6 +22,8 @@ Die Initialisierung ist noch keine Freigabe für Codeänderungen. Gemäß Abschn
 **V4-005, 14. Oktober 2026:** Die beiden alten PCD-Beispielkarten sind aus dem aktiven V4-Tree entfernt; beim Eingang waren beide Löschungen bereits im Working Tree vorhanden. Keine Ersatzkarten. Nutzer konfigurieren eigene PCD-Dateien, shipped maps-Werte sind leer. Die externe Konfiguration über R3D_CONFIG_DIR funktioniert auch ohne den ursprünglichen Source-Checkout. Historische Inventare, ältere V4-Einträge und das unveränderte PDF beschreiben weiterhin korrekt den früheren Kartenbestand. **Die Git-Historie enthält die alten Daten weiterhin**; ein vollständiger Git-Klon ist nicht mit einem datenfreien Tree-/Paketartefakt gleichzusetzen.
 
 **V4-006, 14. Oktober 2026:** Technische AP01-Verifikation **VERIFIED** für Originaltext, 18 eigene SPDX-/Copyrightheader, Apache-Manifeste/Setup, erhaltene sechs Fremdtemplates, dokumentierte LiDAR-Trennung/Notice, datenfreien aktiven Tree und tatsächlich geprüfte Lizenzmitnahme in sdists, Wheels und Copy-colcon-Shares. Je Paket ist eine identische lokale LICENSE-Kopie hinzugefügt; Root-LICENSE unverändert. Keine vollständige rechtliche/transitive/Debian-/Buildfarm-Freigabe. Arbeitspaket AP01 insgesamt bleibt BLOCKED für individuelle Rechts-/Release-Gates, AP04/AP06/AP08/AP10 IN PROGRESS; AP02/AP03 NOT STARTED.
+
+**V4-007, 14. Oktober 2026:** Das zuvor unversionierte historische PDF ist unverändert in Git aufgenommen: 33 Seiten, 298707 Byte, SHA-256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383. Frühere Angaben „unversioniert“ beschreiben den jeweiligen früheren Eingangszustand, keine aktuelle Anweisung. Historischer Inhalt/alte Kartendarstellung und Software-Lizenzgrenzen bleiben unverändert.
 
 ## 2. Technischer Ausgangsstand
 
@@ -634,6 +636,42 @@ Technische AP01-Implementierung im benannten Umfang VERIFIED: Lizenzentscheidung
 
 Fünf fokussierte Commitpfade; keine Änderungen an Root-LICENSE, Manifeste/Versionen/Dependencies/ROS-Interfaces/PCD-Algorithmen oder externen Repositories. Keine Historienumschreibung, keine Datenlöschung aus historischen Gitobjekten, kein Push/Release/GitHub-/Sichtbarkeitswechsel. Weitere Arbeit wartet auf den nächsten Auftrag.
 
+### V4-007 - Historische Entwicklungsbaseline unverändert versionieren
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin)
+**Arbeitspaket:** AP08; wissenschaftlicher Baselineschutz, keine technische Funktion
+**Betroffene Dateien:** docs/R3D_Planner_Development_History.pdf und dieses zentrale Protokoll
+**Git-Commit:** stabiler Subject `docs(history): track historical development baseline`; Parent 78afba0667c658df3e37e14f64b2df4b26075e86, eigene SHA nach Erzeugung separat geprüft
+**Status:** **VERIFIED** für unveränderte PDF-Bytes und gezielte Git-Aufnahme; keine neue Softwarefunktion
+
+#### Ausgangssituation
+
+V4/HEAD 78afba0667c658df3e37e14f64b2df4b26075e86, Baseline c65642f… ist Vorfahr. Keine Änderungen versionierter Dateien/Index, ausschließlich bekanntes historisches PDF unversioniert. Bisher V4-001..006 und bestehendes Lizenzkapitel liegen unverändert vor. Das PDF beschreibt weiterhin V1 bis main einschließlich alter Karten und ist keine aktuelle V4-Anleitung.
+
+#### Ziel der Änderung
+
+Bestehende identische historische Referenz dauerhaft in Git aufnehmen, ohne PDF-Neuerzeugung, Inhaltsänderung oder rückwirkende Anpassung. Separater Commit, keine Metadatenimplementierung in diesem Vorgang.
+
+#### Technische Umsetzung
+
+Vorhandenes 33-seitiges PDF nach Prüfsummenvergleich gezielt zur Git-Aufnahme ausgewählt; ausschließlich PDF plus Protokoll im Commit-Gate. Geprüfter Hash 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383 entspricht Vorgabe. PDF-Inhalt bleibt unverändert.
+
+#### Begründung
+
+Git-Clones sollen die wissenschaftliche Ausgangsreferenz enthalten. Versionierung einer schon vorhandenen Dokumentation ist keine neue Planner-/Preprocessor-Funktion oder rückwirkende Lizenzklärung.
+
+#### Verifikation
+
+Dateiexistenz/Tracking/Hash und /usr/bin/pdfinfo: 33 Seiten, 298707 Byte. Auf PATH lag zunächst ein gebündeltes pdfinfo, das wegen fehlender GLIBC_2.38 nicht startete; System-pdfinfo funktioniert. Kein Paket installiert und kein PDF geändert. Ein erster git diff --cached --check behandelte das ASCII-kodierte PDF als Text und beanstandete PDF-Format-Leerzeichen. Der Originalhash blieb identisch; für die erneute Reviewprüfung wurde PDF ausschließlich kommando-lokal über eine temporäre core.attributesFile als Binärdatei klassifiziert. Keine .gitattributes/Repo-Konfiguration geändert, keine PDF-Bytes reformatiert. Commit-Gate: V4/Parent/Einschluss exakt zwei Pfade, Originalbytes und Hash erhalten, Diff/Indexcheck; anschließend SHA/Parent/Status prüfen.
+
+#### Ergebnis
+
+PDF-Prüfung und Scope-/Index-Gate erfolgreich; identische historische Referenz gezielt versioniert. SHA/Parent/Commitumfang/Tracking werden nach Commiterzeugung separat bestätigt. Keine Dateiersetzung, kein Neuerzeugen und kein Rechtsfreigabenachweis.
+
+#### Auswirkungen
+
+Nur Versionierung derselben historischen Bytes; frühere PCD-Beschreibungen bleiben korrekt. Keine Karte zurückkopiert, keine andere Branchänderung, kein Push/History-Rewrite/GitHubzugriff mit Mutation.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -733,6 +771,14 @@ PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/colcon --log-base /tmp/r3d
 
 `<temporary-dist>` ist ein vor Ausführung konkret ersetzter Platzhalter unter /tmp/r3d-v4-finalize/license-check/dist/<Paket>, kein Projektpfad. tarfile/zipfile wurden zum vollständigen Inhalts-/Bytevergleich verwendet; installierte Shares direkt gelesen. Keine pip-/apt-/rosdep-Installation, kein Upload. Ein fehlerhafter früher Probezeitpunkt wurde korrigiert; nur der abgeschlossene Build/Probe gilt als Nachweis.
 
+#### 6.5 V4-007: historische PDF-Versionierung, 14. Oktober 2026
+
+| ID | Prüfung | Ergebnis | Status | Grenze |
+| --- | --- | --- | --- | --- |
+| T49 | Existenz/Tracking/Hash/PDF-Metadaten/Commitgate | Vorhandenes bislang unversioniertes PDF, 33 Seiten/298707 Byte, exakter Referenzhash 8c3603ec…; nur PDF/Protokoll im Commit-Gate | VERIFIED | /usr/bin/pdfinfo Exit 0; PATH-Version scheiterte an GLIBC_2.38, System-Fallback genutzt; keine Content-/Lizenzänderung |
+
+Ausgeführt: `git ls-files -- docs/R3D_Planner_Development_History.pdf`, `sha256sum docs/R3D_Planner_Development_History.pdf`, `/usr/bin/pdfinfo docs/R3D_Planner_Development_History.pdf`; gezielter Index-Bytevergleich und `git -c core.attributesFile=/tmp/r3d-v4-ap02/pdf-review-attributes diff --cached --check` (PDF binär nur im Prüfbefehl). Nach Commit SHA/Parent/Dateiumfang/Tracking separat kontrolliert. Keine PDF-Neuerzeugung, kein Push.
+
 ## 7. Probleme und offene Entscheidungen
 
 | ID | Beschreibung | Auswirkung | Erforderliche Entscheidung | Vorgeschlagene Lösung | Aktueller Status |
@@ -746,7 +792,7 @@ PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/colcon --log-base /tmp/r3d
 | O07 | Externe Nutzerkarten/R3D_CONFIG_DIR geprüft; Copy-Defaultpolitik und Ausgabe neben Eingabe bestehen | Nutzeroverride funktioniert ohne Source, Defaultportabilität noch offen | Spätere allgemeine Install-/Ausgabepolitik | V4-005 minimaler Kartenvertrag; restliches AP04 separat | IN PROGRESS, begrenzter Teil VERIFIED |
 | O08 | Narrow-Flag in Orientierung, Namespaces/Clouds/Actiongrenzen | Öffentliche API-Korrekturen können bestehende Verbraucher beeinflussen | Neuer Metadaten-/Kompatibilitätsvertrag je Änderung | AP05 kleinere Änderungen; alle internen Verbraucher und Nutzeranleitungen gemeinsam anpassen; Regressionen | NOT STARTED |
 | O09 | Filter/Follower-Systemgrenzen und Kalibrierungsannahmen | Keine generische sichere Navigation aus Detektionscode ableitbar | Gewünschten unterstützten Systemvertrag abgrenzen | Konkrete Sourcebefunde und synthetische No-Motion-Prüfungen priorisieren; keine neue Navigation pauschal beauftragen | NOT STARTED |
-| O10 | Historisches PDF weiterhin unversioniert | Spätere frische Clones enthalten die Baseline-Dokumentation nicht | Soll das unveränderte PDF später versioniert oder anderweitig dauerhaft referenziert werden? | Bestehende Datei zunächst unverändert erhalten; später separate bewusste Dokumentationsentscheidung | NOT STARTED |
+| O10 | Historisches PDF unverändert für Git-Aufnahme freigegeben/geprüft | Referenz nun im V4-Clone verfügbar | Nutzerauftrag zur Versionierung liegt ausdrücklich vor | V4-007, gleicher Referenzhash/33 Seiten; keine inhaltliche Aktualisierung | VERIFIED - dokumentierter Aufnahmeumfang |
 | O11 | CI-Fernlauf, weitere Distributionen und Pflegezuständigkeiten unbestätigt | Kein neuer CI-/Support-/Releaseerfolg behauptbar | Zielmatrix, Maintainerzusagen und spätere Veröffentlichung autorisieren | Erst Humble; weitere Ziele nach Prüfung; kein ungefragter Push für CI | NOT STARTED |
 | O12 | Originalhinweise/konkrete eigene Paketartefakte kontrolliert; Roottext in sdists/Wheels/Shares vorhanden | Keine Lizenzmitnahmelücke in geprüften Artefakten, Gesamtbundles/transitive Nativebinaries offen | Tatsächlichen künftigen Bundle-/Debianumfang festlegen und prüfen | T42-T47/11.21.5; keine automatische Library-Neulizenzierung | Technischer Paketumfang VERIFIED; rechtliche Gesamtbundlefreigabe BLOCKED/NOT VERIFIED |
 | O13 | V4 soll nicht öffentlich gepusht werden; origin zeigt weiterhin auf public | Kein konfigurierter privater Pushschutz | Option A/B und konkrete spätere Repository-/Remote-/Pushfreigabe | Empfehlung B, nur nicht ausgeführte Vorlage in Abschnitt 12; aktuelle Remotes unverändert | NOT STARTED - Entscheidung ausstehend |
@@ -763,7 +809,7 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | --- | --- | --- | --- | --- |
 | Entwicklungslinie | main bei `c65642f…`; V1/V2/V3 als Remote-Tracking-Refs | Lokaler Branch V4 unmittelbar von Baseline; ein fokussierter Initial-Dokumentationscommit | Neue getrennte Entwicklungslinie, bestehende Refs unverändert | V4-001, T01/T06, Git-Parent/Refvergleich |
 | Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation | Dasselbe zentrale Protokoll mit V4-001..006 und abgegrenzten Original-/Regression-/Artefaktnachweisen | Keine zusätzlichen Forschungsberichte; historische Einträge erhalten | V4-005/V4-006; T37-T48 |
-| Historische PDF | Unversionierte konsolidierte Baseline-Dokumentation | Keine Änderung, keine Aufnahme in den Initialisierungscommit | SHA-256 unverändert; weitere Versionierungsentscheidung O10 offen | T02, Abschnitt 2.1 |
+| Historische PDF | Vorhandene unveränderte, zunächst unversionierte Baseline-Dokumentation | Identische Bytes in V4 unter Git aufgenommen | Keine neue technische Funktion; SHA unverändert und historische Kartendarstellung erhalten | V4-007/T49 |
 | Planung/Preprocessing | Vorhandene PCD-/Voxel-/Traversierbarkeits-/Graph-/A*-Funktionen | Keine | Bestehende Algorithmen erhalten, kein neuer Algorithmusbeitrag | T02; Abschnitt 2.3 |
 | Paketmetadaten | Namen/Buildtyp/Maintainer vorhanden; Version/Beschreibung/Lizenz uneinheitlich | Nur beide license-Felder durch AP01 auf Apache-2.0 gesetzt | AP02 bleibt NOT STARTED; übrige Metadaten unverändert | V4-004/T31/T33; B03/AP02 |
 | Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | Nur Abgleich/Planung; keine Dependencydeklaration geändert | Lizenzfelder geändert, Dependencyteile unverändert; rosdep nicht neu geprüft | T04/T10/T33; B04-B06 |
