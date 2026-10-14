@@ -60,17 +60,22 @@ independent launch conditions. The map and follower launches are separate.
 The follower is not automatically started because it can command motion.
 
 The resolver reads live source files at each launch, using source/symlink paths
-or an explicitly configured `R3D_CONFIG_DIR` for copied installations.
+or an explicitly configured user-owned `R3D_CONFIG_DIR` for copied installations;
+the directory contains the central YAML and robot profiles, not necessarily source code.
 It never silently uses stale copied YAML. Restart applies YAML changes without
 build or re-sourcing. Paths are relative to the central config directory.
 See [CONFIGURATION.md](CONFIGURATION.md) for schema, units and validation.
 
-### Included data and configuration
+### User data and included configuration
+
+V4 contains no bundled PCD maps. The user supplies the analysis input and
+classified planning file through `maps.pcd_path` and `maps.map_name`.
+The shipped values are unset; installation is independent of these files.
+The two older example maps remain part of historical Git versions, not the
+active V4 tree. General PCD analysis, classification, loading and planning remain.
 
 | File | Content |
 |---|---|
-| `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | Binary PCD v0.7 with 602,619 points and XYZ, intensity, normal, and curvature fields (about 19 MB) |
-| `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | Binary PCD v0.7 with 556,586 XYZ/RGB-classified points (about 8.5 MB) |
 | `r3d_planner/config/planner_config.yaml` | Central runtime entry point |
 | `r3d_planner/config/robots/Go2W.yaml` | Robot geometry and interfaces |
 | `r3d_planner/config/r3d_planner_params.yaml` | Incomplete Nav2 costmap/MPPI configuration fragment |

@@ -1,9 +1,11 @@
 robot_config: robots/Go2W.yaml
 
-# Paths are relative to this directory. The output is <input>_analysed.pcd.
+# No PCD maps are bundled. Configure your own input/output before launch.
+# Relative paths resolve against this directory; absolute paths and ~ are accepted.
+# The analyzer writes <input>_analysed.pcd beside the input.
 maps:
-  pcd_path: ../../r3d_preprocessor/maps/voxel_05_minhits_7.pcd
-  map_name: ../../r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+  pcd_path: ""
+  map_name: ""
 
 # Shared by analysis and graph reconstruction; never duplicate these per node.
 shared:

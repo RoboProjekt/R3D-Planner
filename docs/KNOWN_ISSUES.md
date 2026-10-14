@@ -19,9 +19,11 @@ constraints that affect installation, integration, and future development.
 - **Location:** `r3d_preprocessor/setup.py`, `r3d_pcd_path.py`
 - **Behavior:** Direct developer `ros2 run` defaults to an uninstalled share map.
   Normal V3 launch resolves map paths from live central YAML and validates them.
-- **Impact:** Standalone debugging needs an explicit map override. Source maps
-  must remain available for the supported configuration workflow.
-- **Next step:** Decide on release-time external map distribution separately.
+- **Impact:** Standalone debugging needs an explicit map override. V4 ships no
+  PCD maps; normal launch requires a user-provided selected path in the central YAML.
+  Use `R3D_CONFIG_DIR` for a user-owned configuration in copied installations.
+- **Next step:** Complete default copy-install portability in AP04; keep data
+  provision external. Historical Git versions still contain the old example maps.
 
 ## 3. Planner launch gap resolved; hardware bringup remains external
 

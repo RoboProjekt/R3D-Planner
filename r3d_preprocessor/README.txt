@@ -13,8 +13,9 @@ of its own or custom ROS interfaces. Central launches are provided by r3d_planne
 - Build type: `ament_python`
 - Python package: `r3d_preprocessor`
 - `setup.py` installs the Python nodes, Ament resource, and `package.xml`.
-- The existing `maps/` directory is **not** installed into the package share.
-  The central loader resolves source map paths and forwards an absolute runtime path.
+- V4 contains no bundled PCD maps. Installation does not need map inputs.
+  The central loader resolves user paths against the YAML directory and forwards
+  an absolute runtime path; copied installs can use an external R3D_CONFIG_DIR.
 
 See `../INSTALL.md` for dependencies and build commands.
 

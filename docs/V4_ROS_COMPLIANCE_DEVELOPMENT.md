@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 13. Oktober 2026; fortgeführt bis V4-004 (Lizenzentscheidung und technische Anwendung). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-005 (Kartenentfernung und Nutzerkonfiguration). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -17,7 +17,9 @@ Die Initialisierung ist noch keine Freigabe für Codeänderungen. Gemäß Abschn
 
 **Verbindliche Fortführung V4-004, 13. Oktober 2026:** Der neue Nutzerauftrag wählt **Apache License 2.0 (Apache-2.0)** für autorisierte eigene Softwarebestandteile von r3d_planner und r3d_preprocessor und gibt die technische Anwendung ausdrücklich frei. Root-LICENSE, zwei Manifest-Lizenzfelder und SPDX-Kommentarheader der 18 bereits zugeordneten eigenen Python-Dateien sind umgesetzt und statisch geprüft. Copyright-Attribution: **2026 Bastian Aumer**, vorhandene eigene Hinweise erhalten. Die früheren Rückstellungen/Recherchegrenzen oben und in V4-001 bis V4-003 beschreiben ihren damaligen Stand und sind durch diese gezielte Freigabe für AP01 überholt.
 
-**Geltungsbereich der Root-LICENSE:** Der unveränderte Apache-Text gilt für die eigenen Softwarebestandteile, für die Bastian Aumer die erforderlichen Rechte besitzt. Die Datei ersetzt keine Bedingungen fremder Software. Die sechs OSRF-Testtemplates behalten ihre eigenen Apache-/Copyright-Hinweise; externe Libraries und LiDAR-Software behalten ihre Originallizenzen. **Die beiden PCD-Karten sind nicht unter Apache-2.0 freigegeben.** Unbekannte Herkunft, Dokumentations-/Ressourcenrechte, ältere Bytecode-Artefakte sowie arbeits-/dienstvertragliche Befugnisse werden nicht durch einen Root-Text oder Manifesttag als geklärt dargestellt. Technische Lizenzimplementierung ist keine vollständige rechtliche Releasefreigabe. AP02/AP03 sind nicht begonnen; kein Push oder Release.
+**Geltungsbereich der Root-LICENSE:** Der unveränderte Apache-Text gilt für die eigenen Softwarebestandteile, für die Bastian Aumer die erforderlichen Rechte besitzt. Die Datei ersetzt keine Bedingungen fremder Software. Die sechs OSRF-Testtemplates behalten ihre eigenen Apache-/Copyright-Hinweise; externe Libraries und LiDAR-Software behalten ihre Originallizenzen. **Die früheren beiden PCD-Karten wurden unter V4-005 aus dem aktiven Tree entfernt; keine Apache-Freigabe für historische Objekte.** Unbekannte Herkunft, Dokumentations-/Ressourcenrechte, ältere Bytecode-Artefakte sowie arbeits-/dienstvertragliche Befugnisse werden nicht durch einen Root-Text oder Manifesttag als geklärt dargestellt. Technische Lizenzimplementierung ist keine vollständige rechtliche Releasefreigabe. AP02/AP03 sind nicht begonnen; kein Push oder Release.
+
+**V4-005, 14. Oktober 2026:** Die beiden alten PCD-Beispielkarten sind aus dem aktiven V4-Tree entfernt; beim Eingang waren beide Löschungen bereits im Working Tree vorhanden. Keine Ersatzkarten. Nutzer konfigurieren eigene PCD-Dateien, shipped maps-Werte sind leer. Die externe Konfiguration über R3D_CONFIG_DIR funktioniert auch ohne den ursprünglichen Source-Checkout. Historische Inventare, ältere V4-Einträge und das unveränderte PDF beschreiben weiterhin korrekt den früheren Kartenbestand. **Die Git-Historie enthält die alten Daten weiterhin**; ein vollständiger Git-Klon ist nicht mit einem datenfreien Tree-/Paketartefakt gleichzusetzen.
 
 ## 2. Technischer Ausgangsstand
 
@@ -221,7 +223,7 @@ AP01-Teilstände nach V4-004: Vergleich/Inventur/abgegrenzter Dependency-/LiDAR-
 | Priorität | P0 |
 | Abhängigkeiten | AP03 für vollständigen Clean-Build; AP01 für öffentliche Mitlieferung der vorhandenen Karten, nicht für synthetische Installationsfixtures; AP06-Regressionen begleitend |
 | Abschlusskriterien | Copy-Build/Install ohne Symlink; Tests bei nicht zugänglichem ursprünglichem Source-Checkout; Nodes/Launches/Config/Robotprofile auffindbar; Analyse schreibt ausschließlich in gewählten beschreibbaren Datenpfad; Source-/Override-Verhalten dokumentiert |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **IN PROGRESS** - Nutzerkarten/externes Config-Verzeichnis und temporärer Copy-Build geprüft; vollständige Installations-/Ausgabeportabilität offen |
 
 ### 4.6 AP05 - ROS-Schnittstellen und Konfiguration
 
@@ -245,7 +247,7 @@ AP01-Teilstände nach V4-004: Vergleich/Inventur/abgegrenzter Dependency-/LiDAR-
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **IN PROGRESS** - bestehende 20 plus 23 neue Kartenpfadfälle geprüft; allgemeine Lint-/Coverage-/Regressionstiefe offen |
 
 ### 4.8 AP07 - CI/CD
 
@@ -538,6 +540,52 @@ Apache-2.0 ist für die autorisierten eigenen Softwarebestandteile verbindlich a
 
 Änderung ausschließlich an LICENSE, eigenen Kommentarheadern, zwei Lizenzfeldern und diesem Protokoll. Sechs OSRF-Templates und unbekannte Dateizuordnungen unverändert; keine Apache-Zuordnung der PCDs. Root-LICENSE ersetzt keine externen BSD-/MIT-/MPL-/sonstigen Bedingungen. Keine neuen Forschungsberichte, keine PDF-/historischen Dokumentänderungen, keine Änderungen externer LiDAR-Repositories oder anderer R3D-Branches, kein Remote-/Sichtbarkeitswechsel, kein Push und kein Release. Weitere APs warten auf den nächsten Auftrag.
 
+### V4-005 - Mitgelieferte PCD-Karten aus aktivem V4-Tree entfernen
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin)
+**Arbeitspaket:** AP01 Datenumfang; gezielte AP04-/AP06-/AP08-/AP10-Teilmaßnahmen
+**Betroffene Dateien:** zwei maps-PCDs, planner_config.yaml, configuration.py, test_configuration.py; README.md, INSTALL.md, README_r3d_planner.txt, beide Paket-README.txt, docs/CONFIGURATION.md, ARCHITECTURE.md, KNOWN_ISSUES.md und dieses Protokoll (14 Pfade insgesamt)
+**Git-Commit:** stabiler Subject `refactor(data): remove bundled PCD maps`; Parent 87e213889638ff92cbee85b76fdb95a916c71193. SHA nach Erzeugung separat kontrolliert.
+**Status:** **VERIFIED** für aktiven Tree-/Konfigurations-/Regressionsumfang; keine historische Daten-/Rechtsfreigabe
+
+#### Ausgangssituation
+
+V4/HEAD entsprachen dem zuletzt gemeldeten Commit und stammen von c65642f… ab. Beide beauftragten Karten waren beim Eingang bereits uncommitted gelöscht; diese vorhandene Arbeit wurde ohne Wiederherstellung übernommen. Alle übrigen versionierten Dateien/Index waren unverändert, das bekannte historische PDF unversioniert. V4-005 wurde vor Änderungen als Plan im Protokoll angelegt. Existierende PCD-Algorithmen, Modeauswahl, Source-/Symlink-/R3D_CONFIG_DIR-Vertrag und synthetische Suite sind Vorbestand.
+
+#### Ziel der Änderung
+
+Nur die mitgelieferten konkreten Karten aus dem aktiven Tree nehmen, ihre aktiven Verweise entfernen und vom Nutzer bereitgestellte PCDs verlangen. Keine Beispielkarte nachladen, generieren oder ersetzen; keine Algorithmus-/ROS-Interfaceänderung. Minimaler Konfigurationsdelta, kein vollständiger AP04-Refactor.
+
+#### Technische Umsetzung
+
+Git-Löschungen: `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` (19284059 Byte, SHA-256 1b36ce3ac8b0a57e9bea5cfeb5563db3478c3e1105d68d38a37a395322bab404) und `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` (8905560 Byte, SHA-256 fff00cb9eb9fdaf96cb3c8bbf9c6ed2bd323a7b11e734dfea05ad52d9aadb22c). Diese Dateien waren in Git getrackt, aber bei Auftragseingang bereits nicht mehr auf Disk. Kein weiteres PCD im Repository identifiziert; historische Blobs bleiben unverändert.
+
+Zentrale maps-Werte sind explizit leer. Die gewählte Mode verlangt einen konfigurierten vorhandenen regulären .pcd-Pfad und meldet Feld/aufgelösten Pfad; der unbenutzte maps-Wert darf leer oder zukünftiger Output sein. Modeauswahl bleibt preprocessor→pcd_path, planner/map/follower→map_name. Relative Pfade sind YAML-relativ, absolute Pfade und ~ bleiben unterstützt. Keine implizite Beispielkarte. R3D_CONFIG_DIR wird im Fehlertext und in aktiven Anleitungen als Nutzerverzeichnis mit YAML/Robotprofilen beschrieben, ohne notwendiges Source-Repository. Implizite Copy-Default-Ablehnung bleibt unverändert für späteren AP04-Schritt.
+
+23 parametrische Fälle wurden im bestehenden Testmodul ergänzt: ungesetzte Defaults in vier Modes, fehlende/falsche Endung/Verzeichniseingaben in vier Modes, drei Pfadformen und leerer unbenutzter Wert in vier Modes. Alte Tests/Syntheticfixtures bleiben erhalten. Acht vorhandene Nutzeranleitungen/Datenübersichten wurden angepasst; historische Forschungsberichte/V3-Implementierungsbericht/PDF unverändert. Standalone-Node-Defaults sind allgemeine Dateinamen und nicht Verweise auf die gelöschten konkreten Karten; sie wurden nicht als neue ROS-Interfaceänderung ersetzt.
+
+#### Begründung
+
+Aktive Source-/Installartefakte benötigen keine ungeklärten mitgelieferten Karten mehr. Nutzer liefern Daten und deren Berechtigung selbst. Das ändert weder historische Gitverteilung noch Herkunftsrechte an alten Objekten. Analyse schreibt weiterhin neben eine Nutzereingabe, daher beschreibbarer Nutzerpfad erforderlich; getrennte Ausgabepolitik bleibt AP04.
+
+#### Verifikation
+
+System-Python 3.10.12, ROS 2 Humble/Ubuntu 22.04, pytest 6.2.5. 40 nicht-nodeausführende Fälle unter PYTHONNOUSERSITE=1 bestanden (0,36 s); drei bestehende ROS-/Launchfälle mit bereits vorhandenen User-Site Open3D 0.19/NetworkX 3.4.2/NumPy 1.26.4 bestanden (39,94 s), darunter vier echte Planner-Komponentenkombinationen und Analyzerlaunch. DDS isoliert mit ROS_LOCALHOST_ONLY=1, ROS_DOMAIN_ID=191, RMW_IMPLEMENTATION=rmw_fastrtps_cpp; kein Followerlaunch/Hardware-/Bewegungsbefehl. SciPy 1.8.0 warnt weiterhin zu NumPy 1.26.4; keine Dependencyänderung, kein sauberer rosdep-/Gesamtumgebungsnachweis.
+
+Erster Unitlauf: 35 passed/5 failed; vier LaunchContext-Fälle scheiterten an nicht erlaubtem ~/.ros/log, behoben durch ROS_LOG_DIR im temporären Verzeichnis. Der neue Tilde-Test mockte eine von Path.expanduser gebundene Funktion und scheiterte; ein zweiter Versuch hatte noch einen Tilde-Fehler (39 passed/1 failed). Der finale Test verwendet eine echte Home-relative Referenz auf die temporäre Fixture ohne HOME-Änderung. Das Hilfsskript hatte vor Ausführung einen Syntaxfehler, wurde vor Projektänderungen korrigiert. Diese Fehler sind keine behaupteten Produktionsregressionen.
+
+Copy-colcon-Build ohne Symlinks in temporären Paketkopien: 2 packages finished in 0,90 s; absichtlich deaktiviertes Bytecompiling erzeugt zwei Warnungen. Build-Python ohne User-Site enthält kein Open3D/NetworkX, Packaging funktioniert trotzdem; das beweist keine vollständige Runtime-Dependencyauflösung. Nach Umbenennen der temporären Source-Kopie importiert ein Probeprozess tatsächlich das installierte configuration.py und lädt eigene YAML/Robotprofile erfolgreich. Installbaum enthält 0 PCDs. AST/Hashes belegen unveränderte Analyse-/Planungsnodes, Launch-/Odometry-/ROS-Verträge, Manifeste/Setup/Original-LICENSE/18 Copyrightheader; nur Konfigurationspfadvalidierung und neue Tests sind semantisch geändert.
+
+Befehle/Details T37-T41. Vor Commit: exakter 14-Pfad-Whitelist-/Git-Lösch-/Diff-/Dokument-/Ref-/PDFcheck, danach SHA/Parent/Dateiumfang/Status. Keine fremde Arbeit übernommen, keine zusätzlichen Forschungsdateien.
+
+#### Ergebnis
+
+Aktiver V4-Tree und getesteter Installbaum ohne Beispielkarten; Nutzerkonfiguration und bestehende PCD-Funktionen mit temporären Fixtures geprüft. 43 Fälle insgesamt bestanden (40+3 getrennte Ausführung). Keine neue Standardkarte. Karten-Tree-Mitdistribution beseitigt; historische Git-/Fork-/Kopienrechte nicht geklärt. Lizenzinstallation folgt als getrennte V4-006.
+
+#### Auswirkungen
+
+maps-Defaults müssen explizit gesetzt werden; unbenutzter Modepfad darf nun leer sein. ROS-Parameter-/Topic-/Actionnamen, Algorithmen, Versions-/Dependency-/Buildtypwerte unverändert. Zwei Kartenlöschungen in normalem Commit, keine History-Rewrites/Tags/anderen Branchänderungen/externen Repositoryänderungen/GitHubänderungen/Pushes. AP02/AP03 nicht begonnen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -592,17 +640,40 @@ Die AST-/Tokenprüfung parst Originalbytes aus `git show 9f11996…:<Pfad>` und 
 
 Die temporären Prüfhilfen liegen außerhalb des Repositorys und sind keine zusätzlichen Entwicklungsberichte. Seit V4-001 besteht genau ein zentrales Entwicklungsdokument; V4-004 aktualisiert es und erzeugt keinen weiteren Forschungsbericht. Neue Testergebnisse müssen künftig mit vollständigem Befehl, Umgebung, Commit, Exitcode und relevanten Resultaten hier ergänzt werden; Fehler und nicht ausführbare Prüfungen werden ausdrücklich protokolliert.
 
+#### 6.3 V4-005: Kartenentfernung und Nutzerpfade, 14. Oktober 2026
+
+| ID | Prüfung | Ergebnis | Status | Grenze |
+| --- | --- | --- | --- | --- |
+| T37 | Karteninventar/Löschungen/aktive Referenzen | Zwei exakte getrackte Karten bereits am Eingang fehlend, im Commit gelöscht; 0 andere Repository-PCDs; keine aktiven alten Kartenreferenzen außerhalb historischer zentraler Dokumentation | VERIFIED | Git-Historie bleibt; allgemeine .pcd-Namen und synthetische Fixtures erhalten |
+| T38 | Konfiguration/Regressionssuite | 40 cases passed, 3 deselected, 0,36 s; 23 neue parametrische Fälle | VERIFIED | System-Python 3.10/PYTHONNOUSERSITE=1; vorangegangene Log-/Tilde-Hilfsfehler korrigiert |
+| T39 | Bestehende nicht bewegungserzeugende ROS-/Launchfälle | 3 passed, 40 deselected, 39,94 s; vier Planner-Kombinationen, Odometry/TF und Analyzerlaunch | VERIFIED | localhost/Domain 191/Fast DDS; vorhandene User-Site Dependencies, SciPy-/NumPy-Warnung; keine Hardware |
+| T40 | Temporärer Copy-Build/externes Nutzerconfig-Probe | Zwei Pakete erfolgreich gebaut, installiertes Modul ohne ursprüngliche Source-Kopie konfigurierbar, 0 installierte PCDs | VERIFIED | -B/Bytecompile-Warnungen; keine allgemeine Default-Copy-Policy-/rosdep-/Binärreleaseabnahme |
+| T41 | Statischer Scope-/AST-/Hash-/Gitcheck | 26 Python-Dateien parsebar; alle Nodes/Algorithmen/ROS-Launches/Manifeste/Setup/Lizenzheader unverändert; exakte Konfig-/Teständerung, PDFs/Refs geschützt | VERIFIED | V4-005, Git-Whitelist und Commit-Gate; kein History-Rewrite |
+
+Ausgeführt (temporäre Basis `/tmp/r3d-v4-finalize`, Projektpfad wie 2.1):
+
+```bash
+# ROS 2 Humble zuvor in der jeweiligen Bash gesourced; keine Installation:
+PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/colcon --log-base /tmp/r3d-v4-finalize/map-check/log build --base-paths /tmp/r3d-v4-finalize/map-check/src --build-base /tmp/r3d-v4-finalize/map-check/build --install-base /tmp/r3d-v4-finalize/map-check/install --packages-select r3d_preprocessor r3d_planner --event-handlers console_direct+
+# Source-PYTHONPATH auf die jeweilige geprüfte Paketkopie; ROS_LOG_DIR unter /tmp:
+/usr/bin/python3 -B -m pytest -p no:cacheprovider --basetemp=/tmp/r3d-v4-finalize/pytest-unit r3d_planner/test/test_configuration.py -k "not effective_ros_parameters_and_odometry and not preprocessor_real_launch and not real_launch_restart_and_all_components" -q
+# Nach Sourcen der temporären Installation, mit Domain 191/localhost/Fast DDS:
+/usr/bin/python3 -B -m pytest -p no:cacheprovider --basetemp=/tmp/r3d-v4-finalize/pytest-runtime /tmp/r3d-v4-finalize/map-check/src/r3d_planner/test/test_configuration.py -k "effective_ros_parameters_and_odometry or preprocessor_real_launch or real_launch_restart_and_all_components" -q
+```
+
+Der zweite Befehl lief ohne User-Site, der dritte mit bereits vorhandener User-Site und abgesichertem ROS-Domain. Keine pip-/apt-/rosdep-Installation. Temporäre Fixtures sind keine neuen Projektkarten und werden nach der Prüfung entfernt. Der Copy-Probe wurde anschließend mit Source-Kopie am ursprünglichen Pfad nicht verfügbar, installierter Modulherkunft und eigenem R3D_CONFIG_DIR ausgeführt.
+
 ## 7. Probleme und offene Entscheidungen
 
 | ID | Beschreibung | Auswirkung | Erforderliche Entscheidung | Vorgeschlagene Lösung | Aktueller Status |
 | --- | --- | --- | --- | --- | --- |
 | O01 | Apache-2.0 verbindlich gewählt/technisch angewendet; Vertrags-/Befugnislage nicht unabhängig geprüft | Keine vollständige rechtliche Releasefreigabe | Noch offene arbeits-/dienstvertragliche Rechte und Lizenzierungsbefugnis klären | Entscheidung/Dateien aus V4-004 erhalten; konkrete entgegenstehende Hinweise betroffenenbezogen prüfen | BLOCKED nur für Rechtsgesamtgate; Wahl/Implementierung COMPLETED |
-| O02 | Herkunft/Rechte beider PCD-Karten ungeklärt | Datenverteilung weiterhin offen | Berechtigte und konkrete Weitergabebedingungen bestätigen | Technisches Inventar/SHA in 11.12; keine Standardlizenz annehmen | BLOCKED |
+| O02 | Alte PCDs aus aktivem V4-Tree entfernt; ursprüngliche Herkunft ungeklärt | Kein aktueller Karten-Mitdistributionsblocker im Tree; historische Gitobjekte/öffentliche Kopien weiterhin betroffen | Releaseumfang Tree-/Artefakt vs vollständige Git-Historie abgrenzen | Keine erneute Karteneinbindung; historische Rechte separat prüfen, keine Rewrites | Tree-Maßnahme VERIFIED; historische Rechte NOT VERIFIED |
 | O03 | AP01-Implementierung ausdrücklich freigegeben und durchgeführt; AP02/AP03 nicht beauftragt | Keine automatische weitere Metadaten-/Dependencyarbeit | Nächsten technischen Auftrag bestimmen | Lizenzierung für Eigenanteile technisch abgeschlossen; weitere APs separat | NOT STARTED für AP02/AP03 |
 | O04 | 0.0.0 vs 0.0.1, keine Versionspolitik | Unklare Releaseidentität | Konsistente Paketversion und spätere Stabilitätszusagen | AP02 vereinheitlicht nach abgestimmter Entscheidung; Branch V4 nicht zu SemVer 4.0 erklären | NOT STARTED |
 | O05 | Aktiver Conda-Python 3.14.6 neben System-Python 3.10.12 | Mögliche nichtrepräsentative ROS-/Packaging-Tests | Reproduzierbare isolierte Humble-Testumgebung wählen | Explizites System-Python/saubere Umgebung; keine globale Apt-/pip-/Conda-Reparatur ohne Erklärung | NOT STARTED |
 | O06 | Aktuelle System-/ROS-Keys und Python-TF2-Provider unvalidiert | rosdep-/Buildfarm-Nachweis fehlt | Geeignete verfügbare Dependencies für Humble/Jammy | AP03 resolve/check plus vollständige Installation in isolierter Umgebung; keine Skip-Endlösung | NOT STARTED |
-| O07 | Config-/Karten-/Ausgabepolitik auf Sourceentwicklung zugeschnitten | Copy-Installation bricht oder erwartet Sourcepfade | Default-Ressourcen, Nutzeroverride und beschreibbare Ausgaben festlegen | AP04 minimalen Vertrag entwerfen und vorhandene Validierung beibehalten; Datenrechte getrennt | NOT STARTED |
+| O07 | Externe Nutzerkarten/R3D_CONFIG_DIR geprüft; Copy-Defaultpolitik und Ausgabe neben Eingabe bestehen | Nutzeroverride funktioniert ohne Source, Defaultportabilität noch offen | Spätere allgemeine Install-/Ausgabepolitik | V4-005 minimaler Kartenvertrag; restliches AP04 separat | IN PROGRESS, begrenzter Teil VERIFIED |
 | O08 | Narrow-Flag in Orientierung, Namespaces/Clouds/Actiongrenzen | Öffentliche API-Korrekturen können bestehende Verbraucher beeinflussen | Neuer Metadaten-/Kompatibilitätsvertrag je Änderung | AP05 kleinere Änderungen; alle internen Verbraucher und Nutzeranleitungen gemeinsam anpassen; Regressionen | NOT STARTED |
 | O09 | Filter/Follower-Systemgrenzen und Kalibrierungsannahmen | Keine generische sichere Navigation aus Detektionscode ableitbar | Gewünschten unterstützten Systemvertrag abgrenzen | Konkrete Sourcebefunde und synthetische No-Motion-Prüfungen priorisieren; keine neue Navigation pauschal beauftragen | NOT STARTED |
 | O10 | Historisches PDF weiterhin unversioniert | Spätere frische Clones enthalten die Baseline-Dokumentation nicht | Soll das unveränderte PDF später versioniert oder anderweitig dauerhaft referenziert werden? | Bestehende Datei zunächst unverändert erhalten; später separate bewusste Dokumentationsentscheidung | NOT STARTED |
@@ -628,10 +699,10 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | Nur Abgleich/Planung; keine Dependencydeklaration geändert | Lizenzfelder geändert, Dependencyteile unverändert; rosdep nicht neu geprüft | T04/T10/T33; B04-B06 |
 | Build/Installation | setuptools/ament_python, vorhandene Scripts/Ressourcen; Copy-Config eingeschränkt | Keine | AP04 offen | B07/B08/T11/T15 |
 | ROS-Interfaces | Action/Topics/Service, RViz, Filter/Follower; bekannte Semantikgrenzen | Keine | AP05 offen; keine stillen API-Änderungen | B09-B13/T16 |
-| Konfiguration/Launch | Zentrale validierte YAML, Robotprofile, vier installierte Launches | Ausschließlich SPDX-Kommentare der vier eigenen Launchdateien ergänzt | Launch-ASTs/Tokens und Konfiguration unverändert | V4-004/T30/T32-T34 |
+| Konfiguration/Launch | Source-Beispielpfade, zentrale strikte YAML, vier Launches | maps-Defaults leer, Modeeingabe explizit; relative/absolute/~ und externer Nutzerconfig geprüft | ROS-Launchvertrag unverändert, kein Kartenfallback; allgemeines AP04 offen | V4-005/T38-T40 |
 | Odometry/TF | Standardisierte Poseeingabe, Frische/Frames, use_start, Poseverlust-Nullbefehl | Keine | V3-Vorleistung erhalten | Abschnitt 2.3; T02 |
 | Tests/Lint | Funktionale Fälle und Linter-Templates bereits vorhanden | Nur Dokument-/Statische Prüfungen der Initialisierung | Keine neuen funktionalen Tests oder Lintkorrekturen | T03/T05; T12-T16 noch nicht ausgeführt |
-| Lizenzierung/Datenrechte | Setupstring, TODO-Manifeste, Fremdnotices; keine Root-LICENSE | Apache verbindlich gewählt; Root-LICENSE, 18 SPDX-Header und zwei Manifestlizenzen implementiert | Technische Eigenanteil-Lizenzierung abgeschlossen; Vertrags-/Karten-/Artefaktrechte offen | V4-004; 11.19-11.21; T29-T36 |
+| Lizenzierung/Datenrechte | TODO-/Fremd-/Code-/Kartenrechte offen | Apache-Eigenanteil-Lizenzierung plus aktive Kartenentfernung | Tree enthält keine Beispielkarten; historische Daten-/Vertrags-/Artefaktrechte separat offen | V4-004/V4-005; Lizenzinstallation folgt V4-006 |
 | CI/CD | Keine Pipeline | Keine | AP07 offen | T18 |
 | Kompatibilität | Humble als Ziel dokumentiert | Lokale OS-/Python-Präsenz erfasst, keine ROS-Ausführung | Kein neues Supportversprechen | T17/O05 |
 | Release | Kein hier belegter Index-/Bloom-/Buildfarmabschluss | Kriterien, private V4-Abgrenzung und noch offene Lizenz-/Artefakt-Gates präzisiert | NOT READY; keine Veröffentlichung | Abschnitt 9/12; AP10 |
@@ -654,6 +725,8 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 `READY` darf erst vergeben werden, wenn die konkret definierten Voraussetzungen für den jeweiligen Bereich nachgewiesen sind. `NOT READY` benennt bekannte Hindernisse, `NOT VERIFIED` fehlende Prüfung. Eine erfolgreich konfigurierte lokale Pipeline ist noch keine externe Veröffentlichung und noch kein erfolgreicher Buildfarm-Lauf.
 
 Die verbleibenden grundlegenden Release-Gates sind: autorisierte Code-/Datenverteilung, zutreffende konsistente Paketmetadaten, vollständige plattformspezifische Dependencies, funktionsfähige installierte Ressourcen und nachvollziehbare Version-/Releasevorbereitung. Die umgesetzte Eigenanteil-Attribution/Apache-Wahl und erhaltenen Fremdbedingungen beseitigen diese übrigen Gates nicht. V4 bleibt ausschließlich lokal, bis ein privater Workflow ausdrücklich freigegeben ist. Die V4-Projektziele zu Schnittstellen-/Test-/CI-Qualität werden zusätzlich verfolgt; fehlende optionale Tools sind keine erfundenen separaten Indexblocker. AP01 bleibt insgesamt BLOCKED ausschließlich wegen noch offener Rechts-/Distributionsnachweise; endgültige Eigenanteil-Lizenzentscheidung und beauftragte technische Anwendung sind abgeschlossen.
+
+Aktualisierung V4-005: Der aktive Tree-/Paketdatenblocker der zwei Karten entfällt, nicht die Rechtsprüfung historischer Gitobjekte. Begrenzter Copy-Build und externer Nutzerconfig-Test sind neu belegt; allgemeine rosdep-/Installations-/Release-Gates bleiben NOT READY. AP04/AP06 nun IN PROGRESS; AP02/AP03 bleiben NOT STARTED.
 
 ## 10. Abschließende Bewertung
 
@@ -900,6 +973,8 @@ Das ist ein konkreter Gegenbefund zur Aussage, es gebe ausschließlich MIT-/BSD-
 
 **Ergebnis:** Direkte Bibliotheks-Hauptdeklarationen sind nachvollziehbar erfasst. Eine vollständige transitive SBOM, binäre Lizenzprüfung oder pauschale Kompatibilitätsfreigabe ist nicht erbracht. Es wurde nichts installiert, deinstalliert oder aktualisiert; Dependencyangaben in package.xml bleiben unverändert. Nur die beiden license-Felder wurden unter AP01 geändert; AP03 bleibt NOT STARTED.
 
+**Aktualisierung V4-005:** Die folgende 60-Pfad-Inventur ist historisch. Beide PCD-Einträge und SHA-Angaben bezeichnen den früheren Bestand; aktueller Tree enthält diese Daten nicht mehr. Allgemeine Nutzerdaten und temporäre Testfixtures sind nicht als mitgelieferte Standardkarte lizenziert.
+
 ### 11.12 Lizenzinventar
 
 Die folgende historische Inventur V4-002/V4-003 umfasst alle 60 damals zum Eingang versionierten Dateien: die 59 Baseline-Dateien plus das bestehende zentrale V4-Protokoll. Damit sind alle 26 Python-Dateien einzeln erfasst. Die unversionierte historische PDF und das externe Recherche-PDF werden anschließend separat aufgeführt. „Eigenanteil laut Erklärung“ ist eine dokumentierte Zuordnung, keine unabhängige Rechtsprüfung. Für normale Projekttexte ohne ausdrücklichen Hinweis wird keine Lizenz erfunden. Die Tabelle hält den Zustand **vor V4-004** und den damaligen Änderungsbedarf fest; der aktuelle Delta mit Root-LICENSE, 18 SPDX-Ergänzungen und zwei Manifesten steht in 11.21.2. Danach umfasst der versionierte Tree 61 Dateien. Historische Copyright-/Lizenzbefunde werden nicht rückwirkend umgeschrieben.
@@ -981,7 +1056,7 @@ Zusätzlich gelesen, unverändert und nicht neu in Git aufgenommen: `docs/R3D_Pl
 
 Die Analysefunktion schreibt klassifizierte PCDs; daraus folgt weder ein automatischer Rechteerwerb an einer fremden Eingabekarte noch eine automatisch gewählte Datenlizenz. Relevant können Werk-, Datenbankhersteller- und vertragliche Aufnahme-/Nutzungsrechte sein. Ihre Voraussetzungen sind für diese beiden Dateien nicht festgestellt [Q17/Q18]. Räumliche Aufnahmen können zusätzlich Freigaben oder personenbezogene/sonstige sensible Informationen betreffen; ob solche Umstände hier vorliegen, ist nicht bestimmbar und wurde nicht behauptet.
 
-Auch Dokumentation, Konfiguration und generierte Binärdateien sind im künftigen Distributionsumfang bewusst abzugrenzen. Beide PCDs bleiben unverändert im lokalen Repository; keine Entfernung, Neulizenzierung, zusätzliche Installation oder private/öffentliche Übertragung erfolgt. Die getroffene Softwarelizenzentscheidung und eine noch offene Datenlizenzentscheidung bleiben ausdrücklich getrennt.
+Auch Dokumentation, Konfiguration und generierte Binärdateien sind im künftigen Distributionsumfang bewusst abzugrenzen. Bis V4-004 blieben beide PCDs unverändert im lokalen Repository. V4-005 übernimmt ihre bereits vor Auftragseingang vorhandenen Working-Tree-Löschungen in den aktiven Tree; historische Gitobjekte bleiben. Keine Neulizenzierung oder zusätzliche Übertragung. Die getroffene Softwarelizenzentscheidung und eine noch offene Datenlizenzentscheidung bleiben ausdrücklich getrennt.
 
 ### 11.13 LiDAR-SLAM-Herkunft
 
@@ -1219,8 +1294,8 @@ Der Fragenkatalog ist als konkrete Abnahmevorbereitung zu beantworten, möglichs
 | R04 | Bestehen ausschließliche Nutzungsrechte, Geheimhaltungs-, Sponsor-, Hochschul- oder sonstige Vertragsbindungen? | Geltender Umfang und etwaige Zustimmung zur Open-Source-Verteilung; keine Vereinbarungen erfinden |
 | R05 | Deckt die Berechtigung Source, Binärpakete, Modifikationen, Unterlizenzierung und erforderliche Patentgrants ab? | Dokumentierte Autorisierung für vorgesehenen Distributionsumfang |
 | R06 | Welche Lizenz galt bereits für vor dem Root-Import übernommene Teile? | Originaltexte/Notices; Apache-Templates bestätigt, weitere Herkunft offen |
-| R07 | Wer erzeugte/stellte die rohe und analysierte PCD bereit, mit welchen Aufnahme-/Nutzungsbedingungen? | Datenherkunft, Berechtigte, Bearbeitungs-/Weiterverteilungsfreigabe, gegebenenfalls separate Datenlizenz |
-| R08 | Enthalten Karten oder andere Artefakte zusätzliche sensible/vertrauliche Inhalte oder Drittmaterial? | Inhalts-/Vertragsprüfung nach tatsächlicher Herkunft; derzeit nicht bestimmbar |
+| R07 | Herkunft/Weitergabe der historischen Karten weiterhin unbekannt; keine aktiven V4-PCDs mehr | Kein aktueller Tree-Datenreleaseblocker; historische Objekte, Forks/Kopien und vollständiger Git-Releaseumfang separat prüfen |
+| R08 | Historische Kartendaten oder sonstige Artefakte möglicherweise sensibel/vertraulich | PCDs aus aktuellem Tree entfernt; historischer Inhalts-/Vertragsstatus weiterhin nicht bestimmbar |
 | R09 | Welche exakten Dependencies/Artefakte werden beim späteren Release tatsächlich mitgeliefert? | Versions-/Plattforminventar, mitzugebende Texte/Notices und gegebenenfalls besondere Binärbedingungen |
 | R10 | Gibt es bekannte Patentansprüche oder Rechtebeschränkungen bei Beitragenden/Arbeitgebern? | Gezielte Auskunft; keine allgemeine Patentfreiheit behaupten |
 | R11 | Wie werden künftige externe Beiträge und deren Berechtigungsbestätigung behandelt? | Passende Contribution-Regel; CLA/DCO nur bewusst wählen, keine Urheberrechtsübertragung voraussetzen |

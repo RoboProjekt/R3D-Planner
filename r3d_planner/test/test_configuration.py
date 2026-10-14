@@ -336,3 +336,56 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
     finally:
         observer.destroy_node()
         rclpy.shutdown()
+
+
+@pytest.mark.parametrize('mode', ['preprocessor', 'planner', 'map', 'follower'])
+def test_default_configuration_requires_user_map(mode):
+    selected = 'pcd_path' if mode == 'preprocessor' else 'map_name'
+    with pytest.raises(ConfigurationError, match=r'maps\.' + selected + ': configure'):
+        load_configuration(SOURCE / 'planner_config.yaml', mode=mode)
+
+
+@pytest.mark.parametrize('mode', ['preprocessor', 'planner', 'map', 'follower'])
+@pytest.mark.parametrize('fault', ['missing', 'suffix', 'directory'])
+def test_selected_user_map_validation(config, mode, fault):
+    path, central, robot, save = config
+    selected = 'pcd_path' if mode == 'preprocessor' else 'map_name'
+    candidate = path.parent / 'missing.pcd'
+    if fault == 'suffix':
+        candidate = path.parent / 'not-a-pcd.txt'
+        candidate.write_text('test-only input')
+    elif fault == 'directory':
+        candidate = path.parent / 'directory.pcd'
+        candidate.mkdir()
+    central['maps'][selected] = str(candidate)
+    save()
+    with pytest.raises(ConfigurationError, match=r'maps\.' + selected + ': missing or invalid'):
+        load_configuration(path, mode=mode)
+
+
+@pytest.mark.parametrize('kind', ['relative', 'absolute', 'tilde'])
+def test_user_map_path_resolution(config, kind):
+    import os
+    path, central, robot, save = config
+    cloud = path.parent / 'tiny.pcd'
+    value = 'tiny.pcd' if kind == 'relative' else str(cloud)
+    if kind == 'tilde':
+        value = str(Path('~') / os.path.relpath(cloud, Path.home()))
+    central['maps'] = {'pcd_path': value, 'map_name': value}
+    save()
+    cfg = load_configuration(path)
+    assert cfg['preprocessor']['pcd_path'] == str(cloud)
+    assert cfg['planner']['map_name'] == str(cloud)
+
+
+@pytest.mark.parametrize('mode', ['preprocessor', 'planner', 'map', 'follower'])
+def test_unused_map_can_be_unset(config, mode):
+    path, central, robot, save = config
+    unused = 'map_name' if mode == 'preprocessor' else 'pcd_path'
+    central['maps'][unused] = ''
+    save()
+    cfg = load_configuration(path, mode=mode)
+    if mode == 'preprocessor':
+        assert cfg['preprocessor']['pcd_path'].endswith('tiny.pcd')
+    else:
+        assert cfg['planner']['map_name'].endswith('tiny.pcd')

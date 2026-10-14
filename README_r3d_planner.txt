@@ -23,7 +23,10 @@ source install/setup.bash
 ## Configure and use
 
 Edit r3d_planner/config/planner_config.yaml; robot_config selects robots/Go2W.yaml.
-Set maps.pcd_path and maps.map_name and the independent
+V4 bundles no PCD maps. Set maps.pcd_path/maps.map_name to your own suitable
+input/classified output; the selected path must be configured and exist.
+Copied installs can set R3D_CONFIG_DIR to a user-owned central YAML/robot directory.
+Set the independent
 components.live_filter.enabled / components.rviz_interface.enabled switches.
 
 ```bash

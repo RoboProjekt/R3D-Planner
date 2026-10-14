@@ -14,8 +14,10 @@ The loader reads both files anew on each launch and logs their resolved paths.
 With the supported `colcon build --symlink-install`, module and configuration
 symlinks resolve to live source files. New robot files are read directly from
 source and need no rebuild. For a copied installation, set `R3D_CONFIG_DIR`
-once to the source `r3d_planner/config` directory. Without live source access,
-startup fails explicitly instead of using an installed snapshot. Moving the
+to a user-owned directory containing `planner_config.yaml` and `robots/`.
+The explicit directory does not need a source checkout. Without an explicit
+configuration, the existing copied-install policy still fails instead of silently
+using an installed snapshot; full default-install portability remains future work. Moving the
 workspace itself requires rebuilding its installation, unlike editing YAML.
 
 YAML changes are restart-time configuration, not live ROS parameter updates.
@@ -55,9 +57,36 @@ absolute ROS topic names; the map, odometry and base frames must be distinct.
 directory, not the shell working directory. Absolute external map paths are
 also accepted. Preprocessing validates the input exists; planner/map/follower
 launch validates the analyzed file exists. The other map path may not exist yet.
-Only PCD files are accepted. The analyzer always writes `<input>_analysed.pcd`;
-keep `map_name` aligned manually. The included analyzed map is an example
-artifact, not proof that it was generated using the current selected settings.
+V4 contains no bundled PCD maps. Both shipped map values are empty. Set the
+selected path to your own suitable PCD before launch; preprocessing requires
+`pcd_path`, while planner/map/follower require `map_name`. The unused value may
+remain empty or refer to a future output. Missing, non-PCD and directory inputs
+fail with the selected key and resolved path; no old example fallback exists.
+Only PCD files are accepted. The analyzer always writes `<input>_analysed.pcd`
+beside the input; keep `map_name` aligned manually and use a writable input
+location. Algorithms, topics, actions and node defaults are unchanged.
+
+For a copied installation, create an editable user configuration from its share:
+
+```bash
+r3d_share=$(ros2 pkg prefix --share r3d_planner)
+mkdir -p "$HOME/.config/r3d_planner"
+cp "$r3d_share/config/planner_config.yaml" "$HOME/.config/r3d_planner/"
+cp -r "$r3d_share/config/robots" "$HOME/.config/r3d_planner/"
+export R3D_CONFIG_DIR="$HOME/.config/r3d_planner"
+```
+
+Then edit that directory's YAML. For example, replace these illustrative paths
+with your own files (the analyzed file need not exist until you start planning):
+
+```yaml
+maps:
+  pcd_path: /path/to/your/input.pcd
+  map_name: /path/to/your/input_analysed.pcd
+```
+
+No PCD is needed to install either package. Data ownership/permission remains
+the user's responsibility; synthetic test inputs are temporary fixtures.
 
 | `shared` key | Default | Unit / effect |
 |---|---:|---|

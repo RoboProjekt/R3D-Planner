@@ -53,7 +53,8 @@ def default_config_path():
         return installed.resolve()
     raise ConfigurationError(
         'Live configuration not found. Build once with colcon build --symlink-install '
-        'or set R3D_CONFIG_DIR to the source r3d_planner/config directory. '
+        'or set R3D_CONFIG_DIR to a user configuration directory containing '
+        'planner_config.yaml and robot profiles. '
         'Copied install YAML is deliberately not used.')
 
 
@@ -142,14 +143,23 @@ def load_configuration(path=None, mode='planner'):
     for key, value in robot['topics'].items():
         text(value, 'robot.topics.' + key, topic=True)
     keys(cfg['maps'], ['pcd_path', 'map_name'], 'maps')
+    selected_key = 'pcd_path' if mode == 'preprocessor' else 'map_name'
     maps = {}
     for key, value in cfg['maps'].items():
-        if not isinstance(value, str) or not value:
-            raise ConfigurationError('maps.' + key + ': expected a path')
-        maps[key] = str((path.parent / Path(value).expanduser()).resolve())
-    selected = maps['pcd_path' if mode == 'preprocessor' else 'map_name']
+        if not isinstance(value, str):
+            raise ConfigurationError('maps.' + key + ': expected a path string')
+        if not value.strip():
+            if key == selected_key:
+                raise ConfigurationError(
+                    f'maps.{key}: configure a user-provided PCD path in {path}. '
+                    'No PCD maps are bundled.')
+            maps[key] = ''
+        else:
+            maps[key] = str((path.parent / Path(value).expanduser()).resolve())
+    selected = maps[selected_key]
     if not Path(selected).is_file() or Path(selected).suffix.lower() != '.pcd':
-        raise ConfigurationError(f'Missing PCD map: {selected}')
+        raise ConfigurationError(
+            f'maps.{selected_key}: missing or invalid PCD file: {selected}')
     keys(cfg['shared'], ['voxel_size_cm', 'min_step_height_cm', 'max_step_height_cm'], 'shared')
     for key, value in cfg['shared'].items():
         number(value, 'shared.' + key, zero=key == 'min_step_height_cm')

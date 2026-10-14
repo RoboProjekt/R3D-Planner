@@ -184,17 +184,24 @@ ros2 pkg executables r3d_planner
 
 ## Runtime configuration
 
-Edit `<path-to-workspace>/src/R3D-Planner/r3d_planner/config/planner_config.yaml`.
+V4 bundles no PCD maps; installation does not require concrete map data.
+Provide your own suitable PCD inputs and configure `maps.pcd_path` for analysis
+and `maps.map_name` for planning/display. The shipped paths are empty; there is
+no fallback to a repository example. Use the source `planner_config.yaml` in a
+symlink workspace, or copy installed configuration into a user-owned directory
+as described in [CONFIGURATION.md](docs/CONFIGURATION.md).
 Its `robot_config: robots/Go2W.yaml` selects the dedicated robot configuration.
-Set `maps.pcd_path` and `maps.map_name`; relative paths resolve against this
-config directory, not the shell working directory. Set general preprocessing,
+Relative paths resolve against the YAML directory, not the shell working directory;
+absolute paths and `~` are also accepted. Set general preprocessing,
 graph, filtering and controller tuning in the central YAML and robot dimensions,
 odometry frames/topic and hardware topics in the robot YAML.
 
 Use `--symlink-install` for the initial build. Runtime reads resolve to live
 source files; edits and newly added robot YAMLs need only launch restart, without
 build or re-sourcing. For a copied install, set `R3D_CONFIG_DIR` once to the
-live source config directory. Startup refuses stale installed copies.
+user configuration directory containing `planner_config.yaml` and robot profiles.
+Startup still refuses an implicit copied snapshot; no source checkout is required
+when the explicit user configuration is complete.
 See [configuration reference](docs/CONFIGURATION.md) for all parameters.
 
 ## Prepare and inspect a map

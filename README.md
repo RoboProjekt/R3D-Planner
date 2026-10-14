@@ -51,7 +51,7 @@ workspace once in each new terminal. `--symlink-install` makes source
 configuration available at runtime, including newly added robot YAMLs.
 Editing YAML thereafter requires only stopping and restarting the affected launch,
 not rebuilding or sourcing again. Copied installations must set
-`R3D_CONFIG_DIR` once to the live source configuration directory; the loader
+`R3D_CONFIG_DIR` to a user-owned configuration directory containing the central YAML and robot profiles; the loader
 rejects stale copied YAML rather than using it silently.
 
 ## Configuration
@@ -88,10 +88,14 @@ validation, default values and adding a robot.
 
 ## Using the preprocessor: select and analyze a map
 
-Edit `maps.pcd_path` in `planner_config.yaml`. The included input is
-`r3d_preprocessor/maps/voxel_05_minhits_7.pcd`. Set `maps.map_name` to the
-corresponding `*_analysed.pcd`. Other RoboLab, HomeLab and stair maps are not
-included; provide your own PCD and change these two paths.
+V4 bundles no PCD example maps. Provide a suitable PCD that you are entitled
+to use, then set `maps.pcd_path` in your `planner_config.yaml`. Set
+`maps.map_name` to the corresponding `<input-name>_analysed.pcd` before planning.
+Both shipped values are empty; launch fails clearly until the selected input is
+configured and exists. Relative paths resolve against the YAML directory;
+absolute paths and `~` are accepted. No map is downloaded or selected as a fallback.
+Installation does not require map data. See the [configuration reference](docs/CONFIGURATION.md)
+for using an external configuration directory with a copied installation.
 
 ```bash
 ros2 launch r3d_planner preprocessor.launch.py

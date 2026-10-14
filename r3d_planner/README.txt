@@ -31,8 +31,10 @@ rviz2
 
 Use --symlink-install for the initial build. Editing the central or robot YAML
 requires launch restart only, without rebuild or re-sourcing. New robot YAMLs
-also need no build. Copied installations must set R3D_CONFIG_DIR once to live
-source config. See ../docs/CONFIGURATION.md for all keys, units, validation,
+also need no build. Copied installations use R3D_CONFIG_DIR for a user-owned
+central YAML and robot profiles; no source checkout is required for that override.
+V4 ships no PCD maps. Set the selected maps.pcd_path/maps.map_name to your own
+file; empty shipped values fail explicitly without a fallback. See ../docs/CONFIGURATION.md for all keys, units, validation,
 ownership and robot-selection instructions. Direct ros2 run is developer-only
 and does not automatically load the central YAML.
 
