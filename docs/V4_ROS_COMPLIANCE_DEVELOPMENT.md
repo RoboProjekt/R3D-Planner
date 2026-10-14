@@ -754,6 +754,44 @@ Herkunft/Datenschutz laut Entwickler dokumentiert. Gewünschte Kartenentfernung 
 
 Nur Dokumentation, keine Daten-/Lizenz-/Branch-/Objektänderung. Späterer eigener Auftrag notwendig, kein Push und keine Veröffentlichung.
 
+### V4-010 - Aktuelle historische Branch-Trees von PCD-Beispielkarten bereinigen
+
+**Datum:** 14. Oktober 2026. **Arbeitspakete:** Datenumfang/AP01, AP08/AP10; getrennt von AP03. **Status:** VERIFIED für die lokalen aktuellen Trees und statische Folgeprüfung, keine historische Objektlöschung/Runtime- oder Rechtsgesamtfreigabe.
+
+**Ausgangslage und Freigabe:** V4-HEAD `d2e05e696f259be155d943f80de4a7c849be53ae`, sauberer Index/Tree, ein bestehender V4-Worktree. V1/V2/V3 nur als origin-Trackingrefs, main lokal auf der Forschungsbaseline. Auftrag erlaubt die Bereinigung ausdrücklich; automatische Ausführungsprüfung lehnte zunächst die als Attachment übermittelte Autorisierung ab. Keine Mutation erfolgte dabei. Der Nutzer bestätigte daraufhin im Chat „Ja, beide Teile wie im Auftrag ausführen“. Keine Systeminstallation, keine Veröffentlichung. Die zuvor auf V4 entfernten Dateien bilden auch auf allen vier historischen Tips den vollständigen PCD-Bestand, keine zusätzlichen PCD-Testfixtures.
+
+**Entscheidung:** ausschließlich die zwei identischen gebündelten Beispielkarten entfernen. V1/V2 besitzen keine zentrale Karten-YAML, ihre nodeeigenen generischen Defaults (`environment.pcd`, `map_analysed.pcd`) werden nicht modernisiert; dokumentierte konkrete Beispielkommandos auf eigene absolute Pfade ändern. V3/main bekommen leere maps-Werte; der bereits vorhandene unveränderte Loader lehnt diese mit `maps.pcd_path: expected a path` ab. Er verlangt beide nichtleeren Pfade, auch einen zukünftigen analysierten Ausgabepfad vor der Vorverarbeitung. Keine V4-Modevalidierung, Odometry-/Metadaten-/Lizenz-/Versionsarbeit in historische Branches übernommen.
+
+**Umsetzung:** Reihenfolge V1 → V2 → V3 → main, je neuer temporärer Worktree unter `/tmp/r3d-v4-ap03/history-<Branch>`. V1/V2/V3 als lokale gleichnamige Branches vom jeweils vorhandenen Remote-Tip angelegt, main vom lokalen Tip; `git rm --` mit den beiden einzeln inventarisierten Pfaden. Pro Branch genau ein Commit `chore(data): remove bundled PCD example maps`. Nur diese neuen Worktrees nach Commit/sauberer Prüfung entfernt; lokale Branches bleiben. Kein V4-Checkoutwechsel, Merge oder Cherry-Pick. Die neu erzeugten branch.V1/V2/V3 Trackingkonfigurationen referenzieren origin; vorhandene Remote-URLs/Remote-Trackingrefs bleiben unverändert.
+
+**Inventar vor jeder Löschung:**
+
+| Branch | Dateipfad | Bytes | Blob-SHA | Zweck / Referenz / Entscheidung |
+|---|---|---:|---|---|
+| V1 | `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | 19284059 | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` | Roh-PCD für Vorverarbeitung; README/INSTALL/README_r3d_planner.txt Beispiele; DELETE, gebündelte Beispielkarte |
+| V1 | `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | 8905560 | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` | RGB-klassifizierte Planungs-/Visualisierungseingabe; README/INSTALL/README_r3d_planner.txt Beispiele; DELETE, gebündelte Beispielkarte |
+| V2 | `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | 19284059 | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` | Roh-PCD für Vorverarbeitung; README/INSTALL/README_r3d_planner.txt Beispiele; DELETE, gebündelte Beispielkarte |
+| V2 | `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | 8905560 | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` | RGB-klassifizierte Planungs-/Visualisierungseingabe; README/INSTALL/README_r3d_planner.txt Beispiele; DELETE, gebündelte Beispielkarte |
+| V3 | `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | 19284059 | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` | Roh-PCD für Vorverarbeitung; planner_config.yaml maps.pcd_path; DELETE, gebündelte Beispielkarte |
+| V3 | `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | 8905560 | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` | RGB-klassifizierte Planungs-/Visualisierungseingabe; planner_config.yaml maps.map_name; DELETE, gebündelte Beispielkarte |
+| main | `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | 19284059 | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` | Roh-PCD für Vorverarbeitung; planner_config.yaml maps.pcd_path; DELETE, gebündelte Beispielkarte |
+| main | `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | 8905560 | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` | RGB-klassifizierte Planungs-/Visualisierungseingabe; planner_config.yaml maps.map_name; DELETE, gebündelte Beispielkarte |
+
+V4: keine PCD-Datei, NO CHANGE REQUIRED an V4-Karten. Beide Karten wurden nie über die betreffenden setup.py-data_files installiert; keine Installregel musste geändert werden. Pickles, Quellcode, bestehende pyc, Lizenz- oder sonstige Artefakte nicht entfernt. Historische ARCHITECTURE-Inventare als frühere Bestände gekennzeichnet, keine mitgelieferten Karten mehr zugesagt.
+
+| Branch | Alter HEAD | Neuer HEAD / Löschcommit | Gelöscht | Statische Prüfungen |
+|---|---|---|---|---|
+| V1 | `01348f3285a0e7582f70cc5f2ed3d1bf4b7f904b` | `91ccb1a824e7d2d7163433f13594d6c07855b1c5` | 2 PCDs | 21 Python-ASTs, 1 YAMLs, 2 Manifeste/0 Warnungen; exakte Diff-Whitelist, Vorfahrprüfung, Tree frei von PCD |
+| V2 | `3abd002e8cc9e7a26cacaf43a5c20b1822664f14` | `cc2f5bef269b3dcb1664bc52bba1d9c0be1bd1ca` | 2 PCDs | 18 Python-ASTs, 1 YAMLs, 2 Manifeste/0 Warnungen; exakte Diff-Whitelist, Vorfahrprüfung, Tree frei von PCD |
+| V3 | `3752404a08867e9e6f3725300b88e148d4d5be37` | `a914f0e4cd793f1ed7f35501e09a7ca865914b67` | 2 PCDs | 26 Python-ASTs, 3 YAMLs, 2 Manifeste/0 Warnungen; exakte Diff-Whitelist, Vorfahrprüfung, Tree frei von PCD |
+| main | `c65642fe56015556f696364a724cb5b976a27888` | `51a08ed3da1bd43f06d89c6a84bbbd540aaf5861` | 2 PCDs | 26 Python-ASTs, 3 YAMLs, 2 Manifeste/0 Warnungen; exakte Diff-Whitelist, Vorfahrprüfung, Tree frei von PCD |
+
+**Betroffene Dateien:** V1/V2: die zwei Karten, README.md, INSTALL.md, README_r3d_planner.txt, docs/ARCHITECTURE.md. V3/main: die zwei Karten, r3d_planner/config/planner_config.yaml, README.md, docs/CONFIGURATION.md, docs/ARCHITECTURE.md. Ausschließlich Markdown-/Beispielpfade und zwei YAML-Skalare korrigiert. Alle Python-Dateien einschließlich setup.py, package.xml, Lizenzen, übrige Konfiguration und Tests bytegleich zum jeweiligen alten Tip. Somit Funktionen zum PCD-Laden, Analysieren/Klassifizieren/Schreiben, Graphaufbau, Pickle-Verarbeitung (V1) und A* unverändert; kein funktionaler Lauf mit den entfernten Karten behauptet.
+
+**Verifikation/Befehle:** `git status --short`, `git branch -avv`, `git branch --show-current`, `git log -10 --oneline`, `git remote -v`, `git worktree list`; `git ls-tree -r -l <Tip>` für Pfad/Blob/Größe; `git grep -n -I voxel_05_minhits_7 <Tip>` für Referenzen; `git worktree add [-b <fehlender lokaler Branch>] <neuer Temp-Pfad> <verifizierter Branch/Remote-Tip>`, explizites `git rm`, gezieltes git add, `git diff --cached --check`, Python3.10-AST/YAML/catkin_pkg-Parsing, `git commit`, `git merge-base --is-ancestor <alt> <neu>`, `git ls-tree -r --name-only HEAD`, `git worktree remove <eigener neuer Pfad>`. Statische Gates und Commitbefehle jeweils Exit 0; negative Referenzsuche Exit 1 bedeutet keine aktive Fundstelle. V3/main-Loaderprobe liefert erwartete ConfigurationError. Keine neuen historischen Tests erstellt. Historische sechs Linttests bzw. zusätzlich V3/main-Konfigurations-/ROS-Tests nicht ausgeführt: kein voller Branch-Test-PASS. Automatische Tests referenzieren die beiden konkreten Kartennamen nicht; datenabhängige manuelle Beispiele brauchen nun eigene Daten.
+
+**Baseline/Historie:** `c65642fe56015556f696364a724cb5b976a27888` bleibt dasselbe Commitobjekt und Vorfahr von main/V4. Alle ursprünglichen Tips/13 historischen Commits bleiben erreichbar, alte Trees enthalten die identischen Kartenblobs weiterhin. Das 33-seitige PDF ist unverändert: SHA256 `8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383`. Öffentliche GitHub-Trees, Forks und Kopien wurden nicht verändert; keine vollständige rückwirkende Entfernung behaupten. V4-Code am Ende von Teil A weiterhin d2e05e6/bytegleich/sauber. Dokumentationscommit: der Commit, der V4-010 enthält (auflösbar via `git log -- docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md`); historische Commitreferenzen oben vollständig.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -1888,3 +1926,8 @@ Die historische Git-Historie bleibt zunächst unverändert. Ein späterer normal
 | M05 | Installiertes catkin_pkg.package/Person und packaging.utils unter /usr/lib/python3/dist-packages | 14.10.2026; tatsächlich ausgeführte Parser-/Emailformat-/Namensnormalisierung, catkin_pkg 1.1.1 |
 
 **Nächster vorgeschlagener Schritt: AP03 – Dependency Management und rosdep**, nur nach neuer ausdrücklicher Freigabe. Scope: vollständige ROS-/Python-/Launch-/Build-/Runtime-Dependencies, Open3D/NetworkX/NumPy/SciPy/sensor_msgs_py/std_msgs/tf2_ros-Provider, plattformspezifische rosdep-Keys, reproduzierbare Installation und Beseitigung des bisherigen --skip-keys-Verfahrens. Hier keine Keys geändert, nichts installiert und AP03 nicht begonnen. Weitere Branchbereinigung ist eine eigene Aufgabe, kein automatischer AP03-Schritt. Kein Git-Push oder Veröffentlichung.
+
+
+## 14. Aktuelle historische Datenbereinigung (V4-010)
+
+Am 14. Oktober 2026 wurden die lokalen aktuellen V1/V2/V3/main-Trees wie in V4-010 inventarisiert bereinigt. Damit sind alle fünf lokalen Branch-Trees frei von PCD-Dateien. Die vorherigen V4-009-Zukunftsaussagen und früheren Rechts-/Branchbefunde bleiben historische Snapshots. Remote-Trees und Gitobjekte sind unverändert; das Projekt besitzt weiterhin keine vollständige rechtliche Releasefreigabe. AP01 technisch VERIFIED / Rechtsgesamtgate BLOCKED; AP02 VERIFIED. AP03 ist jetzt ausdrücklich freigegeben, wird nach dieser getrennten Sicherung/Dokumentation bearbeitet. AP04 nicht erweitert. Für AP03 erfolgten vorbereitende Import-/Key-/Umgebungsproben an separaten Kopien, noch keine Dependency-Mutation in V4. Automatische Freigabeablehnung, zusätzliche Chatbestätigung und nachfolgende erfolgreiche autorisierte Ausführung sind getrennt erfasst.
