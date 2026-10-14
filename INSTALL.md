@@ -13,8 +13,10 @@ ROS 2 Humble is the supported ROS distribution. Other ROS distributions are
 not supported. The complete stack has run successfully on a Unitree Go2W with
 the documented TF and sensor integration.
 
-Installation uses a native ROS 2 workspace. No Docker, rosinstall or requirements
-files are provided. ROS launch entry points are installed by `r3d_planner`.
+Installation uses a native ROS 2 workspace. The isolated verification used the
+official `ros:humble-ros-base` image; Docker is not a runtime requirement. No
+Dockerfile, rosinstall or requirements file is provided. ROS launch entry points
+are installed by `r3d_planner`.
 Sensor and robot drivers are part
 of the Go2W deployment rather than this workspace.
 
@@ -51,13 +53,14 @@ operations. Use one consistent apt-managed Python environment; user-site NumPy
 warning. System NumPy 1.21.5 did not. Conda's Python is not the ROS interpreter.
 
 Open3D's official rosdep rule resolves to Jammy's universe package. Enable the
-Ubuntu universe repository if necessary. AP03 tested Open3D 0.14.1 and NetworkX
-2.4 from apt archives extracted into a temporary directory, alongside installed
-Humble and system NumPy/SciPy. This validates those runtime versions but is not
-an apt installation or a fresh-machine test. The audit host still lacks the
-installed `python3-open3d` and `python3-networkx` packages, so its `rosdep check`
-reports those two packages as unsatisfied. The installation command below is
-for users setting up their environment; it was only simulated in AP03.
+Ubuntu universe repository if necessary. On 14 October 2026, actual rosdep
+installation and subsequent check both exited 0 in two fresh isolated Humble
+containers (Ubuntu 22.04.5, Python 3.10.12). Open3D 0.14.1 and NetworkX 2.4 came
+from apt, with NumPy 1.21.5 and SciPy 1.8.0; the former compatibility warning
+was absent. No skip keys or global pip/Conda replacements were needed. The audit
+host still lacks apt Open3D/NetworkX and was not modified. Full commands, image
+digest, failures during test-tool preparation and results are in the
+[central protocol](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#16-ap03ap04ap06--isolierte-humble-abnahme-und-portabilität).
 
 The current official `python3-open3d` rule is explicitly unavailable on Ubuntu
 24.04 Noble. A Humble/Jammy result does not establish Jazzy support. Resolving
@@ -158,8 +161,9 @@ rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_prepro
   --ignore-src --rosdistro humble --os=ubuntu:jammy
 ```
 
-V4 needs no dependency skip list. `rosdep install --simulate` successfully
-resolved the corrected dependency set in AP03; it does not install packages.
+V4 needs no dependency skip list. AP03 separately verified key resolution,
+actual installation, imports and rosdep check; the last two install/check runs
+were performed in fresh isolated containers rather than on the audit host.
 A successful check proves package presence, not successful build or runtime.
 The workspace contains both R3D packages, so `--ignore-src` excludes the local
 `r3d_preprocessor` dependency. Every external manifest key was also resolved
@@ -170,7 +174,7 @@ individually to avoid mistaking an installed ROS overlay for key validation.
 ```bash
 cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
-colcon build --symlink-install
+colcon build --packages-select r3d_preprocessor r3d_planner
 source install/setup.bash
 ```
 
@@ -184,10 +188,13 @@ ros2 pkg executables r3d_planner
 
 `colcon list` must include `r3d_preprocessor` and `r3d_planner`.
 
-For a regular copy installation, omit `--symlink-install` and use explicit
-user-owned configuration through `R3D_CONFIG_DIR` as described below. AP03 built
-both packages with separate build/install/log paths and no symlink installation;
-implicit installed-config portability and output-path design remain AP04.
+The regular copy installation above was verified in two empty workspaces.
+Both builds exited 0; each full suite passed 86 tests and `colcon test-result`
+exited 0. Standard configuration/robot resources work through package share;
+use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
+container with a read-only installed tree passed 37 installation/output tests.
+The install prefix remained at its build-time path: relocating a workspace is
+not established by this test. Optional `--symlink-install` is a developer workflow.
 
 ## Runtime configuration
 
@@ -203,9 +210,9 @@ absolute paths and `~` are also accepted. Set general preprocessing,
 graph, filtering and controller tuning in the central YAML and robot dimensions,
 odometry frames/topic and hardware topics in the robot YAML.
 
-Use `--symlink-install` for the initial build. Runtime reads resolve to live
-source files; edits and newly added robot YAMLs need only launch restart, without
-build or re-sourcing. For a copied install, set `R3D_CONFIG_DIR` once to the
+With optional developer `--symlink-install`, runtime reads resolve to live source
+files; edits and newly added robot YAMLs need only launch restart, without build
+or re-sourcing. For a copied install, set `R3D_CONFIG_DIR` once to the
 user configuration directory containing `planner_config.yaml` and robot profiles.
 Without an override, a copy installation reads its regular package-share YAML
 and robot profiles. User configuration needs no source checkout.
@@ -348,9 +355,23 @@ These tests use temporary PCD/config files, publish synthetic Odometry, exercise
 action start selection and restart actual planner launches for all four
 component combinations. No hardware driver or motion follower is launched.
 The complete original Go2W system is tested; the V3 refactor requires deployment
-regression testing before motion. Existing template Flake8 tests still report
-legacy lint failures. Run package test directories separately to avoid their
-duplicate template module names.
+regression testing before motion. The current V4 package-level Flake8, PEP257
+and copyright checks pass; both copyright skips have been removed. Run the full
+suite through colcon, which keeps each package's duplicate template module names
+in its own test process:
+
+```bash
+cd <path-to-workspace>
+colcon test --packages-select r3d_preprocessor r3d_planner
+colcon test-result --verbose
+```
+
+The verified total is 86 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
+10 new output cases, 27 new installation cases and six lint checks. Launch
+lookup covers all four files using `--show-args`; seven node constructors use
+synthetic inputs and an isolated command topic without running follower control.
+This does not prove full navigation, motion safety, coverage or CI. Dependency
+warnings from NetworkX `np.int` and ament tooling remain; they are not test failures.
 
 ## Troubleshooting
 
@@ -367,8 +388,8 @@ duplicate template module names.
   these assumptions remain unchanged.
 - **Python warnings/build errors:** Use the ROS system Python and consistent
   dependencies. The local workstation previously had a packaging conflict;
-  the isolated V3 system-Python build succeeds, but its NumPy/SciPy version
-  warning remains. The Go2W environment does not have this conflict. Do not
-  blindly upgrade global packages.
+  the V4 isolated apt/Humble environment passes without the NumPy/SciPy
+  compatibility warning. The host conflict was not repaired. Do not blindly
+  upgrade global packages.
 - **Cliff handling:** No internal follower subscriber consumes cliff/stair output.
   Supply and verify the safety integration externally.

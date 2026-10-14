@@ -2,7 +2,7 @@
 
 This ament_python package contains the PCD-based 3D A* planner, local point-cloud
 filter, RViz interface, planar path follower and static test TF node. The
-package boundaries and existing generic interface names are unchanged on V3.
+package boundaries and existing generic interface names are retained on V4.
 
 ## Configuration and startup
 
@@ -29,10 +29,11 @@ ros2 launch r3d_planner map.launch.py
 rviz2
 ```
 
-Use --symlink-install for the initial build. Editing the central or robot YAML
-requires launch restart only, without rebuild or re-sourcing. New robot YAMLs
-also need no build. Copied installations use R3D_CONFIG_DIR for a user-owned
-central YAML and robot profiles; no source checkout is required for that override.
+Use a regular colcon copy build for installation. Defaults are found through
+package share without a source checkout; R3D_CONFIG_DIR takes precedence for a
+user-owned central YAML and robot profiles. Optional developer --symlink-install
+reads live source YAML; editing YAML or adding a robot then needs only a launch
+restart. With a copy build, edit user configuration rather than package share.
 V4 ships no PCD maps. Set the selected maps.pcd_path/maps.map_name to your own
 file; empty shipped values fail explicitly without a fallback. See ../docs/CONFIGURATION.md for all keys, units, validation,
 ownership and robot-selection instructions. Direct ros2 run is developer-only
@@ -168,4 +169,7 @@ config/robots/*.yaml. The legacy config/r3d_planner_params.yaml remains an
 unattached incomplete Nav2 fragment, not an active configuration entry point.
 V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
-../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining installation/test gates.
+../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
+On Humble/Jammy the real dependency install/check and two fresh copy builds pass;
+each full suite passes 86 cases, and a source-free install passes 37 cases.
+This establishes the tested installation scope, not CI, motion or Jazzy support.

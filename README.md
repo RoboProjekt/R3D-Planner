@@ -63,18 +63,22 @@ rosdep install --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_prep
   --ignore-src --rosdistro humble --os=ubuntu:jammy -y
 rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
   --ignore-src --rosdistro humble --os=ubuntu:jammy
-colcon build --symlink-install
+colcon build --packages-select r3d_preprocessor r3d_planner
 source install/setup.bash
 ```
 
-AP03 verified every external manifest key and a regular copy build. Dependency
-installation was simulated; the audit host still lacks the installed apt packages
-for Open3D and NetworkX. Functional ROS regressions and existing lint failures
-are distinguished in the development protocol. These checks do not establish a
-clean-machine release or support for newer distributions.
+AP03 verified all 26 external keys, actual rosdep installation and rosdep check
+(exit 0) in two fresh isolated ROS 2 Humble / Ubuntu 22.04.5 containers using
+system Python 3.10.12. Apt NumPy 1.21.5, SciPy 1.8.0, Open3D 0.14.1 and NetworkX
+2.4 worked without the former NumPy/SciPy compatibility warning. Two fresh copy
+workspaces each passed 86 tests (0 failures, 0 skips), including active lint and
+copyright checks; a separate container without the source tree passed 37
+installation/output cases. The audit host was unchanged and still lacks apt
+Open3D/NetworkX. These results establish the tested Humble installation scope;
+CI, newer distributions, hardware deployment and official release remain separate.
 
 Replace angle-bracket placeholders before running commands. Source ROS and the
-workspace once in each new terminal. `--symlink-install` makes source
+workspace once in each new terminal. Optional developer `--symlink-install` makes source
 configuration available at runtime, including newly added robot YAMLs.
 Editing YAML thereafter requires only stopping and restarting the affected launch,
 not rebuilding or sourcing again. Copy installations use the regular installed
@@ -104,7 +108,7 @@ invalid values fail at startup.
 |---|---|
 | `maps` | Input PCD and analyzed planning PCD; paths relative to the config directory |
 | `shared` | Voxel size and minimum/maximum graph step heights |
-| `preprocessing` | Density, voxel hit filtering, floor filling and clustering |
+| `preprocessing` | Density, voxel hit filtering, floor filling, clustering and optional `output_dir` |
 | `planner` | Map frame, odometry age limit, graph costs and path visualization |
 | `components` | Independent Live Filter and RViz-interface launch switches |
 | `live_filter` | Sensor-coordinate perception thresholds |

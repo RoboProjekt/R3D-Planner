@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-012 (tatsächliche isolierte Humble-Dependencyinstallation). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-016 (isolierte Humble-Dependencyinstallation, Source-freie Copy-Installation und vollständige Testabnahme). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -231,7 +231,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 |
 | Abhängigkeiten | AP03 für vollständigen Clean-Build; AP01 für öffentliche Mitlieferung der vorhandenen Karten, nicht für synthetische Installationsfixtures; AP06-Regressionen begleitend |
 | Abschlusskriterien | Copy-Build/Install ohne Symlink; Tests bei nicht zugänglichem ursprünglichem Source-Checkout; Nodes/Launches/Config/Robotprofile auffindbar; Analyse schreibt ausschließlich in gewählten beschreibbaren Datenpfad; Source-/Override-Verhalten dokumentiert |
-| Aktueller Status | **IN PROGRESS** — V4-011 zusätzlicher nativer Copy-Build und installierte Ressourcen/Entry-Point-Imports verifiziert; implizite Share-Konfiguration, Ausgabepfade und reproduzierbarer Clean-OS-Build offen, keine neue AP04-Implementierung |
+| Aktueller Status | **VERIFIED** — ursprüngliche Copy-/Sourcefrei-/Ressourcen-/Config-/Outputkriterien in Humble/Jammy erfüllt (V4-013/014/016); keine pauschale Plattform-/Workspace-Relokations-/Releasegarantie |
 
 ### 4.6 AP05 - ROS-Schnittstellen und Konfiguration
 
@@ -255,7 +255,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | **IN PROGRESS** — 43 vorhandene Funktionsfälle in Apt/Humble-Copy-Umgebung bestanden; Gesamtsuite 2 bestehende Flake8-Fehler/2 Copyright-Skips, Coverage/weitere Regressionen offen |
+| Aktueller Status | **VERIFIED für den bearbeiteten Umfang** — zweimal 86 PASS/0 FAIL/0 SKIP via colcon, zusätzlich 37 Source-freie Fälle; sechs Lints inklusive Copyright aktiv; Coverage/weitere API-/Algorithmus-/Hardwaretests separat offen |
 
 ### 4.8 AP07 - CI/CD
 
@@ -279,7 +279,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für korrekte Nutzung; P2/P3 für weitergehende Policies |
 | Abhängigkeiten | Begleitet alle APs; Lizenztext nur nach AP01; konkrete Support-/API-Zusagen erst anhand AP06/AP09 |
 | Abschlusskriterien | Nachvollziehbare Änderungs-IDs und Commitreferenzen, zutreffende Prüfberichte, reproduzierbare aktualisierte Nutzeranleitungen; dokumentierte Grenzen statt pauschaler Quality-Level-/ABI-Garantie |
-| Aktueller Status | **IN PROGRESS** — Protokoll bis V4-011, aktuelle Dependency-/Installations-/Datenbereinigungsnachweise und Bestandsdokumentation aktualisiert; übrige Policies/Dokumentation offen |
+| Aktueller Status | **IN PROGRESS** — Protokoll bis V4-016 und vorhandene Installations-/Konfigurations-/Paketdokumentation aktualisiert; weitere Wartungs-/Versions-/Securitypolicies offen |
 
 ### 4.10 AP09 - ROS-Distributionskompatibilität
 
@@ -303,13 +303,13 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 für offene Release-Gates; Umsetzung nach technischen Grundlagen |
 | Abhängigkeiten | AP01-AP04 zwingend für belastbaren Abschluss; AP05/AP06 für vorgesehenen Produktvertrag; AP08/AP09 für Ziel-/Wartungszusagen; AP07 als Projektqualitätsnachweis |
 | Abschlusskriterien | Geprüfte Checkliste, konsistente Version/Ref, vollständige Dependencies, funktionierender Copy-Install, geklärte Rechte; Veröffentlichung nur nach gesonderter Autorisierung und externer Bestätigung |
-| Aktueller Status | **IN PROGRESS** — Metadata/Dependency-/Daten-Teilblocker korrigiert; echte Installation/check, Defaultportabilität, Rechtsgesamtgate, Version-/Releasevorbereitung weiterhin offen; keine Veröffentlichung |
+| Aktueller Status | **IN PROGRESS** — Metadaten, Humble-Dependencies und Copy-Installation technisch geprüft; vollständige Rechts-/public-V4-/Versions-/Changelog-/Releaseorganisation offen; keine Veröffentlichung |
 
 ### 4.12 Abhängigkeitsgerechte Reihenfolge und nächste Freigabe
 
 AP01-Lizenzentscheidung und beauftragte technische Lizenzimplementierung sind abgeschlossen. Offene Vertrags-, Karten- und konkrete Distributionsrechte sperren weiterhin die entsprechende Veröffentlichung, nicht jede unabhängige technische Arbeit. Die bereits begründete Apache-Wahl muss dafür nicht erneut recherchiert werden. Bei konkreten entgegenstehenden Hinweisen ist die betroffene Lizenzzuordnung zu stoppen und neu zu beurteilen.
 
-AP01 technisch und AP02 VERIFIED; AP03 wurde unter V4-011 ausdrücklich bearbeitet und bleibt IN PROGRESS für echte Installation/check. Nächster gesondert freizugebender Schritt: AP04 – Build and Installation Portability (Share-Konfiguration, Copy-Ressourcen, beschreibbare Ausgaben, Launches ohne Source, reproduzierbarer Clean-Build). AP06/AP08 begleiten; AP07 erst auf stabilen Grundlagen; AP09/AP10 benötigen eigene ausgeführte Nachweise. AP04 nicht automatisch beginnen, kein Push oder Release.
+AP01 technisch und AP02 VERIFIED. AP03/AP04 und AP06 im bearbeiteten Umfang nun anhand V4-012..016 VERIFIED, ohne historische Ausgangsbefunde umzudeuten. AP08/AP10 IN PROGRESS, AP09 NOT STARTED; AP05/AP07 nicht begonnen. Nächster gesondert freizugebender Schritt: AP05 – ROS Interfaces and Configuration (Topics/Namespaces/Remapping/TF-/PointCloud2-/Quaternionverträge). AP07 folgt auf stabilen Grundlagen, AP09 benötigt separate Plattformprüfung. AP05 nicht automatisch beginnen; kein Push/Release.
 
 ## 5. Entwicklungsprotokoll
 
@@ -814,7 +814,7 @@ V4: keine PCD-Datei, NO CHANGE REQUIRED an V4-Karten. Beide Karten wurden nie ü
 
 ### V4-012 - Tatsächliche Humble-Dependencyinstallation verifizieren
 
-**Datum:** 14. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP03, AP08/AP10 Nachweise. **Betroffene Dateien:** nur zentrales Protokoll; keine Manifest-/Hoständerung. **Git-Commit:** `test(deps): verify rosdep installation on Humble`, Parent e204fee7e71aa915d76245223fb78003e268d158, eigene SHA späterer regulärer Nachtrag. **Status:** VERIFIED im definierten Humble/Jammy-Umfang.
+**Datum:** 14. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP03, AP08/AP10 Nachweise. **Betroffene Dateien:** nur zentrales Protokoll; keine Manifest-/Hoständerung. **Git-Commit:** `test(deps): verify rosdep installation on Humble`, Parent e204fee7e71aa915d76245223fb78003e268d158, eigene SHA als abgeschlossener Commit unten ergänzt. **Status:** VERIFIED im definierten Humble/Jammy-Umfang.
 
 #### Ausgangssituation
 
@@ -841,6 +841,8 @@ Fehlversuche: temporäres Bootstrap-nounset brach vor Apt bei ROS setup.bash mit
 #### Ergebnis
 
 AP03 ursprüngliche Humble-Kriterien jetzt VERIFIED: vorhandene konsistente Manifeste/26 Keys plus tatsächliche Installation/Check/Imports/reproduzierbares Verfahren. Kein Host-System-/pip-/Conda-/NVIDIA-/ROS-Eingriff. Hostdpkg meldet weiter keine python3-open3d/python3-networkx; Erfolg gilt für Container. Keine Multi-Distro-/CI-/Buildfarm-/Rechtsfreigabe.
+
+**Abgeschlossener Commit:** `7a476588ba3e50550074c14920b95d3658e45a03`.
 
 #### Auswirkungen
 
@@ -874,6 +876,8 @@ Ausgeführt im gepinnten Apt/Humble-Container: python3 -m pytest -p no:cacheprov
 
 Sharepolitik gezielt implementiert und statisch/mit 40 Fällen geprüft; Gesamt-AP04/AP06 IN PROGRESS bis vollständiger Installationsabnahme.
 
+**Abgeschlossener Commit:** `c702da4ac241f3173d3732da3bdd1a754a04d949`.
+
 #### Auswirkungen
 
 Nur notwendige Installationspolitik und zugehörige Bestandsanleitung/Test; keine Versions-/Lizenz-/Dependency-/ROS-Interfaceänderung. AP05/AP07 nicht beginnen.
@@ -905,6 +909,8 @@ Ausgeführt im Apt/Humble-Container als r3dtest UID1000: python3 -m pytest -p no
 #### Ergebnis
 
 Output-I/O und 50 passende Fälle bestanden, keine unerwartete Configregression. Gesamt-AP04/AP06 bleiben bis installierter Gesamtabnahme IN PROGRESS.
+
+**Abgeschlossener Commit:** `370cf5f9246791c570600fffceab637c3c4b564b`.
 
 #### Auswirkungen
 
@@ -938,9 +944,49 @@ Vor Anwendung an Containerkopien beide Pakete je pytest -k "copyright or flake8 
 
 Beide Qualitätsgates bestanden, alle 22 angewandten Dateien bytegleich zu geprüften finalen Kopien; alle Pythondateien parsebar, sechs Noticeblöcke geschützt, exakte Commit-Whitelist. AP06 IN PROGRESS bis Gesamtsuite/Installregressionen; keine Hardware/CI/Multi-Distrobehauptung.
 
+**Abgeschlossener Commit:** `bb578b36fc6ac72dddb043f35a474fe15c25da30`.
+
 #### Auswirkungen
 
 Keine neue Lizenzwahl/Versions-/Dependency-/ROS-Namens-/Parameter-/Algorithmusänderung. B09-B13-Interfaceprobleme bewusst für AP05 erhalten, keine kosmetische Korrektur als neue Planung ausgeben.
+
+### V4-016 - Source-freie Installation und vollständige Regressionen nachweisen
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP04/AP06, begleitend AP08/AP10. **Status:** VERIFIED für den beauftragten Humble-Installations-/Testumfang. **Git-Commit:** `test(install): add clean installation regression coverage` (eigener Commit über den eindeutigen Subject/Parent auflösbar; SHA nicht selbstreferenziell im selben Commit erzeugbar), Parent bb578b36fc6ac72dddb043f35a474fe15c25da30. **Betroffene Dateien:** neuer test_installation.py, README.md, INSTALL.md, docs/CONFIGURATION.md, docs/KNOWN_ISSUES.md, beide Paket-README.txt und dieses Protokoll.
+
+#### Ausgangssituation
+
+Vorher Shareauflösung/Outputpfad korrigiert, 40 bestehende Configfälle, zehn neue Outputfälle und sechs Lints getrennt bestanden. Vollständiger Copy-/Source-free-/Gesamtnachweis fehlte. Neuer Eintrag wurde vor Testimplementierung als IN PROGRESS angelegt, jetzt mit tatsächlichen Ergebnissen abgeschlossen.
+
+#### Ziel der Änderung
+
+Dauerhafte Regressionen für installierte Standard-/Overridekonfiguration, Robotprofile, Pfade, Ressourcen, sieben Entry-Points, vier Launches und echtes readonly-PCD-I/O; alle Bestandsfälle erhalten. Zwei leere Copy-Workspaces und eigener Source-freier Prozess; keine API-/CI-/Hardwarearbeit.
+
+#### Technische Umsetzung
+
+27 parametrisierte Installed-Testfälle mit neutralem cwd und tatsächlichen installierten Modulursprüngen. Zwei frische Workspaces /work/final2 und /work/final3 in vollständig versorgtem isoliertem Humble-Container, Build ohne --symlink-install und ohne alte R3D-Overlays. Ausführung als r3dtest UID1000. Zweiter frischer Container mit demselben gepinnten Image, eigener echter rosdep-Installation aus zwei Manifestkopien, nur readonly-Installbaum am ursprünglichen Installprefix, readonly-Testdateien/Manifestkopien/temporäre Tools und getrennten Ergebnissen. Kein Repository-/Source-/Buildworkspace-Mount dort; /r3d-source und /work/final1/src bis /work/final3/src fehlen nachweislich.
+
+#### Begründung
+
+Discovery/Import, Nodeinitialisierung und funktionale Ausführung werden getrennt. Readonly-Installation und ordinary-user-DAC beweisen tatsächliche Quellen-/Schreibortunabhängigkeit; kein root-Pseudobeweis. Quelldaten synthetisch erzeugt, keine alten Karten zurückgebracht.
+
+#### Verifikation
+
+Beide Copy-Builds Exit0, jeweils colcon test Exit0 und test-result Exit0: 86 PASS, 0 FAIL, 0 ERROR, 0 SKIP. 43 Bestandsfunktionen (einschließlich tatsächlicher Launchkombinationen/Odometry/action), zehn neue Outputfälle, 27 Installed-Fälle und sechs aktive Lints. Im zweiten Source-freien Container zusätzlich 37 PASS/0 FAIL/0 SKIP (27 Installed plus zehn Output), pytest Exit0. Alle 26 Keys weiterhin gültig; rosdep install/check dort Exit0. Ressourcen: zwei Manifeste, zwei LICENSEs, zwei Amentmarker, sieben Scripts/Importe, vier Launches, drei YAMLs, null PCDs. Die drei YAMLs umfassen zentrale Konfiguration, Go2W-Profil und den weiterhin nicht geladenen Legacy-Nav2-Fragment; nicht drei aktive Konfigurationen.
+
+Vier `ros2 launch ... --show-args` erfolgreich, kein Followerstart daraus. Alle sieben Nodekonstruktoren mit temporären Inputs/Overrides initialisiert und zerstört; Commandtopic /r3d_install_test/cmd_vel, kein Follower-spin/control_loop. Analyzer tatsächlich als installiertes Console-Script mit readonly Input erfolgreich (Exit0); vorhandener Output oder ungültige PCD jeweils Exit1, bestehende Daten unverändert. Weitere umfassende Navigation-/Hardware-/GUItests nicht daraus abgeleitet.
+
+Erster Vollversuch /work/final1: Build0, colcon test0, aber test-result1 mit 85PASS/1FAIL/0SKIP. Ursache ausschließlich neuer Testhelper: `AttributeError: module 'rclpy' has no attribute 'node'`; expliziter `from rclpy.node import Node` korrigiert, Produktionscode dafür unverändert. Zweite/dritte frische Workspaces danach beide fehlerfrei. Colcon test Exit0 allein reicht ausdrücklich nicht als erfolgreiche Suite.
+
+33 Share-Ressourcenkeys in beiden Builds identisch; 31 Inhalte byteidentisch. Zwei generierte package.sh enthalten erwartete /work/final2 gegenüber /work/final3 Prefixe, nach ausschließlich dieser Prefixnormalisierung identisch. Alle 20 installierten Pythondateien byteidentisch: 18 Paketmodule/Launches einschließlich leerer Marker sowie zwei generierte Colcon-Setuphelper. Initialer pauschaler Hashgleichheitscheck deshalb nicht bestanden; keine Bitreproduzierbarkeit sämtlicher Artefakte behauptet. NetworkX-np.int-/ament-Deprecations bleiben sichtbar; frühere SciPy/NumPy-Kompatibilitätswarnung fehlt. Relevante vollständige Kommandos/Ausgaben und konsolidierte T65-T86 in 16.5.
+
+#### Ergebnis
+
+AP03 VERIFIED Humble/Jammy; AP04 VERIFIED gemäß ursprünglichen Copy-/Sourcefrei-/Ressourcen-/Config-/Outputkriterien; AP06 VERIFIED für den bearbeiteten Umfang, Bestandsfälle und neue Regressionen inklusive aktivierter Copyrighttests. Keine Kriterienabschwächung, keine Gruppenabschaltung, keine SKIP-als-PASS-Wertung. Allgemeine Coverage/Algorithmus-/API-/QualityLevel-/CI-/Jazzy-/Hardwareabnahme bleibt offen. Benutzeranleitungen auf tatsächliche Prüfungen und regulären Copy-Build aktualisiert, nur vorhandene Dokumente.
+
+#### Auswirkungen
+
+Manifestbytes/Paketnamen/0.0.1/Apache-2.0 unverändert; neue Tests keine ROS-API-/Algorithmusänderung. Historische Einträge und PDF erhalten. Zwei eigene Testcontainer nach Sicherung relevanter Ergebnisse gestoppt/entfernt; keine vorher vorhandenen Images gelöscht, offizielles gezogenes Image behalten. Host-Apt/pip/Conda/NVIDIA/ROS/Dockerkonfiguration unverändert. Kein Push/Release/Hardwarebetrieb; AP05/AP07 nicht begonnen.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -1092,11 +1138,11 @@ Der konkrete Distpfad lag unter /tmp/r3d-v4-ap02/dist/<Paket>; Platzhalter nicht
 | --- | --- | --- | --- | --- | --- |
 | O01 | Apache-2.0 verbindlich gewählt/technisch angewendet; Vertrags-/Befugnislage nicht unabhängig geprüft | Keine vollständige rechtliche Releasefreigabe | Noch offene arbeits-/dienstvertragliche Rechte und Lizenzierungsbefugnis klären | Entscheidung/Dateien aus V4-004 erhalten; konkrete entgegenstehende Hinweise betroffenenbezogen prüfen | BLOCKED nur für Rechtsgesamtgate; Wahl/Implementierung COMPLETED |
 | O02 | V4-010 bereinigt lokale aktuelle V1/V2/V3/main-Trees; V4 schon bereinigt | Historische Gitobjekte/öffentliche Remote-Trees bleiben; Selbstauskunft keine unabhängige Rechtsfreigabe | Individuelle Rechts-/Distributionsfragen getrennt prüfen | Normale lokale neue Commits, kein Push/Rewrite | Aktuelle lokale Trees VERIFIED; rechtliche Gesamtfreigabe NOT VERIFIED |
-| O03 | AP03 jetzt ausdrücklich im Auftrag und Chat autorisiert/unter V4-011 bearbeitet | Weitere Systeminstallation/AP04 nicht automatisch freigegeben | AP04 als nächsten separaten Auftrag behandeln; AP03-Installationsgate offen | Dependency-/Key-/Build-/Testnachweise dokumentiert | AP03 IN PROGRESS, AP04 hier nicht begonnen |
+| O03 | AP03/AP04/AP06 mit aktuellem Auftrag ausdrücklich autorisiert und unter V4-012..016 abgenommen | Nächste API-/CI-Arbeit benötigt neuen Auftrag | AP05 gesondert freigeben | Install-/Testgrundlagen jetzt belegt | AP03/AP04 VERIFIED; AP06 VERIFIED im Umfang; AP05/AP07 NOT STARTED |
 | O04 | Beide Manifest-/Setupversionen nun 0.0.1 konsistent; Versions-/Releasepolitik offen | Keine aktuelle Metadatendiskrepanz, keine öffentliche Releaseidentität | Spätere Versions-/API-/Stabilitäts-/Releasepolitik festlegen | V4-008 technische Vereinheitlichung VERIFIED; Branch V4 nicht SemVer 4.0 | VERIFIED für AP02, Politik NOT STARTED/AP10 |
-| O05 | Aktiver Conda-Python 3.14.6 neben System-Python 3.10.12 | Mögliche nichtrepräsentative ROS-/Packaging-Tests | Reproduzierbare isolierte Humble-Testumgebung wählen | Explizites System-Python/saubere Umgebung; keine globale Apt-/pip-/Conda-Reparatur ohne Erklärung | NOT STARTED |
-| O06 | 26 externe Keys Humble/Jammy aufgelöst, Python-TF2-Provider korrigiert | Host-Apt-Open3D/NetworkX fehlen; echte Installation/check nicht abgeschlossen | Vollständig versorgte isolierte Umgebung oder separate Installfreigabe; Noble-Open3D unter AP09 | Simulation/temporäre Deb-Extraktion ohne Systemänderung; keine Skip-Endlösung | Auflösung VERIFIED, Check-Gesamtnachweis BLOCKED |
-| O07 | Externe Nutzerkarten/R3D_CONFIG_DIR geprüft; Copy-Defaultpolitik und Ausgabe neben Eingabe bestehen | Nutzeroverride funktioniert ohne Source, Defaultportabilität noch offen | Spätere allgemeine Install-/Ausgabepolitik | V4-005 minimaler Kartenvertrag; restliches AP04 separat | IN PROGRESS, begrenzter Teil VERIFIED |
+| O05 | Host-Conda3.14 neben System-Python3.10; isolierte Apt/Humble-Container eingesetzt | Hostmischung unverändert, Containererfolg nicht als Hostreparatur ausgeben | Native konsistente Humble-Umgebung verwenden | Python3.10.12 mit Apt-Bibliotheken ohne User-Site/Conda | Isolierter Nachweis VERIFIED; Host nicht geändert |
+| O06 | 26 Keys, echte rosdep-Installation/check und Imports in zwei frischen Humble-Containern bestanden | Noble-Open3D weiterhin separat problematisch | AP09-Zielplattform später auswählen/prüfen | Keine Skip-Endlösung oder willkürlichen Versionspins | Humble/Jammy VERIFIED; Jazzy NOT VERIFIED |
+| O07 | Normale Copy-Share-Konfiguration und R3D_CONFIG_DIR, separate exklusive Outputpfade geprüft | Eigene Karten und beschreibbares Outputverzeichnis weiter nötig | Mapname nach Analyse bewusst auf Output setzen | Installierte Ressourcen readonly, Daten nutzerbezogen | AP04 VERIFIED für Humble; Umzug des Installprefix nicht nachgewiesen |
 | O08 | Narrow-Flag in Orientierung, Namespaces/Clouds/Actiongrenzen | Öffentliche API-Korrekturen können bestehende Verbraucher beeinflussen | Neuer Metadaten-/Kompatibilitätsvertrag je Änderung | AP05 kleinere Änderungen; alle internen Verbraucher und Nutzeranleitungen gemeinsam anpassen; Regressionen | NOT STARTED |
 | O09 | Filter/Follower-Systemgrenzen und Kalibrierungsannahmen | Keine generische sichere Navigation aus Detektionscode ableitbar | Gewünschten unterstützten Systemvertrag abgrenzen | Konkrete Sourcebefunde und synthetische No-Motion-Prüfungen priorisieren; keine neue Navigation pauschal beauftragen | NOT STARTED |
 | O10 | Historisches PDF unverändert für Git-Aufnahme freigegeben/geprüft | Referenz nun im V4-Clone verfügbar | Nutzerauftrag zur Versionierung liegt ausdrücklich vor | V4-007, gleicher Referenzhash/33 Seiten; keine inhaltliche Aktualisierung | VERIFIED - dokumentierter Aufnahmeumfang |
@@ -1115,22 +1161,22 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Bereich | Ausgangsstand main | Änderung V4 | Ergebnis | Nachweis |
 | --- | --- | --- | --- | --- |
 | Entwicklungslinie | main bei `c65642f…`; V1/V2/V3 als Remote-Tracking-Refs | Lokaler Branch V4 unmittelbar von Baseline; ein fokussierter Initial-Dokumentationscommit | Neue getrennte Entwicklungslinie, bestehende Refs unverändert | V4-001, T01/T06, Git-Parent/Refvergleich |
-| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe Protokoll bis V4-009; historisches PDF unverändert versioniert | Keine neuen Forschungsberichte, keine neuen Algorithmen; frühere V4-Einträge erhalten | V4-007..009/T49-T54 |
+| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe Protokoll bis V4-016; vorhandene Benutzeranleitungen aktualisiert | Keine neuen Forschungsberichte; historische Einträge/PDF unverändert | V4-012..016; Kapitel16 |
 | Historische PDF | Vorhandene unveränderte, zunächst unversionierte Baseline-Dokumentation | Identische Bytes in V4 unter Git aufgenommen | Keine neue technische Funktion; SHA unverändert und historische Kartendarstellung erhalten | V4-007/T49 |
 | Planung/Preprocessing | Vorhandene PCD-/Voxel-/Traversierbarkeits-/Graph-/A*-Funktionen | Keine | Bestehende Algorithmen erhalten, kein neuer Algorithmusbeitrag | T02; Abschnitt 2.3 |
 | Paketmetadaten | Version 0.0.0 vs 0.0.1, TODO-Beschreibungen, keine URLs/Author | AP02: 0.0.1 konsistent, Beschreibungen/Repo-/Issue-/Authorfelder ergänzt, Maintainer erhalten | Technischer Metadatenumfang VERIFIED, Namen/Buildtyp/Dependencies/Lizenzen erhalten | V4-008/T50-T53; Kapitel 13 |
-| Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | Nur Abgleich/Planung; keine Dependencydeklaration geändert | Lizenzfelder geändert, Dependencyteile unverändert; rosdep nicht neu geprüft | T04/T10/T33; B04-B06 |
-| Build/Installation | Copy-Config absichtlich abgelehnt, Sourcepfade und fehlende Paketlizenzmitnahme | Nutzerconfig ohne Source getestet; Originaltext in Paketroot/Share/sdist/Wheel vorhanden | Begrenzter Copy-Build belegt, Default-/Ausgabepolitik und rosdep weiterhin offen | V4-005/V4-006; T40/T44-T46 |
+| Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | AP03 direkte Manifeste unter V4-011 korrigiert; 26 Keys und reale Install-/Check-/Importprüfung | Humble/Jammy VERIFIED; Host unverändert; Jazzy offen | V4-011/012/016; T65-T68/T77 |
+| Build/Installation | Copy-Config absichtlich abgelehnt, Sourcepfade und fehlende Paketlizenzmitnahme | Normale Copy-Shareauflösung; externer Override; Lizenzmitnahme; separate exklusive Ausgabe | Zwei Clean-Copy-Builds und Source-freie readonly-Installation bestanden | V4-006/013/014/016; T71-T81 |
 | ROS-Interfaces | Action/Topics/Service, RViz, Filter/Follower; bekannte Semantikgrenzen | Keine | AP05 offen; keine stillen API-Änderungen | B09-B13/T16 |
-| Konfiguration/Launch | Source-Beispielpfade, zentrale strikte YAML, vier Launches | maps-Defaults leer, Modeeingabe explizit; relative/absolute/~ und externer Nutzerconfig geprüft | ROS-Launchvertrag unverändert, kein Kartenfallback; allgemeines AP04 offen | V4-005/T38-T40 |
+| Konfiguration/Launch | Source-Beispielpfade, zentrale strikte YAML, vier Launches | Leere Maps, strikte Validierung erhalten; optionale preprocessing.output_dir; installierte Robot-/Launchressourcen | Share/Override/relative/absolute/~; vier Launch-lookups; Bestandslaunchtests erhalten | V4-005/013/014/016; T69/T70/T74/T75/T78 |
 | Odometry/TF | Standardisierte Poseeingabe, Frische/Frames, use_start, Poseverlust-Nullbefehl | Keine | V3-Vorleistung erhalten | Abschnitt 2.3; T02 |
-| Tests/Lint | Funktionale Fälle und Linter-Templates bereits vorhanden | Nur Dokument-/Statische Prüfungen der Initialisierung | Keine neuen funktionalen Tests oder Lintkorrekturen | T03/T05; T12-T16 noch nicht ausgeführt |
+| Tests/Lint | Funktionale Fälle und Linter-Templates bereits vorhanden | 43 vorhandene Funktionsfälle erhalten; 37 neue I/O-/Installed-Fälle; sechs Lints aktiv | Zweimal86PASS/0FAIL/0SKIP; Source-frei37PASS/0FAIL/0SKIP | V4-015/016; T72/T73/T77 |
 | Lizenzierung/Datenrechte | Keine Root-LICENSE, TODOs und ungeklärte gebündelte PCDs | Apache-Eigenanteile samt Pakettexten geprüft; PCDs aus aktivem Tree/Artefakten entfernt | Technischer AP01-Umfang VERIFIED, historische Git-/Vertrags-/Bundlefragen offen | V4-004..006; T42-T48 |
 | CI/CD | Keine Pipeline | Keine | AP07 offen | T18 |
-| Kompatibilität | Humble als Ziel dokumentiert | Lokale OS-/Python-Präsenz erfasst, keine ROS-Ausführung | Kein neues Supportversprechen | T17/O05 |
+| Kompatibilität | Humble als Ziel dokumentiert | Tatsächliche reine Apt-/Humble-Containerprüfung und wiederholte Builds | Getesteter Humble-Umfang VERIFIED; weitere Plattformen NOT VERIFIED | V4-012/016; T65-T81 |
 | Release | Kein hier belegter Index-/Bloom-/Buildfarmabschluss | Kriterien, private V4-Abgrenzung und noch offene Lizenz-/Artefakt-Gates präzisiert | NOT READY; keine Veröffentlichung | Abschnitt 9/12; AP10 |
 | Externe LiDAR-Software | Separates Repository; Standard-Odometry-/TF-Vertrag | Herkunft und ältere Diffs dokumentiert; Notice im Protokoll abgeschlossen | Kein fremder Code integriert/geändert; Originallizenzen getrennt | V4-003/V4-004; 11.13-11.15 |
-| Copyright-Attribution | 18 eigene Namensheader plus sechs OSRF-Templates | Zusätzliche SPDX-Attribution 2026 Bastian Aumer nur für 18 zugeordnete eigene Dateien | Eigene bisherige Hinweise erhalten; sechs Fremdtemplates byteidentisch | V4-004/T30/T34; 11.21.2 |
+| Copyright-Attribution | 18 eigene Namensheader plus sechs OSRF-Templates | Traditionelle Apacheheader zusätzlich zur erhaltenen SPDX-/Namensattribution; neue eigene Dateien entsprechend | Sechs OSRF-Noticeblöcke identisch, zwei obsolete Skips entfernt; Root-/Pakettexte unverändert | V4-004/015/016; T70/T82 |
 | GitHub-/Remoteverwaltung | origin public, V4 lokal ohne Upstream | Optionen und Pushschutz nur als Vorschlag dokumentiert | Keine Sichtbarkeits-/Remoteänderung; kein Push | Abschnitt 12/T25 |
 
 ## 9. Veröffentlichungsstatus
@@ -1138,16 +1184,16 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Gegenstand | Status | Begründung und nächster erforderlicher Nachweis |
 | --- | --- | --- |
 | ROS Index source readiness | **NOT READY** | AP02-Metadaten/Apache-Text/datenfreier V4-Tree vorhanden; public-V4-Ref/Namenskollision/Review, vollständige Befugnis-/historische Git-/sonstige Herkunftsprüfung offen. Keine Registrierung ausgeführt |
-| rosdep readiness | **NOT READY insgesamt** | V4-011: 26 Humble/Jammy-Keys und Simulation VERIFIED; echte Installation/check auf vollständig versorgtem isolierten Ziel fehlen, Hostcheck Open3D/NetworkX FAIL; keine ungültigen aktuellen Keys |
-| Bloom readiness | **NOT READY** | Manifest-/Setupversion 0.0.1 nun konsistent; öffentliche Releaseversion/-politik/Changelogs, rosdep-/Runtime-/Defaultinstall-/Rechts-/Releaseorganisation offen. Kein Release-Track/-Repository/Farmjob |
-| Buildfarm readiness | **NOT READY** | AP02-Parser-/Wheel-Metadaten und bisherige begrenzte Copy-/Configprüfungen bestehen; Dependencyvollständigkeit/rosdep/Defaultinstall/Release-/Rechtsgates offen. Keine neue Buildfarmabnahme |
+| rosdep readiness | **VERIFIED für Humble/Jammy** | 26 Keys plus tatsächliche Installation/check Exit0 und Imports in zwei frischen Apt-Containern; weitere Zielplattformen nicht verifiziert |
+| Bloom readiness | **NOT READY** | Version0.0.1 konsistent, Humble-Install/Testgrundlagen bestanden; öffentliche Releaseversion/-politik/Changelogs, vollständige Rechts-/Releaseorganisation und public-V4-Ref offen. Kein Release-Track/-Repository/Farmjob |
+| Buildfarm readiness | **NOT READY** | Copy-/Source-frei-/Dependency-/Ressourcengrundlagen Humble lokal geprüft; Release-/Rechtsgates und konkrete externe Farmabnahme offen. Kein Buildfarmjob |
 | Tatsächliche offizielle Index-/Binärveröffentlichung | **NOT VERIFIED** | Keine neue rosdistro-/Release-/Buildfarm-Statusabfrage oder externe Bestätigung; historische Abwesenheit nicht als aktuelle Serverprüfung ausgeben |
-| ROS 2 Humble / Ubuntu 22.04 / Python 3.10 | **NOT VERIFIED** | Primäres dokumentiertes Ziel; historisch berichtete Tests, aber kein neuer vollständiger Clean-Nachweis für V4 |
+| ROS 2 Humble / Ubuntu 22.04 / Python 3.10 | **VERIFIED im beauftragten Umfang** | Ubuntu22.04.5/Python3.10.12/Humble: zwei echte Dependencyinstallationen, zwei Clean-Copy-Workspaces je86Tests, Source-frei37Tests. Keine Hardware-/vollständige Algorithmus-/QualityLevel-Garantie |
 | Jazzy / neuere ROS-Distributionen / andere Plattformen | **NOT VERIFIED** | Keine neue Ausführung, keine Supportzusage; weitere Ziele erst nach Auswahl und Prüfung |
 
 `READY` darf erst vergeben werden, wenn die konkret definierten Voraussetzungen für den jeweiligen Bereich nachgewiesen sind. `NOT READY` benennt bekannte Hindernisse, `NOT VERIFIED` fehlende Prüfung. Eine erfolgreich konfigurierte lokale Pipeline ist noch keine externe Veröffentlichung und noch kein erfolgreicher Buildfarm-Lauf.
 
-Die verbleibenden grundlegenden Release-Gates sind: autorisierte Code-/Datenverteilung, zutreffende konsistente Paketmetadaten, vollständige plattformspezifische Dependencies, funktionsfähige installierte Ressourcen und nachvollziehbare Version-/Releasevorbereitung. Die umgesetzte Eigenanteil-Attribution/Apache-Wahl und erhaltenen Fremdbedingungen beseitigen diese übrigen Gates nicht. V4 bleibt ausschließlich lokal, bis ein privater Workflow ausdrücklich freigegeben ist. Die V4-Projektziele zu Schnittstellen-/Test-/CI-Qualität werden zusätzlich verfolgt; fehlende optionale Tools sind keine erfundenen separaten Indexblocker. AP01 bleibt insgesamt BLOCKED ausschließlich wegen noch offener Rechts-/Distributionsnachweise; endgültige Eigenanteil-Lizenzentscheidung und beauftragte technische Anwendung sind abgeschlossen.
+Die verbleibenden grundlegenden Release-Gates sind: autorisierte Code-/Datenverteilung, zutreffende konsistente Paketmetadaten, vollständige plattformspezifische Dependencies (Humble/Jammy inzwischen verifiziert), funktionsfähige installierte Ressourcen (beauftragter Humble-Umfang verifiziert) und nachvollziehbare Version-/Releasevorbereitung. Die umgesetzte Eigenanteil-Attribution/Apache-Wahl und erhaltenen Fremdbedingungen beseitigen diese übrigen Gates nicht. V4 bleibt ausschließlich lokal, bis ein privater Workflow ausdrücklich freigegeben ist. Die V4-Projektziele zu Schnittstellen-/Test-/CI-Qualität werden zusätzlich verfolgt; fehlende optionale Tools sind keine erfundenen separaten Indexblocker. AP01 bleibt insgesamt BLOCKED ausschließlich wegen noch offener Rechts-/Distributionsnachweise; endgültige Eigenanteil-Lizenzentscheidung und beauftragte technische Anwendung sind abgeschlossen.
 
 Aktualisierung V4-005: Der aktive Tree-/Paketdatenblocker der zwei Karten entfällt, nicht die Rechtsprüfung historischer Gitobjekte. Begrenzter Copy-Build und externer Nutzerconfig-Test sind neu belegt; allgemeine rosdep-/Installations-/Release-Gates bleiben NOT READY. AP04/AP06 nun IN PROGRESS; AP02/AP03 bleiben NOT STARTED.
 
@@ -1164,6 +1210,8 @@ Zwei logisch getrennte lokale Commits halten Karten-/Configänderung und Lizenzm
 AP02-Fortschritt V4-008: Version/Description/URLs/Autor-/Maintainer-/Pythonkonstanz im freigegebenen Umfang VERIFIED. V4-007 versioniert unveränderte historische Referenz. V4-009 ergänzt Herkunfts-/Datenschutzselbstauskunft und lediglich den Wunsch späterer anderer Branchbereinigung. AP01 technisch VERIFIED, vollständige Rechtsfreigabe weiterhin getrennt; AP03 NOT STARTED. Metadaten-/Versionsdiskrepanz beseitigt, Releasepolitik/Dependencies/Defaultinstall/Rechte/Serverreview weiterhin offen.
 
 **Aktualisierung V4-010/V4-011:** Die oben datierten bisherigen Test-/Dependency-/Branchbefunde bleiben historische Ergebnisse. Jetzt sind alle fünf lokalen aktiven Trees PCD-frei und der aktuelle Manifest-Import-/Keyvertrag ist korrigiert. Apt-/Humble-Copy-Build, sieben Entry-Point-Imports und 43 Funktionstests erfolgreich; kein erneuter SciPy-/NumPy-Kompatibilitätsfehler in der getesteten Systemkombination. AP03-Gesamtgate echte Installation/check bleibt offen, zwei bestehende Lintfehler/zwei Copyright-Skips getrennt. AP04/AP06/AP08/AP10 IN PROGRESS, AP09 NOT STARTED mit dokumentierter Noble-Open3D-Hürde; ROS Index/Bloom/Buildfarm weiterhin NOT READY. Kein pauschaler Humble-/Jazzy-/Rechts-/Release-Qualitätsanspruch.
+
+**Aktualisierung 14. Oktober 2026, V4-012..016:** Echte isolierte Dependencyinstallation/check, normale Share-Konfiguration, sichere separate Ausgabe, zwei Clean-Copy-Builds und Source-freie Laufzeit bestanden. AP03/AP04 und AP06 im bearbeiteten Umfang VERIFIED, AP08/AP10 IN PROGRESS; AP05/AP07/AP09 nicht begonnen. Keine SciPy/NumPy-Kompatibilitätswarnung in Apt-Kombination; externe Deprecations bleiben. Vollsuite zweimal86PASS/0FAIL/0SKIP, Source-frei37PASS/0FAIL/0SKIP. Frühere hier datierte Befunde bleiben historische Ergebnisse, nicht aktuelle Fehler. Rechtlicher Gesamtgate und ROS Index/Bloom/Buildfarm NOT READY. Details/Kommandoausgaben/Abnahmegrenzen in Kapitel16.
 
 ## 11. Open-Source-Lizenzanalyse und Copyright-Strategie
 
@@ -2537,4 +2585,147 @@ Alle 22 betroffenen Pythonpfade wurden vor Anwendung in Containerkopien geprüft
 
 18 frühere eigene Pythondateien erhalten einen zusätzlichen traditionellen Apache-2.0-Header, ihre alten Copyright-/SPDX-Zeilen bleiben. Zwei neue eigene Outputdateien ordnen ihre unveränderten SPDX-Zeilen nach dem vollständigen Licenseblock an. Sechs OSRF-Lizenz-/Copyrightblöcke byteidentisch, nur der obsolete Skipcode der zwei Copyrighttests entfernt. Leere Pythonmarker bleiben leer; keine Attribution unbekannter YAML/TXT/PYC. Root-/Paket-LICENSE und Manifestversion0.0.1/Apache-2.0 erhalten. Echter ament_copyright-Test passt, keine selbstgeschriebene Ersatzprüfung.
 
-Temporäre finale Lintresultate: Planner3PASS/43deselected, Preprocessor3PASS/10deselected, beide Exit0; keine SKIPs. Vorherige formatterbedingte 16/4 Restbefunde/two-license-unknowns transparent korrigiert. Verbleibende externe ament_flake8 SelectableGroups-/optparse-Warnungen ändern Teststatus nicht. Die vollständige Suite wird unter V4-016 ohne Ausklammerung erneut ausgeführt.
+Temporäre finale Lintresultate: Planner3PASS/43deselected, Preprocessor3PASS/10deselected, beide Exit0; keine SKIPs. Vorherige formatterbedingte 16/4 Restbefunde/two-license-unknowns transparent korrigiert. Verbleibende externe ament_flake8 SelectableGroups-/optparse-Warnungen ändern Teststatus nicht. Die vollständige Suite wurde anschließend unter V4-016 ohne Ausklammerung erfolgreich ausgeführt.
+
+
+### 16.5 Konsolidierte Testnachweise und relevante Ausgaben
+
+Datum 14. Oktober 2026. C1 = r3d-v4-humble-completion-20261014; C2 = r3d-v4-humble-sourcefree-20261014. Beide aus ros:humble-ros-base@sha256:860e53793ccf575e5369b5e9a19939de2bfcfb46a299954d06f54f2af54fed19, Ubuntu22.04.5/Python3.10.12/Humble. Imagesnapshot und Apt-/rosdep-Indexstand sind getrennt: Aptquellen wurden live aktualisiert, keine Lockfile- oder dauerhafte Bitreproduzierbarkeitszusage. Ein späterer Lauf muss seine Versionen erneut erfassen.
+
+C1-Sourcebind readonly; Builds in getrennten Containerverzeichnissen. C2 hat nur fertigen Installbaum readonly unter /work/final2/install, zwei Testdateien readonly, zwei Manifestkopien readonly, temporäre Harnessscripts readonly und ein Ergebnisverzeichnis rw. Kein ursprünglicher Gitcheckout oder R3D-Quellbaum dort verfügbar. Kein privileged/host-network, keine sensitiven Mounts. FastDDS, ROS_LOCALHOST_ONLY=1, getrennte ROS_DOMAIN_ID201/203, PYTHONNOUSERSITE=1, unprivilegierter User1000. Nicht als allgemeine Prefix-Relokation oder jeder-OS-Installation ausgeben.
+
+Commitcodes: A=7a476588ba3e50550074c14920b95d3658e45a03; B=c702da4ac241f3173d3732da3bdd1a754a04d949; C=370cf5f9246791c570600fffceab637c3c4b564b; D=bb578b36fc6ac72dddb043f35a474fe15c25da30; E=der diese Tabelle/test_installation.py enthaltende eindeutige Commit `test(install): add clean installation regression coverage`, Parent D. `git log --format='%H %s'` liefert seine SHA ohne selbstreferenziellen Committext. Früher dokumentierte IDs T01-T64 unverändert; folgende IDs sind neue Nachweise und keine Baselineleistungen.
+
+| Test-ID | Arbeitspaket | Prüfung | Testumgebung | Befehl | Ergebnis | Status | Commit |
+|---|---|---|---|---|---|---|---|
+| T65 | AP03 | 26 externe Keys individuell | C1 Humble/Jammy | `rosdep resolve --rosdistro humble --os=ubuntu:jammy KEY` | 26 Exit0; kein skip | VERIFIED | A/V4-012 |
+| T66 | AP03 | Reale Dependencyinstallation | C1 frischer Apt-Container | `rosdep install --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy -y` | Exit0, tatsächlich installierte Apt-Pakete | VERIFIED | A/V4-012 |
+| T67 | AP03 | Installierte Dependencies checken | C1 | `rosdep check --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy` | Exit0: All system dependencies have been satisfied | VERIFIED | A/V4-012 |
+| T68 | AP03 | Systemversionen/Imports/Pythonpfade | C1/C2 Python3.10.12 | `python3 -c "import numpy, scipy, open3d, networkx, yaml"; ROS-/Projekt-Importprüfungen` | Apt1.21.5/1.8.0/0.14.1/2.4/5.4.1; keine SciPy-Kompatibilitätswarnung | VERIFIED | A/E |
+| T69 | AP04 | Share-/Override-/strikte Configregression | C1 temporäre Paketkopie | `python3 -m pytest -p no:cacheprovider --basetemp=/work/config-pytest-final test/test_configuration.py -k "not effective_ros_parameters_and_odometry and not preprocessor_real_launch and not real_launch_restart_and_all_components" -q` | 40PASS; drei Runtimefälle später in Vollsuite | VERIFIED | B/V4-013 |
+| T70 | AP04/AP06 | Exklusiver readonly-Input/Output/Fehlpfad | C1 UID1000 | `python3 -m pytest -p no:cacheprovider --basetemp=/work/tests-user/output test/test_output.py -q` | 10PASS/0FAIL/0SKIP; echte Open3D-Rücklesung/Schreibrechte | VERIFIED | C/V4-014 |
+| T71 | AP04 | Clean-Copy-Build1 | C1 /work/final2 UID1000 | `colcon --log-base log-build build --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+` | Exit0, zwei Pakete, ohne symlink/Altinstall | VERIFIED | E/V4-016 |
+| T72 | AP06 | Vollsuite1 | C1 /work/final2 UID1000 | `colcon --log-base log-test test --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+; colcon test-result --verbose` | Beide Exit0; 86PASS/0FAIL/0ERROR/0SKIP | VERIFIED | D/E |
+| T73 | AP04/AP06 | Clean-Copy-Build2/Vollsuite2 | C1 unabhängiger leerer /work/final3 UID1000 | `Identische build/test/test-result-Befehle im zweiten Workspace` | Alle Exit0; erneut86PASS/0FAIL/0ERROR/0SKIP | VERIFIED | E/V4-016 |
+| T74 | AP04 | Ressourcen/Versions-/Lizenz-/Scriptinventar | C1 beide Copy-Workspaces | `test_installed_artifacts_and_entry_points; get_package_share_directory` | 2 Manifeste/2 LICENSE/2 Marker/7 Scripts/4 Launches/3 YAMLs/0PCD; 0.0.1 | VERIFIED | E/V4-016 |
+| T75 | AP04 | Alle installierten Launchfiles | C1/C2 synthetischer Override | `ros2 launch r3d_planner LAUNCHFILE --show-args (vier Dateien)` | 4xExit0; nur Discovery/Generierung, Follower nicht gestartet | VERIFIED | E/V4-016 |
+| T76 | AP03 | Reale Installation/check reproduziert | C2 neues Imagefilesystem, nur Manifestkopien | `rosdep install/check --from-paths /dependency-manifests --ignore-src --rosdistro humble --os=ubuntu:jammy (install zusätzlich -y)` | Beide Exit0, keine skip/simulate; Imports erfolgreich | VERIFIED | E/V4-016 |
+| T77 | AP04/AP06 | Source-freie readonly-Installation | C2 ohne Source-/Workspace-Mount UID1000 | `python3 -m pytest -p no:cacheprovider --basetemp=/work/runtime-user/pytest --junitxml=/runtime-results/pytest.xml /runtime-tests -q` | Exit0; 37PASS/0FAIL/0SKIP; Sourcepfade fehlen, Module aus Install | VERIFIED | E/V4-016 |
+| T78 | AP04 | Map-/Robot-/Output-/Overridepfade | C1/C2 Installedtests | `test_installation.py Konfigurations-/Pfadgruppen` | Standardshare/Override/relativ/absolut/~, Legacy-YAML, invalid types/missing override geprüft | VERIFIED | B/C/E |
+| T79 | AP04 | Sieben installierte Nodes initialisieren | C1/C2 neuer subprocess | `test_installed_nodes_initialize_with_isolated_inputs` | 7 Konstruktoren/Destroy, synthetic inputs, Commandtopic isoliert; kein Control-loop | VERIFIED | E/V4-016 |
+| T80 | AP04 | Installiertes Analyzer-Script funktional | C1/C2 readonly Inputs | `test_installation.py Analyzer-readonly/collision- und invalid-PCD-Fälle` | Success0; ungültige PCD/collision1; Input/Outputdaten erhalten | VERIFIED | C/E |
+| T81 | AP04 | Wiederholte Ressourceninhalte vergleichen | C1 final2 vs final3 | `SHA256 plus exakter Vergleich installierter .py und nur Prefixnormalisierung package.sh` | 31/33 Sharebytes gleich; 2 generierte Prefixhooks normiert gleich; 20 Pythondateien gleich (18 Paketmodule/Launches plus2 generierte Helper) | VERIFIED (keine Bitreproduzierbarkeitsbehauptung) | E/V4-016 |
+| T82 | AP01/AP02/AP06 | Geschützte Texte/AST/Metadaten | Repo plus Containerkopien | `Manifest-/LICENSE-/PDF-SHA; 6 OSRF-Blockvergleiche; AST-Normalvergleich; git diff --check` | Alle invarianten Checks; sechs Lints aktiv, keine Lizenz-/Versionsänderung | VERIFIED | D/E |
+| T83 | AP06 | Unveränderter Eingang frisch reproduziert | C1 /work/baseline | `colcon test; colcon test-result --verbose` | 45PASS/2Flake8FAIL/2CopyrightSKIP; test-result1 (Ausgangspunkt) | FAILED (historischer Eingang) | A/V4-012 |
+| T84 | AP06 | Neuer Node-Testhelper erster Vollversuch | C1 /work/final1 | `colcon test; colcon test-result --verbose` | 85PASS/1FAIL/0SKIP, result1; fehlender expliziter rclpy.node-Import im Test korrigiert | FAILED (danach T72/T73/T77 VERIFIED) | E/V4-016 |
+| T85 | AP09/AP07 | Jazzy/andere Plattformen/CI/Coverage/Hardware | Nicht ausgeführt | `Keine entsprechenden Befehle/Hardwaretests` | Keine Freigabe/kein Nachweis; externe Warnungen bleiben | NOT VERIFIED | Kein Implementierungscommit |
+| T86 | AP08/AP10 | Temporäre Container aufräumen | Dockerhost, nur codex.task=r3d-v4-completion | `docker stop und docker rm mit den zwei exakten eigenen Namen` | Exit0; keine eigenen Container übrig, keine Images gelöscht/Hostpakete verändert | VERIFIED | E/V4-016 |
+
+Reproduzierbare tatsächliche Kommandos für beide leeren Copy-Workspaces (WORKSPACE jeweils /work/final2 oder /work/final3; keine Überlagerung eines alten R3D-Installbaums):
+
+```bash
+# als r3dtest UID1000 innerhalb C1, aus jeweils neu kopierten src/Paketen:
+source /opt/ros/humble/setup.bash
+cd /work/final2  # zweiter erfolgreicher Lauf: /work/final3
+export PYTHONNOUSERSITE=1
+colcon list --names-only
+colcon --log-base log-build build --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+
+source install/setup.bash
+colcon --log-base log-test test --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+
+colcon test-result --verbose
+```
+
+Relevante unveränderte Ausgabe der tatsächlichen Ergebnisse:
+
+**final2:** list/build/test/test-result jeweils Exit0.
+
+```text
+r3d_planner
+r3d_preprocessor
+Finished <<< r3d_preprocessor [0.28s]
+Finished <<< r3d_planner [0.28s]
+Summary: 2 packages finished [0.63s]
+======================== 13 passed, 2 warnings in 0.38s ========================
+Finished <<< r3d_preprocessor [0.60s]
+======================= 73 passed, 4 warnings in 40.47s ========================
+Finished <<< r3d_planner [40.8s]
+Summary: 2 packages finished [41.5s]
+Summary: 86 tests, 0 errors, 0 failures, 0 skipped
+```
+
+**final3:** list/build/test/test-result jeweils Exit0.
+
+```text
+r3d_planner
+r3d_preprocessor
+Finished <<< r3d_preprocessor [0.29s]
+Finished <<< r3d_planner [0.29s]
+Summary: 2 packages finished [0.64s]
+======================== 13 passed, 2 warnings in 0.40s ========================
+Finished <<< r3d_preprocessor [0.62s]
+======================= 73 passed, 4 warnings in 40.91s ========================
+Finished <<< r3d_planner [41.3s]
+Summary: 2 packages finished [42.0s]
+Summary: 86 tests, 0 errors, 0 failures, 0 skipped
+```
+
+C2 führte eine separate echte rosdep install/check-Prüfung aus (nicht von C1-Dpkg übernommen):
+
+```bash
+# ausschließlich innerhalb C2 nach ROS/workspace-tool-Setup:
+rosdep update --rosdistro humble
+rosdep install --from-paths /dependency-manifests --ignore-src --rosdistro humble --os=ubuntu:jammy -y
+rosdep check --from-paths /dependency-manifests --ignore-src --rosdistro humble --os=ubuntu:jammy
+```
+
+Relevante tatsächliche Ausgabe, finaler Bootstrap Exit0:
+
+```text
+#All required rosdeps installed successfully
+All system dependencies have been satisfied
+BOOTSTRAP_INSTALL_AND_CHECK_PASS
+```
+
+Source-freier Testaufruf als UID1000 nach Source von ROS und dem readonly-Installbaum:
+
+```bash
+source /opt/ros/humble/setup.bash
+source /work/final2/install/setup.bash
+export PYTHONNOUSERSITE=1 ROS_LOG_DIR=/work/runtime-user/ros-log
+cd /work/runtime-user
+python3 -m pytest -p no:cacheprovider --basetemp=/work/runtime-user/pytest --junitxml=/runtime-results/pytest.xml /runtime-tests -q
+```
+
+Relevante tatsächliche Ausgabe, Exit0:
+
+```text
+.....................................                                    [100%]
+37 passed in 3.53s
+```
+
+Fehlversuche werden erhalten: Bootstrap-nounset-/Debian-Metadatendiagnosefehler (16.1); ursprüngliche 45PASS/2FAIL/2SKIP (T83); erste Formatierung mit Restbefunden (16.4); neuer Nodehelper-Importfehler 85PASS/1FAIL/0SKIP (T84). Aus diesen Fehlern wurden keine ungeprüften Produktionsbugs oder rosdep-Keyfehler abgeleitet. Zwei erfolgreiche Vollsuiten danach und Source-free-Lauf enthalten keine ausgeschlossenen Gruppen/Skips. colcon test Exit0 des ersten Fehlversuchs war ausdrücklich kein Gesamt-PASS.
+
+Die vollständigen technischen Rohlogs/xUnit/Versions-/SHA-/Isolationsdaten wurden vor Cleanup unter /tmp/r3d-v4-completion gesichert; das ist temporärer Testoutput, kein neuer Forschungsbericht oder Langzeitarchiv. Dauerhafte relevante Kommandos/Ergebnisse/Grenzen stehen hier. Testcode wird in den Paketen versioniert. Die beiden selbst angelegten Container wurden nach Sicherung gestoppt/entfernt; ausschließlich das neu gezogene offizielle Image blieb im Cache, vorhandene Images unberührt. Kein Host-Apt/pip/Conda-/ROS-/Treiber-/Daemonkonfigurationseingriff.
+
+### 16.6 Abnahme, bestehende Vorleistungen und offene Folgearbeit
+
+| Arbeitspaket | Aktueller Status | Erfüllter Umfang / verbleibende Grenze |
+|---|---|---|
+| AP01 | technisch VERIFIED; rechtliches Gesamtgate BLOCKED | Gewählte Apache-2.0/Metadaten/Lizenzmitnahme erhalten; Verträge/historische Gitdaten/konkrete Bundlefreigabe separat |
+| AP02 | VERIFIED | Zwei unveränderte Manifeste/Setupmetadaten, Namen/0.0.1/ament_python erhalten |
+| AP03 | VERIFIED für Humble/Jammy | Direkte Deklarationen/26Keys, tatsächliches install/check, Imports und konsistente Apt-Versionen belegt; Host nicht repariert, andere Ziele offen |
+| AP04 | VERIFIED für ursprünglichen beauftragten Umfang | Zwei Clean-Copy-Builds, Share/Override/Robot/Launch/Entry-Points, sourcefreier readonly-Installbaum und separate exklusive Ausgabe; keine beliebige Installprefix-Relokation |
+| AP05 | NOT STARTED | Namespaces/Remapping/TF/PointCloud2/Quaternionverträge benötigen neuen Auftrag |
+| AP06 | VERIFIED für bearbeiteten Umfang | 43 vorhandene Funktionen plus37 neue Regressionen und6 Lints, zweimal86PASS/0FAIL/0SKIP; Coverage/umfassende API-/Algorithmus-/Hardwaretests nicht belegt |
+| AP07 | NOT STARTED | Kein CI-Lauf oder Pipeline implementiert; lokale Containerprüfung ist keine CI |
+| AP08 | IN PROGRESS | Vorhandene Anleitungen/Protokoll bisV4-016 aktualisiert; Policies/weitere Wartungsdokumentation offen |
+| AP09 | NOT STARTED | Humbleprüfung, keine Jazzy-/anderePlattform-Prüfung; Noble-Open3D-Hürde bleibt |
+| AP10 | IN PROGRESS | Technische Installationsgates geschlossen; Index/Bloom/Buildfarm weiterhin NOT READY |
+
+Bereits vor diesem Auftrag vorhanden und nicht als neue Forschungsergebnisse ausgeben: PCD-Laden/Voxelisierung/Boden-/Clearance-/Hindernis-/Stairklassifikation/Export, NetworkX-Graph/A*, ComputePathToPose, RViz/Filter/Follower, Odometry-/TF-Verarbeitung, zentrale strikte YAML/Robotprofil, vier Launches/sieben Entry-Points, Lizenz-/Metadaten-/Dependencykorrekturen bis V4-011 und43 Funktionsregressionen. Neu im aktuellen Auftrag: reale isolierte Dependencyverifikation, normale Share-Defaults, separater exklusiver Outputpfad, Lint-/Headerkompatibilität mit aktivem Checker,37 Output-/Installed-Regressionen und tatsächliche Clean-/Source-free-Abnahme. AST-/Bestandstests stützen den Erhalt der Algorithmen; vollständige Algorithmus-/Fahrzeug-/GUI-Regression ist nicht bewiesen.
+
+Verbleibende Release-Gates: vollständige rechtliche Rechte-/Distributions-/historische Datenprüfung, geeigneter autorisierter öffentlicher V4-Ref und Namens-/Indexreview, freigegebene Releaseversion/-politik/Changelogs und konkrete Bloom-/Releaseorganisation. Lokale Humbleergebnisse sind keine externe Indexregistrierung/Buildfarmabnahme. CI/QualityLevel/Multi-Distribution sind zusätzliche Projektqualität und keine erfundenen pauschalen Indexpflichten. ROS Index/Bloom/Buildfarm bleiben NOT READY.
+
+Nächster sinnvoller Schritt ist ausschließlich nach ausdrücklicher neuer Freigabe AP05 – ROS Interfaces and Configuration. Schwerpunkt: dokumentierte bestehende Grenzen von absoluten Topics/Namespaces/Remapping, TF-Verträgen, gepackter PointCloud2-Annahme und nichtnormalisierten Quaternion-Markern. Keine neue SLAM-/Nav2-/Algorithmusarbeit begonnen. AP07/Releaseautomatisierung erst nach stabilen Verträgen; AP09-Plattformdependencies getrennt klären.
+
+Abschlussgrenzen: nur V4; V1/V2/V3/main und Remote-Tracking-Refs unverändert; Baseline c65642fe56015556f696364a724cb5b976a27888 bleibt Vorfahr. Historisches PDF SHA256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383 unverändert; Root-/beide Paket-LICENSE SHA256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 unverändert. Sechs Fremdnoticeblöcke erhalten, neun getrackte alte PYC nicht bereinigt. Keine History-Rewrites, Remote-/Sichtbarkeits-/öffentliche Repositoryänderung, kein Push, keine Veröffentlichung und keine realen Roboterbewegungen. Kein R3D_null untersucht/geändert.

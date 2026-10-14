@@ -67,6 +67,7 @@ normal configuration workflow.
 | Parameter | Default | Unit | Actual behavior |
 |---|---:|---|---|
 | `pcd_path` | `environment.pcd` | file path | Input; expands `~` and resolves an absolute path |
+| `output_dir` | empty | directory path | Optional separate output; empty uses absolute XDG data directory or `~/.local/share/r3d_preprocessor`; existing outputs rejected |
 | `voxel_size_cm` | 5.0 | cm | Open3D voxel edge length |
 | `min_step_height_cm` | 5.0 | cm | Height differences up to this value are flat |
 | `max_step_height_cm` | 25.0 | cm | Largest height difference accepted as a step |
@@ -128,11 +129,12 @@ and `python3-setuptools`. Setuptools is also the declared packaging buildtool.
 Tests declare `python3-pytest`, `ament_copyright`, `ament_flake8` and
 `ament_pep257`; `ament_python` remains the build type.
 
-The corrected keys resolve on Humble/Jammy. Dependency installation was only
-simulated in AP03; the audit host still lacks installed apt Open3D (and NetworkX
-for the planner). Temporary extracted Jammy libraries support the tested copy
-build and functional regressions. See `../INSTALL.md` and
-`../docs/KNOWN_ISSUES.md` for the regular rosdep procedure and remaining checks.
+Actual rosdep installation and check pass in two fresh isolated Humble/Jammy
+containers, with apt Open3D 0.14.1 and NetworkX 2.4. The audit host was unchanged.
+Two fresh copy builds each pass the full 86-case suite; 37 installation/output
+cases also pass without a source tree. Six package lint checks include active
+copyright verification with no skips. See `../INSTALL.md` and
+`../docs/KNOWN_ISSUES.md` for commands and remaining platform/release boundaries.
 
 ## Integration
 

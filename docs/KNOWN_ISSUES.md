@@ -3,24 +3,23 @@
 These maintenance notes describe the V4 development tree, with retained V3
 architecture and historical limitations explicitly distinguished.
 
-## 1. V4 dependency keys corrected; installation and test gates remain
+## 1. Humble dependency and installation scope verified; other targets remain open
 
-- **Location:** both `package.xml` files and [INSTALL.md](../INSTALL.md).
-- **AP03 result:** direct runtime imports, launch APIs, Python TF2 provider,
-  setuptools and existing test tools are declared with verified Humble/Jammy
-  rosdep keys. `numpy`/`scipy` were replaced by `python3-numpy`/`python3-scipy`;
-  V4 needs no skip list. Public historical branches retain older metadata.
-- **Validation boundary:** per-key resolution and install simulation pass. The
-  audit host has no installed apt Open3D/NetworkX, so its `rosdep check` fails
-  for precisely those two packages. A temporary extracted Jammy-apt environment
-  supports a copy build and runtime regression testing; it is not a clean host
-  populated by rosdep. Two existing Flake8 tests fail and copyright tests remain
-  skipped. See the central protocol for complete initial/final test results.
-- **Version issue:** user-site NumPy 1.26.4 with apt SciPy 1.8.0 produces a
-  compatibility warning. Use native Python 3.10 and consistent apt libraries;
-  no global pip/Conda correction was performed in AP03.
-- **AP09 boundary:** the official Open3D key is unavailable for Ubuntu Noble;
-  Humble/Jammy resolution does not establish Jazzy support.
+- **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
+- **Verified:** 26 Humble/Jammy keys; real rosdep install and check exit 0 in two
+  fresh isolated apt containers. No skip keys. Two empty copy workspaces each
+  pass 86 tests (0 fail, 0 skip), including Flake8, PEP257 and copyright. A
+  separate source-free, read-only installation passes 37 installed/output cases.
+- **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
+  SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
+  still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
+- **Warnings:** NetworkX `np.int` and ament tooling deprecations remain. The old
+  user-site NumPy 1.26.4 / apt SciPy 1.8.0 compatibility warning is absent in
+  the isolated apt set. This does not repair a mixed host environment.
+- **AP09 boundary:** the previously investigated official Open3D key is
+  unavailable for Ubuntu Noble. No Jazzy, other-platform or hardware verification.
+- **Release boundary:** no CI run, coverage claim, public V4 ref, official
+  release or complete legal/distribution approval. See the central protocol.
 
 ## 2. Standalone planner defaults still refer to uninstalled maps
 
@@ -176,14 +175,18 @@ launched by this workspace.
 - **Next step:** Repair the local workstation's apt/pip environment
   separately.
 
-## 16. Existing lint tests fail and conflict in a combined run
+## 16. Package-level lint passes; combined raw pytest collection remains unsuitable
 
-- **Location:** both `test/` directories and existing Python sources
-- **Current behavior:** PEP257 passes and copyright is skipped. Flake8 reports
-  lint failures, while a combined root invocation collides on duplicate
-  test-module names.
-- **Impact:** Package-level lint does not pass.
-- **Next step:** Address lint and test layout in a dedicated maintenance change.
+- **Location:** both `test/` directories and Python sources.
+- **Current result:** Flake8, PEP257 and activated copyright checks all pass;
+  the complete colcon suite has 86 PASS / 0 FAIL / 0 SKIP. Own Apache headers
+  use a form recognized by Humble's checker; original OSRF notices are preserved.
+- **Invocation limitation:** raw combined pytest collection of both package test
+  directories can collide on their existing template filenames. Use `colcon test`
+  (separate package processes), or test package directories separately.
+- **Remaining scope:** comprehensive algorithm/API coverage, CI and future AP05
+  regressions remain work items. Root runs cannot prove ordinary-user write
+  permissions; the final output tests were run as UID 1000, with no skips.
 
 ## 17. Standard Odometry integration requires deployment regression
 

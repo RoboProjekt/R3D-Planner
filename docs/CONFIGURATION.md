@@ -11,7 +11,7 @@ misplaced, missing, unknown and duplicate keys. Launch parameters override the
 deliberate standalone-node defaults; defaults never override YAML.
 
 The loader reads both files anew on each launch and logs their resolved paths.
-With the supported `colcon build --symlink-install`, module and configuration
+With optional developer `colcon build --symlink-install`, module and configuration
 symlinks resolve to live source files. New robot files are read directly from
 source and need no rebuild. For a copied installation, set `R3D_CONFIG_DIR`
 to a user-owned directory containing `planner_config.yaml` and `robots/`.
@@ -88,6 +88,9 @@ export R3D_CONFIG_DIR="$HOME/.config/r3d_planner"
 
 Then edit that directory's YAML. For example, replace these illustrative paths
 with your own files (the analyzed file need not exist until you start planning):
+
+Edit these fields in the copied full YAML. This partial example is not a
+replacement configuration; retain all other required sections and keys.
 
 ```yaml
 maps:
