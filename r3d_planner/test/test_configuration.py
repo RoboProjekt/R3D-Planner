@@ -207,15 +207,22 @@ def test_default_live_source_config(monkeypatch):
     assert default_config_path().resolve() == SOURCE / 'planner_config.yaml'
 
 
-def test_copied_install_does_not_silently_load_snapshot(config, monkeypatch):
+def test_copied_install_loads_package_share_and_override(config, monkeypatch):
     import r3d_planner.configuration as module
     from ament_index_python import packages
     path, central, robot, save = config
     monkeypatch.delenv('R3D_CONFIG_DIR', raising=False)
     monkeypatch.setattr(module, '__file__', str(path.parent / 'installed/lib/module.py'))
-    monkeypatch.setattr(packages, 'get_package_share_directory', lambda name: str(path.parent / 'installed/share'))
-    with pytest.raises(ConfigurationError, match='Copied install YAML'):
-        module.default_config_path()
+    import shutil
+    share = path.parent / 'installed/share'
+    installed = share / 'config'
+    installed.mkdir(parents=True)
+    shutil.copyfile(path, installed / 'planner_config.yaml')
+    shutil.copytree(path.parent / 'robots', installed / 'robots')
+    shutil.copyfile(path.parent / 'tiny.pcd', installed / 'tiny.pcd')
+    monkeypatch.setattr(packages, 'get_package_share_directory', lambda name: str(share))
+    assert module.default_config_path() == installed / 'planner_config.yaml'
+    assert module.load_configuration()['robot_name'] == 'Go2W'
     monkeypatch.setenv('R3D_CONFIG_DIR', str(path.parent))
     assert module.default_config_path() == path
 

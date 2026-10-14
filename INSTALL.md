@@ -207,8 +207,8 @@ Use `--symlink-install` for the initial build. Runtime reads resolve to live
 source files; edits and newly added robot YAMLs need only launch restart, without
 build or re-sourcing. For a copied install, set `R3D_CONFIG_DIR` once to the
 user configuration directory containing `planner_config.yaml` and robot profiles.
-Startup still refuses an implicit copied snapshot; no source checkout is required
-when the explicit user configuration is complete.
+Without an override, a copy installation reads its regular package-share YAML
+and robot profiles. User configuration needs no source checkout.
 See [configuration reference](docs/CONFIGURATION.md) for all parameters.
 
 ## Prepare and inspect a map
@@ -351,8 +351,8 @@ duplicate template module names.
 
 - **Configuration rejected:** Check the logged paths and exact key names in
   [CONFIGURATION.md](docs/CONFIGURATION.md). Strings are not booleans.
-- **Live source unavailable:** Use the supported symlink build or configure
-  `R3D_CONFIG_DIR` once; do not edit an unnoticed install snapshot.
+- **Configuration location:** Copy installations resolve package-share YAML;
+  set `R3D_CONFIG_DIR` to an editable user-owned copy when changing settings.
 - **Missing map:** Paths are relative to the central config directory; generate
   the analyzed output and align `map_name`.
 - **No online start:** Confirm Odometry topic, frame IDs, timestamps and age

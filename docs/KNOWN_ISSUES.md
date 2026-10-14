@@ -30,8 +30,9 @@ architecture and historical limitations explicitly distinguished.
 - **Impact:** Standalone debugging needs an explicit map override. V4 ships no
   PCD maps; normal launch requires a user-provided selected path in the central YAML.
   Use `R3D_CONFIG_DIR` for a user-owned configuration in copied installations.
-- **Next step:** Complete default copy-install portability in AP04; keep data
-  provision external. Historical Git versions still contain the old example maps.
+- **AP04 result:** Regular copy installations resolve installed package-share
+  configuration; an explicit user-owned `R3D_CONFIG_DIR` remains the override.
+  Data provision stays external. Historical Git versions retain the old maps.
 
 ## 3. Planner launch gap resolved; hardware bringup remains external
 

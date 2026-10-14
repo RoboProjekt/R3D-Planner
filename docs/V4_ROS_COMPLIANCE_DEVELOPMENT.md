@@ -846,6 +846,38 @@ AP03 ursprüngliche Humble-Kriterien jetzt VERIFIED: vorhandene konsistente Mani
 
 Nur Dokumentation, keine Dependency-/Algorithmus-/ROS-Namens-/Lizenz-/Versionsänderung. Vorhandene Dockerimages nicht gelöscht, kein Push/Release, keine fremden Branches. AP04/AP06 folgen mit eigener Dokumentation und zielgerichteten Änderungen.
 
+### V4-013 - Kopierte Package-Share-Konfiguration regulär auflösen
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP04, begleitend AP06/AP08. **Status:** VERIFIED für gezielte Share-Auflösung/40 Konfigurationsfälle; Gesamt-AP04 bis V4-016 IN PROGRESS. **Git-Commit:** `fix(install): support source-independent ROS installation`. **Betroffene Dateien:** configuration.py, bestehender test_configuration.py, aktuelle Konfig-/Installationsanleitungen und zentrales Protokoll.
+
+#### Ausgangssituation
+
+AP03 im Container VERIFIED, Configloader bevorzugt live Source/Symlink und verweigert noch kopierte Share-YAML. Vorhandener Test sichert alte Ablehnung ab. Kein impliziter Kartenfallback; vorhandene Nutzer-Overrides/strikte Schemaprüfung erhalten.
+
+#### Ziel der Änderung
+
+R3D_CONFIG_DIR zuerst, direkte Source-/Symlinkentwicklung weiter möglich, ansonsten reguläre über ament_index_python gefundene installierte YAML inklusive Robotprofil. Keine Sourcepflicht für Copy-Installation, keine unbemerkte Rückkehr von ungültigen Nutzerpfaden zum Default.
+
+#### Technische Umsetzung
+
+Gezielte Änderung der Defaultauflösung auf reguläre Sharedatei, bestehende Testpolitik passend migrieren; keine Änderung von Schema/ROS-Namen, Planungs-/Sensor-/Followeralgorithmen. Vollständige Ressourcen-/Source-ausblendende Launchabnahme folgt unter eigenem V4-016.
+
+#### Begründung
+
+Copy-Paketressourcen sind normale ROS-Installation. Nutzer können eigene editierbare Kopien explizit wählen; installiertes Default ist schreibgeschützte Vorlage und erfordert weiterhin passende nutzerseitige PCDs.
+
+#### Verifikation
+
+Ausgeführt im gepinnten Apt/Humble-Container: python3 -m pytest -p no:cacheprovider --basetemp=/work/config-pytest-final test/test_configuration.py -k "not effective_ros_parameters_and_odometry and not preprocessor_real_launch and not real_launch_restart_and_all_components" -q, Exit0: 40 passed/3 deselected in 0.34s. Migrierter vorhandener Test prüft echte temporäre share/config-YAML samt Robotprofil und expliziten Override. Erster Lauf 39 PASS/1 FAIL, weil der Test-Share ohne notwendige config-Unterebene angelegt war; Fixture korrigiert, kein Produktionsfallback eingeführt. Kompletter tatsächlicher Copy-/Source-unavailable-/Launchnachweis folgt unter V4-016, hier nicht vorwegnehmen.
+
+#### Ergebnis
+
+Sharepolitik gezielt implementiert und statisch/mit 40 Fällen geprüft; Gesamt-AP04/AP06 IN PROGRESS bis vollständiger Installationsabnahme.
+
+#### Auswirkungen
+
+Nur notwendige Installationspolitik und zugehörige Bestandsanleitung/Test; keine Versions-/Lizenz-/Dependency-/ROS-Interfaceänderung. AP05/AP07 nicht beginnen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -2419,3 +2451,8 @@ Die erste erfolgreiche echte Installation ergänzt unter anderem python3-open3d,
 | benötigte ROS-/Launch-/TF2-/Messages | Humble-Apt-Pakete | /opt/ros/humble (Python3.10) |
 
 Warnungen: NetworkX2.4 np.int-Deprecations, keine SciPy-Kompatibilitätswarnung. Erster Helper-nounset-/catkin-Metadatenfehler separat von echten rosdep-Exit0-Ergebnissen dokumentiert. Das Containerimage und Workspacewerkzeuge allein ersetzen keinen späteren Projektbuild/Funktionstest. Noble-Open3D bleibt AP09-Problem, keine Jazzy-Unterstützung.
+
+
+### 16.2 V4-013 – Reguläre Package-Share-Konfiguration
+
+Priorität unverändert: R3D_CONFIG_DIR → live Source/Symlink, wenn direkt aus Source importiert → normale installierte share/r3d_planner/config/planner_config.yaml. Robotpfad relativ zur tatsächlich gewählten YAML, Overridefehler führen nicht zu Defaultfallback. Ohne nutzerseitige PCDs meldet die erkannte installierte YAML weiterhin maps.<gewählter Pfad>: configure; keine Standardkarte. 40 bestehende passende Fälle PASS (Exit0), drei ROS-Ausführungsfälle später in voller Suite. Bestehender Ablehnungstest auf neuen Share-/Overridevertrag migriert, übrige Bestandsfälle erhalten. Anfangsfixture-Fehler explizit dokumentiert. Aktuelle README/INSTALL/CONFIGURATION/ARCHITECTURE/KNOWN_ISSUES aktualisiert, historische V3-/PDFberichte unverändert. Keine Version/License/Dependency/ROS-Namensänderung.

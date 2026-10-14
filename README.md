@@ -77,9 +77,10 @@ Replace angle-bracket placeholders before running commands. Source ROS and the
 workspace once in each new terminal. `--symlink-install` makes source
 configuration available at runtime, including newly added robot YAMLs.
 Editing YAML thereafter requires only stopping and restarting the affected launch,
-not rebuilding or sourcing again. Copied installations must set
-`R3D_CONFIG_DIR` to a user-owned configuration directory containing the central YAML and robot profiles; the loader
-rejects stale copied YAML rather than using it silently.
+not rebuilding or sourcing again. Copy installations use the regular installed
+package-share YAML and robot profiles. Set `R3D_CONFIG_DIR` to a user-owned
+configuration directory for editable overrides; no source checkout is required.
+Rebuild a copy installation to refresh its installed templates.
 
 ## Configuration
 

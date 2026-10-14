@@ -59,11 +59,12 @@ reconstruction, not duplicated per node. The two component booleans are
 independent launch conditions. The map and follower launches are separate.
 The follower is not automatically started because it can command motion.
 
-The resolver reads live source files at each launch, using source/symlink paths
-or an explicitly configured user-owned `R3D_CONFIG_DIR` for copied installations;
-the directory contains the central YAML and robot profiles, not necessarily source code.
-It never silently uses stale copied YAML. Restart applies YAML changes without
-build or re-sourcing. Paths are relative to the central config directory.
+The resolver reads YAML on each launch. An explicit user-owned `R3D_CONFIG_DIR`
+takes precedence; otherwise direct source/symlink modules use source YAML and
+copy installations resolve regular package-share YAML through ament_index_python.
+The override needs only central YAML and robot profiles, no source checkout.
+Restart applies user-YAML changes; copy-template changes require rebuilding.
+Paths are relative to the selected central config directory.
 See [CONFIGURATION.md](CONFIGURATION.md) for schema, units and validation.
 
 ### User data and included configuration

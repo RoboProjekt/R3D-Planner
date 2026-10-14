@@ -15,10 +15,13 @@ With the supported `colcon build --symlink-install`, module and configuration
 symlinks resolve to live source files. New robot files are read directly from
 source and need no rebuild. For a copied installation, set `R3D_CONFIG_DIR`
 to a user-owned directory containing `planner_config.yaml` and `robots/`.
-The explicit directory does not need a source checkout. Without an explicit
-configuration, the existing copied-install policy still fails instead of silently
-using an installed snapshot; full default-install portability remains future work. Moving the
-workspace itself requires rebuilding its installation, unlike editing YAML.
+The explicit directory does not need a source checkout and takes precedence.
+Without an override, directly imported source/symlink modules use live source
+configuration; regular copy installations resolve YAML and robot profiles through
+`ament_index_python` in the package share. No source checkout is required.
+Installed templates are read-only resources; copy them into a user-owned
+directory to edit settings. Rebuild a copy installation to refresh templates.
+Moving the workspace itself requires rebuilding its installation.
 
 YAML changes are restart-time configuration, not live ROS parameter updates.
 Stop the affected launch, edit YAML, and restart the same command in the same

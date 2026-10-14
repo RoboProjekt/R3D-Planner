@@ -40,7 +40,7 @@ UniqueLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, uni
 
 
 def default_config_path():
-    """Use live source files, never silently use a stale installed copy."""
+    """Resolve an explicit override, live source, or installed package resource."""
     explicit = os.environ.get('R3D_CONFIG_DIR')
     if explicit:
         return Path(explicit).expanduser().resolve() / 'planner_config.yaml'
@@ -49,13 +49,9 @@ def default_config_path():
         return source
     from ament_index_python.packages import get_package_share_directory
     installed = Path(get_package_share_directory('r3d_planner')) / 'config/planner_config.yaml'
-    if installed.is_symlink():
+    if installed.is_file():
         return installed.resolve()
-    raise ConfigurationError(
-        'Live configuration not found. Build once with colcon build --symlink-install '
-        'or set R3D_CONFIG_DIR to a user configuration directory containing '
-        'planner_config.yaml and robot profiles. '
-        'Copied install YAML is deliberately not used.')
+    raise ConfigurationError(f'Installed configuration not found: {installed}')
 
 
 def read_yaml(path):
