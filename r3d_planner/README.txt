@@ -137,9 +137,13 @@ topic comes from the selected robot YAML. Existing sensor-coordinate thresholds
 and algorithms are retained. Offline graph step limits and sensor-local step
 thresholds intentionally remain separate.
 
-The filter still assumes packed 12-byte XYZ float32 records and X-forward,
-Y-lateral, Z-up sensor axes; it does not generally decode PointCloud2 field
-metadata or transform clouds. Recheck the driver layout after a sensor change.
+The filter and follower decode scalar numeric XYZ through field offsets,
+point_step, row_step and byte order, including organized/padded clouds. Extra
+RGB/intensity/array fields are ignored; NaN/Inf rows are removed regardless of
+is_dense. Malformed input is logged and rejected without a false clear output;
+input storage is unchanged. Filter coordinates still use X-forward, Y-lateral,
+Z-up sensor axes; no cloud transform is added in this step. Recheck calibration
+and the follower's remaining frame/freshness limitations after a sensor change.
 Outputs keep the incoming header. Cliff and stair outputs have no internal
 motion-control consumer.
 
@@ -171,5 +175,5 @@ V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
 ../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
 On Humble/Jammy the real dependency install/check and two fresh copy builds pass;
-each full suite passes 86 cases, and a source-free install passes 37 cases.
+each full suite passes 171 cases, and a source-free install passes 120 cases.
 This establishes the tested installation scope, not CI, motion or Jazzy support.

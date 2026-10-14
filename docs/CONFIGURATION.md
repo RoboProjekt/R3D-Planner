@@ -161,8 +161,10 @@ is a separate explicit motion-producing command.
 All distances are in the sensor frame. These step thresholds are separate from
 offline world-coordinate graph connectivity and intentionally keep their
 existing distinct semantics/defaults. Minimum bounds must be below maximum
-bounds. Changing settings does not fix the filter's packed-XYZ decoding or axes
-assumptions. The unused legacy `cliff_dist` attribute is not a configuration key.
+bounds. PointCloud2 decoding honors field offsets, numeric XYZ types, endian
+order and point/row padding; extra channels are ignored and NaN/Inf excluded.
+Changing settings does not establish a sensor-to-base transformation or change
+the existing sensor-axis assumptions. The unused legacy `cliff_dist` attribute is not a configuration key.
 
 | `rviz_interface` key | Default | Effect |
 |---|---:|---|

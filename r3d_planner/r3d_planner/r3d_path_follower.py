@@ -28,7 +28,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Path
 from sensor_msgs.msg import PointCloud2
-import sensor_msgs_py.point_cloud2 as pc2
+from .cloud import read_xyz
 import math
 from .odometry import OdometryInput
 
@@ -75,7 +75,12 @@ class PathFollower(Node):
     def obstacle_callback(self, msg):
         obstacle_detected = False
 
-        for point in pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True):
+        try:
+            points = read_xyz(msg)
+        except ValueError as exc:
+            self.get_logger().warning(f'PointCloud2 rejected: {exc}', throttle_duration_sec=2.0)
+            return
+        for point in points:
             x, y, z = point
             if self.obstacle_x_min < x < self.stop_distance and abs(y) < self.obstacle_half_width:
                 obstacle_detected = True

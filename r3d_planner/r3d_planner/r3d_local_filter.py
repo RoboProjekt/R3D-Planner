@@ -25,32 +25,10 @@
 
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import PointCloud2, PointField
+from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PointStamped
 import numpy as np
-
-
-def create_cloud_xyz32(header, points):
-    # Hilfsfunktion zum Erstellen der PC2 Nachricht
-    if len(points) == 0:
-        return PointCloud2(header=header, height=1, width=0)
-
-    fields = [
-        PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
-        PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-        PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
-    ]
-    return PointCloud2(
-        header=header,
-        height=1,
-        width=points.shape[0],
-        is_dense=False,
-        is_bigendian=False,
-        fields=fields,
-        point_step=12,
-        row_step=12 * points.shape[0],
-        data=points.tobytes()
-    )
+from .cloud import create_cloud_xyz32, read_xyz
 
 
 class ObstacleCliffFilter(Node):
@@ -88,21 +66,11 @@ class ObstacleCliffFilter(Node):
             setattr(self, key, self.get_parameter(key).value)
 
     def pc_callback(self, msg):
-        # --- SCHRITT 1: DATEN LADEN (Zuerst!) ---
-        dtype_list = [('x', np.float32), ('y', np.float32), ('z', np.float32)]
         try:
-            cloud_arr = np.frombuffer(msg.data, dtype=np.dtype(dtype_list, align=True))
-        except Exception:
+            points = read_xyz(msg)
+        except ValueError as exc:
+            self.get_logger().warning(f'PointCloud2 rejected: {exc}', throttle_duration_sec=2.0)
             return
-
-        # NumPy Array erstellen
-        points = np.zeros((cloud_arr.shape[0], 3), dtype=np.float32)
-        points[:, 0] = cloud_arr['x']
-        points[:, 1] = cloud_arr['y']
-        points[:, 2] = cloud_arr['z']
-
-        # NaNs entfernen
-        points = points[~np.isnan(points).any(axis=1)]
 
         # --- SCHRITT 2: TOTZONEN-FILTER (Noise Removal) ---
         # Berechne Distanz in der XY-Ebene

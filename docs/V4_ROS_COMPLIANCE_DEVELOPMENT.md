@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-017 (AP05-Schnittstelleninventar und noch nicht freigegebene Migrationsstrategie). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-019 (AP05-Analyse/PointCloud2/Testwerkzeug; M01/M02-Migration noch nicht freigegeben). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -243,7 +243,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Kopplung an geplante öffentliche API vor Release klären |
 | Abhängigkeiten | AP03/AP04 für reproduzierbare Ausführung; AP06 pro Vertragsänderung; AP09 bei distributionsverschiedenen Action-/Python-APIs |
 | Abschlusskriterien | Normierte semantisch sinnvolle Orientierungen; erhaltenes Engstellenverhalten; konsistente interne Namen und Namespace-Test; Cloud-Varianten und Frames geprüft; Action-Erfolg/Fehler/Cancel entsprechend dokumentiertem Zielvertrag; keine stille API-Änderung |
-| Aktueller Status | **IN PROGRESS** — aktuelles Inventar/V4-017; konkrete narrow-/Follower-Migration vorbereitet, ohne gesonderte Freigabe nicht implementieren; unabhängige kompatible Korrekturen separat prüfen |
+| Aktueller Status | **IN PROGRESS** — Inventar/Migrationsstrategie V4-017; PointCloud2 V4-018 VERIFIED; Quaternion/narrow- und strikter Followervertrag M01/M02 BLOCKED bis gesonderter Freigabe, übrige AP05-Aufgaben offen |
 
 ### 4.7 AP06 - Tests und Qualitätssicherung
 
@@ -255,7 +255,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | **VERIFIED für den bearbeiteten Umfang** — zweimal 86 PASS/0 FAIL/0 SKIP via colcon, zusätzlich 37 Source-freie Fälle; sechs Lints inklusive Copyright aktiv; Coverage/weitere API-/Algorithmus-/Hardwaretests separat offen |
+| Aktueller Status | **IN PROGRESS für erweiterten AP05-Umfang** — bisher86Fälle erhalten, aktuell zweimal171PASS/0FAIL/0SKIP plus120Source-frei; Cloud-/Queryumfang VERIFIED, spätere Action-/TF-/Namespace-/Metadaten-/QoS-/Followerregressionen noch offen |
 
 ### 4.8 AP07 - CI/CD
 
@@ -279,7 +279,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für korrekte Nutzung; P2/P3 für weitergehende Policies |
 | Abhängigkeiten | Begleitet alle APs; Lizenztext nur nach AP01; konkrete Support-/API-Zusagen erst anhand AP06/AP09 |
 | Abschlusskriterien | Nachvollziehbare Änderungs-IDs und Commitreferenzen, zutreffende Prüfberichte, reproduzierbare aktualisierte Nutzeranleitungen; dokumentierte Grenzen statt pauschaler Quality-Level-/ABI-Garantie |
-| Aktueller Status | **IN PROGRESS** — Protokoll bis V4-016 und vorhandene Installations-/Konfigurations-/Paketdokumentation aktualisiert; weitere Wartungs-/Versions-/Securitypolicies offen |
+| Aktueller Status | **IN PROGRESS** — Protokoll bisV4-019, aktuelle Cloud-/Installations-/Testanleitungen aktualisiert; vollständige AP05-Verträge/Wartungspolicies später nach Phasenfreigabe |
 
 ### 4.10 AP09 - ROS-Distributionskompatibilität
 
@@ -1022,7 +1022,7 @@ Nur Dokumentation, keine öffentliche ROS-Schnittstelle oder Controllerfunktion 
 
 ### V4-018 - PointCloud2-Feldlayout und organisierte Daten korrekt interpretieren
 
-**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP05/AP06, AP08. **Status:** IN PROGRESS vor Anwendung/Tests. **Git-Commit:** `fix(ros): decode PointCloud2 fields and row padding`. **Betroffene Dateien:** neuer eigener cloud.py/test_pointcloud.py, LocalFilter-Dekoder/Outputhelper, Follower-Clouddekoder und vorhandene Anleitungen/Protokoll.
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP05/AP06, AP08. **Status:** VERIFIED für PointCloud2-Korrektur und aktuelle Regressionen; AP05 insgesamt IN PROGRESS bis Migrationsentscheidung. **Git-Commit:** `fix(ros): decode PointCloud2 fields and row padding`. **Betroffene Dateien:** neuer eigener cloud.py/test_pointcloud.py, LocalFilter-Dekoder/Outputhelper, Follower-Clouddekoder, INSTALL.md, docs/ARCHITECTURE.md, docs/CONFIGURATION.md, docs/KNOWN_ISSUES.md, r3d_planner/README.txt, README.md und Protokoll.
 
 #### Ausgangssituation
 
@@ -1034,7 +1034,7 @@ Alle gültigen skalaren numerischen XYZ-Layouts korrekt lesen, nichtgeometrische
 
 #### Technische Umsetzung
 
-Geplant: sensor_msgs_py.dtype_from_fields für typisierte Felder; strided readonly-NumPyview und explizite Endian-Dtype statt inplace-byteswap. Nur XYZ-Array materialisieren, keine Kopie aller Zusatzkanäle; finite-Maske. Validierung Dimensions-/Buffer-/Feldgrößen, Metadaten auch bei Emptyoutput. Beide internen Cloudconsumer nutzen gemeinsamen Decoder. Keine Frame-/QoS-/Topic-/ROS-Typ-/Controlleränderung.
+Implementiert: sensor_msgs_py.dtype_from_fields für typisierte Felder; strided readonly-NumPyview und explizite Endian-Dtype statt inplace-byteswap. Nur XYZ-Array materialisieren, keine Kopie aller Zusatzkanäle; finite-Maske. Validierung Dimensions-/Buffer-/Feldgrößen, Metadaten auch bei Emptyoutput. Anonyme/Array-Zusatzfelder erlaubt, skalare numerische XYZ erforderlich; float32/float64 und gemischte Integer/Float korrekt. Ein XYZ-Zielarray statt temporärer Einzelkanalkopien; nur bei nichtfiniten Punkten zusätzlicher Selektionsoutput. Vollständige Dichte-/Feldmetadaten auch für leere Ausgaben. Beide internen Cloudconsumer nutzen gemeinsamen Decoder. Keine Frame-/QoS-/Topic-/ROS-Typ-/Controlleränderung.
 
 #### Begründung
 
@@ -1042,11 +1042,17 @@ Humblehelper allein deckt organisierte Rowpadding-Wolken nicht zuverlässig ab. 
 
 #### Verifikation
 
-Geplant: tatsächliche Humblemessage-Typen, vier Layouts/Endian/Organized/Padding/dense, malformedXYZ/Data, NaN/Inf, unveränderte Inputbytes und gleiche Filteroutputs für äquivalente Geometrie. Anschließend neuer Copy-Build und vollständige Bestands-/Lintsuite. Host unverändert, temporärer Container mit readonlySource/domain211/localhost und UID1000; keine Hardware.
+Tatsächliche Humblemessages/Python3.10.12/Ubuntu22.04.5 im isolierten Apt-Container. 83 neue Cloudfälle: 64 Layout-/Endian-/Organized-/Rowpadding-/dense-Kombinationen,8Malformedfälle,6NaN/Inf+dense-Fälle,1MixedNumeric,2Empty/Outputmetadata,1echter Filterconstructor mit äquivalenten Layoutoutputs/invalid-no-publish,1anonymous/array-extra-fields. Alle Inputbytes unverändert. Beide Consumer nutzen denselben Decoder; Produktions-Filtermathematik und Follower-control_loop AST exakt zum Eingang. Keine Message-Typ-/Topic-/Parameter-/Frame-/QoS-/Controllerregel geändert.
+
+Frische Copy-Workspaces /work/cloud6 und /work/cloud7, separate Domains213/215, jeweils list/build/test/test-result Exit0:171PASS/0FAIL/0ERROR/0SKIP (86Bestandsfälle+83Cloud+2V4-019-Helperfälle). Alle sechs Lints aktiv/PASS. Zweiter frischer Apt-Container sourcefrei mit readonly-Install unter /work/cloud6/install; rosdep install/check Exit0, 120Runtime-/Output-/Cloudtests PASS/0FAIL/0SKIP als UID1000, pytest Exit0. Installierte Module und Testkopien beider Workspaces bytegleich zu finalem Code; keine installierten PCDs.
+
+Fehlversuche erhalten: cloud1=166PASS/2LintFAIL/0SKIP (7Flake8+D213); cloud2=168PASS/1Flake8FAIL/0SKIP; cloud3=168PASS/1Flake8FAIL/0SKIP (fehlerhafte erste Einrückungskorrektur). Finale gezielte Lints danach0. cloud4=168PASS/1bestehender CLIqueryFAIL/0SKIP, Lints/Cloudfälle allePASS; V4-019 ergänzt begrenzte Readinessquery und vollständige Diagnostik. cloud5 mit altem Helper in neuer Domain169PASS/0FAIL/0SKIP, keine absolute Flakinessfreiheit daraus abgeleitet. Abschließende cloud6/7 inklusive Helper beide171PASS.
+
+Dekodiermessung mit100000synthetischen finiten Punkten,15Wiederholungen: früherer eigener packed-Decoder Median1.134ms/tracedPeak3302792Bytes; neuer packed-Decoder0.528ms/1609856Bytes; organizedRGB+Rowpadding0.569ms/1609952Bytes. GleicheXYZ-Ausgabe, Inputgrößen1.2MB bzw.3.2016MB, Output1.2MB. Tracemallocpeak ohne gehaltenen Input, kein gesamter RSS-/native-Library-/Roboterperformancebeweis und kein neuer A*-Algorithmusbeitrag. Relevante Kommandos/Ausgaben/T87..T96 in17.5.
 
 #### Ergebnis
 
-Noch kein PASS; tatsächliche Ergebnisse nach Prüfung ergänzen. M01/M02-Freigabe bleibt getrennt.
+PointCloud2-Umfang VERIFIED, neue83Fälle und alle86Bestandsfälle erhalten, begleitende2Testhelperfälle bestanden. Bestehende Benutzeranleitungen gezielt aktualisiert. M01/M02-Freigabe bleibt offen; Path/narrow/Followerframe/Frische und weitere AP05-Arbeit nicht implementiert. Kein AP05..AP10-Gesamtabschluss.
 
 #### Auswirkungen
 
@@ -1257,16 +1263,16 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Bereich | Ausgangsstand main | Änderung V4 | Ergebnis | Nachweis |
 | --- | --- | --- | --- | --- |
 | Entwicklungslinie | main bei `c65642f…`; V1/V2/V3 als Remote-Tracking-Refs | Lokaler Branch V4 unmittelbar von Baseline; ein fokussierter Initial-Dokumentationscommit | Neue getrennte Entwicklungslinie, bestehende Refs unverändert | V4-001, T01/T06, Git-Parent/Refvergleich |
-| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe Protokoll bis V4-016; vorhandene Benutzeranleitungen aktualisiert | Keine neuen Forschungsberichte; historische Einträge/PDF unverändert | V4-012..016; Kapitel16 |
+| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe Protokoll bis V4-019; vorhandene Benutzeranleitungen aktualisiert | Keine neuen Forschungsberichte; historische Einträge/PDF unverändert | V4-012..019; Kapitel16/17 |
 | Historische PDF | Vorhandene unveränderte, zunächst unversionierte Baseline-Dokumentation | Identische Bytes in V4 unter Git aufgenommen | Keine neue technische Funktion; SHA unverändert und historische Kartendarstellung erhalten | V4-007/T49 |
 | Planung/Preprocessing | Vorhandene PCD-/Voxel-/Traversierbarkeits-/Graph-/A*-Funktionen | Keine | Bestehende Algorithmen erhalten, kein neuer Algorithmusbeitrag | T02; Abschnitt 2.3 |
 | Paketmetadaten | Version 0.0.0 vs 0.0.1, TODO-Beschreibungen, keine URLs/Author | AP02: 0.0.1 konsistent, Beschreibungen/Repo-/Issue-/Authorfelder ergänzt, Maintainer erhalten | Technischer Metadatenumfang VERIFIED, Namen/Buildtyp/Dependencies/Lizenzen erhalten | V4-008/T50-T53; Kapitel 13 |
 | Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | AP03 direkte Manifeste unter V4-011 korrigiert; 26 Keys und reale Install-/Check-/Importprüfung | Humble/Jammy VERIFIED; Host unverändert; Jazzy offen | V4-011/012/016; T65-T68/T77 |
 | Build/Installation | Copy-Config absichtlich abgelehnt, Sourcepfade und fehlende Paketlizenzmitnahme | Normale Copy-Shareauflösung; externer Override; Lizenzmitnahme; separate exklusive Ausgabe | Zwei Clean-Copy-Builds und Source-freie readonly-Installation bestanden | V4-006/013/014/016; T71-T81 |
-| ROS-Interfaces | Action/Topics/Service, RViz, Filter/Follower; bekannte Semantikgrenzen | Keine | AP05 offen; keine stillen API-Änderungen | B09-B13/T16 |
+| ROS-Interfaces | Action/Topics/Service, RViz, Filter/Follower; bekannte Semantikgrenzen | Inventar und Migration konkret vorbereitet; Cloudfelder korrigiert, Namen/Typen unverändert | AP05 IN PROGRESS; M01/M02 nicht implementiert | V4-017/018; Kapitel17 |
 | Konfiguration/Launch | Source-Beispielpfade, zentrale strikte YAML, vier Launches | Leere Maps, strikte Validierung erhalten; optionale preprocessing.output_dir; installierte Robot-/Launchressourcen | Share/Override/relative/absolute/~; vier Launch-lookups; Bestandslaunchtests erhalten | V4-005/013/014/016; T69/T70/T74/T75/T78 |
 | Odometry/TF | Standardisierte Poseeingabe, Frische/Frames, use_start, Poseverlust-Nullbefehl | Keine | V3-Vorleistung erhalten | Abschnitt 2.3; T02 |
-| Tests/Lint | Funktionale Fälle und Linter-Templates bereits vorhanden | 43 vorhandene Funktionsfälle erhalten; 37 neue I/O-/Installed-Fälle; sechs Lints aktiv | Zweimal86PASS/0FAIL/0SKIP; Source-frei37PASS/0FAIL/0SKIP | V4-015/016; T72/T73/T77 |
+| Tests/Lint | Funktionale Fälle und Linter-Templates bereits vorhanden | Bisherige86Fälle erhalten;83Cloudfälle und2Queryfälle ergänzt, sechs Lints aktiv | Zweimal171PASS/0FAIL/0SKIP, sourcefrei120PASS/0FAIL/0SKIP im aktuellen Teilumfang | V4-018/019; T87-T96 |
 | Lizenzierung/Datenrechte | Keine Root-LICENSE, TODOs und ungeklärte gebündelte PCDs | Apache-Eigenanteile samt Pakettexten geprüft; PCDs aus aktivem Tree/Artefakten entfernt | Technischer AP01-Umfang VERIFIED, historische Git-/Vertrags-/Bundlefragen offen | V4-004..006; T42-T48 |
 | CI/CD | Keine Pipeline | Keine | AP07 offen | T18 |
 | Kompatibilität | Humble als Ziel dokumentiert | Tatsächliche reine Apt-/Humble-Containerprüfung und wiederholte Builds | Getesteter Humble-Umfang VERIFIED; weitere Plattformen NOT VERIFIED | V4-012/016; T65-T81 |
@@ -1274,6 +1280,7 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Externe LiDAR-Software | Separates Repository; Standard-Odometry-/TF-Vertrag | Herkunft und ältere Diffs dokumentiert; Notice im Protokoll abgeschlossen | Kein fremder Code integriert/geändert; Originallizenzen getrennt | V4-003/V4-004; 11.13-11.15 |
 | Copyright-Attribution | 18 eigene Namensheader plus sechs OSRF-Templates | Traditionelle Apacheheader zusätzlich zur erhaltenen SPDX-/Namensattribution; neue eigene Dateien entsprechend | Sechs OSRF-Noticeblöcke identisch, zwei obsolete Skips entfernt; Root-/Pakettexte unverändert | V4-004/015/016; T70/T82 |
 | GitHub-/Remoteverwaltung | origin public, V4 lokal ohne Upstream | Optionen und Pushschutz nur als Vorschlag dokumentiert | Keine Sichtbarkeits-/Remoteänderung; kein Push | Abschnitt 12/T25 |
+| PointCloud2 | Gepackte12-byteXYZ-Annahme im Filter, Rowpadding-/Endiangrenze | Feld-/Stride-/Endianbewusster gemeinsamer Decoder, finiteXYZ und complete-empty-Metadata | 83Regressionsfälle, Inputbytegleichheit, äquivalente Filteroutputs | V4-018/T89/T90 |
 
 ## 9. Veröffentlichungsstatus
 
@@ -1284,7 +1291,7 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Bloom readiness | **NOT READY** | Version0.0.1 konsistent, Humble-Install/Testgrundlagen bestanden; öffentliche Releaseversion/-politik/Changelogs, vollständige Rechts-/Releaseorganisation und public-V4-Ref offen. Kein Release-Track/-Repository/Farmjob |
 | Buildfarm readiness | **NOT READY** | Copy-/Source-frei-/Dependency-/Ressourcengrundlagen Humble lokal geprüft; Release-/Rechtsgates und konkrete externe Farmabnahme offen. Kein Buildfarmjob |
 | Tatsächliche offizielle Index-/Binärveröffentlichung | **NOT VERIFIED** | Keine neue rosdistro-/Release-/Buildfarm-Statusabfrage oder externe Bestätigung; historische Abwesenheit nicht als aktuelle Serverprüfung ausgeben |
-| ROS 2 Humble / Ubuntu 22.04 / Python 3.10 | **VERIFIED im beauftragten Umfang** | Ubuntu22.04.5/Python3.10.12/Humble: zwei echte Dependencyinstallationen, zwei Clean-Copy-Workspaces je86Tests, Source-frei37Tests. Keine Hardware-/vollständige Algorithmus-/QualityLevel-Garantie |
+| ROS 2 Humble / Ubuntu 22.04 / Python 3.10 | **VERIFIED im beauftragten Umfang** | Ubuntu22.04.5/Python3.10.12/Humble: aktuelle isolierte Dependencyinstallation/check, zwei Clean-Copy-Workspaces je171Tests, Source-frei120Tests; nur bisher implementierter Teilumfang. Keine Hardware-/vollständige Algorithmus-/QualityLevel-Garantie |
 | Jazzy / neuere ROS-Distributionen / andere Plattformen | **NOT VERIFIED** | Keine neue Ausführung, keine Supportzusage; weitere Ziele erst nach Auswahl und Prüfung |
 
 `READY` darf erst vergeben werden, wenn die konkret definierten Voraussetzungen für den jeweiligen Bereich nachgewiesen sind. `NOT READY` benennt bekannte Hindernisse, `NOT VERIFIED` fehlende Prüfung. Eine erfolgreich konfigurierte lokale Pipeline ist noch keine externe Veröffentlichung und noch kein erfolgreicher Buildfarm-Lauf.
@@ -2968,3 +2975,64 @@ Rollout: neues Interfacepaket, Planner und Follower gemeinsam bauen/installieren
 Alternativen/Tradeoffs: (a) getrennter typisierter Header+Boolarray-Kanal spart doppelte Pfadpositionen, benötigt aber exaktes Pairing/Cache/Timeout und bringt zusätzliche Fehlzustände; (b) JSON/String vermeidet Interfacepaket, verliert aber rosidl-Typprüfung/Discovery und erschwert publicAPI; (c) lokal erneutes Map-KDTree-Matching vermeidet neuen Transport, bindet Follower an Graphkarten/Regenerationsparameter und kann Wegpunktzuordnung verlieren. Empfohlen M01 mit atomarer typisierter Nachricht trotz zusätzlichem kleinen Package und transportiertem Path; größere Scopeänderung sichtbar und nicht bereits implementiert.
 
 Freigabequelle ist ausdrücklich der aktuelle Nutzerauftrag, Abschnitt6 („Solche nicht rückwärtskompatiblen Änderungen benötigen eine gesonderte Freigabe“), Abschnitt10 und38. Die allgemeine AP05-Freigabe ersetzt diese konkrete Migrationsfreigabe nicht. Unabhängige PointCloud2-Dekoderkorrektur I02 erfordert kein Legacytopic-/narrow-/Followerstop-Defaultbruch und kann separat geprüft werden. PhasenAP06..AP10 folgen auf die abschließend freigegebene/abgenommene AP05-Schnittstellenbasis; nicht als abgeschlossen erklären, solange M01/M02 offen sind.
+
+
+### 17.5 Tatsächliche aktuelle Nachweise und Freigabegrenze
+
+Datum14.10.2026. Neue Ergebnisse beziehen sich auf den jetzigen PointCloud2-/Testhelperstand, nicht auf die unimplementierte gesamte Migrationsstrategie. C1=r3d-v4-interface-humble-20261014, C2=r3d-v4-interface-sourcefree-20261014. Beide offizielles Humbleimage mit dem bereits dokumentierten Digest860e5379..., Ubuntu22.04.5/Python3.10.12, native Aptversionen NumPy1.21.5/SciPy1.8.0/Open3D0.14.1/NetworkX2.4, kein User-Site/Conda. C1 Source readonly, neue Workspaces getrennt; C2 nur readonly-Install/Testfiles/Manifestkopien/Harness und getrennte Ergebnisausgabe, kein Sourcecheckout. FastDDS/localhost/Domain213,215 bzw.214; Tests UID1000. Kein hardwarebezogener Follower-spin oder produktives cmd_vel.
+
+| Test-ID | AP | Prüfung | Kommando / Umgebung | Ergebnis | Status |
+|---|---|---|---|---|---|
+| T87 | AP05 | Git/Inventar/Schema | ASTindex und tatsächlicher Containerimport ComputePathToPose.Result.get_fields_and_field_types()/ActionServer-signature | Names/Params/QoS inventarisiert; Humble path+planning_time, leerer Feedbackpayload, keine error_code; Quaterniondefaultw1 | VERIFIED Analyse |
+| T88 | AP03/AP05 | Echte aktuelle Installation/check | rosdep install/check --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy (install -y); C2 entsprechend /dependency-manifests | Je Exit0 ohne skip/simulate, Imports erfolgreich; keine NumPy/SciPy-Kompatibilitätswarnung | VERIFIED Humble |
+| T89 | AP05/AP06 | Cloudlayouts/Outputs | test_pointcloud.py, actual installed Humblemodule | 83PASS, 64Kombinationen plus malformed/finite/empty/mixed/anonymous/array/nodefälle | VERIFIED |
+| T90 | AP05 | Performance/Allocation | 100000finiteXYZ,15Trials; tracemalloc/timing im isolierten Prozess | packed0.528ms, organizedRGB+padding0.569ms; ca1.61MBtracedpeak ohne Input; kein universeller Benchmark | VERIFIED spezifische Messung |
+| T91 | AP06 | Testhelpertransient/permanent | Zwei test_parameter_query_readiness_preserves_failures-Fälle, echter Launchtest weiterhin aktiviert | Wiederholung nur bei CLIexit!=0; dauerhaft3Fehler führen Assertion mit stdout/stderr; Params unverändert geprüft | VERIFIED |
+| T92 | AP04/AP06 | FreshCopy1 | /work/cloud6: colcon build; colcon test; colcon test-result --verbose | Je Exit0;171PASS/0FAIL/0ERROR/0SKIP;6Lints aktiv | VERIFIED |
+| T93 | AP04/AP06 | FreshCopy2 | /work/cloud7 gleiche Befehle, neuer Workspace/Domain | Je Exit0;erneut171PASS/0FAIL/0ERROR/0SKIP | VERIFIED |
+| T94 | AP04/AP06 | Sourcefrei/readonly | C2 pytest /runtime-tests, install=/work/cloud6/install readonly | Exit0;120PASS/0FAIL/0SKIP, Module aus Install, Sourcecheckout fehlt, kein installiertesPCD | VERIFIED Teilumfang |
+| T95 | AP01/AP02/AP08 | Geschützte Inhalte/Codeidentität | Ref-/SHA-/Eventvergleich, module/testcopy bytevergleich, git diff --check | Baseline/PDF/LICENSE/Manifeste/Version/Fremdnotice/alteEreignisse unverändert; finale Produktions-/Testkopien identisch | VERIFIED |
+| T96 | AP05/AP07..10 | Migrations-/Phasengate | Kein entsprechender Implementierungs-/CI-/Releasebefehl | M01/M02 angefragt, keine Antwort als Zustimmung gewertet; spätere Phasen noch nicht ausgeführt | BLOCKED Entscheidung / NOT VERIFIED spätere Phasen |
+
+Aktuelle erfolgreiche Hauptbefehle in beiden neuen Workspaces, als unprivilegierter User und ohne --symlink-install/alte R3D-Overlays:
+
+```bash
+source /opt/ros/humble/setup.bash
+cd /work/cloud6  # zweiter Lauf: /work/cloud7
+export PYTHONNOUSERSITE=1
+colcon --log-base log-build build --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+
+source install/setup.bash
+colcon --log-base log-test test --packages-select r3d_preprocessor r3d_planner --event-handlers console_cohesion+
+colcon test-result --verbose
+```
+
+Tatsächliche Ausgabe jeweils, test-result Exit0:
+
+```text
+Summary: 171 tests, 0 errors, 0 failures, 0 skipped
+```
+
+Source-frei C2 als UID1000:
+
+```bash
+source /opt/ros/humble/setup.bash
+source /work/cloud6/install/setup.bash
+cd /work/runtime-user
+python3 -m pytest -p no:cacheprovider --basetemp=/work/runtime-user/pytest --junitxml=/results/pytest.xml /runtime-tests -q
+```
+
+Tatsächliche Ausgabe, Exit0:
+
+```text
+........................................................................ [ 60%]
+................................................                         [100%]
+120 passed in 3.59s
+```
+
+Frühere Fehlläufe cloud1..4 sind in V4-018/019 offen ausgewiesen; keine FAIL-als-PASS-Wertung. cloud5 bestand169Fälle vor Testhelperergänzung, cloud6/7 nun171. NetworkX-/ament-Deprecations bleiben, kein globales Ignorieren. Die Source-freien120Fälle umfassen27Installation+10Output+83Cloud, nicht die43anderen Funktionstests oder die2reinen Testhelperfälle. Rohlogs/xUnit/Benchmark/Isolations-/Bytevergleiche temporär unter /tmp/r3d-v4-finalization, dauerhaft relevante Ergebnisse hier; kein neuer Forschungsbericht.
+
+Fokussierte Commits: Inventar/Migrationsvorschlag60bbe44622deb7f3671b52403a435f648852d23d; begrenzter Testhelper add819661cc2405823b0c8f31b1ea7b1e7efe9e8; PointCloud2 plus aktuelle Dokumentation im eindeutigen `fix(ros): decode PointCloud2 fields and row padding`-Commit (Parent add8196). Commitorder der unabhängigen Helper-/Cloudkorrektur ist nicht die Reihenfolge der V4-IDs; V4-018 wurde vor Codeänderung angelegt, V4-019 dokumentiert den während seiner Abnahme gefundenen Testwerkzeugbedarf. Jeder Implementationcommit enthält das Protokoll.
+
+**Freigabegrenze:** Die angefragten M01/M02-Verträge sind weiterhin nicht implementiert; kein neues Interfacepaket oder Metadatatopic angelegt, keine Quaternion-/Followerframe-/Hindernistimeout-/Namespace-/QoS-/Actionmigration durchgeführt. AP05 IN PROGRESS, Cloud-/Queryteil VERIFIED; erweiterter AP06-Gesamtumfang IN PROGRESS. AP07/AP09 NOT STARTED; AP08/AP10 begleiten als IN PROGRESS, keine spätere Phase vor der stabilisierten/freigegebenen AP05-Basis abgeschlossen. ROS Index/Bloom/Buildfarm weiterhin NOT READY; rechtliches Gesamtgate unverändert. Der Gesamtauftrag AP05..AP10 ist ausdrücklich noch nicht abgeschlossen und wird nach gesonderter Migrationsentscheidung fortgesetzt.
+
+Es wurden ausschließlich zwei eigene Testcontainer gestoppt/entfernt; bestehende Dockerimages/Hostpakete/Conda/ROS-/NVIDIA-/Daemonkonfiguration unberührt. V1/V2/V3/main/Remote-Trackingrefs/Gitconfig/PDF/Lizenztexte/historischeV4-001..016 unverändert, keine Historienumschreibung/externenRepositoryänderung/Push/Release/Hardwarebewegung. Kein R3D_null untersucht/geändert.

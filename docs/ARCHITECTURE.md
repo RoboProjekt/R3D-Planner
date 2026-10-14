@@ -84,7 +84,11 @@ active V4 tree. General PCD analysis, classification, loading and planning remai
 
 Each package also contains the standard Ament Python resource file and three
 template tests for copyright, Flake8, and PEP257. There is no map metadata file,
-or custom interface package. Four planner-package launch entry points are installed.
+or custom interface package. Four planner-package launch entry points are installed. The shared `cloud.py`
+decoder honors PointCloud2 XYZ fields, point/row strides and endian order for
+both local filter and follower; it preserves input storage and excludes NaN/Inf.
+Filter geometry and output headers remain in the incoming sensor frame. The
+proposed typed path/narrow interface package is not implemented pending approval.
 
 ## Offline map processing
 

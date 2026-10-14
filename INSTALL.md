@@ -189,10 +189,10 @@ ros2 pkg executables r3d_planner
 `colcon list` must include `r3d_preprocessor` and `r3d_planner`.
 
 The regular copy installation above was verified in two empty workspaces.
-Both builds exited 0; each full suite passed 86 tests and `colcon test-result`
+Both builds exited 0; each full suite passed 171 tests and `colcon test-result`
 exited 0. Standard configuration/robot resources work through package share;
 use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
-container with a read-only installed tree passed 37 installation/output tests.
+container with a read-only installed tree passed 120 installation/output/PointCloud2 tests.
 The install prefix remained at its build-time path: relocating a workspace is
 not established by this test. Optional `--symlink-install` is a developer workflow.
 
@@ -366,8 +366,9 @@ colcon test --packages-select r3d_preprocessor r3d_planner
 colcon test-result --verbose
 ```
 
-The verified total is 86 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
-10 new output cases, 27 new installation cases and six lint checks. Launch
+The verified total is 171 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
+10 new output cases, 27 new installation cases, 83 PointCloud2 cases, two
+parameter-query cases and six lint checks. Launch
 lookup covers all four files using `--show-args`; seven node constructors use
 synthetic inputs and an isolated command topic without running follower control.
 This does not prove full navigation, motion safety, coverage or CI. Dependency
@@ -384,8 +385,10 @@ warnings from NetworkX `np.int` and ament tooling remain; they are not test fail
 - **No online start:** Confirm Odometry topic, frame IDs, timestamps and age
   limit, then `map -> odom` at the message timestamp. TF alone is insufficient.
 - **TF conflict:** Disable RViz calibration TF when global localization owns it.
-- **Filter output wrong:** Check the sensor's packed-XYZ binary layout and axes;
-  these assumptions remain unchanged.
+- **Filter output wrong:** Check valid scalar XYZ fields, dimensions and buffer
+  sizes; offsets, padding and endian order are decoded. Sensor axes, units and
+  calibration remain deployment contracts; no frame transformation is added by
+  the byte-layout correction.
 - **Python warnings/build errors:** Use the ROS system Python and consistent
   dependencies. The local workstation previously had a packaging conflict;
   the V4 isolated apt/Humble environment passes without the NumPy/SciPy

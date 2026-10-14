@@ -8,8 +8,8 @@ architecture and historical limitations explicitly distinguished.
 - **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
 - **Verified:** 26 Humble/Jammy keys; real rosdep install and check exit 0 in two
   fresh isolated apt containers. No skip keys. Two empty copy workspaces each
-  pass 86 tests (0 fail, 0 skip), including Flake8, PEP257 and copyright. A
-  separate source-free, read-only installation passes 37 installed/output cases.
+  pass 171 tests (0 fail, 0 skip), including Flake8, PEP257 and copyright. A
+  separate source-free, read-only installation passes 120 installed/output/PointCloud2 cases.
 - **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
   SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
   still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
@@ -51,19 +51,22 @@ launched by this workspace.
 - **Next step:** Align it with the external Nav2 bringup and plugin
   versions actually used on the robot.
 
-## 5. The local filter retains sensor-axis and binary-layout assumptions
+## 5. Field decoding is corrected; sensor-axis and follower-frame contracts remain
 
-- **Location:** `r3d_local_filter.py`
-- **Current behavior:** Input topic comes from robot YAML; effective distances, heights,
-  ROIs and thresholds are central YAML parameters. Binary decoding is unchanged. PointCloud2 is interpreted as packed XYZ float32 without generally
-  honoring fields, offsets, `point_step`, padding, or endianness. X forward, Y
-  lateral, and Z up are assumed.
-- **Impact:** The Go2W integration has been exercised, but the reference Hesai
-  configuration establishes only the topic and frame, not a packed 12-byte XYZ
-  contract. A cloud with intensity, padding, different offsets, or a different
-  `point_step` can be rejected or decoded incorrectly.
-- **Next step:** Inspect `fields`, `point_step`, endianness, and mounting axes on
-  the deployed Hesai topic and after every driver or sensor change.
+- **Location:** `cloud.py`, `r3d_local_filter.py`, `r3d_path_follower.py`.
+- **Current behavior:** Both consumers honor scalar numeric XYZ fields, offsets,
+  point/row strides and endian order. Organized, padded and extra-channel clouds
+  are supported; nonfinite XYZ is removed even when is_dense claims true.
+  Input bytes are preserved. Empty filter outputs have complete XYZ metadata.
+- **Rejected data:** Missing/non-scalar XYZ, unknown datatypes, inconsistent
+  strides and truncated buffers are logged and rejected, not published as clear.
+- **Remaining frame boundary:** Filter thresholds deliberately use sensor
+  coordinates with X forward, Y lateral, Z up; outputs retain the sensor header.
+  The current follower does not yet establish a timestamped sensor-to-base
+  transformation or obstacle timeout. Those behavioral migrations need the
+  separate approval recorded in central protocol section 17.4.
+- **Verification boundary:** Synthetic byte-layout and node-output regressions
+  establish decoding; no new physical sensor calibration or robot test.
 
 ## 6. Cliff and stair outputs have no internal consumer
 
@@ -179,7 +182,7 @@ launched by this workspace.
 
 - **Location:** both `test/` directories and Python sources.
 - **Current result:** Flake8, PEP257 and activated copyright checks all pass;
-  the complete colcon suite has 86 PASS / 0 FAIL / 0 SKIP. Own Apache headers
+  the complete colcon suite has 171 PASS / 0 FAIL / 0 SKIP. Own Apache headers
   use a form recognized by Humble's checker; original OSRF notices are preserved.
 - **Invocation limitation:** raw combined pytest collection of both package test
   directories can collide on their existing template filenames. Use `colcon test`
