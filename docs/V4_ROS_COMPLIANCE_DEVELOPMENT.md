@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-011 (historische Branch-Datenbereinigung und AP03-Dependencies/rosdep). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-012 (tatsächliche isolierte Humble-Dependencyinstallation). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -219,7 +219,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 |
 | Abhängigkeiten | Planfreigabe; AP02-Namens-/Metadatenkonsistenz; dokumentierte isolierte Humble-/Jammy-Umgebung ohne globale Reparatur; kein Lizenzentscheid für technische Schlüsselauskunft notwendig |
 | Abschlusskriterien | Import-/Manifest-Abgleich und alle 26 externen Keys Humble/Jammy VERIFIED; vollständige tatsächliche Dependency-Installation und rosdep check ohne Skip bleiben erforderlich; Copy-Build/Funktionstests getrennt von Lint-/OS-Gesamtnachweis |
-| Aktueller Status | **IN PROGRESS** — Manifeste/Keys/Simulation/Copy-Build/43 Funktionstests VERIFIED; Installation/check-Gate BLOCKED ohne freigegebene Systeminstallation oder bereits vollständig versorgte isolierte Zielumgebung |
+| Aktueller Status | **VERIFIED** — 26 externe Humble/Jammy-Keys, tatsächliche rosdep-Installation/check und Imports im gepinnten isolierten Container erfolgreich (V4-012); keine Host-/Multi-Distro-/Releasefreigabe |
 
 ### 4.5 AP04 - Build und Installationsportabilität
 
@@ -811,6 +811,40 @@ V4: keine PCD-Datei, NO CHANGE REQUIRED an V4-Karten. Beide Karten wurden nie ü
 **Grenzen:** keine tatsächliche apt-/rosdep-Installation, kein rosdep-check-PASS, kein Docker-/frischer OS-/Buildfarmlauf. Open3D 0.14.1/NetworkX 2.4 aus 17 ausschließlich nach /tmp geladenen und entpackten Jammy-Debs mit System-NumPy 1.21.5/SciPy 1.8.0 und nativem Humble getestet; vorhandene hostseitige ROS-/Systempakete weiterhin Voraussetzung. User-Site-NumPy 1.26.4/SciPy 1.8.0 produziert nachgewiesene Kompatibilitätswarnung; native getestete Kombination nicht. NetworkX 2.4 meldet bestehende np.int-Deprecations, keine globale Reparatur. Noble-Open3D-Regel ausdrücklich unavailable: AP09-Teilblocker, kein Jazzy-Runtimeversuch. Lizenz-/Defaultconfig-/Ausgabepfade-/CI-/Versionpolicy-/Release-Gates bleiben offen. AP04 als nächsten gesondert freizugebenden Schritt vorschlagen, hier nicht beginnen.
 
 **Betroffene Dateien:** r3d_planner/package.xml; r3d_preprocessor/package.xml; README.md; INSTALL.md; r3d_planner/README.txt; r3d_preprocessor/README.txt; docs/KNOWN_ISSUES.md; docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md. Commitreferenz: fokussierter Commit `fix(deps): correct ROS dependencies and rosdep keys`; SHA `d177d3052d9554b3a2a9a160a7a79ddb52c94e6f`; ergänzender Abschlussnachweis in Abschnitt 15.12. Historische Branchcommits/PDF/Historienobjekte davon getrennt.
+
+### V4-012 - Tatsächliche Humble-Dependencyinstallation verifizieren
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP03, AP08/AP10 Nachweise. **Betroffene Dateien:** nur zentrales Protokoll; keine Manifest-/Hoständerung. **Git-Commit:** `test(deps): verify rosdep installation on Humble`, Parent e204fee7e71aa915d76245223fb78003e268d158, eigene SHA späterer regulärer Nachtrag. **Status:** VERIFIED im definierten Humble/Jammy-Umfang.
+
+#### Ausgangssituation
+
+V4 sauber auf e204fee, ursprüngliche Baseline Vorfahr, V4-001..011 vollständig gelesen. Andere Branches/Remotes/Worktree/PDF geschützt. Bisher 26 gültige Keys/Simulation/entpackte Debs, aber kein Install-/Check-PASS; Host-Apt-Open3D/NetworkX weiterhin fehlen. Aktive Shell enthält Conda3.14 und fremde ROS-Overlays; System-Python3.10 vorhanden.
+
+#### Ziel der Änderung
+
+Tatsächliche Installation plus Check/Imports im isolierten Humble/Jammy-System, ohne Skip oder globalen Hosteingriff. AP04/AP06 gezielt weiter ausdrücklich freigegeben; AP05/AP07 weiterhin nicht beginnen.
+
+#### Technische Umsetzung
+
+Docker29.1.3 funktioniert außerhalb Sandbox; dort nur Socket-Sandboxzugriff zunächst abgelehnt, Hostkonfiguration unverändert. Offizielles ros:humble-ros-base gezogen, gepinnter Digest sha256:860e53793ccf575e5369b5e9a19939de2bfcfb46a299954d06f54f2af54fed19. Temporärer Container r3d-v4-humble-completion-20261014, kein privileged/host-network/sensitiver Mount. Nur /r3d-source readonly, temporäre /tools readonly und getrennte /results. ROS_DOMAIN_ID201/localhost/FastDDS, Python-System/Apt ohne Conda/User-Site. Container-Apt-Update und Workspacewerkzeuge, rosdep update/install/check; keine Paketversionpins oder Dependencykorrektur nötig.
+
+#### Begründung
+
+Realer Apt-/dpkg-Satz und Exit0-Check schließen das bisherige Installationsgate; entpackte Bibliotheken sind nicht mehr der alleinige Nachweis. Import-, Build-, Runtime- und Releaseabnahme bleiben unterschiedliche Prüfungen.
+
+#### Verifikation
+
+Container Ubuntu22.04/Python3.10.12/ROS Humble, rosdep0.27.0/colcon-core0.21.3/setuptools59.6.0/pytest6.2.5. 26 individuelle rosdep resolve --rosdistro humble --os=ubuntu:jammy Exit0. Tatsächliches rosdep install --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy -y Exit0, kein simulate/skip; anschließend rosdep check mit denselben Pfaden Exit0, „All system dependencies have been satisfied“. NumPy1.21.5/SciPy1.8.0/Open3D0.14.1/NetworkX2.4/YAML5.4.1 und benötigte ROS-Module importierbar. Keine SciPy/NumPy-Inkompatibilitätswarnung; alte NetworkX-np.int-Deprecations vorhanden. Module /usr/lib/python3/dist-packages und /opt/ros/humble, keine User-Site/Conda-/alten R3D-Overlays. Beide XMLs gültig/unverändert. Unveränderte Eingangssuite frisch im Container gebaut/getestet: 49 Testcases/45 PASS/2 Flake8 FAIL/2 Copyright SKIP, test-result Exit1, keine künstliche Gesamtabnahme.
+
+Fehlversuche: temporäres Bootstrap-nounset brach vor Apt bei ROS setup.bash mit AMENT_TRACE_SETUP_FILES unbound ab; Helper korrigiert, während Sourcen nounset aus. Erster tatsächlicher Install-/Checklauf bestand, spätere Hilfsabfrage des Debian-Metadatennamens catkin-pkg scheiterte; Versionprobe korrigiert, vollständiger finaler Bootstrap Exit0. Keine fehlerhafte Paketdeklaration daraus abgeleitet. Vollständige relevante Kommandos/Ausgaben in Abschnitt16.1; weitere Test-/Codeänderungen eigene IDs.
+
+#### Ergebnis
+
+AP03 ursprüngliche Humble-Kriterien jetzt VERIFIED: vorhandene konsistente Manifeste/26 Keys plus tatsächliche Installation/Check/Imports/reproduzierbares Verfahren. Kein Host-System-/pip-/Conda-/NVIDIA-/ROS-Eingriff. Hostdpkg meldet weiter keine python3-open3d/python3-networkx; Erfolg gilt für Container. Keine Multi-Distro-/CI-/Buildfarm-/Rechtsfreigabe.
+
+#### Auswirkungen
+
+Nur Dokumentation, keine Dependency-/Algorithmus-/ROS-Namens-/Lizenz-/Versionsänderung. Vorhandene Dockerimages nicht gelöscht, kein Push/Release, keine fremden Branches. AP04/AP06 folgen mit eigener Dokumentation und zielgerichteten Änderungen.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -2345,3 +2379,43 @@ AP03-Implementierungscommit erfolgreich erstellt, danach Arbeitsbaum/Index saube
 Finale Kontrollprüfung mit /usr/bin/python3 -B: 26 unveränderte Pythondateien syntaktisch gültig, beide Manifeste/catkin_pkg/0 Warnungen und finaler Share-Manifestvergleich erfolgreich. Alle nicht freigegebenen ursprünglichen 62 Dateipfade bytegleich; kein neuer Repositorypfad/keine PCDs. Frühere zehn V4-Ereignisblöcke bytegleich erhalten, 15 Hauptabschnitte, Markdown-Tabellenspalten konsistent. Keine neue Skip-Anweisung in aktueller Installations-/Paketdokumentation; historische eingefrorene Aussagen im Protokoll/V2-Bericht nicht entfernt. Beide LICENSE-Originale/PDF unverändert. Fünf aktuelle lokale Branch-Trees PCD-frei, 13 historische Commits weiterhin existierend, alte Branch-Tips direkte Vorfahren ihrer vier Löschcommits. Ursprüngliche Remote-Trackingrefs und alle früheren Gitconfig-Abschnitte unverändert; ausschließlich die freigegebenen neuen branch.V1/V2/V3-Trackingabschnitte hinzugekommen. Nur ursprünglicher V4-Worktree vorhanden. `git diff --check`, Index-Whitelist, Commit-Parent-/Dateiumfang-/Vorfahrprüfungen erfolgreich. Abschließende `git status`, `git branch -avv`, `git log --all --graph --oneline --decorate` bestätigen dieselben Branchrelationen und sauberen lokalen Endzustand.
 
 **Unverändert offene Abnahme:** AP03 IN PROGRESS für echten Installations-/Check-Nachweis, keine systemweite Installation. Copy-Build/Funktionstests und Key-Auflösung VERIFIED; Gesamtsuite bekannte zwei Lintfehler/zwei Skips. Kein Push/keine Veröffentlichung/Sichtbarkeitsänderung/History-Umschreibung/Hardwarebewegung. AP04 nur vorgeschlagen, nächste Nutzerfreigabe abwarten.
+
+
+## 16. AP03/AP04/AP06 – Isolierte Humble-Abnahme und Portabilität
+
+### 16.1 V4-012 – Tatsächliche Dependencies
+
+Getesteter Eingang e204fee; 16 vorherige Textchunks vollständig gelesen, ältere Einträge erhalten. Neues Ziel ist die tatsächliche technische Installation/Portabilität/Qualität; Rechte-/API-/CI-/Multi-Distro-Arbeit bleibt separat.
+
+```bash
+docker pull ros:humble-ros-base
+# gestartet mit gepinntem Digest, ro Quellmount, getrennten temporären tools/results:
+source /opt/ros/humble/setup.bash
+apt-get update
+apt-get install -y --no-install-recommends python3-colcon-common-extensions python3-rosdep
+rosdep update --rosdistro humble
+rosdep install --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy -y
+rosdep check --from-paths /r3d-source/r3d_planner /r3d-source/r3d_preprocessor --ignore-src --rosdistro humble --os=ubuntu:jammy
+# alle diese Apt-/rosdep-Befehle ausschließlich im Container, keine Hostinstallation
+```
+
+Relevante tatsächliche Ausgabe, finale Exitcodes 0:
+
+```text
+#All required rosdeps installed successfully
+All system dependencies have been satisfied
+BOOTSTRAP_INSTALL_AND_CHECK_PASS
+```
+
+Die erste erfolgreiche echte Installation ergänzt unter anderem python3-open3d, ros-humble-nav2-msgs, python3-scipy und python3-networkx samt Apt-Transitiven; übrige ROS/Testwerkzeuge bereits im Image bzw. vorherigem Container-Toolbootstrap. Zweiter idempotenter Ablauf ebenfalls erfolgreich, nicht als erneute frische Erstinstallation ausgegeben. Individuelle 26 Keyauflösungen separat bestanden. Vorhandene neun Host-PYC nie entfernt; temporäre Workspacekopien ohne Altcache. Hostdpkg/Interpreter/Remotes unverändert. Keine globale pip-/Conda-Mischung, keine zusätzliche Python-Umgebung als Benutzerpflicht.
+
+| Bibliothek | Tatsächliche Container-Version | Importpfad |
+|---|---|---|
+| NumPy | 1.21.5 | /usr/lib/python3/dist-packages/numpy |
+| SciPy | 1.8.0 | /usr/lib/python3/dist-packages/scipy |
+| Open3D | 0.14.1 | /usr/lib/python3/dist-packages/open3d |
+| NetworkX | 2.4 | /usr/lib/python3/dist-packages/networkx |
+| PyYAML | 5.4.1 | /usr/lib/python3/dist-packages/yaml |
+| benötigte ROS-/Launch-/TF2-/Messages | Humble-Apt-Pakete | /opt/ros/humble (Python3.10) |
+
+Warnungen: NetworkX2.4 np.int-Deprecations, keine SciPy-Kompatibilitätswarnung. Erster Helper-nounset-/catkin-Metadatenfehler separat von echten rosdep-Exit0-Ergebnissen dokumentiert. Das Containerimage und Workspacewerkzeuge allein ersetzen keinen späteren Projektbuild/Funktionstest. Noble-Open3D bleibt AP09-Problem, keine Jazzy-Unterstützung.
