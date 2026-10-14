@@ -878,6 +878,38 @@ Sharepolitik gezielt implementiert und statisch/mit 40 Fällen geprüft; Gesamt-
 
 Nur notwendige Installationspolitik und zugehörige Bestandsanleitung/Test; keine Versions-/Lizenz-/Dependency-/ROS-Interfaceänderung. AP05/AP07 nicht beginnen.
 
+### V4-014 - PCD-Eingabe und beschreibbare Analyseausgabe trennen
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP04/AP06/AP08. **Status:** VERIFIED für Output-I/O/10 neue Fälle und 40 bestehende Configfälle; vollständiger Install-/Nodeumfang folgt V4-016. **Git-Commit:** `fix(config): separate PCD input and output paths`. **Betroffene Dateien:** optionaler preprocessing.output_dir/YAML/Loader, Analyzer-I/O, neuer eigener Outputhelfer und gezielte Outputtests, bestehende Configfixture/Anleitungen, Protokoll.
+
+#### Ausgangssituation
+
+Analyzer schreibt <input>_analysed.pcd neben Input, prüft write_point_cloud-Ergebnis nicht und kann bestehende Dateien überschreiben; main meldet nach abgefangenen I/O-Fehlern keinen Fehlerexit. Share/default und explizite Nutzerconfig sind getrennt, Input darf außerhalb Paketen liegen.
+
+#### Ziel der Änderung
+
+Schreibgeschützte Inputs verarbeiten, Ausgabe in gewähltem beschreibbarem Verzeichnis; sicherer datenfreier Nutzerdefault statt Package-Share. Bestehende Filename-/Klassifikations-/Graphalgorithmen erhalten, keine fremden Outputs überschreiben, klare Fehler und Regressionen.
+
+#### Technische Umsetzung
+
+Implementiert: optionaler output_dir-String in preprocessing, YAML-relative/absolute/~ Auflösung; leeres Default führt zu XDG_DATA_HOME/r3d_preprocessor bzw. ~/.local/share/r3d_preprocessor. Echte exklusive Ausgabepublikation über temporäre PCD im Zielverzeichnis und os.link ohne überschreibenden Replace; vorhandene Dateien/Symlinks ablehnen, temporäres Artefakt bei Fehlern entfernen. Open3D-Schreibfehler und Exitstatus sichtbar. Nur I/O/Packaging-Konformitätsänderung, keine neue Planung/SLAM/API-Überarbeitung.
+
+#### Begründung
+
+Inputbesitz und Outputschreibrechte unabhängig, Package-Share ist Ressource. Optionaler Schlüssel hält alte gültige YAMLs ohne neues Feld kompatibel. Neue Parameter ausdrücklich dokumentieren.
+
+#### Verifikation
+
+Ausgeführt im Apt/Humble-Container als r3dtest UID1000: python3 -m pytest -p no:cacheprovider --basetemp=/work/tests-user/output test/test_output.py -q → Exit0, 10 passed in 0.19s, kein Skip. Reale Open3D-Ausgabe/Readback und unveränderter SHA eines 0444-Inputs in 0555-Inputverzeichnis; File-/dangling-Symlink-Kollisionen unverändert, simulated Open3Dfalse mit vollständigem Tempcleanup, tatsächlich unwritable 0555-Outputdir PermissionError. Defaults XDG/fallback und fehlende/directory/suffix-Inputs geprüft. Bestehende passende Configfälle erneut Exit0, 40 passed/3 deselected in 0.34s. ASTs aller Voxel-/Boden-/Clearance-/Traversierbarkeits-/Treppenfunktionen vor/nach identisch; nur save_colored_pcd-I/O, run_processing-Output und main-Exit bewusst verändert. Gesamte installierte Node-/Launchsuite folgt V4-016, keine vorweggenommene Bestätigung.
+
+#### Ergebnis
+
+Output-I/O und 50 passende Fälle bestanden, keine unerwartete Configregression. Gesamt-AP04/AP06 bleiben bis installierter Gesamtabnahme IN PROGRESS.
+
+#### Auswirkungen
+
+Kein neuer Topic/Action/Frame/Controller, keine Version-/Manifest-/Lizenztextänderung. Alte Daten unverändert, Tests nur temporäre synthetische PCDs.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -2456,3 +2488,12 @@ Warnungen: NetworkX2.4 np.int-Deprecations, keine SciPy-Kompatibilitätswarnung.
 ### 16.2 V4-013 – Reguläre Package-Share-Konfiguration
 
 Priorität unverändert: R3D_CONFIG_DIR → live Source/Symlink, wenn direkt aus Source importiert → normale installierte share/r3d_planner/config/planner_config.yaml. Robotpfad relativ zur tatsächlich gewählten YAML, Overridefehler führen nicht zu Defaultfallback. Ohne nutzerseitige PCDs meldet die erkannte installierte YAML weiterhin maps.<gewählter Pfad>: configure; keine Standardkarte. 40 bestehende passende Fälle PASS (Exit0), drei ROS-Ausführungsfälle später in voller Suite. Bestehender Ablehnungstest auf neuen Share-/Overridevertrag migriert, übrige Bestandsfälle erhalten. Anfangsfixture-Fehler explizit dokumentiert. Aktuelle README/INSTALL/CONFIGURATION/ARCHITECTURE/KNOWN_ISSUES aktualisiert, historische V3-/PDFberichte unverändert. Keine Version/License/Dependency/ROS-Namensänderung.
+
+
+### 16.3 V4-014 – PCD-Ausgabevertrag
+
+Neuer optionaler ROS-Parameter output_dir im Analyzer, zentrale Zuordnung preprocessing.output_dir. Ohne Feld/bei leerem String nutzerbezogenes XDG_DATA_HOME/r3d_preprocessor (nur absoluter XDG-Wert) oder ~/.local/share/r3d_preprocessor. Nichtleeres YAML output_dir relativ zur tatsächlichen YAML, absolute/~ möglich; Directory-file/Typ-/Whitespacefehler klar abweisen. Übriges striktes Schema unverändert, vorhandene gültige alte YAML ohne Feld akzeptiert. Die Filenamekonvention <stem>_analysed<pcd-suffix> bleibt erhalten; map_name muss den neuen Output manuell wählen.
+
+Kein Outputbesitz aus Inputpfad abgeleitet: tempfile ausschließlich im gewählten Ziel, Open3D schreibt dort, os.link veröffentlicht atomar ohne replace. Existierende Datei oder (auch dangling) Symlink bleibt unverändert, Tempdatei nach Erfolg/Fehler entfernt. Fehlendes/ungültiges Input, unbeschreibbare Ausgabe, Open3D-false/Exception liefern sichtbare Fehlermeldung und Analyzer-main Exit1; Erfolg Exit0. Kein Package-Share als impliziter Writeort. Explizite Nutzerwahl kann natürlich ein beliebiges eigenes beschreibbares Verzeichnis bestimmen. Keine neuen Planungs-/Klassifikationsberechnungen.
+
+Unprivilegierter echter I/O-Nachweis (kein root-Rechte-Pseudobeweis): 10 Outputfälle PASS/0 FAIL/0 SKIP, 40 bestehende Configfälle PASS/3 ROSfälle bewusst später; Voxel-/Floor-/Clearance-/Stairfunktion-ASTs identisch. Root würde den reinen DAC-Test skippen; finale Gesamtsuite wird deshalb als regulärer User ausgeführt, kein Skip-PASS. Die Dateioutput-Tests sind neue AP04-Regressionen, nicht nachträglich der Baseline zugerechnet. Lizenzentscheidung/SPDX-/Fremdnotices unverändert; neue eigene Helper-/Testdateien tragen passenden Apache-/SPDX-Hinweis.

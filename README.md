@@ -131,8 +131,11 @@ ros2 launch r3d_planner preprocessor.launch.py
 
 This starts the existing one-shot `r3d_preprocessor/pcd_analyser` node.
 It voxelizes the input, filters weak voxels, checks robot clearance, optionally
-fills floors, and writes `<input-name>_analysed.pcd` beside the input.
-An existing output with that name is overwritten. It publishes no TF or topics.
+fills floors, and writes `<input-name>_analysed.pcd` in
+`preprocessing.output_dir`. An empty value uses the user data directory
+(`$XDG_DATA_HOME/r3d_preprocessor`, otherwise `~/.local/share/r3d_preprocessor`).
+Inputs may be read-only. Existing outputs are rejected, including symlinks;
+choose a new output directory for another analysis. It publishes no TF or topics.
 Green marks floor, cyan narrow clearance, yellow stair access and magenta
 obstacles.
 

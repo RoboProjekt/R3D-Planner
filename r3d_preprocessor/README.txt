@@ -100,8 +100,11 @@ Select robot geometry using `robot_config`, then:
 ros2 launch r3d_planner preprocessor.launch.py
 ```
 
-The process exits after writing `<input-name>_analysed.pcd`. An existing
-output is overwritten. Geometry or processing changes require regenerating this
+The process exits after writing `<input-name>_analysed.pcd` to ROS parameter
+`output_dir`, supplied by optional `preprocessing.output_dir` in central YAML.
+Empty uses the XDG user data directory or `~/.local/share/r3d_preprocessor`.
+Inputs may be read-only; existing output files/symlinks are rejected. Select a
+new output directory for another analysis. Failed processing/writing exits nonzero. Geometry or processing changes require regenerating this
 artifact. They require no workspace rebuild or re-sourcing.
 
 Publish the centrally selected analyzed output:

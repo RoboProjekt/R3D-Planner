@@ -217,9 +217,14 @@ See [configuration reference](docs/CONFIGURATION.md) for all parameters.
 ros2 launch r3d_planner preprocessor.launch.py
 ```
 
-The one-shot analyzer writes `<input-name>_analysed.pcd` beside the input,
-overwriting any previous output of that name. It does not overwrite the input.
-Set `maps.map_name` to this output. Regenerate it whenever geometry or
+The one-shot analyzer writes `<input-name>_analysed.pcd` into
+`preprocessing.output_dir`, relative to the chosen YAML directory or an absolute/`~`
+path. An empty value uses `$XDG_DATA_HOME/r3d_preprocessor` (absolute XDG path),
+otherwise `~/.local/share/r3d_preprocessor`. The input may be read-only; no
+package-share write location is assumed. Existing output files or symlinks are
+rejected; choose another directory to retain multiple analyses. Input and existing
+output data remain intact. A failed analysis/write exits nonzero.
+Set `maps.map_name` to the resulting output path. Regenerate it whenever geometry or
 preprocessing/shared settings change. The analyzed PCD contains RGB classes,
 not configuration metadata; retain the generating settings with it.
 

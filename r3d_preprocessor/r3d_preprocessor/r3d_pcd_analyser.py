@@ -17,6 +17,8 @@ import numpy as np
 import os
 import traceback
 
+from .output import resolve_output_path, write_point_cloud_exclusive
+
 class VoxelTraversabilityAnalyzer:
     def __init__(self, pcd_path, voxel_size=0.05, max_stair_height=0.25, logger=None):
         self.pcd_path = pcd_path
@@ -290,17 +292,15 @@ class VoxelTraversabilityAnalyzer:
         out_pcd.colors = o3d.utility.Vector3dVector(np.array(colors))
         
         self.log(f"Speichere PCD mit {len(points)} Voxeln...")
-        try:
-            o3d.io.write_point_cloud(output_filename, out_pcd)
-            self.log(f"✅ Analyse erfolgreich gespeichert unter: {output_filename}")
-        except Exception as e:
-            self.log(f"[ERROR] Fehler beim Speichern: {e}")
+        write_point_cloud_exclusive(output_filename, out_pcd)
+        self.log(f"✅ Analyse erfolgreich gespeichert unter: {output_filename}")
 
 
 class PcdToGraphNode(Node):
     def __init__(self):
         super().__init__('pcd_to_graph_node')
         self.declare_parameter('pcd_path', 'environment.pcd')
+        self.declare_parameter('output_dir', '')
         self.declare_parameter('voxel_size_cm', 5.0)
         self.declare_parameter('max_step_height_cm', 25.0)
         
@@ -353,22 +353,24 @@ class PcdToGraphNode(Node):
             processor.identify_walkable_nodes()
             processor.identify_stairs()
             
-            # --- DATEINAME ANPASSEN (_analysed) ---
-            base_name, ext = os.path.splitext(pcd_path)
-            output_path = f"{base_name}_analysed{ext}"
-            
+            output_path = resolve_output_path(
+                pcd_path, self.get_parameter('output_dir').value)
             processor.save_colored_pcd(output_path)
-            
+            return True
+
         except Exception as e:
             self.get_logger().error(f"Abbruch durch Fehler: {e}")
             self.get_logger().error(traceback.format_exc())
+            return False
 
 def main(args=None):
     rclpy.init(args=args)
     node = PcdToGraphNode()
-    node.run_processing()
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        return 0 if node.run_processing() else 1
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

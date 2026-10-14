@@ -14,6 +14,8 @@ shared:
   max_step_height_cm: 25.0
 
 preprocessing:
+  # Empty uses the writable user data directory, never the input/package share.
+  output_dir: ''
   min_points_per_sqm: 10.0
   min_points_per_voxel: 3
   floor_height_tolerance: 0.02

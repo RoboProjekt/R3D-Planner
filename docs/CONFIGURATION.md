@@ -65,9 +65,16 @@ selected path to your own suitable PCD before launch; preprocessing requires
 `pcd_path`, while planner/map/follower require `map_name`. The unused value may
 remain empty or refer to a future output. Missing, non-PCD and directory inputs
 fail with the selected key and resolved path; no old example fallback exists.
-Only PCD files are accepted. The analyzer always writes `<input>_analysed.pcd`
-beside the input; keep `map_name` aligned manually and use a writable input
-location. Algorithms, topics, actions and node defaults are unchanged.
+Only PCD files are accepted. The analyzer preserves `<input>_analysed.pcd` as
+its filename, but writes it into optional `preprocessing.output_dir`; keep
+`maps.map_name` aligned manually. A nonempty output directory resolves relative
+to the selected YAML, or accepts absolute and `~` paths. The empty default uses
+`$XDG_DATA_HOME/r3d_preprocessor` when XDG_DATA_HOME is absolute, otherwise
+`~/.local/share/r3d_preprocessor`. Old YAMLs without output_dir use the same default.
+Input files/directories may be read-only. Output directories are created if needed;
+existing output files and symlinks are rejected without overwrite. Failed
+processing or writing produces a nonzero analyzer exit. Package shares are
+read-only resources and are never an implicit output directory.
 
 For a copied installation, create an editable user configuration from its share:
 
@@ -85,7 +92,10 @@ with your own files (the analyzed file need not exist until you start planning):
 ```yaml
 maps:
   pcd_path: /path/to/your/input.pcd
-  map_name: /path/to/your/input_analysed.pcd
+  map_name: /path/to/your/output/input_analysed.pcd
+preprocessing:
+  output_dir: /path/to/your/output
+  # Keep all other shipped preprocessing keys unchanged.
 ```
 
 No PCD is needed to install either package. Data ownership/permission remains
@@ -102,6 +112,7 @@ strictly below maximum step. PCD artifacts do not embed these values.
 
 | `preprocessing` key | Default | Unit / effect |
 |---|---:|---|
+| `output_dir` | empty | optional directory path; resolved as described above |
 | `min_points_per_sqm` | 10.0 | points/m²; floor-fill threshold `max(3, int(density * grid_m²))` |
 | `min_points_per_voxel` | 3 | integer hits; occupied-voxel filtering |
 | `floor_height_tolerance` | 0.02 | m; fill planarity `z_range < 2*tolerance + 0.02` |

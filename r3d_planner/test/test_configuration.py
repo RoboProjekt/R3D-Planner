@@ -34,6 +34,7 @@ def config(tmp_path):
                      'COUNT 1 1 1 1\nWIDTH 3\nHEIGHT 1\nVIEWPOINT 0 0 0 1 0 0 0\n'
                      'POINTS 3\nDATA ascii\n0 0 0 65280\n0.05 0 0 65280\n0.1 0 0 65280\n')
     central['maps'] = {'pcd_path': 'tiny.pcd', 'map_name': 'tiny.pcd'}
+    central['preprocessing']['output_dir'] = 'output'
     path = tmp_path / 'planner_config.yaml'
     def save():
         path.write_text(yaml.safe_dump(central))
@@ -254,7 +255,7 @@ def test_preprocessor_real_launch(config, monkeypatch):
     result = subprocess.run(['ros2', 'launch', 'r3d_planner', 'preprocessor.launch.py'],
                             capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert (path.parent / 'tiny_analysed.pcd').is_file(), result.stdout + result.stderr
+    assert (path.parent / 'output/tiny_analysed.pcd').is_file(), result.stdout + result.stderr
 
 
 def test_real_launch_restart_and_all_components(config, monkeypatch):

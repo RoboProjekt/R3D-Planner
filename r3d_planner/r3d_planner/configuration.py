@@ -65,11 +65,11 @@ def read_yaml(path):
     return value
 
 
-def keys(value, expected, location):
+def keys(value, expected, location, optional=()):
     if not isinstance(value, dict):
         raise ConfigurationError(f'{location}: expected a YAML mapping')
     missing = set(expected) - set(value)
-    extra = set(value) - set(expected)
+    extra = set(value) - set(expected) - set(optional)
     if missing or extra:
         raise ConfigurationError(
             f'{location}: missing keys {sorted(missing)}; unknown keys {sorted(extra)}')
@@ -165,8 +165,17 @@ def load_configuration(path=None, mode='planner'):
     keys(preprocessing, ['min_points_per_sqm', 'min_points_per_voxel', 'floor_height_tolerance',
                          'ground_fill', 'analysis_grid_size_cm', 'cluster_gap_threshold_cm',
                          'fill_plane_iterations', 'fill_plane_search_radius',
-                         'fill_plane_min_neighbors'], 'preprocessing')
+                         'fill_plane_min_neighbors'], 'preprocessing', optional=('output_dir',))
+    output_dir = preprocessing.get('output_dir', '')
+    if not isinstance(output_dir, str) or (output_dir and not output_dir.strip()):
+        raise ConfigurationError('preprocessing.output_dir: expected a directory path or empty string')
+    if output_dir:
+        output_dir = str((path.parent / Path(output_dir).expanduser()).resolve())
+        if Path(output_dir).exists() and not Path(output_dir).is_dir():
+            raise ConfigurationError('preprocessing.output_dir: expected a directory')
     for key, value in preprocessing.items():
+        if key == 'output_dir':
+            continue
         if key == 'ground_fill':
             if type(value) is not bool:
                 raise ConfigurationError('ground_fill must be boolean')
@@ -233,7 +242,7 @@ def load_configuration(path=None, mode='planner'):
                          **ros_parameters(preprocessing, (
                              'min_points_per_voxel', 'fill_plane_iterations',
                              'fill_plane_search_radius', 'fill_plane_min_neighbors')),
-                         'pcd_path': maps['pcd_path']},
+                         'pcd_path': maps['pcd_path'], 'output_dir': output_dir},
         'planner': {**common, **shared, **ros_parameters(planner), 'map_name': maps['map_name']},
         'live_filter': {**ros_parameters(live, (
                             'stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points')),
