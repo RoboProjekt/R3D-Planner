@@ -810,7 +810,7 @@ V4: keine PCD-Datei, NO CHANGE REQUIRED an V4-Karten. Beide Karten wurden nie ü
 
 **Grenzen:** keine tatsächliche apt-/rosdep-Installation, kein rosdep-check-PASS, kein Docker-/frischer OS-/Buildfarmlauf. Open3D 0.14.1/NetworkX 2.4 aus 17 ausschließlich nach /tmp geladenen und entpackten Jammy-Debs mit System-NumPy 1.21.5/SciPy 1.8.0 und nativem Humble getestet; vorhandene hostseitige ROS-/Systempakete weiterhin Voraussetzung. User-Site-NumPy 1.26.4/SciPy 1.8.0 produziert nachgewiesene Kompatibilitätswarnung; native getestete Kombination nicht. NetworkX 2.4 meldet bestehende np.int-Deprecations, keine globale Reparatur. Noble-Open3D-Regel ausdrücklich unavailable: AP09-Teilblocker, kein Jazzy-Runtimeversuch. Lizenz-/Defaultconfig-/Ausgabepfade-/CI-/Versionpolicy-/Release-Gates bleiben offen. AP04 als nächsten gesondert freizugebenden Schritt vorschlagen, hier nicht beginnen.
 
-**Betroffene Dateien:** r3d_planner/package.xml; r3d_preprocessor/package.xml; README.md; INSTALL.md; r3d_planner/README.txt; r3d_preprocessor/README.txt; docs/KNOWN_ISSUES.md; docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md. Commitreferenz: fokussierter Commit `fix(deps): correct ROS dependencies and rosdep keys`; SHA nach Erstellung im Abschlussnachweis in Abschnitt 15. Historische Branchcommits/PDF/Historienobjekte davon getrennt.
+**Betroffene Dateien:** r3d_planner/package.xml; r3d_preprocessor/package.xml; README.md; INSTALL.md; r3d_planner/README.txt; r3d_preprocessor/README.txt; docs/KNOWN_ISSUES.md; docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md. Commitreferenz: fokussierter Commit `fix(deps): correct ROS dependencies and rosdep keys`; SHA `d177d3052d9554b3a2a9a160a7a79ddb52c94e6f`; ergänzender Abschlussnachweis in Abschnitt 15.12. Historische Branchcommits/PDF/Historienobjekte davon getrennt.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -2327,3 +2327,21 @@ Quellen/Stand 14.10.2026, tatsächliche resolve/where-defined/apt-policy/Debimpo
 | D07 | lokal SciPy __init__.py, apt-cache policy und importmodule.__file__/__version__ | tatsächliche NumPy-/SciPy-Mischung, erwarteter Range und isolierte Gegenprobe; keine unbekannte Installationsherkunft behauptet |
 
 **Nächster vorgeschlagener Entwicklungsschritt:** AP04 – Build and Installation Portability nach ausdrücklicher neuer Freigabe. Share-Verzeichnisse/Copy-Konfiguration/ressourcenunabhängige Pfade/beschreibbare Ausgaben/Launches ohne Source und reproduzierbarer Clean-Build; offen gebliebenen AP03-Installationsnachweis dabei sauber getrennt nachholen. Kein automatischer Beginn, kein Push.
+
+
+### 15.12 Commitreferenzen und abschließende Kontrollprüfung
+
+| Ereignis | Branch / Commit | Nachgewiesener Umfang |
+|---|---|---|
+| historische Kartenbereinigung | V1 / `91ccb1a824e7d2d7163433f13594d6c07855b1c5` | eigener direkter Nachfolger `01348f3285a0e7582f70cc5f2ed3d1bf4b7f904b`; zwei Karten und vier minimale Folge-Dateien, kein Merge |
+| historische Kartenbereinigung | V2 / `cc2f5bef269b3dcb1664bc52bba1d9c0be1bd1ca` | eigener direkter Nachfolger `3abd002e8cc9e7a26cacaf43a5c20b1822664f14`; zwei Karten und vier minimale Folge-Dateien, kein Merge |
+| historische Kartenbereinigung | V3 / `a914f0e4cd793f1ed7f35501e09a7ca865914b67` | eigener direkter Nachfolger `3752404a08867e9e6f3725300b88e148d4d5be37`; zwei Karten und vier minimale Folge-Dateien, kein Merge |
+| historische Kartenbereinigung | main / `51a08ed3da1bd43f06d89c6a84bbbd540aaf5861` | eigener direkter Nachfolger `c65642fe56015556f696364a724cb5b976a27888`; zwei Karten und vier minimale Folge-Dateien, kein Merge |
+| V4-010 Dokumentation | V4 / `b8967211a2a6696f3bfebdd32e8793a315d6eb86` | nur zentrales Protokoll; unmittelbarer Vorgänger d2e05e6 |
+| V4-011 AP03 Implementierung | V4 / `d177d3052d9554b3a2a9a160a7a79ddb52c94e6f` | genau acht Manifest-/Dokumentationsdateien; unmittelbarer Vorgänger `b8967211a2a6696f3bfebdd32e8793a315d6eb86` |
+
+AP03-Implementierungscommit erfolgreich erstellt, danach Arbeitsbaum/Index sauber. Abschließender separater Protokollcommit dokumentiert diese entstandenen SHAs und Kontrollprüfung; seine eigene SHA ist aus `git log -1 --format=%H --grep='docs(deps): record AP03 verification and commit references'` auflösbar. Keine selbstreferenzielle SHA oder amend erforderlich.
+
+Finale Kontrollprüfung mit /usr/bin/python3 -B: 26 unveränderte Pythondateien syntaktisch gültig, beide Manifeste/catkin_pkg/0 Warnungen und finaler Share-Manifestvergleich erfolgreich. Alle nicht freigegebenen ursprünglichen 62 Dateipfade bytegleich; kein neuer Repositorypfad/keine PCDs. Frühere zehn V4-Ereignisblöcke bytegleich erhalten, 15 Hauptabschnitte, Markdown-Tabellenspalten konsistent. Keine neue Skip-Anweisung in aktueller Installations-/Paketdokumentation; historische eingefrorene Aussagen im Protokoll/V2-Bericht nicht entfernt. Beide LICENSE-Originale/PDF unverändert. Fünf aktuelle lokale Branch-Trees PCD-frei, 13 historische Commits weiterhin existierend, alte Branch-Tips direkte Vorfahren ihrer vier Löschcommits. Ursprüngliche Remote-Trackingrefs und alle früheren Gitconfig-Abschnitte unverändert; ausschließlich die freigegebenen neuen branch.V1/V2/V3-Trackingabschnitte hinzugekommen. Nur ursprünglicher V4-Worktree vorhanden. `git diff --check`, Index-Whitelist, Commit-Parent-/Dateiumfang-/Vorfahrprüfungen erfolgreich. Abschließende `git status`, `git branch -avv`, `git log --all --graph --oneline --decorate` bestätigen dieselben Branchrelationen und sauberen lokalen Endzustand.
+
+**Unverändert offene Abnahme:** AP03 IN PROGRESS für echten Installations-/Check-Nachweis, keine systemweite Installation. Copy-Build/Funktionstests und Key-Auflösung VERIFIED; Gesamtsuite bekannte zwei Lintfehler/zwei Skips. Kein Push/keine Veröffentlichung/Sichtbarkeitsänderung/History-Umschreibung/Hardwarebewegung. AP04 nur vorgeschlagen, nächste Nutzerfreigabe abwarten.
