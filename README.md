@@ -36,9 +36,9 @@ existing third-party notices retain their original attribution and conditions.
 
 V4 is currently developed locally. The project has no official ROS Index
 registration or Bloom/Buildfarm release; `0.0.1` is not a released ROS version.
-V4 bundles no PCD maps and requires user-provided inputs. The source-clone
-instructions below refer to the existing public V3 branch, not an unpublished
-V4 remote branch.
+V4 bundles no PCD maps and requires user-provided inputs. The public V3 source
+remains available; the V4 installation instructions below require the existing
+local V4 checkout.
 
 ## Installation
 
@@ -48,22 +48,30 @@ use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
 Sensor drivers, odometry, global localization and the robot command adapter
 remain external. No specific SLAM package is a dependency.
 
-Install the apt dependencies listed in [INSTALL.md](INSTALL.md), then:
+For the local V4 checkout, follow [INSTALL.md](INSTALL.md) to place both packages
+below a workspace's `src` directory. The public V3 branch does not contain the
+AP03 manifest corrections. Use the native Humble system interpreter, with no
+Conda or unrelated workspace overlays:
 
 ```bash
-mkdir -p <path-to-workspace>/src
-cd <path-to-workspace>/src
-git clone git@github.com:RoboProjekt/R3D-Planner.git
-cd R3D-Planner
-git checkout V3
 cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
+export PYTHONNOUSERSITE=1
 sudo rosdep init  # only if not initialized on this machine
-rosdep update
-rosdep install --from-paths src --ignore-src -r -y --skip-keys="numpy scipy"
+rosdep update --rosdistro humble
+rosdep install --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy -y
+rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy
 colcon build --symlink-install
 source install/setup.bash
 ```
+
+AP03 verified every external manifest key and a regular copy build. Dependency
+installation was simulated; the audit host still lacks the installed apt packages
+for Open3D and NetworkX. Functional ROS regressions and existing lint failures
+are distinguished in the development protocol. These checks do not establish a
+clean-machine release or support for newer distributions.
 
 Replace angle-bracket placeholders before running commands. Source ROS and the
 workspace once in each new terminal. `--symlink-install` makes source

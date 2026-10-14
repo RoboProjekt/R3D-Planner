@@ -1,18 +1,26 @@
 # Known Limitations and Maintenance Notes
 
-These maintenance notes apply to the PCD-only V3 development branch. They cover
-constraints that affect installation, integration, and future development.
+These maintenance notes describe the V4 development tree, with retained V3
+architecture and historical limitations explicitly distinguished.
 
-## 1. Dependency metadata remains incomplete
+## 1. V4 dependency keys corrected; installation and test gates remain
 
-- **Location:** both `package.xml` files and Python imports
-- **Current behavior:** `numpy` and, depending on the rosdep database, `scipy` are
-  not valid rosdep keys. Open3D, NetworkX,
-  `sensor_msgs_py` and some direct message imports are not fully
-  represented in the manifests.
-- **Impact:** `rosdep install` can fail or leave runtime dependencies missing.
-- **Next step:** Establish correct rosdep keys for ROS 2 Humble
-  and validate revised manifests in a dedicated dependency-maintenance step.
+- **Location:** both `package.xml` files and [INSTALL.md](../INSTALL.md).
+- **AP03 result:** direct runtime imports, launch APIs, Python TF2 provider,
+  setuptools and existing test tools are declared with verified Humble/Jammy
+  rosdep keys. `numpy`/`scipy` were replaced by `python3-numpy`/`python3-scipy`;
+  V4 needs no skip list. Public historical branches retain older metadata.
+- **Validation boundary:** per-key resolution and install simulation pass. The
+  audit host has no installed apt Open3D/NetworkX, so its `rosdep check` fails
+  for precisely those two packages. A temporary extracted Jammy-apt environment
+  supports a copy build and runtime regression testing; it is not a clean host
+  populated by rosdep. Two existing Flake8 tests fail and copyright tests remain
+  skipped. See the central protocol for complete initial/final test results.
+- **Version issue:** user-site NumPy 1.26.4 with apt SciPy 1.8.0 produces a
+  compatibility warning. Use native Python 3.10 and consistent apt libraries;
+  no global pip/Conda correction was performed in AP03.
+- **AP09 boundary:** the official Open3D key is unavailable for Ubuntu Noble;
+  Humble/Jammy resolution does not establish Jazzy support.
 
 ## 2. Standalone planner defaults still refer to uninstalled maps
 

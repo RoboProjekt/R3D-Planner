@@ -120,14 +120,16 @@ the central YAML automatically.
 
 ## Dependencies
 
-### Declared dependencies
+V4 runtime keys: `rclpy`, `sensor_msgs`, `python3-numpy`, `python3-open3d`
+and `python3-setuptools`. Setuptools is also the declared packaging buildtool.
+Tests declare `python3-pytest`, `ament_copyright`, `ament_flake8` and
+`ament_pep257`; `ament_python` remains the build type.
 
-`rclpy`, `sensor_msgs`, and `numpy`.
-
-### Additional runtime dependency
-
-Open3D. `package.xml` does not yet provide complete rosdep metadata; see
-`../INSTALL.md` and `../docs/KNOWN_ISSUES.md`.
+The corrected keys resolve on Humble/Jammy. Dependency installation was only
+simulated in AP03; the audit host still lacks installed apt Open3D (and NetworkX
+for the planner). Temporary extracted Jammy libraries support the tested copy
+build and functional regressions. See `../INSTALL.md` and
+`../docs/KNOWN_ISSUES.md` for the regular rosdep procedure and remaining checks.
 
 ## Integration
 

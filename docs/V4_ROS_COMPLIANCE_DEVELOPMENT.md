@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-009 (AP02-Metadaten, PDF-Versionierung und dokumentierte Kartenerklärung). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-011 (historische Branch-Datenbereinigung und AP03-Dependencies/rosdep). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -26,6 +26,8 @@ Die Initialisierung ist noch keine Freigabe für Codeänderungen. Gemäß Abschn
 **V4-007, 14. Oktober 2026:** Das zuvor unversionierte historische PDF ist unverändert in Git aufgenommen: 33 Seiten, 298707 Byte, SHA-256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383. Frühere Angaben „unversioniert“ beschreiben den jeweiligen früheren Eingangszustand, keine aktuelle Anweisung. Historischer Inhalt/alte Kartendarstellung und Software-Lizenzgrenzen bleiben unverändert.
 
 **V4-008/V4-009, 14. Oktober 2026:** AP02 im freigegebenen technischen Umfang **VERIFIED**: beide Manifeste und setup.py konsistent Version 0.0.1, fachliche englische Beschreibungen, vorhandene Repository-/Bugtracker-URLs und bekannte Autorrolle. Maintainer bauya/baau1001@stud.hs-kl.de, Namen, ament_python, Dependencies, Entry-Points und Lizenzressourcen unverändert. Entwicklungsversion, kein ROS-Release. Der Entwickler erklärt eigene Aufnahme/Verarbeitung der früheren PCDs und keine verletzten Datenschutzauflagen; das ist dokumentierte Selbstauskunft, kein unabhängiger Rechtenachweis. V4 bleibt datenfrei; gewünschte spätere Kartenentfernung aus V1/V2/V3/main ist nur dokumentiert und nicht ausgeführt.
+
+**V4-010/V4-011, 14. Oktober 2026 – aktueller Stand:** Historische lokale V1/V2/V3/main-Trees durch vier neue getrennte Commits datenfrei, Ursprung/13 alte Commits/Remote-Trees/PDF unverändert. AP03-Manifeste korrigiert, 26 externe Humble/Jammy-Keys und Install-Simulation VERIFIED, Copy-Build/43 Funktionstests VERIFIED. Gesamtsuite: 49 Tests, 45 bestanden, 2 bestehende Flake8-Fehler, 2 Copyright-Skips. AP03 insgesamt **IN PROGRESS**: tatsächliche rosdep-Installation/check in vollständig versorgter isolierter Umgebung nicht ausgeführt; Hostcheck meldet fehlende Apt-Open3D/NetworkX. Kein globaler Python-/System-/Conda-Eingriff, kein Push. Frühere NOT STARTED-Angaben in datierten Einträgen sind historische Snapshots. Aktuelle Annahmen und Grenzen in Abschnitt 15.
 
 ## 2. Technischer Ausgangsstand
 
@@ -213,11 +215,11 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | --- | --- |
 | Ausgangsstand | ROS-/Science-Deklarationen und Apt-Anleitung vorhanden; direkter Importabgleich initial erstellt; Skip-Workaround dokumentiert |
 | Probleme | B04-B06: direkte Dependencies fehlen, Systemschlüssel und Kategorien ungesichert; Python-TF2-Provider prüfen; install_requires ist kein vollständiger ROS-Distributionsvertrag |
-| Geplante Änderung | Alle Runtime-/Launch-/Testimporte paketweise zuordnen; validierte System-/ROS-Schlüssel und passende Kategorien verwenden; unbenötigte Einträge nur nach Nachweis entfernen; Skip-Workaround aus finalem Verfahren ablösen |
+| Geplante Änderung | V4-011 korrigiert direkte Runtime-/Buildtool-/Testverträge und aktive Installationsanleitung; offene echte Installation/check in isolierter Umgebung als nächsten AP03-Nachweis behandeln |
 | Priorität | P0 |
 | Abhängigkeiten | Planfreigabe; AP02-Namens-/Metadatenkonsistenz; dokumentierte isolierte Humble-/Jammy-Umgebung ohne globale Reparatur; kein Lizenzentscheid für technische Schlüsselauskunft notwendig |
-| Abschlusskriterien | Import-/Manifest-Abgleich vollständig; alle Keys für Humble/Jammy aufgelöst; Dependency-Installation und rosdep check ohne Skip erfolgreich, Befehle/Versionen protokolliert |
-| Aktueller Status | **NOT STARTED** |
+| Abschlusskriterien | Import-/Manifest-Abgleich und alle 26 externen Keys Humble/Jammy VERIFIED; vollständige tatsächliche Dependency-Installation und rosdep check ohne Skip bleiben erforderlich; Copy-Build/Funktionstests getrennt von Lint-/OS-Gesamtnachweis |
+| Aktueller Status | **IN PROGRESS** — Manifeste/Keys/Simulation/Copy-Build/43 Funktionstests VERIFIED; Installation/check-Gate BLOCKED ohne freigegebene Systeminstallation oder bereits vollständig versorgte isolierte Zielumgebung |
 
 ### 4.5 AP04 - Build und Installationsportabilität
 
@@ -229,7 +231,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 |
 | Abhängigkeiten | AP03 für vollständigen Clean-Build; AP01 für öffentliche Mitlieferung der vorhandenen Karten, nicht für synthetische Installationsfixtures; AP06-Regressionen begleitend |
 | Abschlusskriterien | Copy-Build/Install ohne Symlink; Tests bei nicht zugänglichem ursprünglichem Source-Checkout; Nodes/Launches/Config/Robotprofile auffindbar; Analyse schreibt ausschließlich in gewählten beschreibbaren Datenpfad; Source-/Override-Verhalten dokumentiert |
-| Aktueller Status | **IN PROGRESS** - Nutzerkarten/externes Config-Verzeichnis und temporärer Copy-Build geprüft; vollständige Installations-/Ausgabeportabilität offen |
+| Aktueller Status | **IN PROGRESS** — V4-011 zusätzlicher nativer Copy-Build und installierte Ressourcen/Entry-Point-Imports verifiziert; implizite Share-Konfiguration, Ausgabepfade und reproduzierbarer Clean-OS-Build offen, keine neue AP04-Implementierung |
 
 ### 4.6 AP05 - ROS-Schnittstellen und Konfiguration
 
@@ -253,7 +255,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | **IN PROGRESS** - bestehende 20 plus 23 neue Kartenpfadfälle geprüft; allgemeine Lint-/Coverage-/Regressionstiefe offen |
+| Aktueller Status | **IN PROGRESS** — 43 vorhandene Funktionsfälle in Apt/Humble-Copy-Umgebung bestanden; Gesamtsuite 2 bestehende Flake8-Fehler/2 Copyright-Skips, Coverage/weitere Regressionen offen |
 
 ### 4.8 AP07 - CI/CD
 
@@ -277,7 +279,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für korrekte Nutzung; P2/P3 für weitergehende Policies |
 | Abhängigkeiten | Begleitet alle APs; Lizenztext nur nach AP01; konkrete Support-/API-Zusagen erst anhand AP06/AP09 |
 | Abschlusskriterien | Nachvollziehbare Änderungs-IDs und Commitreferenzen, zutreffende Prüfberichte, reproduzierbare aktualisierte Nutzeranleitungen; dokumentierte Grenzen statt pauschaler Quality-Level-/ABI-Garantie |
-| Aktueller Status | **IN PROGRESS** - Protokoll bis V4-009, historisches PDF versioniert, AP02- und Erklärungsnachweise ergänzt; laufende Entwicklung/Policies weiter offen |
+| Aktueller Status | **IN PROGRESS** — Protokoll bis V4-011, aktuelle Dependency-/Installations-/Datenbereinigungsnachweise und Bestandsdokumentation aktualisiert; übrige Policies/Dokumentation offen |
 
 ### 4.10 AP09 - ROS-Distributionskompatibilität
 
@@ -289,7 +291,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für Humble; P2 für weitere freigegebene Ziele |
 | Abhängigkeiten | AP03-AP06; CI kann später geeignete Matrixnachweise liefern |
 | Abschlusskriterien | Zielbezogene Dependency-/Build-/Test-/Installnachweise mit OS/Python/ROS-Versionen; weitere Distributionen erst nach Ausführung als unterstützt bezeichnen |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **NOT STARTED** — neue AP03-Key-Erkenntnis: python3-open3d unter Noble unavailable; keine Multi-Distribution-Implementierung/Runtimeverifikation |
 
 ### 4.11 AP10 - ROS Index und Releasevorbereitung
 
@@ -301,13 +303,13 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 für offene Release-Gates; Umsetzung nach technischen Grundlagen |
 | Abhängigkeiten | AP01-AP04 zwingend für belastbaren Abschluss; AP05/AP06 für vorgesehenen Produktvertrag; AP08/AP09 für Ziel-/Wartungszusagen; AP07 als Projektqualitätsnachweis |
 | Abschlusskriterien | Geprüfte Checkliste, konsistente Version/Ref, vollständige Dependencies, funktionierender Copy-Install, geklärte Rechte; Veröffentlichung nur nach gesonderter Autorisierung und externer Bestätigung |
-| Aktueller Status | **IN PROGRESS** - AP02-Metadaten abgenommen, 0.0.1 nur Entwicklungsversion; Versions-/Releasepolitik, Dependency-/Install-/Rechts-/Serverreviewgates offen; keine Publikation |
+| Aktueller Status | **IN PROGRESS** — Metadata/Dependency-/Daten-Teilblocker korrigiert; echte Installation/check, Defaultportabilität, Rechtsgesamtgate, Version-/Releasevorbereitung weiterhin offen; keine Veröffentlichung |
 
 ### 4.12 Abhängigkeitsgerechte Reihenfolge und nächste Freigabe
 
 AP01-Lizenzentscheidung und beauftragte technische Lizenzimplementierung sind abgeschlossen. Offene Vertrags-, Karten- und konkrete Distributionsrechte sperren weiterhin die entsprechende Veröffentlichung, nicht jede unabhängige technische Arbeit. Die bereits begründete Apache-Wahl muss dafür nicht erneut recherchiert werden. Bei konkreten entgegenstehenden Hinweisen ist die betroffene Lizenzzuordnung zu stoppen und neu zu beurteilen.
 
-AP02 ist nun technisch VERIFIED. Als nächster **gesondert zu beauftragender** Schritt wird AP03 (Dependency Management/rosdep) vorgeschlagen, danach AP04 → AP05 mit begleitenden AP06-Regressionen/AP08-Dokumentation. AP04/AP10 müssen auch den tatsächlichen Installations-/Binärumfang einschließlich Pflichttexten prüfen. AP07 folgt stabilen Grundlagen; AP09/AP10 benötigen eigene ausgeführte Nachweise. AP03 wird ohne ausdrückliche nächste Freigabe nicht begonnen; kein Push und keine Releaseausführung nach diesem Auftrag.
+AP01 technisch und AP02 VERIFIED; AP03 wurde unter V4-011 ausdrücklich bearbeitet und bleibt IN PROGRESS für echte Installation/check. Nächster gesondert freizugebender Schritt: AP04 – Build and Installation Portability (Share-Konfiguration, Copy-Ressourcen, beschreibbare Ausgaben, Launches ohne Source, reproduzierbarer Clean-Build). AP06/AP08 begleiten; AP07 erst auf stabilen Grundlagen; AP09/AP10 benötigen eigene ausgeführte Nachweise. AP04 nicht automatisch beginnen, kein Push oder Release.
 
 ## 5. Entwicklungsprotokoll
 
@@ -792,6 +794,24 @@ V4: keine PCD-Datei, NO CHANGE REQUIRED an V4-Karten. Beide Karten wurden nie ü
 
 **Baseline/Historie:** `c65642fe56015556f696364a724cb5b976a27888` bleibt dasselbe Commitobjekt und Vorfahr von main/V4. Alle ursprünglichen Tips/13 historischen Commits bleiben erreichbar, alte Trees enthalten die identischen Kartenblobs weiterhin. Das 33-seitige PDF ist unverändert: SHA256 `8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383`. Öffentliche GitHub-Trees, Forks und Kopien wurden nicht verändert; keine vollständige rückwirkende Entfernung behaupten. V4-Code am Ende von Teil A weiterhin d2e05e6/bytegleich/sauber. Dokumentationscommit: der Commit, der V4-010 enthält (auflösbar via `git log -- docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md`); historische Commitreferenzen oben vollständig.
 
+### V4-011 - Direkte Dependencies und Humble/Jammy-rosdep-Verträge korrigieren
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP03, begleitend AP04/AP06/AP08/AP09/AP10 nur Nachweise/Planung. **Status:** Implementierung/Importabgleich/Key-Auflösung/Copy-Build/43 Funktionstests VERIFIED; AP03 insgesamt IN PROGRESS, Installations-/Check-Gate BLOCKED in der derzeit ohne Systeminstallation zugelassenen Umgebung. Keine vollständige Clean-OS-/Lint-/Release-Verifikation.
+
+**Vor Umsetzung dokumentierter Scope:** Nach gesondertem Abschluss von V4-010 ist AP03 ausdrücklich freigegeben. Ausgangs-V4 d2e05e6; vor Dependencyänderung separater V4-Dokumentationscommit `b8967211a2a6696f3bfebdd32e8793a315d6eb86`. Nur beide XML-Dependencyblöcke und bestehende README/INSTALL/KNOWN_ISSUES/Paket-READMEs/Protokoll ändern. setup.py/setup.cfg, Algorithmen, ROS-Verträge, Launchdateien, Testdateien, Entry-Points, Lizenztexte und AP02-Metadaten bytegleich erhalten. Kein globales pip/Apt-/Conda-Update; ausschließlich aktuelle offizielle rosdep-Regeln und isoliert entpackte Jammy-Apt-Archive für Prüfungen. Keine eigenen Keys, keine Skip-Endlösung, keine AP04-Implementierung.
+
+**Ausgangsstand/Problem:** ROS-/Science-Manifestangaben und Apt-Liste vorhanden, aber 128 AST-Importstellen in 26 Python-Dateien zeigen direkte Lücken (Open3D beide Pakete, NetworkX/std_msgs/sensor_msgs_py Planner); numpy/scipy sind ungültige Keys. tf2_ros war vorhanden, bezeichnet jedoch nicht den direkt importierten Python-Provider. Externe Robotikpublisher/Hesai/SLAM/Unitree/Nav2-Bringup sind keine eingebauten Bibliotheken. setuptools/tests_require/Marker-/Script-/License-/Launch-/Config-Mitnahme bestanden bereits vor AP03.
+
+**Entscheidung/Umsetzung:** Alle reinen Python-/ROS-Runtimeimporte als exec_depend; kein pauschaler depend mit unbelegten Compile-/Exportrollen. NumPy → python3-numpy beide, SciPy → python3-scipy Planner; Open3D beide und NetworkX/sensor_msgs_py/std_msgs Planner ergänzt; tf2_ros durch tf2_ros_py ersetzt. Planner behält launch/launch_ros/ament_index_python/python3-yaml/r3d_preprocessor. Beide Pakete deklarieren python3-setuptools als buildtool_depend (setup.py/colcon) und exec_depend (bestehendes install_requires); verschiedene Rollen, kein doppelter identischer Tag. ament_python bleibt build_type, nicht erfundener Buildtool-Key. Vier vorhandene Testdeps bleiben; Planner ergänzt ros2cli/ros2launch/ros2param für tatsächlich ausgeführte CLI-Integrationstests. Keine Paketstruktur-, Lizenz-, Versions- oder Algorithmusänderung. setup.py bleibt vollständig bytegleich: install_requires=['setuptools'], tests_require=['pytest']; kein ROS-/Science-pip-Parallelresolver. Source/colcon hat Vorrang, kein PyPI-Vollruntimevertrag zugesagt.
+
+**Dokumentation:** Aktive V4-README/INSTALL-Anleitung mit normalem rosdep ohne Skip-Liste. Unveröffentlichter lokaler V4-Clone gegenüber unveränderten öffentlichen V3-Metadaten ausdrücklich unterschieden; kein erfundener origin/V4. Manuelle Voll-Apt-Liste durch manifestbasierten Prozess ersetzt, Workspace-Buildtools separat, RViz/TF-CLI/Hesaisensor/Odometry/Robotadapter optional/extern. KNOWN_ISSUES und beide Paket-READMEs aktualisiert statt den behobenen Keyfehler weiter als aktuellen V4-Blocker auszugeben. Historisch eingefrorener V2-REFERENCE_COMPARISON-Bericht bleibt unverändert und benennt frühere rosdep-Exclusions ausdrücklich für seinen Snapshot.
+
+**Verifikation/Ergebnis:** 2 Manifeste mit catkin_pkg 1.1.1/Package.validate und 0 Warnungen; AP02-Metadaten und 24 sonstige Python-Dateien sowie beide setup.py/AP01-Lizenzen bytegleich. 26 tatsächlich deklarierte externe Keys lösen unter Humble/Jammy via apt auf (Exit 0 je Key); r3d_preprocessor ist lokales Paket/kein externer rosdep-Key. rosdep install --simulate Exit 0, rosdep check Exit 1 ausschließlich python3-open3d/python3-networkx nicht installiert. Isolierte Copy-colcon-Builds Exit 0, beide Pakete/7 Entry-Points/2 LICENSEs/4 Launches/3 YAML-Ressourcen verifiziert, keine PCD-Artefakte. Vorhandene Funktionstests 43 PASS; finale Gesamtsuite 49 Tests: 45 PASS, 2 Flake8 FAIL (166/150 Befunde), 2 Copyright SKIP; colcon test Exit 0 ist trotz Fehlern keine grüne Gesamtsuite, test-result Exit 1. Kein neuer Testcode/keine Formatierung. Details und initiale Fehlversuche in Abschnitt 15.
+
+**Grenzen:** keine tatsächliche apt-/rosdep-Installation, kein rosdep-check-PASS, kein Docker-/frischer OS-/Buildfarmlauf. Open3D 0.14.1/NetworkX 2.4 aus 17 ausschließlich nach /tmp geladenen und entpackten Jammy-Debs mit System-NumPy 1.21.5/SciPy 1.8.0 und nativem Humble getestet; vorhandene hostseitige ROS-/Systempakete weiterhin Voraussetzung. User-Site-NumPy 1.26.4/SciPy 1.8.0 produziert nachgewiesene Kompatibilitätswarnung; native getestete Kombination nicht. NetworkX 2.4 meldet bestehende np.int-Deprecations, keine globale Reparatur. Noble-Open3D-Regel ausdrücklich unavailable: AP09-Teilblocker, kein Jazzy-Runtimeversuch. Lizenz-/Defaultconfig-/Ausgabepfade-/CI-/Versionpolicy-/Release-Gates bleiben offen. AP04 als nächsten gesondert freizugebenden Schritt vorschlagen, hier nicht beginnen.
+
+**Betroffene Dateien:** r3d_planner/package.xml; r3d_preprocessor/package.xml; README.md; INSTALL.md; r3d_planner/README.txt; r3d_preprocessor/README.txt; docs/KNOWN_ISSUES.md; docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md. Commitreferenz: fokussierter Commit `fix(deps): correct ROS dependencies and rosdep keys`; SHA nach Erstellung im Abschlussnachweis in Abschnitt 15. Historische Branchcommits/PDF/Historienobjekte davon getrennt.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -909,6 +929,22 @@ Ausgeführt: `git ls-files -- docs/R3D_Planner_Development_History.pdf`, `sha256
 | T53 | Zwei erzeugte Wheels/Metadaten-/Share-Regression | Version/Description/Author/Maintainer/URLs/Apache und Share-Manifeste/Lizenz/Indexmarker geprüft, 0 PCDs; Exit 0 | VERIFIED | Normierte Python-Distributionnamen separat; erster naiver Namechecker korrigiert; kein colcon-/Debian-/Releaseartefaktclaim |
 | T54 | Dokument-/Erklärungs-/Gitgate | V4-001..007 erhalten, nur sechs AP02-Pfade; Karten-Selbstauskunft vollständig dokumentiert; andere Branch-/Remote-/PDFrefs geschützt | VERIFIED im Dokumentumfang | Unterliegende Rechte/Datenschutz nicht unabhängig geprüft; andere Branchbereinigung NOT STARTED |
 
+#### 6.7 V4-010/V4-011: historische Trees und Dependencies, 14. Oktober 2026
+
+| Test ID | Test | Ausgangsstand | V4-Ergebnis | Status | Nachweis |
+|---|---|---|---|---|---|
+| T55 | Historische Branchbereinigung | V1/V2/V3/main je zwei PCDs | 21/18/26/26 Python-ASTs, 1/1/3/3 YAMLs, jeweils zwei Manifeste/0 Warnungen; exakte Whitelist/alte Tips Vorfahren | VERIFIED statisch | V4-010 / Abschnitt 14 |
+| T56 | Direkter Dependencyabgleich | 128 Imports/26 Python-Dateien | Alle Runtime-/Build-/Testimporte und CLI-Aufrufe erfasst, 2 Manifeste gültig/AP02 unverändert | VERIFIED | V4-011 / 15.1-15.3 |
+| T57 | Offizielle Humble/Jammy-Keys | 26 externe Keys plus lokales Paket | Je resolve Exit 0; numpy/scipy/ament_python Gegenproben Exit 1 | VERIFIED Auflösung | 15.4 |
+| T58 | rosdep Installation/check | korrigierte Manifeste | Simulation Exit 0; check Exit 1, Apt-Open3D/NetworkX fehlen; keine echte Installation | BLOCKED Gesamtnachweis | 15.5 |
+| T59 | Native Apt-/Python-Versionen | System/Benutzer/entpackte Debs | Python3.10/Open3D0.14.1/NetworkX2.4/NumPy1.21.5/SciPy1.8.0; keine SciPy-Kompatibilitätswarnung | VERIFIED begrenzte Kombination | 15.6 |
+| T60 | Copy-Build/Artefakte | zwei Pakete | colcon build Exit 0; 7 Entry-Points/2 LICENSEs/4 Launches/3 YAMLs; keine PCDs, installierte Module importierbar | VERIFIED Copy-/Importumfang | 15.7 |
+| T61 | Bestehende ROS-Regressionen | 43 Konfigurations-/Launch-/Odometryfälle | 43 PASS, test-result Exit 0 | VERIFIED | 15.8 |
+| T62 | Vollständige Bestandsuite | 49 Tests beider Pakete | final 45 PASS/2 Flake8 FAIL/2 Copyright SKIP; test Exit 0, test-result Exit 1 | FAIL Gesamtsuite | 15.8 |
+| T63 | Noble-Key-Grenze | python3-open3d | rosdep resolve Ubuntu:Noble Exit 1/unavailable; keine Jazzy-Ausführung | VERIFIED Regelbefund, NOT VERIFIED Runtime | 15.9 |
+| T64 | Endzustand Git/Historienschutz | alle fünf Branches | lokale aktuelle Trees PCD-frei, 13 ursprüngliche Commits erhalten, PDF/Remote-URLs/Trackingrefs unverändert; kein Merge/Push | VERIFIED | 15.11 / Abschlusscommit |
+
+
 Ausgeführt unter `/usr/bin/python3` 3.10.12, catkin_pkg 1.1.1, pytest 6.2.5, setuptools 59.6.0/wheel 0.37.1; ROS-Humble-Setup nur für Configtests gesourced, PYTHONNOUSERSITE=1/PYTHONDONTWRITEBYTECODE=1. `parse_package(path, warnings=[])` und `Package.validate(warnings=...)` für beide Manifeste; gezielte XML-/AST-/URL-/Hash-/Entry-Pointkontrollen ohne Projektmodule/Setupausführung im statischen Check. Wheel-Setupausführung ausschließlich in temporären Paketkopien.
 
 ```bash
@@ -925,11 +961,11 @@ Der konkrete Distpfad lag unter /tmp/r3d-v4-ap02/dist/<Paket>; Platzhalter nicht
 | ID | Beschreibung | Auswirkung | Erforderliche Entscheidung | Vorgeschlagene Lösung | Aktueller Status |
 | --- | --- | --- | --- | --- | --- |
 | O01 | Apache-2.0 verbindlich gewählt/technisch angewendet; Vertrags-/Befugnislage nicht unabhängig geprüft | Keine vollständige rechtliche Releasefreigabe | Noch offene arbeits-/dienstvertragliche Rechte und Lizenzierungsbefugnis klären | Entscheidung/Dateien aus V4-004 erhalten; konkrete entgegenstehende Hinweise betroffenenbezogen prüfen | BLOCKED nur für Rechtsgesamtgate; Wahl/Implementierung COMPLETED |
-| O02 | Laut neuer Entwicklererklärung eigene Kartenaufnahme/Verarbeitung, keine Datenschutzauflagen verletzt; V4-Tree bereinigt | Dokumentierte Herkunft, keine unabhängige Rechts-/Datenschutzfreigabe; historische Gitobjekte bleiben | Spätere separate Kartenbereinigung aktiver V1/V2/V3/main-Bestände beauftragen | V4-009 nur dokumentiert; keine Rewrites/Merges/Objekt-/Remoteänderung | V4-Tree VERIFIED; Erklärung dokumentiert, weitere Branches NOT STARTED |
-| O03 | AP01-Technik und AP02 ausdrücklich beauftragt/abgenommen; AP03 nicht autorisiert | Keine automatische Dependencyarbeit | Nächste AP03-Freigabe abwarten | AP03 als nächsten Schritt vorschlagen, keine Keys/Installationen vorziehen | NOT STARTED für AP03 |
+| O02 | V4-010 bereinigt lokale aktuelle V1/V2/V3/main-Trees; V4 schon bereinigt | Historische Gitobjekte/öffentliche Remote-Trees bleiben; Selbstauskunft keine unabhängige Rechtsfreigabe | Individuelle Rechts-/Distributionsfragen getrennt prüfen | Normale lokale neue Commits, kein Push/Rewrite | Aktuelle lokale Trees VERIFIED; rechtliche Gesamtfreigabe NOT VERIFIED |
+| O03 | AP03 jetzt ausdrücklich im Auftrag und Chat autorisiert/unter V4-011 bearbeitet | Weitere Systeminstallation/AP04 nicht automatisch freigegeben | AP04 als nächsten separaten Auftrag behandeln; AP03-Installationsgate offen | Dependency-/Key-/Build-/Testnachweise dokumentiert | AP03 IN PROGRESS, AP04 hier nicht begonnen |
 | O04 | Beide Manifest-/Setupversionen nun 0.0.1 konsistent; Versions-/Releasepolitik offen | Keine aktuelle Metadatendiskrepanz, keine öffentliche Releaseidentität | Spätere Versions-/API-/Stabilitäts-/Releasepolitik festlegen | V4-008 technische Vereinheitlichung VERIFIED; Branch V4 nicht SemVer 4.0 | VERIFIED für AP02, Politik NOT STARTED/AP10 |
 | O05 | Aktiver Conda-Python 3.14.6 neben System-Python 3.10.12 | Mögliche nichtrepräsentative ROS-/Packaging-Tests | Reproduzierbare isolierte Humble-Testumgebung wählen | Explizites System-Python/saubere Umgebung; keine globale Apt-/pip-/Conda-Reparatur ohne Erklärung | NOT STARTED |
-| O06 | Aktuelle System-/ROS-Keys und Python-TF2-Provider unvalidiert | rosdep-/Buildfarm-Nachweis fehlt | Geeignete verfügbare Dependencies für Humble/Jammy | AP03 resolve/check plus vollständige Installation in isolierter Umgebung; keine Skip-Endlösung | NOT STARTED |
+| O06 | 26 externe Keys Humble/Jammy aufgelöst, Python-TF2-Provider korrigiert | Host-Apt-Open3D/NetworkX fehlen; echte Installation/check nicht abgeschlossen | Vollständig versorgte isolierte Umgebung oder separate Installfreigabe; Noble-Open3D unter AP09 | Simulation/temporäre Deb-Extraktion ohne Systemänderung; keine Skip-Endlösung | Auflösung VERIFIED, Check-Gesamtnachweis BLOCKED |
 | O07 | Externe Nutzerkarten/R3D_CONFIG_DIR geprüft; Copy-Defaultpolitik und Ausgabe neben Eingabe bestehen | Nutzeroverride funktioniert ohne Source, Defaultportabilität noch offen | Spätere allgemeine Install-/Ausgabepolitik | V4-005 minimaler Kartenvertrag; restliches AP04 separat | IN PROGRESS, begrenzter Teil VERIFIED |
 | O08 | Narrow-Flag in Orientierung, Namespaces/Clouds/Actiongrenzen | Öffentliche API-Korrekturen können bestehende Verbraucher beeinflussen | Neuer Metadaten-/Kompatibilitätsvertrag je Änderung | AP05 kleinere Änderungen; alle internen Verbraucher und Nutzeranleitungen gemeinsam anpassen; Regressionen | NOT STARTED |
 | O09 | Filter/Follower-Systemgrenzen und Kalibrierungsannahmen | Keine generische sichere Navigation aus Detektionscode ableitbar | Gewünschten unterstützten Systemvertrag abgrenzen | Konkrete Sourcebefunde und synthetische No-Motion-Prüfungen priorisieren; keine neue Navigation pauschal beauftragen | NOT STARTED |
@@ -942,7 +978,7 @@ Der konkrete Distpfad lag unter /tmp/r3d-v4-ap02/dist/<Paket>; Platzhalter nicht
 
 Die verbindliche Lizenzentscheidung und technische Eigenanteil-Implementierung sind unter V4-004 erfolgt. Sie ersetzen keine unabhängige Vertrags-/Datenrechteklärung oder konkrete Binärfreigabe. O01/O02/O12 blockieren den öffentlichen Abschluss, nicht jede unabhängige technische Änderung. Bei neuer Information wird der jeweilige Status mit Datum und Nachweis aktualisiert; frühere Einschränkungen bleiben historisch nachvollziehbar.
 
-## 8. Versionsvergleich: main → V4
+## 8. Versionsvergleich: historische main-Baseline → V4
 
 Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein später eventuell weiterentwickeltes main. „Unverändert“ bezieht sich auf diesen initialen V4-Stand. Erst ausgeführte Folgeänderungen dürfen diese Spalte erweitern.
 
@@ -972,7 +1008,7 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Gegenstand | Status | Begründung und nächster erforderlicher Nachweis |
 | --- | --- | --- |
 | ROS Index source readiness | **NOT READY** | AP02-Metadaten/Apache-Text/datenfreier V4-Tree vorhanden; public-V4-Ref/Namenskollision/Review, vollständige Befugnis-/historische Git-/sonstige Herkunftsprüfung offen. Keine Registrierung ausgeführt |
-| rosdep readiness | **NOT READY** | Direkte Manifestlücken und dokumentierter Skip-Workaround; vollständige aktuelle Humble-Auflösung/Installation/check nicht ausgeführt. AP03 |
+| rosdep readiness | **NOT READY insgesamt** | V4-011: 26 Humble/Jammy-Keys und Simulation VERIFIED; echte Installation/check auf vollständig versorgtem isolierten Ziel fehlen, Hostcheck Open3D/NetworkX FAIL; keine ungültigen aktuellen Keys |
 | Bloom readiness | **NOT READY** | Manifest-/Setupversion 0.0.1 nun konsistent; öffentliche Releaseversion/-politik/Changelogs, rosdep-/Runtime-/Defaultinstall-/Rechts-/Releaseorganisation offen. Kein Release-Track/-Repository/Farmjob |
 | Buildfarm readiness | **NOT READY** | AP02-Parser-/Wheel-Metadaten und bisherige begrenzte Copy-/Configprüfungen bestehen; Dependencyvollständigkeit/rosdep/Defaultinstall/Release-/Rechtsgates offen. Keine neue Buildfarmabnahme |
 | Tatsächliche offizielle Index-/Binärveröffentlichung | **NOT VERIFIED** | Keine neue rosdistro-/Release-/Buildfarm-Statusabfrage oder externe Bestätigung; historische Abwesenheit nicht als aktuelle Serverprüfung ausgeben |
@@ -996,6 +1032,8 @@ Die bisherigen zwei Karten waren bereits beim Auftragseingang im Working Tree ge
 Zwei logisch getrennte lokale Commits halten Karten-/Configänderung und Lizenzmitnahme/Verifikation fest. Historische V4-Einträge/Branchreferenzen/PDFs erhalten, keine History-Rewrites, externen Repository-/GitHub-/Remoteänderungen, keine Veröffentlichung und kein Push. Weitere Arbeit wartet auf den nächsten Auftrag.
 
 AP02-Fortschritt V4-008: Version/Description/URLs/Autor-/Maintainer-/Pythonkonstanz im freigegebenen Umfang VERIFIED. V4-007 versioniert unveränderte historische Referenz. V4-009 ergänzt Herkunfts-/Datenschutzselbstauskunft und lediglich den Wunsch späterer anderer Branchbereinigung. AP01 technisch VERIFIED, vollständige Rechtsfreigabe weiterhin getrennt; AP03 NOT STARTED. Metadaten-/Versionsdiskrepanz beseitigt, Releasepolitik/Dependencies/Defaultinstall/Rechte/Serverreview weiterhin offen.
+
+**Aktualisierung V4-010/V4-011:** Die oben datierten bisherigen Test-/Dependency-/Branchbefunde bleiben historische Ergebnisse. Jetzt sind alle fünf lokalen aktiven Trees PCD-frei und der aktuelle Manifest-Import-/Keyvertrag ist korrigiert. Apt-/Humble-Copy-Build, sieben Entry-Point-Imports und 43 Funktionstests erfolgreich; kein erneuter SciPy-/NumPy-Kompatibilitätsfehler in der getesteten Systemkombination. AP03-Gesamtgate echte Installation/check bleibt offen, zwei bestehende Lintfehler/zwei Copyright-Skips getrennt. AP04/AP06/AP08/AP10 IN PROGRESS, AP09 NOT STARTED mit dokumentierter Noble-Open3D-Hürde; ROS Index/Bloom/Buildfarm weiterhin NOT READY. Kein pauschaler Humble-/Jazzy-/Rechts-/Release-Qualitätsanspruch.
 
 ## 11. Open-Source-Lizenzanalyse und Copyright-Strategie
 
@@ -1931,3 +1969,361 @@ Die historische Git-Historie bleibt zunächst unverändert. Ein späterer normal
 ## 14. Aktuelle historische Datenbereinigung (V4-010)
 
 Am 14. Oktober 2026 wurden die lokalen aktuellen V1/V2/V3/main-Trees wie in V4-010 inventarisiert bereinigt. Damit sind alle fünf lokalen Branch-Trees frei von PCD-Dateien. Die vorherigen V4-009-Zukunftsaussagen und früheren Rechts-/Branchbefunde bleiben historische Snapshots. Remote-Trees und Gitobjekte sind unverändert; das Projekt besitzt weiterhin keine vollständige rechtliche Releasefreigabe. AP01 technisch VERIFIED / Rechtsgesamtgate BLOCKED; AP02 VERIFIED. AP03 ist jetzt ausdrücklich freigegeben, wird nach dieser getrennten Sicherung/Dokumentation bearbeitet. AP04 nicht erweitert. Für AP03 erfolgten vorbereitende Import-/Key-/Umgebungsproben an separaten Kopien, noch keine Dependency-Mutation in V4. Automatische Freigabeablehnung, zusätzliche Chatbestätigung und nachfolgende erfolgreiche autorisierte Ausführung sind getrennt erfasst.
+
+
+## 15. AP03 – Dependency Management und rosdep (V4-011)
+
+### 15.1 Umgebung, Inventar und Abgrenzung
+
+Primärziel und tatsächlicher Host: Ubuntu 22.04.5 Jammy amd64, ROS 2 Humble unter /opt/ros/humble, /usr/bin/python3 3.10.12; rosdep 0.27.0, catkin_pkg 1.1.1, setuptools 59.6.0, pytest 6.2.5. Shellinitialisierung enthält Conda /home/bauya/miniconda3 und fremde ROS-Workspaceoverlays (fast_lio/Unitree/LiDAR). Tests laufen mit PATH=/usr/bin:/bin, PYTHONNOUSERSITE=1, PYTHONDONTWRITEBYTECODE=1, ohne CONDA-/PYTHONPATH-/AMENT-/CMAKE-/COLCON-/ROS-/LD-Übernahme und anschließend ausschließlich /opt/ros/humble/setup.bash plus eigene temporäre Copy-Installation. Keine Conda-Umgebung geändert. System-Python 3.10 ist vom PATH-Standard Python3.14 getrennt. Dokumentierte Versionsnummern sind Beobachtungen, keine neuen Manifestpins.
+
+128 AST-Importstellen in allen 26 vorhandenen Python-Dateien einschließlich vier Launches, beiden setup.py und allen Tests geprüft; folgende komplette Einzelstelleninventarliste erfasst auch lokale/Standardbibliotheksimporte. Keine dynamische Allpfad-/Algorithmuscoverage daraus behauptet. Laufzeitübergaben bleiben unverändert.
+
+| Paketdatei:Zeile | Python-Import | Kategorie | Rolle | Zuordnung |
+|---|---|---|---|---|
+| `r3d_planner/launch/follower.launch.py:14` | `r3d_planner.launching` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/launch/map.launch.py:13` | `r3d_planner.launching` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/launch/planner.launch.py:13` | `r3d_planner.launching` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/launch/preprocessor.launch.py:13` | `r3d_planner.launching` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/configuration.py:14` | `math` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/configuration.py:15` | `os` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/configuration.py:16` | `pathlib` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/configuration.py:18` | `yaml` | Extern | Runtime/Launch | python3-yaml |
+| `r3d_planner/r3d_planner/configuration.py:50` | `ament_index_python.packages` | Extern | Runtime/Launch | ament_index_python |
+| `r3d_planner/r3d_planner/configuration.py:96` | `rclpy.validate_full_topic_name` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/launching.py:14` | `launch` | Extern | Runtime/Launch | launch |
+| `r3d_planner/r3d_planner/launching.py:15` | `launch.actions` | Extern | Runtime/Launch | launch |
+| `r3d_planner/r3d_planner/launching.py:16` | `launch.conditions` | Extern | Runtime/Launch | launch |
+| `r3d_planner/r3d_planner/launching.py:17` | `launch_ros.actions` | Extern | Runtime/Launch | launch_ros |
+| `r3d_planner/r3d_planner/launching.py:18` | `.configuration` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/odometry.py:14` | `math` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/odometry.py:15` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/odometry.py:16` | `nav_msgs.msg` | Extern | Runtime/Launch | nav_msgs |
+| `r3d_planner/r3d_planner/odometry.py:17` | `rclpy.qos` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/odometry.py:18` | `rclpy.time` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/odometry.py:19` | `tf2_ros` | Extern | Runtime/Launch | tf2_ros_py |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:15` | `sensor_msgs.msg` | Extern | Runtime/Launch | sensor_msgs |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:16` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:17` | `numpy` | Extern | Runtime/Launch | python3-numpy |
+| `r3d_planner/r3d_planner/r3d_local_filter.py:18` | `math` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:15` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:16` | `nav_msgs.msg` | Extern | Runtime/Launch | nav_msgs |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:17` | `sensor_msgs.msg` | Extern | Runtime/Launch | sensor_msgs |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:18` | `sensor_msgs_py.point_cloud2` | Extern | Runtime/Launch | sensor_msgs_py |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:19` | `math` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_path_follower.py:20` | `.odometry` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_path_test.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_path_test.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_path_test.py:15` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/r3d_path_test.py:16` | `tf2_ros` | Extern | Runtime/Launch | tf2_ros_py |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:15` | `rclpy.action` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:16` | `nav2_msgs.action` | Extern | Runtime/Launch | nav2_msgs |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:17` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:18` | `nav_msgs.msg` | Extern | Runtime/Launch | nav_msgs |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:19` | `visualization_msgs.msg` | Extern | Runtime/Launch | visualization_msgs |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:20` | `std_msgs.msg` | Extern | Runtime/Launch | std_msgs |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:21` | `open3d` | Extern | Runtime/Launch | python3-open3d |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:22` | `numpy` | Extern | Runtime/Launch | python3-numpy |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:23` | `heapq` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:24` | `scipy.spatial` | Extern | Runtime/Launch | python3-scipy |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:25` | `os` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:26` | `networkx` | Extern | Runtime/Launch | python3-networkx |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:27` | `ament_index_python.packages` | Extern | Runtime/Launch | ament_index_python |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py:28` | `.odometry` | Eigenes Modul | Runtime/Launch | kein externer Key |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:15` | `geometry_msgs.msg` | Extern | Runtime/Launch | geometry_msgs |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:16` | `nav2_msgs.action` | Extern | Runtime/Launch | nav2_msgs |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:17` | `rclpy.action` | Extern | Runtime/Launch | rclpy |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:18` | `std_srvs.srv` | Extern | Runtime/Launch | std_srvs |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:19` | `tf2_ros` | Extern | Runtime/Launch | tf2_ros_py |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py:20` | `math` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_planner/setup.py:13` | `setuptools` | Extern | Build/Packaging | python3-setuptools |
+| `r3d_planner/setup.py:14` | `os` | Standardbibliothek | Build/Packaging | kein externer Key |
+| `r3d_planner/setup.py:15` | `glob` | Standardbibliothek | Build/Packaging | kein externer Key |
+| `r3d_planner/test/test_configuration.py:14` | `copy` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:15` | `pathlib` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:16` | `unittest.mock` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:18` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_planner/test/test_configuration.py:19` | `yaml` | Extern | Test | python3-yaml |
+| `r3d_planner/test/test_configuration.py:21` | `r3d_planner.configuration` | Eigenes Modul | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:96` | `launch` | Extern | Test | launch |
+| `r3d_planner/test/test_configuration.py:97` | `r3d_planner.launching` | Eigenes Modul | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:112` | `rclpy` | Extern | Test | rclpy |
+| `r3d_planner/test/test_configuration.py:113` | `rclpy.parameter` | Extern | Test | rclpy |
+| `r3d_planner/test/test_configuration.py:114` | `geometry_msgs.msg` | Extern | Test | geometry_msgs |
+| `r3d_planner/test/test_configuration.py:115` | `nav_msgs.msg` | Extern | Test | nav_msgs |
+| `r3d_planner/test/test_configuration.py:116` | `nav2_msgs.action` | Extern | Test | nav2_msgs |
+| `r3d_planner/test/test_configuration.py:117` | `r3d_planner.r3d_pcd_path` | Eigenes Modul | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:118` | `r3d_preprocessor.r3d_pcd_analyser` | Eigenes Modul | Test | r3d_preprocessor |
+| `r3d_planner/test/test_configuration.py:205` | `r3d_planner.configuration` | Eigenes Modul | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:211` | `r3d_planner.configuration` | Eigenes Modul | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:212` | `ament_index_python` | Extern | Test | ament_index_python |
+| `r3d_planner/test/test_configuration.py:240` | `subprocess` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:255` | `os` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:256` | `signal` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:257` | `subprocess` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:258` | `time` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:259` | `rclpy` | Extern | Test | rclpy |
+| `r3d_planner/test/test_configuration.py:260` | `rclpy.node` | Extern | Test | rclpy |
+| `r3d_planner/test/test_configuration.py:368` | `os` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_configuration.py:155` | `time` | Standardbibliothek | Test | kein externer Key |
+| `r3d_planner/test/test_copyright.py:15` | `ament_copyright.main` | Extern | Test | ament_copyright |
+| `r3d_planner/test/test_copyright.py:16` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_planner/test/test_flake8.py:15` | `ament_flake8.main` | Extern | Test | ament_flake8 |
+| `r3d_planner/test/test_flake8.py:16` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_planner/test/test_pep257.py:15` | `ament_pep257.main` | Extern | Test | ament_pep257 |
+| `r3d_planner/test/test_pep257.py:16` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:15` | `open3d` | Extern | Runtime/Launch | python3-open3d |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:16` | `numpy` | Extern | Runtime/Launch | python3-numpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:17` | `os` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py:18` | `traceback` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:15` | `sensor_msgs.msg` | Extern | Runtime/Launch | sensor_msgs |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:16` | `rclpy.qos` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:17` | `open3d` | Extern | Runtime/Launch | python3-open3d |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:18` | `numpy` | Extern | Runtime/Launch | python3-numpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py:19` | `os` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:13` | `rclpy` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:14` | `rclpy.node` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:15` | `sensor_msgs.msg` | Extern | Runtime/Launch | sensor_msgs |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:16` | `rclpy.qos` | Extern | Runtime/Launch | rclpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:17` | `open3d` | Extern | Runtime/Launch | python3-open3d |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:18` | `numpy` | Extern | Runtime/Launch | python3-numpy |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:19` | `os` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py:20` | `struct` | Standardbibliothek | Runtime/Launch | kein externer Key |
+| `r3d_preprocessor/setup.py:13` | `setuptools` | Extern | Build/Packaging | python3-setuptools |
+| `r3d_preprocessor/setup.py:14` | `os` | Standardbibliothek | Build/Packaging | kein externer Key |
+| `r3d_preprocessor/test/test_copyright.py:15` | `ament_copyright.main` | Extern | Test | ament_copyright |
+| `r3d_preprocessor/test/test_copyright.py:16` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_preprocessor/test/test_flake8.py:15` | `ament_flake8.main` | Extern | Test | ament_flake8 |
+| `r3d_preprocessor/test/test_flake8.py:16` | `pytest` | Extern | Test | python3-pytest |
+| `r3d_preprocessor/test/test_pep257.py:15` | `ament_pep257.main` | Extern | Test | ament_pep257 |
+| `r3d_preprocessor/test/test_pep257.py:16` | `pytest` | Extern | Test | python3-pytest |
+
+Die Tabelle zählt AST-Importstellen, nicht 128 verschiedene Dependencies. Lokale relative Module, math/os/pathlib/copy/unittest/subprocess/signal/time/heapq/traceback/struct/glob sind Standardbibliothek bzw. eigene Module. Zusätzlich benutzen test_configuration.py:247/283/301/315 die ROS-CLI via subprocess: ros2 launch bzw. ros2 param dump; Provider ros2cli/ros2launch/ros2param als test_depend. Die eigenen Planner-Testimporte benötigen den Preprocessor, der bereits als exec_depend tatsächlich über Launch/Sharezugriff benötigt wird. Kein zirkulärer Preprocessor→Planner-Vertrag.
+
+### 15.2 Dependencyübersicht und bisheriger Vertrag
+
+| Dependency / Key | Verwendung / Import / Zweck | Build/Runtime/Test | Bisher | Neuer Vertrag / Nachweis |
+|---|---|---|---|---|
+| `ament_copyright` | beide test_copyright.py:15, vorhandene Skips | Test | planner: test_depend; preprocessor: test_depend | r3d_planner: test_depend; r3d_preprocessor: test_depend; Humble/Jammy resolve VERIFIED |
+| `ament_flake8` | beide test_flake8.py:15 | Test | planner: test_depend; preprocessor: test_depend | r3d_planner: test_depend; r3d_preprocessor: test_depend; Humble/Jammy resolve VERIFIED |
+| `ament_index_python` | configuration.py:50 und r3d_pcd_path.py:27 Share lookup | Runtime/Launch | planner: exec_depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `ament_pep257` | beide test_pep257.py:15 | Test | planner: test_depend; preprocessor: test_depend | r3d_planner: test_depend; r3d_preprocessor: test_depend; Humble/Jammy resolve VERIFIED |
+| `geometry_msgs` | Posen/Punkte/Twist/TF | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `launch` | launching.py:14-16 und Testdescription | Runtime/Launch | planner: exec_depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `launch_ros` | launching.py:17 Node | Runtime/Launch | planner: exec_depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `nav2_msgs` | Planner/RViz ComputePathToPose; kein Nav2-Bringup | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `nav_msgs` | Path/Odometry | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-networkx` | r3d_pcd_path.py:26 Graph | Runtime/Launch | planner: fehlte; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-numpy` | Punktwolken/Voxels/Geometrie, beide | Runtime/Launch | planner: depend; preprocessor: depend | r3d_planner: exec_depend; r3d_preprocessor: exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-open3d` | r3d_pcd_path.py:21, drei Preprocessormodule PCD I/O/Voxel | Runtime/Launch | planner: fehlte; preprocessor: fehlte | r3d_planner: exec_depend; r3d_preprocessor: exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-pytest` | alle Tests / vorhandenes tests_require | Test | planner: test_depend; preprocessor: test_depend | r3d_planner: test_depend; r3d_preprocessor: test_depend; Humble/Jammy resolve VERIFIED |
+| `python3-scipy` | r3d_pcd_path.py:24 KDTree | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-setuptools` | beide setup.py:13, vorhandenes install_requires | Buildtool und Runtime | planner: fehlte; preprocessor: fehlte | r3d_planner: buildtool_depend,exec_depend; r3d_preprocessor: buildtool_depend,exec_depend; Humble/Jammy resolve VERIFIED |
+| `python3-yaml` | configuration.py:18, test_configuration.py:19 YAML | Runtime/Launch | planner: exec_depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `rclpy` | Nodes/Actions/QoS/Time/Topicvalidierung beider Pakete | Runtime/Launch | planner: depend; preprocessor: depend | r3d_planner: exec_depend; r3d_preprocessor: exec_depend; Humble/Jammy resolve VERIFIED |
+| `ros2cli` | subprocess ros2 Kommando in test_configuration.py | Test | planner: fehlte; preprocessor: fehlte | r3d_planner: test_depend; Humble/Jammy resolve VERIFIED |
+| `ros2launch` | subprocess ros2 launch, test_configuration.py:247/283 | Test | planner: fehlte; preprocessor: fehlte | r3d_planner: test_depend; Humble/Jammy resolve VERIFIED |
+| `ros2param` | subprocess ros2 param dump, test_configuration.py:301/315 | Test | planner: fehlte; preprocessor: fehlte | r3d_planner: test_depend; Humble/Jammy resolve VERIFIED |
+| `sensor_msgs` | PointCloud2/LaserScan beider Pakete | Runtime/Launch | planner: depend; preprocessor: depend | r3d_planner: exec_depend; r3d_preprocessor: exec_depend; Humble/Jammy resolve VERIFIED |
+| `sensor_msgs_py` | r3d_path_follower.py:18 read_points | Runtime/Launch | planner: fehlte; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `std_msgs` | r3d_pcd_path.py:20 ColorRGBA | Runtime/Launch | planner: fehlte; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `std_srvs` | r3d_rviz_interface.py:18 Trigger | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `tf2_ros_py` | odometry.py:19 / TF-Helper/RViz; Import tf2_ros | Runtime/Launch | planner: exec_depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| `visualization_msgs` | r3d_pcd_path.py:19 Marker | Runtime/Launch | planner: depend; preprocessor: fehlte | r3d_planner: exec_depend; Humble/Jammy resolve VERIFIED |
+| r3d_preprocessor (eigenes Paket) | launching.py:25/31 Node package, r3d_pcd_path.py Share, Testimport | Runtime und Tests Planner | bereits exec_depend Planner | erhalten; beide Pakete im selben Workspace, ignore-src, kein externer System-Key erforderlich |
+| ament_python | package.xml export build_type / colcon ROS-Python-Erkennung | Buildtyp | bereits exportiert, kein Buildtooltag | unverändert; kein gültiger rosdep-Key, nicht als Dependency erfunden |
+| Standardbibliothek/eigene relative Module | vollständige AST-Tabelle oben | Runtime/Build/Test je Datei | implizit System-Python/eigenes Modul | keine zusätzlichen package.xml-Systemkeys |
+| colcon / rosdep | Workspace-Orchestrierung/Resolver, keine Sourceimporte | Workspace-Werkzeuge | Apt-Anleitung vorhanden | außerhalb Paket-Runtime, Installanleitung behält python3-colcon-common-extensions/python3-rosdep |
+| RViz / TF-CLI / Nav2-Bringup / Sensorfrontends | externe Consumer/Publisher oder optionale Integration | optional/externe Nodes | Deploymentanleitung | keine pauschalen Pflichtdependencies; nav2_msgs/sensor_msgs/nav_msgs sind die tatsächlich benötigten Schnittstellen |
+| Hesai / Unitree / LiDAR-odom / externe SLAM-Repositories | PointCloud2/Odometry/TF/cmd_vel-Vertrag | Deployment/Hardware | separat dokumentiert | keine vendorten Quellen/Git-/Hardware-SDK-Abhängigkeit in beiden Paketen ergänzt |
+
+### 15.3 Manifest- und Setuptoolsentscheidung
+
+Alle Sourceimporte der reinen Python-Pakete erfolgen zur Runtime oder zu Tests; keine eigenen Header/Compiler-/Buildexportabnehmer. Alte depend-Tags durch exec_depend ersetzt, ohne Runtimevertrag zu verlieren. Python3-setuptools ist beide Male Buildtool für setup.py/colcon und wegen vorhandenem install_requires zusätzlich Runtime. Das ist zwei Kategorien mit Zweck, kein doppelter Tag. Kein ament_cmake-Paket/CMake-Konvertierung. Beide XMLs format 3/0.0.1/Apache-2.0/Beschreibungen/Maintainer/Autor/URLs/export ament_python exakt erhalten. catkin_pkg-Parser/Package.validate: jeweils Exit 0, Warnungen 0; kein separat ausgeführter XSD-Schemavalidator behauptet.
+
+Humble-Generator lokal /opt/ros/humble/lib/python3.10/site-packages/ros2pkg/verb/create.py:131-162 bestätigt leere pauschale Python-buildtool-Liste; tf2_ros_py-Manifest unter /opt/ros/humble/share/tf2_ros_py/package.xml sowie offizieller Humble-Quellstand bestätigen Python-Provider. Das entfernte tf2_ros ist ein anderer ROS-Packagevertrag, kein „TF2 fehlte vollständig“-Befund. Statisches CLI-Tool ist optional, Python-TF2 zur Laufzeit notwendig.
+
+Beide setup.py und setup.cfg vollständig bytegleich: packages, data_files mit LICENSE/Manifest/Marker, Planner-YAML/Robot-/Launchressourcen, install_requires=['setuptools'], tests_require=['pytest'], sieben Console-Scripts. ROS-Libraries/Science-Pakete werden durch package.xml/rosdep bereitgestellt; keine pip-Runtimevollständigkeit behauptet und kein zusätzlicher pip-Zwang. Keine tatsächlichen neuen pip-Abhängigkeiten, keine Versionspins ohne Bedarf. Metadaten-Vergleich ignoriert nur Dependency-Elemente: alle übrigen XML-Elemente identisch; alle 26 Python-Dateien syntaktisch gültig und bytegleich zum AP02-Stand.
+
+### 15.4 Offizielle rosdep-Auflösung
+
+Aktuelle Regeln am 14.10.2026 von offiziellen ros/rosdistro-Quellen abgerufen; keine lokale erfundene Regel. Beispielbefehl (für jeden der 26 verwendeten externen Keys ausgeführt):
+
+```bash
+/usr/bin/rosdep resolve python3-open3d --rosdistro humble --os=ubuntu:jammy \
+  -c /tmp/r3d-v4-ap03/rosdep-current-copy
+```
+
+| Key | Installer / Ergebnis Humble/Jammy | Exit | Quelle |
+|---|---|---:|---|
+| `ament_copyright` | `#apt ros-humble-ament-copyright` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ament_flake8` | `#apt ros-humble-ament-flake8` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ament_index_python` | `#apt ros-humble-ament-index-python` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ament_pep257` | `#apt ros-humble-ament-pep257` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `geometry_msgs` | `#apt ros-humble-geometry-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `launch` | `#apt ros-humble-launch` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `launch_ros` | `#apt ros-humble-launch-ros` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `nav2_msgs` | `#apt ros-humble-nav2-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `nav_msgs` | `#apt ros-humble-nav-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `python3-networkx` | `#apt python3-networkx` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-numpy` | `#apt python3-numpy` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-open3d` | `#apt python3-open3d` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-pytest` | `#apt python3-pytest` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-scipy` | `#apt python3-scipy` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-setuptools` | `#apt python3-setuptools` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `python3-yaml` | `#apt python3-yaml` | 0 | offizielles python.yaml / where-defined Exit 0 |
+| `rclpy` | `#apt ros-humble-rclpy` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ros2cli` | `#apt ros-humble-ros2cli` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ros2launch` | `#apt ros-humble-ros2launch` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `ros2param` | `#apt ros-humble-ros2param` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `sensor_msgs` | `#apt ros-humble-sensor-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `sensor_msgs_py` | `#apt ros-humble-sensor-msgs-py` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `std_msgs` | `#apt ros-humble-std-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `std_srvs` | `#apt ros-humble-std-srvs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `tf2_ros_py` | `#apt ros-humble-tf2-ros-py` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+| `visualization_msgs` | `#apt ros-humble-visualization-msgs` | 0 | offizielles humble/distribution.yaml / where-defined Exit 0 |
+
+Gegenproben numpy, scipy, ament_python: jeweils Exit 1 `ERROR: no rosdep rule for '<key>'`. Kein ungültiger Key in aktuellen Manifesten; `ament_python` ist gültiger Buildtyp und bleibt exportiert. tf2_ros zusätzlich Exit 0 ros-humble-tf2-ros als alter tatsächlicher Eintrag geprüft, aber nicht direkt benötigter Python-Provider.
+
+**Cache-/Netzwerkbefund:** erster rosdep update -c /tmp/... in Sandbox Exit 1 wegen DNS `Temporary failure in name resolution`; keine Schlussfolgerung über ungültige Regeln. Genehmigte erneute Netzwerkausführung desselben rosdep update --rosdistro humble Exit 0. rosdep 0.27.0 wendet -c auf update nicht wie erwartet an: Ausgabe nennt /home/bauya/.ros/rosdep/sources.cache, dieser Benutzer-Cache wurde tatsächlich aktualisiert (vom Auftrag zulässig). Deshalb die frühere technische Absicht „nur separater Cache“ ausdrücklich nicht als Ergebnis behauptet. Anschließend aktualisierten offiziellen Cache nach /tmp/r3d-v4-ap03/rosdep-current-copy kopiert und sämtliche resolve/check/install-simulation/where-defined daran gebunden. Keine Änderung /etc-Quellen, Systempakete oder Remotes.
+
+### 15.5 Vollständiger Satz, Installation und Hostcheck
+
+Mit bereinigtem Humble-/System-Pythonprozess, cwd /home/bauya/Desktop/Gits/Github/R3D-Planner, tatsächlichen korrigierten V4-Manifesten:
+
+```bash
+/usr/bin/rosdep check --from-paths r3d_planner r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy \
+  -c /tmp/r3d-v4-ap03/rosdep-current-copy
+/usr/bin/rosdep install --from-paths r3d_planner r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy --simulate \
+  -c /tmp/r3d-v4-ap03/rosdep-current-copy
+```
+
+check Exit 1: `System dependencies have not been satisfied: apt python3-networkx; apt python3-open3d`. install --simulate Exit 0: würde genau `sudo -H apt-get install python3-open3d` und `sudo -H apt-get install python3-networkx` aufrufen. Diese Installbefehle NICHT ausgeführt. Kein sudo-Systemeingriff, kein pip-/Conda-Eingriff. Derselbe Satz im separaten src-Workspace ergibt dieselben Ergebnisse. rosdep keys Exit 0 zeigt sieben Systemkeys, weil ignore-src bereits installierte ROS-Pakete bzw. lokale Pakete ausnimmt; das ist kein Nachweis, dass alle ROS-Schlüssel geprüft worden wären, deshalb sämtliche 26 externen resolve-Aufrufe separat. Tests/Buildtools nicht über -t wegselektiert, Standardumfang außer doc verwendet.
+
+Tatsächliche vollständige Installation und anschließender erfolgreicher rosdep check sind NOT VERIFIED/BLOCKED für die aktuelle Ausführungsumgebung. Simulation/Importprobe/extrahierte Dateien verändern die dpkg-Paketpräsenz nicht. Ein Check-PASS würde wiederum keinen Clean-Build beweisen. Kein formaler Humble-Auflösungsblocker für Open3D/NetworkX: deren gültige Apt-Regeln existieren; hier fehlt der durchgeführte Installationsnachweis. Eine vollständig bestückte isolierte Zielumgebung oder gesonderte Freigabe für notwendige Systeminstallation kann diesen verbleibenden AP03-Nachweis ermöglichen.
+
+### 15.6 Open3D und NumPy/SciPy: Quellen und tatsächliche Versionen
+
+| Umgebung (System-Python 3.10.12) | NumPy | SciPy | NetworkX | Open3D | Ergebnis |
+|---|---|---|---|---|---|
+| bestehende User-Site, ursprüngliche Overlays | 1.26.4 ~/.local | 1.8.0 /usr/lib/python3/dist-packages | 3.4.2 ~/.local | 0.19.0 ~/.local | SciPy warnt >=1.17.3/<1.25.0 erwartet; Open3D CUDA-Warnung; keine neue pip-Installation |
+| PYTHONNOUSERSITE=1, Systembibliotheken | 1.21.5 Apt | 1.8.0 Apt | fehlt | fehlt | keine NumPy/SciPy-Kompatibilitätswarnung; nicht vollständige Runtime |
+| isolierter Humbleprozess + Jammy-Deb-Extraktion /tmp | 1.21.5 Apt | 1.8.0 Apt | 2.4 aus Apt-Deb | 0.14.1 aus Apt-Deb | alle Importe, Copy-Build und 43 Funktionstests erfolgreich; NetworkX np.int-Deprecations |
+
+PyYAML 5.4.1 und setuptools 59.6.0/pytest 6.2.5 stammen aus System-Python. Lokales SciPy __init__.py:140-149 belegt erwarteten NumPybereich >=1.17.3 und <1.25.0, die User-Site-Importwarnung wird aufgezeichnet. Ursache für diese konkrete Warnung ist nachgewiesen: importiertes NumPy außerhalb des dort implementierten Bereichs, mit System-SciPy vermischt. Nicht behauptet: Conda selbst habe diese NumPydateien installiert, jede transitive Paketkombination sei kaputt oder ein Algorithmusfehler sei damit belegt. Die System-Python-Tests benötigen keinen Conda-Interpreter. Gegenmaßnahme konsistenter Apt-Satz, User-Site deaktivieren; bewusst keine globale „Reparatur“.
+
+Offizieller Jammy-Kandidat python3-open3d 0.14.1+dfsg-7build3 (universe), Python-Abhängigkeiten >=3.10~ und <3.11 sowie NumPy>=1.20.0/ABI9. Die tatsächliche Importprobe und vorhandene PCD-Voxel-/Schreib-/Planungsregression bestätigen den geprüften Teilumfang auf Python3.10. Nicht die Open3D0.19-Userinstallation als rosdep-Nachweis verwenden. Apt-Simulation (nur zwei fehlende Pythonkeys) Exit 0: 17 neue Pakete, 0 Upgrades/0 Entfernungen. Exakte Versionen der geladenen Pakete:
+
+| Apt-Paket | heruntergeladene Version | Prüfung |
+|---|---|---|
+| `fonts-roboto-unhinted` | `2:0~20170802-3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `fonts-roboto` | `2:0~20170802-3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libastcenc1d` | `3.3+ds-1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libmeshoptimizer1d` | `0.17+dfsg-1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libspirv-cross-c-shared0` | `2021.01.15-5` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libstb0` | `0.0~git20210910.af1a5bc+ds-1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libtinyexr1d` | `1.0.1+dfsg-3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libfilament1.9` | `1.9.25+dfsg2-4build1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libglfw3` | `3.3.6-1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libtmglib3` | `3.10.0-2ubuntu1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `liblapacke` | `3.10.0-2ubuntu1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `liblzf1` | `3.6-3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libtinyobjloader1` | `2.0.0~rc5+dfsg1-5build1` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `libopen3d0.14` | `0.14.1+dfsg-7build3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `open3d-gui-data` | `0.14.1+dfsg-7build3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `python3-networkx` | `2.4-4ubuntu2` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+| `python3-open3d` | `0.14.1+dfsg-7build3` | apt-get download Exit 0, anschließend dpkg-deb --extract Exit 0 |
+
+Alle Archive ausschließlich /tmp/r3d-v4-ap03/jammy-debs; Entpacken nach jammy-root, keine Maintainerskripte/dpkg-Installation. PYTHONPATH nur um dortige usr/lib/python3/dist-packages, LD_LIBRARY_PATH um usr/lib/x86_64-linux-gnu erweitert. Bestehende Systembibliotheken/Humble werden benutzt; kein frischer Container/keine vollständig neu angelegte ROS-Installation. Diese temporäre Prüfstrategie ist keine reguläre Installationsanleitung und kein zu veröffentlichender Workaround. Verifikation ohne harte Versionspins; tatsächliche Apt-Installation/check weiterhin ausstehend.
+
+### 15.7 Copy-colcon-Build und installierte Artefakte
+
+Beide Paketquellen in eigenen src-Kopien unter /tmp/r3d-v4-ap03/workspace; keine Repo-/Worktree-Buildartefakte erzeugt. Vorhandene pyc/Cache/egg-info nur beim temporären Kopieren ausgelassen, im Repository unverändert. Alle Pythonbytes der Kopien entsprechen V4; korrigierte Manifeste ebenfalls. Eigene build/install/log-Pfade, keine --symlink-install. Befehle im bereinigten nativen Humble-/Deb-Prozess:
+
+```bash
+/usr/bin/colcon list --names-only --base-paths src
+/usr/bin/colcon --log-base /tmp/r3d-v4-ap03/workspace/log-build build \
+  --base-paths src --build-base build --install-base install \
+  --event-handlers console_cohesion+
+```
+
+Beide Exit 0, Discovery r3d_planner/r3d_preprocessor. Erstbuild 30.7 s, nach Ergänzung der direkt belegten Test-CLI-Tags nochmal Copy-Build mit log-final-build Exit 0, 91 s. Bytekompilierung absichtlich deaktiviert, entsprechende setuptools-Warnungen kein Buildfehler. Kein apt-/rosdep-Install-/Clean-OS-Gate aus erfolgreichem Python-Paketieren ableiten.
+
+**Artefaktprüfungen Exit 0:** beide installierten share/package.xml identisch zum finalen korrigierten Manifest; LICENSE jeweils Original-Apache-SHA256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30; ament-Marker vorhanden; vier Planner-Launchfiles/drei YAML-Dateien identisch; 5 Planner- und 2 Preprocessor-Console-Scripts echte installierte Dateien, Funktionen via importlib.metadata.EntryPoint.load callable aus installierter Copy-Pythonpfadstruktur, keine Source-/Symlinkmodule. Keine main-Funktion/Bewegungsnode durch Import gestartet. Version 0.0.1 und Requires-Dist setuptools, Entry-Points unverändert. Installtrees keine PCD-Datei. Temporäre Test-PCDs sind selbst erzeugte kleine vorhandene Regressionfixtures und gehören nicht zu Installartefakten oder Karteninventar.
+
+Ein erster paralleler Artefaktvergleich während des abschließenden Builds schlug erwartbar wegen noch nicht neu kopiertem XML fehl; nach abgewartetem Build unverändert korrigierte Prüfung PASS. Kein Artefakt-PASS aus dem verfrühten Versuch. AP04-Default-Share-/Ausgabe-/Sourceunabhängigkeit nicht neu umgesetzt; externe R3D_CONFIG_DIR-Laufweise schon vorher vorhanden und beibehalten.
+
+### 15.8 Vorhandene Tests, Failures und Skips
+
+Keine neuen Tests wegen deklarativer Änderungen; vorhandene Tests unverändert. Initial vollständiger colcon-Lauf in Netzwerk-Sandbox: test Exit 0, test-result Exit 1; 49 Testcases mit 3 Failures/2 Skips, 44 Passes. Zwei Flake8-Fehler sowie test_real_launch_restart_and_all_components: PyYAML ReaderError #x001b (ANSI in ros2 param dump stdout). Keine Sourcekorrektur daraus abgeleitet. Erneut in freigegebener nativer lokaler DDS-Umgebung außerhalb Sandbox, ohne fremde Overlays/User-Site, RCUTILS_COLORIZED_OUTPUT=0, ROS_LOCALHOST_ONLY=1, Domain194 bzw.195, keine Hardwaretreiber/Follower gestartet. Diese Umweltänderungen zusammen beseitigen den Fehler im geprüften Lauf; isolierte alleinige Ursache nicht behaupten.
+
+Gezielter vorhandener Funktionssatz:
+
+```bash
+/usr/bin/colcon --log-base /tmp/r3d-v4-ap03/workspace/log-functional test \
+  --build-base build --install-base install \
+  --test-result-base /tmp/r3d-v4-ap03/results-functional \
+  --packages-select r3d_planner --event-handlers console_cohesion+ \
+  --pytest-args -p no:cacheprovider -k test_configuration \
+  --basetemp=/tmp/r3d-v4-ap03/pytest-functional
+/usr/bin/colcon test-result --test-result-base /tmp/r3d-v4-ap03/results-functional --verbose
+```
+
+Beide Exit 0. Pytest 43 passed / 3 Lintertests deselected in 39.63s; test-result 43 Tests, 0 Errors/Failures/Skips. Umfasst YAML/Robotprofile/Validierung/Kartenpfade, echte ROS-Parameter/Odometry/TF, Preprocessor-Launch mit synthetischem PCD/Output, Planner-Neustarts/alle vier optionalen Komponentenkombinationen. Kein Roboter/keine echte Bewegung. Keine zusätzliche A*-Coverage-/Coverage-Prozentbehauptung.
+
+Final vollständiger unveränderter Satz beider Pakete: gleicher colcon-test-Befehl ohne packages-select/-k, log-final-full, results-final-full, pytest-final-full. test Exit 0, test-result --verbose Exit 1. Pytest Planner 44 passed/1 failed/1 skipped, Preprocessor 1 passed/1 failed/1 skipped. Insgesamt 49 Tests: **45 PASS, 2 FAIL, 2 SKIP**, 0 errors. Failures beide vorhandene test_flake8.py, 166 Planner-/150 Preprocessor-Stilbefunde (unter anderem vorhandene Whitespace/langzeilige/ungenutzte Imports); Tests/Pythondateien durch AP03 bytegleich, keine verursachten Algorithmusänderungen. Beide pep257 PASS. Copyright-Templates behalten vorhandenen @pytest.mark.skip; kein ausgeführter Lizenzlinter daraus behauptet. NetworkX2.4/NumPy1.21.5 np.int-Deprecations und ament_flake8 SelectableGroups-/optparse-Warnungen; kein SciPy-NumPy-Inkompatibilitätswarning im finalen Funktionsprozess. Gesamtsuite nicht als bestanden werten, bloßer colcon-test-Prozess-Exit 0 ist kein Testresult-PASS. AP06/Qualitätsarbeit bleibt offen. Keine Hardwaretests/Commandadapter/Followermain-Aufrufe.
+
+### 15.9 Multi-Distribution-Grenze
+
+Offizielle Regel python3-open3d hat ubuntu:noble null. `rosdep resolve python3-open3d --rosdistro humble --os=ubuntu:noble -c <geprüfter Cache>` Exit 1 explizit „defined as not available“. Zusätzlich mit --rosdistro jazzy und --os=ubuntu:noble Exit 1 dieselbe allgemeine Systemregel (Humble-only ROS-Cache, ROS_DISTRO-Overridewarnung); kein vollständiger Jazzy-Katalogtest/Install-/Build-/Runtimeversuch. Befund allein aus offizieller OS-Regel belastbar, ROS-Verträge nicht portiert. Mögliche spätere AP09-Wege: offiziell geeignete Systembereitstellung prüfen, upstream rosdep/Ubuntu-Verfügbarkeit klären oder getrennt bewertete Vendor-/Source-/isolierte pip-Strategie. Keine stillschweigende Manifestumschaltung auf python3-open3d-pip, keine erfundenen Keys, kein pauschaler neuere-Distributionen-Support. AP09 NOT STARTED für Umsetzung, neuer Teilblocker DOCUMENTED/Regelbefund VERIFIED.
+
+### 15.10 Abnahme, Status und Releasefolgen
+
+| AP03-Kriterium | Ergebnis | Status |
+|---|---|---|
+| 1 Direkte Dependencies erfasst | 128 AST-Stellen plus Test-CLI/eigene Launchpakete; Standardbibliothek/Hardware getrennt | VERIFIED statisch |
+| 2 Konsistente Manifeste | format3/0.0.1/Metadaten erhalten, richtige Kategorien, keine identischen Tagduplikate | VERIFIED |
+| 3 Keys Humble/Jammy auflösbar | 26 externe resolve Exit0, lokales Paket ignore-src | VERIFIED |
+| 4 Keine ungültigen Keys | numpy/scipy ersetzt, ament_python nicht als erfundener Key | VERIFIED |
+| 5 Keine erforderliche Dependency ausgelassen | Source-/Launch-/Testsatz abgedeckt, Test-CLI ergänzt | VERIFIED statisch |
+| 6 Buildtools | setuptools Bedarf belegt/deklariert, Buildtyp erhalten | VERIFIED |
+| 7 Testdeps | bestehende 4 plus Planner ROS-CLI-Provider, beide Pakete getrennt gesammelt | VERIFIED Deklaration, kein Lint-PASS |
+| 8 Setuptools widerspruchsfrei | unverändertes setuptools/pytest, Science/ROS via rosdep statt konkurrierender pip-Anforderungen | VERIFIED für ament_python-Verfahren |
+| 9 Nachvollziehbare Installation | Keys/Simulation/korrekte Anleitung, aber keine vollständige echte rosdep-Installation/check | DOCUMENTED / NOT VERIFIED Gesamtgate |
+| 10 Build/Tests bzw. Blocker abgegrenzt | Copy-Build/43 Runtimefälle PASS; Apt-Hostcheck und 2 Lintfehler/2 Skips explizit | VERIFIED Teilnachweise, BLOCKED Gesamtabschluss |
+
+Bestehende strengere Projektabnahme in Abschnitt 3/4 verlangt tatsächlich installierten gesamten Satz plus rosdep check ohne Skip in isolierter dokumentierter Umgebung. Das bleibt ausstehend; daher **AP03 IN PROGRESS**, nicht pauschal VERIFIED. Keine weitere Systeminstallation zur künstlichen Statusaufwertung. Humble-Keys selbst vollständig auflösbar, bestehende Lintfehler AP06 und fehlende OS-/Installationsprüfung jeweils getrennt. AP01 technisch VERIFIED/rechtliches Gesamtgate BLOCKED, AP02 VERIFIED. AP04/AP06/AP08/AP10 IN PROGRESS; AP05/AP07 NOT STARTED; AP09 NOT STARTED mit Noble-Regelbefund. Index/Bloom/Buildfarm weiterhin NOT READY aus bekannten übrigen Gates, keine neue Serverfreigabe/Quality-Level-Angabe. Direkte ungültige/fehlende V4-Dependencies sind jetzt behoben, nicht länger als unveränderter aktueller Keyblocker ausgeben.
+
+Noch offene Gates: vollständige rechtliche Befugnis/konkrete transitive/native Distributionspflichten/historische Datenobjekte; vollständige Installation/check/clean-native target; implizite Copy-Share-/Ausgabeportabilität; verbindliche Releaseversion/Changelogs-/Versionierung/Releasevorbereitung; unabhängige CI/weitere Tests nach Projektziel. Lint-/fehlende optionale Werkzeuge nicht als erfundene formale ROS-Indexpflichten umdeuten. Kein externer Robotik-/SLAM-Code in Paketdependencies erzwungen.
+
+### 15.11 Git-Abschluss und Quellen
+
+Vier historische Datencommits und V4-010-Dokumentationscommit getrennt von AP03. V4 weiterhin Nachfolger der unveränderten Baseline c65642fe56015556f696364a724cb5b976a27888. 13 alte Commits via union origin/V1/V2/V3/main erreichbar, Originalkartenblobs in alten Trees vorhanden. Alle fünf lokalen aktuellen Branches PCD-frei. Keine neuen Merge-Commits/Tags/Cherry-Picks/History-Rewrites. Sämtliche neu erzeugten historischen Worktrees entfernt, ursprünglicher V4-Worktree bleibt; keine Branchreferenz gelöscht. Remote-URLs/Remote-Trackingrefs unverändert, branch.V1/V2/V3 Trackingconfig neu durch erlaubte lokale Branchanlage; kein Push/GitHub-/Sichtbarkeitswechsel/Release. Historisches PDF unverändert SHA256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383. Entwicklungsprotokoll einzige fortlaufende Forschung, kein zusätzliches PDF.
+
+Quellen/Stand 14.10.2026, tatsächliche resolve/where-defined/apt-policy/Debimport-/Testresultausgaben und lokale Toolimplementierungen unterscheiden:
+
+| ID | Quelle | Verwendung / Grenze |
+|---|---|---|
+| D01 | [offizielle rosdep python.yaml](https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/python.yaml) | System-Pythonkeys/Open3D-Noble-null; per-Key lokale Auflösung belegt |
+| D02 | [offizieller Humble-Katalog](https://raw.githubusercontent.com/ros/rosdistro/master/humble/distribution.yaml) | ROS-Keys via aktueller Humble-Cache/where-defined |
+| D03 | [Ubuntu Jammy python3-open3d](https://packages.ubuntu.com/jammy/python3-open3d) | Systempaket 0.14.1, Python3.10/NumPy-ABI, universe; tatsächliche Debimportprobe ergänzt |
+| D04 | [Humble tf2_ros_py-Manifest](https://raw.githubusercontent.com/ros2/geometry2/humble/tf2_ros_py/package.xml) | Python-TF2-Provider, lokal installiertes entsprechendes Manifest gegengeprüft |
+| D05 | [REP-149](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-0149.rst) | Dependencykategorien/Runtime-/Buildtool-/Testvertrag, kein formales Verbot optionaler Verbesserungen |
+| D06 | lokal ros2pkg/verb/create.py und colcon_ros/task/ament_python/build.py, colcon_core/task/python/test/pytest.py | Buildtyp/Setuptools/Testausführung/colcon Exit0 trotz TestFailure; lokale implementierte Werkzeugversionen |
+| D07 | lokal SciPy __init__.py, apt-cache policy und importmodule.__file__/__version__ | tatsächliche NumPy-/SciPy-Mischung, erwarteter Range und isolierte Gegenprobe; keine unbekannte Installationsherkunft behauptet |
+
+**Nächster vorgeschlagener Entwicklungsschritt:** AP04 – Build and Installation Portability nach ausdrücklicher neuer Freigabe. Share-Verzeichnisse/Copy-Konfiguration/ressourcenunabhängige Pfade/beschreibbare Ausgaben/Launches ohne Source und reproduzierbarer Clean-Build; offen gebliebenen AP03-Installationsnachweis dabei sauber getrennt nachholen. Kein automatischer Beginn, kein Push.

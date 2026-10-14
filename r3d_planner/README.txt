@@ -166,4 +166,6 @@ r3d_preprocessor is the runtime PCD producer; no reverse dependency is added.
 setup.py installs modules, executables, launch/*.launch.py, config/*.yaml and
 config/robots/*.yaml. The legacy config/r3d_planner_params.yaml remains an
 unattached incomplete Nav2 fragment, not an active configuration entry point.
-See ../INSTALL.md and ../docs/KNOWN_ISSUES.md for metadata limitations.
+V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
+tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
+../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining installation/test gates.

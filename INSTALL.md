@@ -22,50 +22,50 @@ of the Go2W deployment rather than this workspace.
 
 ### ROS and system dependencies
 
-On Ubuntu 22.04 with ROS 2 Humble, install the build tools and imported ROS
-modules with:
+For the local V4 development tree, install ROS 2 Humble first and use its
+system Python 3.10. Required workspace tools are `python3-colcon-common-extensions`
+and `python3-rosdep`; they are workspace tooling rather than dependencies of a
+node. If absent, install them through Ubuntu's package manager:
 
 ```bash
-sudo apt update
-sudo apt install \
-  python3-colcon-common-extensions \
-  python3-rosdep \
-  python3-pip \
-  python3-yaml \
-  python3-numpy \
-  python3-scipy \
-  python3-networkx \
-  python3-open3d \
-  ros-humble-ament-index-python \
-  ros-humble-geometry-msgs \
-  ros-humble-nav-msgs \
-  ros-humble-nav2-msgs \
-  ros-humble-rclpy \
-  ros-humble-sensor-msgs \
-  ros-humble-sensor-msgs-py \
-  ros-humble-std-msgs \
-  ros-humble-std-srvs \
-  ros-humble-tf2-ros \
-  ros-humble-tf2-ros-py \
-  ros-humble-visualization-msgs \
-  ros-humble-rviz2 \
-  ros-humble-launch \
-  ros-humble-launch-ros
+sudo apt install python3-colcon-common-extensions python3-rosdep
 ```
 
-The stack uses these non-ROS libraries:
+The corrected V4 manifests declare runtime libraries, ROS messages/launch APIs,
+setuptools packaging and existing test tools. Resolve these through rosdep as
+shown below; a parallel global pip installation is not required.
 
-| Library | Use |
-|---|---|
-| NumPy | Voxel, point-cloud, and geometry operations |
-| SciPy (`scipy.spatial.KDTree`) | Locate the graph node nearest to a start or goal |
-| NetworkX | In-memory navigation graph reconstructed from the analyzed PCD |
-| Open3D | Read, voxelize, color, and write PCD data |
+| Python import | Humble/Jammy rosdep key | Ubuntu package / AP03 reference version |
+|---|---|---|
+| `numpy` | `python3-numpy` | python3-numpy, 1.21.5 |
+| `scipy.spatial.KDTree` | `python3-scipy` | python3-scipy, 1.8.0 |
+| `networkx` | `python3-networkx` | python3-networkx, 2.4 |
+| `open3d` | `python3-open3d` | python3-open3d, 0.14.1 |
+| `yaml` | `python3-yaml` | python3-yaml, 5.4.1 |
+| `tf2_ros` | `tf2_ros_py` | ros-humble-tf2-ros-py |
 
-Use the Ubuntu packages above for the ROS Python environment. Mixing global pip
-packages with apt-managed ROS packages can introduce version conflicts. Test a
-different Open3D release in an isolated Python environment before using it with
-ROS 2.
+These are observed Jammy reference versions, not manifest version pins. NumPy,
+SciPy, Open3D and NetworkX provide point-cloud/geometry, nearest-node and graph
+operations. Use one consistent apt-managed Python environment; user-site NumPy
+1.26.4 together with system SciPy 1.8.0 triggered the observed compatibility
+warning. System NumPy 1.21.5 did not. Conda's Python is not the ROS interpreter.
+
+Open3D's official rosdep rule resolves to Jammy's universe package. Enable the
+Ubuntu universe repository if necessary. AP03 tested Open3D 0.14.1 and NetworkX
+2.4 from apt archives extracted into a temporary directory, alongside installed
+Humble and system NumPy/SciPy. This validates those runtime versions but is not
+an apt installation or a fresh-machine test. The audit host still lacks the
+installed `python3-open3d` and `python3-networkx` packages, so its `rosdep check`
+reports those two packages as unsatisfied. The installation command below is
+for users setting up their environment; it was only simulated in AP03.
+
+The current official `python3-open3d` rule is explicitly unavailable on Ubuntu
+24.04 Noble. A Humble/Jammy result does not establish Jazzy support. Resolving
+that platform separately belongs to AP09; do not silently substitute a pip key.
+
+RViz (`ros-humble-rviz2`) is optional for visualization and starts separately.
+`tf2_ros` command-line tools are optional when users supply an external static
+TF publisher. They are not required Python libraries of either R3D package.
 
 ### External runtime components
 
@@ -121,47 +121,49 @@ Replace `<path-to-workspace>` with the absolute path of the ROS 2 workspace in
 every command in this guide. Angle-bracket placeholders are not literal shell
 syntax and must not be copied unchanged.
 
+The following procedure targets the local V4 checkout with the corrected AP03
+manifests. V4 has not been pushed; do not assume an upstream V4 branch exists.
+The public V3 checkout still has historical dependency declarations and requires
+its separate historical installation instructions. Place your existing local V4
+checkout under `src`, or clone from the local repository:
+
 ```bash
 mkdir -p <path-to-workspace>/src
-cd <path-to-workspace>/src
-git clone git@github.com:RoboProjekt/R3D-Planner.git R3D-Planner
-cd R3D-Planner
-git checkout V3
+git clone --branch V4 <path-to-local-R3D-Planner> <path-to-workspace>/src/R3D-Planner
 cd <path-to-workspace>
 ```
 
-For an existing checkout, place the unchanged repository below the `src`
-directory of a ROS 2 workspace. Do not rename package or source directories.
+Replace `<path-to-local-R3D-Planner>` with the existing local repository path.
+No upstream branch checkout or push is part of this procedure.
 
 ## rosdep
 
-Initialize rosdep if it has not been initialized on this machine:
+Initialize rosdep only if this machine has not been initialized:
 
 ```bash
 sudo rosdep init
-rosdep update
 ```
 
-The `package.xml` files contain keys that rosdep cannot resolve
-(`numpy` and, depending on the rosdep database, `scipy`) while also
-omitting several modules that the source imports. Therefore, an unchanged
-
-```bash
-rosdep install --from-paths src --ignore-src -r -y
-```
-
-is currently **not reproducibly successful**. After installing the apt packages
-listed above, rosdep can process the remaining declared dependencies with
-explicit exclusions:
+With a native Humble environment (no Conda interpreter or unrelated workspace
+overlays), resolve the manifests and check installed packages:
 
 ```bash
 cd <path-to-workspace>
-rosdep install --from-paths src --ignore-src -r -y \
-  --skip-keys="numpy scipy"
+source /opt/ros/humble/setup.bash
+export PYTHONNOUSERSITE=1
+rosdep update --rosdistro humble
+rosdep install --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy -y
+rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+  --ignore-src --rosdistro humble --os=ubuntu:jammy
 ```
 
-The package metadata does not yet support an unmodified rosdep run. The
-required exclusions are tracked in `docs/KNOWN_ISSUES.md`.
+V4 needs no dependency skip list. `rosdep install --simulate` successfully
+resolved the corrected dependency set in AP03; it does not install packages.
+A successful check proves package presence, not successful build or runtime.
+The workspace contains both R3D packages, so `--ignore-src` excludes the local
+`r3d_preprocessor` dependency. Every external manifest key was also resolved
+individually to avoid mistaking an installed ROS overlay for key validation.
 
 ## Build
 
@@ -181,6 +183,11 @@ ros2 pkg executables r3d_planner
 ```
 
 `colcon list` must include `r3d_preprocessor` and `r3d_planner`.
+
+For a regular copy installation, omit `--symlink-install` and use explicit
+user-owned configuration through `R3D_CONFIG_DIR` as described below. AP03 built
+both packages with separate build/install/log paths and no symlink installation;
+implicit installed-config portability and output-path design remain AP04.
 
 ## Runtime configuration
 
