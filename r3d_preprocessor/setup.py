@@ -24,7 +24,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name, ['package.xml', 'LICENSE']),
         # Die Zeilen für den maps-Ordner wurden hier entfernt!
     ],
     install_requires=['setuptools'],
@@ -33,6 +33,7 @@ setup(
     maintainer_email='baau1001@stud.hs-kl.de',
     description='Map generation and publishing for R3D',
     license='Apache-2.0',
+    license_files=['LICENSE'],
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
