@@ -164,7 +164,7 @@ on this branch.
 
 ```bash
 ros2 run r3d_preprocessor pcd_analyser --ros-args \
-  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd \
+  -p pcd_path:=/absolute/path/map.pcd \
   -p voxel_size_cm:=5.0 \
   -p max_step_height_cm:=25.0 \
   -p min_points_per_sqm:=10.0 \
@@ -186,8 +186,8 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args \
 ### Tested map configurations
 
 These presets use the parameter combinations from the deployed map workflow.
-Only `voxel_05_minhits_7.pcd` is included in this repository. Copy the other
-maps to the stated paths or replace `pcd_path` with their actual location.
+No PCD examples are bundled in the current branch. Supply your own PCD files
+and replace `pcd_path` with their actual location; original examples remain in Git history.
 
 RoboLab map:
 
@@ -204,7 +204,7 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspac
 Included voxel map with the reduced density threshold:
 
 ```bash
-ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
+ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=/absolute/path/map.pcd -p voxel_size_cm:=5.0 -p max_step_height_cm:=20.0 -p min_points_per_sqm:=1.0 -p min_points_per_voxel:=1 -p floor_height_tolerance:=0.05 -p ground_fill:=false -p robot_base_clearance_cm:=10.0 -p robot_narrow_radius_cm:=30.0
 ```
 
 Unfiltered stair scan:
@@ -217,7 +217,7 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args -p pcd_path:=<path-to-workspac
 
 ```bash
 ros2 run r3d_preprocessor pcd_server --ros-args \
-  -p pcd_path:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd
+  -p pcd_path:=/absolute/path/map_analysed.pcd
 ```
 
 `pcd_server` publishes `/map_pointcloud` with transient-local durability:
@@ -238,7 +238,7 @@ preprocessing:
 
 ```bash
 ros2 run r3d_planner pcd_path_planner --ros-args \
-  -p map_name:=<path-to-workspace>/src/R3D-Planner/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd \
+  -p map_name:=/absolute/path/map_analysed.pcd \
   -p voxel_size_cm:=5.0 \
   -p min_step_height_cm:=5.0 \
   -p max_step_height_cm:=25.0
