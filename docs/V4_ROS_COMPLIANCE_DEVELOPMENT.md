@@ -1020,6 +1020,70 @@ Migration ist konkret vorbereitet und noch nicht implementiert. Verbleibende Fre
 
 Nur Dokumentation, keine öffentliche ROS-Schnittstelle oder Controllerfunktion geändert. Keine Änderungen an V1/V2/V3/main/Remotes/PDF/Lizenztexten, keine externen Projekte, kein Push/Release/Hardwarebetrieb. R3D_null bleibt ausgeschlossen.
 
+### V4-018 - PointCloud2-Feldlayout und organisierte Daten korrekt interpretieren
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP05/AP06, AP08. **Status:** IN PROGRESS vor Anwendung/Tests. **Git-Commit:** `fix(ros): decode PointCloud2 fields and row padding`. **Betroffene Dateien:** neuer eigener cloud.py/test_pointcloud.py, LocalFilter-Dekoder/Outputhelper, Follower-Clouddekoder und vorhandene Anleitungen/Protokoll.
+
+#### Ausgangssituation
+
+I02: LocalFilter liest gepacktes XYZ12 unabhängig von fields/row_step/endian. Follower verwendet Humble read_points ohne explizite Rowpaddingbehandlung. Filteremptyoutput hat keine XYZ-Felder. narrow-/Followerfrischemigration M01/M02 bleibt unimplementiert bis Freigabe.
+
+#### Ziel der Änderung
+
+Alle gültigen skalaren numerischen XYZ-Layouts korrekt lesen, nichtgeometrische Felder ignorieren, row_step/point_step/Endian beachten und NaN/Inf ungeachtet is_dense ausschließen. Fehlende/malformed Felder nicht als freie Bahn publizieren. Ausgabevertrag und Filterklassifikationslogik erhalten.
+
+#### Technische Umsetzung
+
+Geplant: sensor_msgs_py.dtype_from_fields für typisierte Felder; strided readonly-NumPyview und explizite Endian-Dtype statt inplace-byteswap. Nur XYZ-Array materialisieren, keine Kopie aller Zusatzkanäle; finite-Maske. Validierung Dimensions-/Buffer-/Feldgrößen, Metadaten auch bei Emptyoutput. Beide internen Cloudconsumer nutzen gemeinsamen Decoder. Keine Frame-/QoS-/Topic-/ROS-Typ-/Controlleränderung.
+
+#### Begründung
+
+Humblehelper allein deckt organisierte Rowpadding-Wolken nicht zuverlässig ab. Verwendete API wiederverwenden, eigenen Stridelayoutteil testen; keinen fremden Code kopieren. numerische XYZ-Datentypen erlauben, vor Geometrieoperationen mindestens float32, sonst Integeroverflow vermeiden.
+
+#### Verifikation
+
+Geplant: tatsächliche Humblemessage-Typen, vier Layouts/Endian/Organized/Padding/dense, malformedXYZ/Data, NaN/Inf, unveränderte Inputbytes und gleiche Filteroutputs für äquivalente Geometrie. Anschließend neuer Copy-Build und vollständige Bestands-/Lintsuite. Host unverändert, temporärer Container mit readonlySource/domain211/localhost und UID1000; keine Hardware.
+
+#### Ergebnis
+
+Noch kein PASS; tatsächliche Ergebnisse nach Prüfung ergänzen. M01/M02-Freigabe bleibt getrennt.
+
+#### Auswirkungen
+
+Kompatible Interpretation gültiger PointCloud2-Eingaben, striktere explizite Zurückweisung kaputter Buffer; keine Legacy-narrow-/Stoppolicy-/Frame-/Namens-/Paketversionsänderung. Filtermathematik/Schwellen erhalten, Inputbytes unverändert; vorhandene86Fälle nicht löschen/skippen.
+
+### V4-019 - Begrenzte Parameterbereitschaft im bestehenden Launchtest prüfen
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** begleitendes AP06, AP05-Abnahme. **Status:** VERIFIED für begrenzte Parameterabfrage/Testhelper und frische Vollsuite; neue AP05-Migration separat offen. **Git-Commit:** `test(ros): bound parameter discovery retries`. **Betroffene Dateien:** bestehender test_configuration.py und zentrales Protokoll; keine Produktion.
+
+#### Ausgangssituation
+
+cloud4 Copy-Build0, 169Tests/168PASS/1FAIL/0SKIP: bestehender test_real_launch_restart_and_all_components scheitert mit CalledProcessError bei ros2 param dump /r3d_rviz_interface --no-daemon --spin-time2 (Exit1). Alle83 neuen Cloudfälle und6Lints bestanden. Nodegraph zuvor korrekt; Log zeigt gestartete Nodes und SIGINT-Shutdown des Testcleanup, keine bewiesene Produktions-/Middlewareursache. Bisher check=True verlor stdout/stderr in der Assertion. Discoverytiming als plausible Hypothese, nicht abschließend bewiesen.
+
+#### Ziel der Änderung
+
+Nodegraphsichtbarkeit nicht als sofortige CLI-/Servicebereitschaft behandeln; drei begrenzte echte Abfragen erlauben, bei anhaltendem Fehler aussagekräftiges stdout/stderr liefern. Erfolgs-/Parameter-/Startup-/Schutdownassertions und alle86Bestandsfälle erhalten, keine Gruppenabschaltung.
+
+#### Technische Umsetzung
+
+Implementiert: privater Testhelper _parameter_dump(remote), identisches daemonfreies CLI/Spin2/Timeout12, höchstens3Versuche mit0.2sPause; ausschließlich bei NichtnullExit erneut. Nach dritten Fehler Assertion mit letzter Ausgabe. Testhelper unitgetestet: transienter NichtnullExit->echtesResultat, permanente Fehler->Assertion/exakt3calls. Produktionsnodes/algorithms/topic/Parameter unverändert.
+
+#### Begründung
+
+Begrenztes Warten auf tatsächliche CLIabfrage ergänzt native Discoverybeobachtung, ohne inhaltliche Assertions oder Timeouts unbegrenzt zu lockern. Ist keine Reparatur einer behaupteten ROSMiddlewareursache. Testharness bekommt eigene V4-ID, nicht als neue Plannerfunktion darstellen.
+
+#### Verifikation
+
+Ausgeführt: zwei Helperfälle für transiente/permanente CLIfehler; frischer Workspace /work/cloud6, Copy-Build0, colcon test0, test-result0: 171PASS/0FAIL/0ERROR/0SKIP. Alle86Bestandsfälle plus83Cloudfälle plus2Helperfälle. Dauerfehler-Unitassertion prüft3Queries und erhaltene CLIfehlerausgabe, erfolgreiche zweite Antwort wird inhaltlich geprüft. Zwei neue Blankline-Lintdiagnosen korrigiert; abschließender gezielter Flake8check0 und Gesamt-Flake8/PEP257/Copyright jeweils PASS. Frühere cloud4-CLIfehler und cloud1..3 Stilfehlversuche bleiben dokumentiert, kein Umschreiben als PASS.
+
+#### Ergebnis
+
+Begrenzte Readinessquery im Testwerkzeug VERIFIED; alle vorhandenen Inhalte/Schalter/Nodes/Parameterassertions erhalten. cloud5 mit unverändertem altem Helper in neuer Domain bestand ebenfalls169Tests; das beweist weder die exakte Ursache des cloud4-Fehlers noch eine absolute Flakinessfreiheit. Die Änderung ergänzt begrenztes Warten und bessere Diagnostik statt Produktionsrefactoring. M01/M02-Migrationsfrage bleibt offen, keine AP05-Gesamtabnahme/CI-/Releasebehauptung.
+
+#### Auswirkungen
+
+Nur Testwerkzeug plus Protokoll, kein öffentlicher ROS-Vertragsbruch. Historische86Tests weder gelöscht noch geskippt; zwei sinnvolle neue Fehler-/Erfolgsregressionen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.

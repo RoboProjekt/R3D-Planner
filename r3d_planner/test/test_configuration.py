@@ -276,6 +276,22 @@ def test_preprocessor_real_launch(config, monkeypatch):
     assert (path.parent / 'output/tiny_analysed.pcd').is_file(), result.stdout + result.stderr
 
 
+def _parameter_dump(remote):
+    """Bound service discovery retries and preserve complete CLI diagnostics."""
+    import subprocess
+    import time
+    for attempt in range(3):
+        result = subprocess.run(['ros2', 'param', 'dump', remote,
+                                 '--no-daemon', '--spin-time', '2'],
+                                capture_output=True, text=True, timeout=12)
+        if result.returncode == 0:
+            return result
+        if attempt < 2:
+            time.sleep(0.2)
+    raise AssertionError(f'Parameter query failed for {remote}: '
+                         f'{result.stdout}\n{result.stderr}')
+
+
 def test_real_launch_restart_and_all_components(config, monkeypatch):
     """Restart real launches in the same environment; no rebuild or re-sourcing."""
     import os
@@ -326,9 +342,7 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
                                                         f'launch-{index}.log').read_text()
                         rclpy.spin_once(observer, timeout_sec=0.1)
                     assert names == expected
-                    dump = subprocess.run(['ros2', 'param', 'dump', '/global_graph_planner',
-                                           '--no-daemon', '--spin-time', '2'],
-                                          capture_output=True, text=True, timeout=12, check=True)
+                    dump = _parameter_dump('/global_graph_planner')
                     values = yaml.safe_load(dump.stdout)[
                         '/global_graph_planner']['ros__parameters']
                     assert values['robot_height_cm'] == 80.0 + index
@@ -341,10 +355,7 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
                         (rviz, '/r3d_rviz_interface', 'rviz_interface', 'match_radius')
                     ]:
                         if enabled:
-                            extra = subprocess.run(['ros2', 'param', 'dump', remote,
-                                                    '--no-daemon', '--spin-time', '2'],
-                                                   capture_output=True, text=True,
-                                                   timeout=12, check=True)
+                            extra = _parameter_dump(remote)
                             params = yaml.safe_load(extra.stdout)[remote]['ros__parameters']
                             assert params[key] == central[section][key]
                             if section == 'rviz_interface':
@@ -420,3 +431,21 @@ def test_unused_map_can_be_unset(config, mode):
         assert cfg['preprocessor']['pcd_path'].endswith('tiny.pcd')
     else:
         assert cfg['planner']['map_name'].endswith('tiny.pcd')
+
+
+@pytest.mark.parametrize('permanent', [False, True])
+def test_parameter_query_readiness_preserves_failures(monkeypatch, permanent):
+    import subprocess
+    from unittest.mock import Mock
+    first = subprocess.CompletedProcess([], 1, stdout='no endpoint', stderr='not ready')
+    second = subprocess.CompletedProcess([], 0, stdout='valid parameters', stderr='')
+    run = Mock(side_effect=[first] * 3 if permanent else [first, second])
+    monkeypatch.setattr('subprocess.run', run)
+    monkeypatch.setattr('time.sleep', lambda duration: None)
+    if permanent:
+        with pytest.raises(AssertionError, match='no endpoint.*'):
+            _parameter_dump('/synthetic_node')
+        assert run.call_count == 3
+    else:
+        assert _parameter_dump('/synthetic_node').stdout == 'valid parameters'
+        assert run.call_count == 2
