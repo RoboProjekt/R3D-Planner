@@ -33,7 +33,16 @@ setup(
     zip_safe=True,
     maintainer='bauya',
     maintainer_email='baau1001@stud.hs-kl.de',
-    description='R3D 3D Navigation Package',
+    description=(
+        'Graph-based A* path planning on classified PCD traversability data '
+        'with a ComputePathToPose action, RViz integration, local obstacle '
+        'filtering and path following.'
+    ),
+    author='Bastian Aumer',
+    url='https://github.com/RoboProjekt/R3D-Planner',
+    project_urls={
+        'Bug Tracker': 'https://github.com/RoboProjekt/R3D-Planner/issues',
+    },
     license='Apache-2.0',
     license_files=['LICENSE'],
     tests_require=['pytest'],

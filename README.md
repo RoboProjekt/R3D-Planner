@@ -21,6 +21,25 @@ the Go2W. Other ROS distributions are not supported.
 The pipeline is PCD-only. Pickle executables and external Pickle helper scripts
 from V1 are not available here.
 
+## Development metadata
+
+Both packages use the provisional development version `0.0.1` and the
+`ament_python` build type. `r3d_preprocessor` performs offline voxel-based PCD
+clearance/traversability analysis; `r3d_planner` provides graph-based A* planning
+and the existing ROS 2 navigation components listed above.
+
+Repository: [RoboProjekt/R3D-Planner](https://github.com/RoboProjekt/R3D-Planner).
+Bug tracker: [GitHub issues](https://github.com/RoboProjekt/R3D-Planner/issues).
+Author of the own software: Bastian Aumer; existing maintainer contact:
+`bauya <baau1001@stud.hs-kl.de>`. Authorized own software uses Apache-2.0;
+existing third-party notices retain their original attribution and conditions.
+
+V4 is currently developed locally. The project has no official ROS Index
+registration or Bloom/Buildfarm release; `0.0.1` is not a released ROS version.
+V4 bundles no PCD maps and requires user-provided inputs. The source-clone
+instructions below refer to the existing public V3 branch, not an unpublished
+V4 remote branch.
+
 ## Installation
 
 Use Ubuntu 22.04, ROS 2 Humble and its Python 3.10 environment.

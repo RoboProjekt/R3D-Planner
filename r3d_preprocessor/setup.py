@@ -31,7 +31,16 @@ setup(
     zip_safe=True,
     maintainer='bauya',
     maintainer_email='baau1001@stud.hs-kl.de',
-    description='Map generation and publishing for R3D',
+    description=(
+        'Offline voxel-based analysis and classification of PCD point '
+        'clouds for robot-specific clearance and traversability assessment, '
+        'with classified point-cloud output.'
+    ),
+    author='Bastian Aumer',
+    url='https://github.com/RoboProjekt/R3D-Planner',
+    project_urls={
+        'Bug Tracker': 'https://github.com/RoboProjekt/R3D-Planner/issues',
+    },
     license='Apache-2.0',
     license_files=['LICENSE'],
     tests_require=['pytest'],

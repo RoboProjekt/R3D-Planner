@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-007 (historische PDF-Baseline versioniert). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-009 (AP02-Metadaten, PDF-Versionierung und dokumentierte Kartenerklärung). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -24,6 +24,8 @@ Die Initialisierung ist noch keine Freigabe für Codeänderungen. Gemäß Abschn
 **V4-006, 14. Oktober 2026:** Technische AP01-Verifikation **VERIFIED** für Originaltext, 18 eigene SPDX-/Copyrightheader, Apache-Manifeste/Setup, erhaltene sechs Fremdtemplates, dokumentierte LiDAR-Trennung/Notice, datenfreien aktiven Tree und tatsächlich geprüfte Lizenzmitnahme in sdists, Wheels und Copy-colcon-Shares. Je Paket ist eine identische lokale LICENSE-Kopie hinzugefügt; Root-LICENSE unverändert. Keine vollständige rechtliche/transitive/Debian-/Buildfarm-Freigabe. Arbeitspaket AP01 insgesamt bleibt BLOCKED für individuelle Rechts-/Release-Gates, AP04/AP06/AP08/AP10 IN PROGRESS; AP02/AP03 NOT STARTED.
 
 **V4-007, 14. Oktober 2026:** Das zuvor unversionierte historische PDF ist unverändert in Git aufgenommen: 33 Seiten, 298707 Byte, SHA-256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383. Frühere Angaben „unversioniert“ beschreiben den jeweiligen früheren Eingangszustand, keine aktuelle Anweisung. Historischer Inhalt/alte Kartendarstellung und Software-Lizenzgrenzen bleiben unverändert.
+
+**V4-008/V4-009, 14. Oktober 2026:** AP02 im freigegebenen technischen Umfang **VERIFIED**: beide Manifeste und setup.py konsistent Version 0.0.1, fachliche englische Beschreibungen, vorhandene Repository-/Bugtracker-URLs und bekannte Autorrolle. Maintainer bauya/baau1001@stud.hs-kl.de, Namen, ament_python, Dependencies, Entry-Points und Lizenzressourcen unverändert. Entwicklungsversion, kein ROS-Release. Der Entwickler erklärt eigene Aufnahme/Verarbeitung der früheren PCDs und keine verletzten Datenschutzauflagen; das ist dokumentierte Selbstauskunft, kein unabhängiger Rechtenachweis. V4 bleibt datenfrei; gewünschte spätere Kartenentfernung aus V1/V2/V3/main ist nur dokumentiert und nicht ausgeführt.
 
 ## 2. Technischer Ausgangsstand
 
@@ -199,11 +201,11 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | --- | --- |
 | Ausgangsstand | Zwei syntaktisch lesbare Format-3-Manifeste; passende Namen, Maintainer, ament_python-Export; Version 0.0.0 vs Setup 0.0.1 |
 | Probleme | B03: TODO-Beschreibung, Versionswiderspruch, fehlende empfohlene URLs; rechtliche Angaben ungelöst |
-| Geplante Änderung | Nach gesondertem Auftrag nichtrechtliche Beschreibungen/URLs und Versionskonsistenz korrigieren; Maintainerdaten nicht erfinden/ersetzen; Apache-Lizenzfelder sind bereits durch AP01 gesetzt und keine neue AP02-Leistung |
+| Geplante Änderung | Unter V4-008 umgesetzt: Version 0.0.1, konsistente Beschreibungen/URLs/Author; Maintainer/Lizenz erhalten. Releasepolitik/Kontaktzuständigkeit/Serverreview bleiben AP10, keine AP03-Keys geändert |
 | Priorität | P0 für Release-Metadaten, P1 für empfohlene Ergänzungen |
 | Abhängigkeiten | Freigabe des ersten Implementierungsschritts; Lizenzabschluss hängt von AP01 ab, übrige Korrekturen nicht |
 | Abschlusskriterien | Manifest-/Setup-Metadaten konsistent und geprüft; übrige Platzhalter technisch soweit zulässig entfernt; Lizenzdeklarationen aus AP01 erhalten, rechtliche Gesamtfreigabe separat offen |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **VERIFIED** - technische Metadaten/0.0.1/URL-/Author-/Maintainer-/Python-Konsistenz geprüft; vollständige ROS-/Rechtsfreigabe separat |
 
 ### 4.4 AP03 - Dependencies und rosdep
 
@@ -275,7 +277,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für korrekte Nutzung; P2/P3 für weitergehende Policies |
 | Abhängigkeiten | Begleitet alle APs; Lizenztext nur nach AP01; konkrete Support-/API-Zusagen erst anhand AP06/AP09 |
 | Abschlusskriterien | Nachvollziehbare Änderungs-IDs und Commitreferenzen, zutreffende Prüfberichte, reproduzierbare aktualisierte Nutzeranleitungen; dokumentierte Grenzen statt pauschaler Quality-Level-/ABI-Garantie |
-| Aktueller Status | **IN PROGRESS** - Protokoll bis V4-006 mit Karten-/Regressions-/Lizenzartefaktnachweisen fortgeführt; laufende Entwicklung und Policies weiter offen |
+| Aktueller Status | **IN PROGRESS** - Protokoll bis V4-009, historisches PDF versioniert, AP02- und Erklärungsnachweise ergänzt; laufende Entwicklung/Policies weiter offen |
 
 ### 4.10 AP09 - ROS-Distributionskompatibilität
 
@@ -299,13 +301,13 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 für offene Release-Gates; Umsetzung nach technischen Grundlagen |
 | Abhängigkeiten | AP01-AP04 zwingend für belastbaren Abschluss; AP05/AP06 für vorgesehenen Produktvertrag; AP08/AP09 für Ziel-/Wartungszusagen; AP07 als Projektqualitätsnachweis |
 | Abschlusskriterien | Geprüfte Checkliste, konsistente Version/Ref, vollständige Dependencies, funktionierender Copy-Install, geklärte Rechte; Veröffentlichung nur nach gesonderter Autorisierung und externer Bestätigung |
-| Aktueller Status | **IN PROGRESS** - aktiver Kartenumfang und konkrete Lizenzmitnahme geprüft; historische Git-/Vertrags-/Bundle-/Metadaten-/Dependency-/Release-Gates offen; keine Publikation |
+| Aktueller Status | **IN PROGRESS** - AP02-Metadaten abgenommen, 0.0.1 nur Entwicklungsversion; Versions-/Releasepolitik, Dependency-/Install-/Rechts-/Serverreviewgates offen; keine Publikation |
 
 ### 4.12 Abhängigkeitsgerechte Reihenfolge und nächste Freigabe
 
 AP01-Lizenzentscheidung und beauftragte technische Lizenzimplementierung sind abgeschlossen. Offene Vertrags-, Karten- und konkrete Distributionsrechte sperren weiterhin die entsprechende Veröffentlichung, nicht jede unabhängige technische Arbeit. Die bereits begründete Apache-Wahl muss dafür nicht erneut recherchiert werden. Bei konkreten entgegenstehenden Hinweisen ist die betroffene Lizenzzuordnung zu stoppen und neu zu beurteilen.
 
-Als nächster **gesondert zu beauftragender** Schritt bleibt AP02 (nichtrechtliche Beschreibungen, URLs, Versionskonsistenz), danach AP03 → AP04 → AP05 mit begleitenden AP06-Regressionen/AP08-Dokumentation. AP04/AP10 müssen auch den tatsächlichen Installations-/Binärumfang einschließlich Pflichttexten prüfen. AP07 folgt stabilen Grundlagen; AP09/AP10 benötigen eigene ausgeführte Nachweise. Keine automatische Aufnahme von AP02/AP03, kein Push und keine Releaseausführung nach diesem Auftrag.
+AP02 ist nun technisch VERIFIED. Als nächster **gesondert zu beauftragender** Schritt wird AP03 (Dependency Management/rosdep) vorgeschlagen, danach AP04 → AP05 mit begleitenden AP06-Regressionen/AP08-Dokumentation. AP04/AP10 müssen auch den tatsächlichen Installations-/Binärumfang einschließlich Pflichttexten prüfen. AP07 folgt stabilen Grundlagen; AP09/AP10 benötigen eigene ausgeführte Nachweise. AP03 wird ohne ausdrückliche nächste Freigabe nicht begonnen; kein Push und keine Releaseausführung nach diesem Auftrag.
 
 ## 5. Entwicklungsprotokoll
 
@@ -672,6 +674,86 @@ PDF-Prüfung und Scope-/Index-Gate erfolgreich; identische historische Referenz 
 
 Nur Versionierung derselben historischen Bytes; frühere PCD-Beschreibungen bleiben korrekt. Keine Karte zurückkopiert, keine andere Branchänderung, kein Push/History-Rewrite/GitHubzugriff mit Mutation.
 
+### V4-008 - AP02-Paketmetadaten und Entwicklungsversion vereinheitlichen
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin)
+**Arbeitspaket:** AP02; begleitend AP06/AP08/AP10, keine AP03-Umsetzung
+**Betroffene Dateien:** beide package.xml/setup.py, README.md und dieses zentrale Protokoll (sechs Pfade)
+**Git-Commit:** stabiler Subject `fix(ros): standardize ROS package metadata`; Parent/PDF-Commit 0d267f593100f385e989525273ff9b81c8c36748. Eigene SHA nach Erzeugung separat kontrolliert, kein Amend.
+**Status:** **VERIFIED** für die 15 technischen AP02-Abnahmekriterien; keine vollständige ROS-/Rechts-/Releasefreigabe
+
+#### Ausgangssituation
+
+V4 war auf dem erwarteten 78afba0… und stammt von c65642f… ab. V4-007 versionierte zuvor das identische historische PDF. Versionierte Dateien/Index sauber, keine fremde Arbeit überschrieben. Protokoll mit V4-001..007 und Lizenzkapitel berücksichtigt; V4-008 als Plan vor Änderungen erfasst. Beide Format-3-Manifeste schon syntaktisch/mit catkin_pkg parsebar, aber Version 0.0.0 und TODO-Beschreibung; setup.py 0.0.1 mit uneinheitlichen Kurzbeschreibungen. Fehlende optionale URLs/Author, vorhandene konsistente Maintainerkontakte, ament_python-/Index-/Console-Script-Struktur und technisch verifiziertes AP01 sind Vorbestand.
+
+#### Ziel der Änderung
+
+Freigegebene Entwicklungsversion 0.0.1 und konsistente englische Beschreibungen in beiden Metadatenquellen, reale Projekt-/Issue-URLs und bekannte Autorrolle. Keine neuen Kontaktdaten oder Maintaineridentität erfinden. Namen, Lizenz, Buildtyp, Dependencies, Skripte, Launches, ROS-Verträge und Algorithmen unverändert; AP03 nicht vorziehen.
+
+#### Technische Umsetzung
+
+XML-Versionen 0.0.0→0.0.1; beide Setup-Versionen waren bereits 0.0.1 und bleiben so. TODOs durch die in Kapitel 13 wörtlich dokumentierten Beschreibungen ersetzt, Setup-Beschreibungen identisch. Beide XMLs ergänzen author Bastian Aumer sowie url type repository und bugtracker; setup.py ergänzt author, url und project_urls/Bug Tracker mit denselben Projektzielen. Keine Author-E-Mail ergänzt. Maintainer bauya/baau1001@stud.hs-kl.de bleiben aus den gültigen konsistenten Projektmetadaten unverändert; ihr Alias ist nicht automatisch durch den Copyrightnamen ersetzt. Die optionale Author-Angabe folgt der dokumentierten Erklärung für eigenen Code und ersetzt keine Fremdattribution.
+
+README ergänzt knappe Paket-/Version-/Repository-/Lizenz-/lokale V4-/Releasehinweise und grenzt vorhandene öffentliche V3-Cloneanweisungen vom unveröffentlichten V4 ab. INSTALL/CONFIGURATION enthalten keine durch diese Metadatenänderung neu falschen Versions-/Kontakt-/Lizenzangaben und blieben unverändert. Keine neue Forschungsdatei. PCD-Karten bleiben entfernt; separate Selbstauskunft/Future-Branchentscheidung in V4-009 ohne Ausführung.
+
+#### Begründung
+
+REP-149 beschreibt Manifeststruktur; REP-144 regelt Namen. Die gelesene Humble-Python-Anleitung verlangt konsistente Paket-/Setupmetadaten und beschreibt Resource-/setup.cfg-/Paketstruktur. URLs/Author sind optionale sinnvolle Ergänzungen, keine allgemeine Pflicht zu Website/Author-E-Mail. 0.0.1 ist ausdrücklich autorisierte Entwicklungsversion, nicht 4.0.0 oder bereits veröffentlichte Version. Release-/API-/Stabilitäts-/Versionierungspolitik verbleibt AP10.
+
+#### Verifikation
+
+System-Python 3.10.12, catkin_pkg 1.1.1, ElementTree, pytest 6.2.5, setuptools 59.6.0/wheel 0.37.1. Beide parse_package/Package.validate mit warnings-Liste erfolgreich, keine Warnungen (Exit 0). Explizit Format 3, lexikalische Namen, Version/Description/License, Maintainerstruktur, optionale Authorrolle, zwei richtige URL-Typen/kanonische HTTPS-Ziele und ament_python geprüft. Kontaktzustellung/Email-Befugnis oder aktuelle Live-URL-Erreichbarkeit nicht unabhängig geprüft; bestehende deklarierte Kontakte und Nutzer-URLs bleiben erhalten.
+
+26 Python-Dateien parsebar; ausschließlich zwei Setup-ASTs ändern vier Metadatenkeywords description/author/url/project_urls. Nach Entfernen genau dieser Metadatenschlüssel sind ASTs vor/nach identisch; alle anderen 24 Python-ASTs und alle Laufzeit-/Launch-/Algorithmusbytes unverändert. XML-Dependency-Elemente inklusive Kategorien/Attribute bytegleich, Python install_requires/tests_require/Entry-Points/Versions-/Lizenz-/data_files-/license_files-Konfiguration erhalten. Indexmarker und Console-Script-Ziele auf vorhandene main-Funktionen geprüft; drei Original-LICENSEs/18 SPDX-/sechs Fremdheader/PDF unverändert.
+
+40 passende bestehende Konfigurationsfälle bestanden, 3 native ROS-/Launchfälle bewusst nicht wiederholt (0,36 s, Exit 0). Diese drei waren unter V4-005 bestanden; sie werden nicht als neuer AP02-Lauf ausgegeben. Zwei temporäre Wheels erfolgreich erzeugt: Version/Beschreibung/Author/Maintainer/Home-page/Bugtracker/Apache-Metadaten sowie Share-Manifeste, Lizenzkopien und ament-Marker geprüft, 0 PCDs. Erster Wheelchecker verlangte fälschlich Name gleich ROS-Underscorename; Python-Metadaten normalisieren zu r3d-planner/r3d-preprocessor. Nach Abgleich gegen PyPA/packaging.utils.canonicalize_name korrekt geprüft, keine ROS-/Importnamen geändert. Ein weiterer Hilfsvergleich suchte die Description als zusammenhängenden Quelltext nach reinem Zeilenumbruch; er wurde auf den tatsächlichen AST-Stringwert korrigiert. Keine Produktions-/Metadatenregression aus diesen Hilfsfehlern. Die Wheel-Builds melden absichtlich deaktiviertes Bytecompiling und SetuptoolsDeprecationWarning für den vorhandenen setup.py-install-Unterprozess; beide Exit 0. Keine tatsächliche Wheelinstallation/colcon-/Debian-/Buildfarm-/rosdepabnahme behauptet.
+
+Die ros.org/docs.ros.org-Endpunkte lieferten Access Denied; relevante offizielle GitHub-Raw-REPs/Humble-Quelldokumentation gelesen. Das PDF wurde bereits separat hashidentisch versioniert; seine Byteprüfung bleibt gültig. T50-T54/13.3 dokumentieren Befehle, Exitcodes, Grenzen und Quellen. Vor Commit: sechs genaue Pfade, V4/Parent/Index-/Diff-/Dokumentgate; danach SHA/Parent/Umfang/sauberer Status kontrolliert. Keine System-/Conda-/Globalpip-/Hardwareänderung.
+
+#### Ergebnis
+
+AP02-Metadaten im beauftragten technischen Umfang VERIFIED; keine offene notwendige AP02-Korrektur aus diesen Prüfungen. Maintainerkontakt organisatorisch vor Release zu bestätigen, Namenskollisionen/live URLs/Versionierungspolitik als Releasefragen nicht als erledigte AP02-Serverprüfung ausgeben. AP01 technisch VERIFIED, Rechtsgesamtfreigabe weiterhin getrennt; AP03 NOT STARTED. Kein Quality-/Runtime-/rosdep-/Index-/Bloom-Freigabenachweis aus Metadatenprüfung.
+
+#### Auswirkungen
+
+Nur Paketmetadaten und README/Protokoll; keine Algorithmen, ROS-Themen/Actions/Sicherheitsmechanismen, Dependencies, Buildtypen, Entry-Points, Launches, Konfiguration oder Lizenzentscheidung geändert. Historische Entwicklungsleistungen nicht rückwirkend AP02 zugerechnet. Historisches PDF identisch, keine PCDs zurückkopiert, keine anderen Branches/Merges/History-Rewrites/Remotes/GitHub-/Push-/Releaseaktionen. AP03 als nächster technischer Schritt nur vorgeschlagen, Freigabe abwarten.
+
+### V4-009 - Entwicklererklärung und spätere historische Kartenbereinigung dokumentieren
+
+**Datum:** 14. Oktober 2026 (Europe/Berlin)
+**Arbeitspaket:** AP01-Rechteabgrenzung/AP08/AP10; reine Dokumentation
+**Betroffene Dateien:** ausschließlich dieses bestehende zentrale Protokoll
+**Git-Commit:** gemeinsam mit V4-008 unter `fix(ros): standardize ROS package metadata`; keine fremden Branchcommits
+**Status:** **COMPLETED** für zutreffende Erklärungsdokumentation; zugrunde liegende Rechte-/Datenschutzsachverhalte nicht unabhängig verifiziert
+
+#### Ausgangssituation
+
+Die bisherigen PCDs sind seit V4-005 aus aktivem V4 entfernt, historische Gitobjekte/PDFbeschreibungen bestehen. Der Nutzer ergänzt ausdrücklich eine Herkunfts-/Datenschutzselbstauskunft und möchte eine spätere Branchbereinigung.
+
+#### Ziel der Änderung
+
+Die neue Information korrekt als Entwicklererklärung aufnehmen und die verlangte Dokumentation von einer nicht autorisierten technischen Branch-/Historienänderung trennen.
+
+#### Technische Umsetzung
+
+Bastian Aumer erklärt, die ursprünglichen PCD-Beispielkarten selbst aufgenommen und verarbeitet zu haben und dabei keine Datenschutzauflagen verletzt zu haben. Unabhängig davon sollen Karten künftig aus den aktiven Beständen von V1, V2, V3 und main entfernt werden. V4 ist schon bereinigt. Hier wurde ausschließlich dieser Wunsch dokumentiert; Ausführung ist separate zukünftige Aufgabe mit eigenem explizitem Auftrag. Keine Branchwechsel, fremden Commits/Merges/Remoteänderungen/Objektlöschung/History-Rewrites/Force-Pushes.
+
+#### Begründung
+
+Selbstauskunft verbessert die dokumentierte Herkunftslage, ersetzt aber keine unabhängige Nutzungs-/Vertrags-/Datenschutzprüfung oder rückwirkende Entfernung veröffentlichter Objekte. Ein neuer Löschcommit auf einem historischen Branch wäre zudem nicht gleichbedeutend mit Löschung seiner alten Gitobjekte; hier ist beides unbegonnen.
+
+#### Verifikation
+
+Erklärung gegen den aktuellen Nutzerauftrag vollständig abgeglichen. Refs-/Config-/PDFhashes vor/nach schützen main/origin/V1/V2/V3/main und alle historischen Objekte; keine weiteren Branchaktionen ausgeführt. Historische PDF kann alte Karten weiterhin korrekt beschreiben; SHA unverändert. T54 ist Dokument-/Scopeprüfung, keine Rechtsprüfung.
+
+#### Ergebnis
+
+Herkunft/Datenschutz laut Entwickler dokumentiert. Gewünschte Kartenentfernung aus anderen Branches NOT STARTED; technische Datenfreiheit von V4 weiterhin VERIFIED; unabhängige historische Rechtsfreigabe NOT VERIFIED.
+
+#### Auswirkungen
+
+Nur Dokumentation, keine Daten-/Lizenz-/Branch-/Objektänderung. Späterer eigener Auftrag notwendig, kein Push und keine Veröffentlichung.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -779,14 +861,35 @@ PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/colcon --log-base /tmp/r3d
 
 Ausgeführt: `git ls-files -- docs/R3D_Planner_Development_History.pdf`, `sha256sum docs/R3D_Planner_Development_History.pdf`, `/usr/bin/pdfinfo docs/R3D_Planner_Development_History.pdf`; gezielter Index-Bytevergleich und `git -c core.attributesFile=/tmp/r3d-v4-ap02/pdf-review-attributes diff --cached --check` (PDF binär nur im Prüfbefehl). Nach Commit SHA/Parent/Dateiumfang/Tracking separat kontrolliert. Keine PDF-Neuerzeugung, kein Push.
 
+#### 6.6 V4-008/V4-009: AP02-Metadaten und deklarierte Rechte, 14. Oktober 2026
+
+| ID | Prüfung | Ergebnis/Exitcode | Status | Grenze |
+| --- | --- | --- | --- | --- |
+| T50 | XML/catkin_pkg/REP-/Versions-/URL-/Maintainerprüfung | Zwei Manifeste parse_package/validate erfolgreich, 0 warnings, Format 3/Namen/0.0.1/Apache/ament_python/konsistente Beschreibungen/URL-Typen; Exit 0 | VERIFIED | Keine rosdep-Auflösung, keine Mailzustellungs-/Live-URL-/Namenskollisionsprüfung |
+| T51 | Python-/Dependency-/Interface-/Lizenzscope | 26 Python-Dateien parsebar; zwei Setup-Metadaten-ASTs geändert, nach exakt vier Meta-Keywordmasken identisch; 24 übrige ASTs/Runtimebytes/Deps/Entry-Points/Ressourcen/Lizenz/PDF unverändert; Exit 0 | VERIFIED | Keine Algorithmen-/ROS-/Safetyänderung und keine zusätzliche Lizenzrecherche |
+| T52 | Vorhandene passende Konfigurationsfälle | 40 passed, 3 deselected, 0,36 s; Exit 0 | VERIFIED | System-Python 3.10, -B, ohne User-Site; native ROS-/Launchfälle nicht erneut ausgeführt |
+| T53 | Zwei erzeugte Wheels/Metadaten-/Share-Regression | Version/Description/Author/Maintainer/URLs/Apache und Share-Manifeste/Lizenz/Indexmarker geprüft, 0 PCDs; Exit 0 | VERIFIED | Normierte Python-Distributionnamen separat; erster naiver Namechecker korrigiert; kein colcon-/Debian-/Releaseartefaktclaim |
+| T54 | Dokument-/Erklärungs-/Gitgate | V4-001..007 erhalten, nur sechs AP02-Pfade; Karten-Selbstauskunft vollständig dokumentiert; andere Branch-/Remote-/PDFrefs geschützt | VERIFIED im Dokumentumfang | Unterliegende Rechte/Datenschutz nicht unabhängig geprüft; andere Branchbereinigung NOT STARTED |
+
+Ausgeführt unter `/usr/bin/python3` 3.10.12, catkin_pkg 1.1.1, pytest 6.2.5, setuptools 59.6.0/wheel 0.37.1; ROS-Humble-Setup nur für Configtests gesourced, PYTHONNOUSERSITE=1/PYTHONDONTWRITEBYTECODE=1. `parse_package(path, warnings=[])` und `Package.validate(warnings=...)` für beide Manifeste; gezielte XML-/AST-/URL-/Hash-/Entry-Pointkontrollen ohne Projektmodule/Setupausführung im statischen Check. Wheel-Setupausführung ausschließlich in temporären Paketkopien.
+
+```bash
+# Ausgeführt im Projektroot, mit Source-PYTHONPATH und ROS_LOG_DIR unter /tmp:
+/usr/bin/python3 -B -m pytest -p no:cacheprovider --basetemp=/tmp/r3d-v4-ap02/pytest r3d_planner/test/test_configuration.py -k "not effective_ros_parameters_and_odometry and not preprocessor_real_launch and not real_launch_restart_and_all_components" -q
+# Je temporäre vollständige Paketkopie; keine pip-/Systeminstallation:
+PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B setup.py bdist_wheel --dist-dir <temporary-package-dist>
+```
+
+Der konkrete Distpfad lag unter /tmp/r3d-v4-ap02/dist/<Paket>; Platzhalter nicht wörtlich ausgeführt. Kein Clean-Build/colcon test/rosdepcheck/Hardwaretest in AP02; vorhandene AP03-Lücken bleiben. Der erste Wheelchecker scheiterte an Python-Namensnormalisierung, der finale kanonische Vergleich und beide Wheels sind erfolgreich. ROS-Web-Endpunkte waren gesperrt; offizielle Raw-Quellen genutzt. Keine rückwirkende Neuinterpretation früherer Testresultate.
+
 ## 7. Probleme und offene Entscheidungen
 
 | ID | Beschreibung | Auswirkung | Erforderliche Entscheidung | Vorgeschlagene Lösung | Aktueller Status |
 | --- | --- | --- | --- | --- | --- |
 | O01 | Apache-2.0 verbindlich gewählt/technisch angewendet; Vertrags-/Befugnislage nicht unabhängig geprüft | Keine vollständige rechtliche Releasefreigabe | Noch offene arbeits-/dienstvertragliche Rechte und Lizenzierungsbefugnis klären | Entscheidung/Dateien aus V4-004 erhalten; konkrete entgegenstehende Hinweise betroffenenbezogen prüfen | BLOCKED nur für Rechtsgesamtgate; Wahl/Implementierung COMPLETED |
-| O02 | Alte PCDs aus aktivem V4-Tree entfernt; ursprüngliche Herkunft ungeklärt | Kein aktueller Karten-Mitdistributionsblocker im Tree; historische Gitobjekte/öffentliche Kopien weiterhin betroffen | Releaseumfang Tree-/Artefakt vs vollständige Git-Historie abgrenzen | Keine erneute Karteneinbindung; historische Rechte separat prüfen, keine Rewrites | Tree-Maßnahme VERIFIED; historische Rechte NOT VERIFIED |
-| O03 | AP01-Implementierung ausdrücklich freigegeben und durchgeführt; AP02/AP03 nicht beauftragt | Keine automatische weitere Metadaten-/Dependencyarbeit | Nächsten technischen Auftrag bestimmen | Lizenzierung für Eigenanteile technisch abgeschlossen; weitere APs separat | NOT STARTED für AP02/AP03 |
-| O04 | 0.0.0 vs 0.0.1, keine Versionspolitik | Unklare Releaseidentität | Konsistente Paketversion und spätere Stabilitätszusagen | AP02 vereinheitlicht nach abgestimmter Entscheidung; Branch V4 nicht zu SemVer 4.0 erklären | NOT STARTED |
+| O02 | Laut neuer Entwicklererklärung eigene Kartenaufnahme/Verarbeitung, keine Datenschutzauflagen verletzt; V4-Tree bereinigt | Dokumentierte Herkunft, keine unabhängige Rechts-/Datenschutzfreigabe; historische Gitobjekte bleiben | Spätere separate Kartenbereinigung aktiver V1/V2/V3/main-Bestände beauftragen | V4-009 nur dokumentiert; keine Rewrites/Merges/Objekt-/Remoteänderung | V4-Tree VERIFIED; Erklärung dokumentiert, weitere Branches NOT STARTED |
+| O03 | AP01-Technik und AP02 ausdrücklich beauftragt/abgenommen; AP03 nicht autorisiert | Keine automatische Dependencyarbeit | Nächste AP03-Freigabe abwarten | AP03 als nächsten Schritt vorschlagen, keine Keys/Installationen vorziehen | NOT STARTED für AP03 |
+| O04 | Beide Manifest-/Setupversionen nun 0.0.1 konsistent; Versions-/Releasepolitik offen | Keine aktuelle Metadatendiskrepanz, keine öffentliche Releaseidentität | Spätere Versions-/API-/Stabilitäts-/Releasepolitik festlegen | V4-008 technische Vereinheitlichung VERIFIED; Branch V4 nicht SemVer 4.0 | VERIFIED für AP02, Politik NOT STARTED/AP10 |
 | O05 | Aktiver Conda-Python 3.14.6 neben System-Python 3.10.12 | Mögliche nichtrepräsentative ROS-/Packaging-Tests | Reproduzierbare isolierte Humble-Testumgebung wählen | Explizites System-Python/saubere Umgebung; keine globale Apt-/pip-/Conda-Reparatur ohne Erklärung | NOT STARTED |
 | O06 | Aktuelle System-/ROS-Keys und Python-TF2-Provider unvalidiert | rosdep-/Buildfarm-Nachweis fehlt | Geeignete verfügbare Dependencies für Humble/Jammy | AP03 resolve/check plus vollständige Installation in isolierter Umgebung; keine Skip-Endlösung | NOT STARTED |
 | O07 | Externe Nutzerkarten/R3D_CONFIG_DIR geprüft; Copy-Defaultpolitik und Ausgabe neben Eingabe bestehen | Nutzeroverride funktioniert ohne Source, Defaultportabilität noch offen | Spätere allgemeine Install-/Ausgabepolitik | V4-005 minimaler Kartenvertrag; restliches AP04 separat | IN PROGRESS, begrenzter Teil VERIFIED |
@@ -808,10 +911,10 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Bereich | Ausgangsstand main | Änderung V4 | Ergebnis | Nachweis |
 | --- | --- | --- | --- | --- |
 | Entwicklungslinie | main bei `c65642f…`; V1/V2/V3 als Remote-Tracking-Refs | Lokaler Branch V4 unmittelbar von Baseline; ein fokussierter Initial-Dokumentationscommit | Neue getrennte Entwicklungslinie, bestehende Refs unverändert | V4-001, T01/T06, Git-Parent/Refvergleich |
-| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation | Dasselbe zentrale Protokoll mit V4-001..006 und abgegrenzten Original-/Regression-/Artefaktnachweisen | Keine zusätzlichen Forschungsberichte; historische Einträge erhalten | V4-005/V4-006; T37-T48 |
+| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe Protokoll bis V4-009; historisches PDF unverändert versioniert | Keine neuen Forschungsberichte, keine neuen Algorithmen; frühere V4-Einträge erhalten | V4-007..009/T49-T54 |
 | Historische PDF | Vorhandene unveränderte, zunächst unversionierte Baseline-Dokumentation | Identische Bytes in V4 unter Git aufgenommen | Keine neue technische Funktion; SHA unverändert und historische Kartendarstellung erhalten | V4-007/T49 |
 | Planung/Preprocessing | Vorhandene PCD-/Voxel-/Traversierbarkeits-/Graph-/A*-Funktionen | Keine | Bestehende Algorithmen erhalten, kein neuer Algorithmusbeitrag | T02; Abschnitt 2.3 |
-| Paketmetadaten | Namen/Buildtyp/Maintainer vorhanden; Version/Beschreibung/Lizenz uneinheitlich | Nur beide license-Felder durch AP01 auf Apache-2.0 gesetzt | AP02 bleibt NOT STARTED; übrige Metadaten unverändert | V4-004/T31/T33; B03/AP02 |
+| Paketmetadaten | Version 0.0.0 vs 0.0.1, TODO-Beschreibungen, keine URLs/Author | AP02: 0.0.1 konsistent, Beschreibungen/Repo-/Issue-/Authorfelder ergänzt, Maintainer erhalten | Technischer Metadatenumfang VERIFIED, Namen/Buildtyp/Dependencies/Lizenzen erhalten | V4-008/T50-T53; Kapitel 13 |
 | Dependencies | Teildeklaration, fehlende Imports, Skip-Workaround | Nur Abgleich/Planung; keine Dependencydeklaration geändert | Lizenzfelder geändert, Dependencyteile unverändert; rosdep nicht neu geprüft | T04/T10/T33; B04-B06 |
 | Build/Installation | Copy-Config absichtlich abgelehnt, Sourcepfade und fehlende Paketlizenzmitnahme | Nutzerconfig ohne Source getestet; Originaltext in Paketroot/Share/sdist/Wheel vorhanden | Begrenzter Copy-Build belegt, Default-/Ausgabepolitik und rosdep weiterhin offen | V4-005/V4-006; T40/T44-T46 |
 | ROS-Interfaces | Action/Topics/Service, RViz, Filter/Follower; bekannte Semantikgrenzen | Keine | AP05 offen; keine stillen API-Änderungen | B09-B13/T16 |
@@ -830,10 +933,10 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 
 | Gegenstand | Status | Begründung und nächster erforderlicher Nachweis |
 | --- | --- | --- |
-| ROS Index source readiness | **NOT READY** | Apache-Text/Metadaten und aktiver datenfreier Tree vorhanden; individuelle Befugnis-/historische Git-Datenrechte, sonstige Herkunft und übrige Metadaten/öffentlicher Release-Ref/Review offen. Keine V4-Veröffentlichung |
+| ROS Index source readiness | **NOT READY** | AP02-Metadaten/Apache-Text/datenfreier V4-Tree vorhanden; public-V4-Ref/Namenskollision/Review, vollständige Befugnis-/historische Git-/sonstige Herkunftsprüfung offen. Keine Registrierung ausgeführt |
 | rosdep readiness | **NOT READY** | Direkte Manifestlücken und dokumentierter Skip-Workaround; vollständige aktuelle Humble-Auflösung/Installation/check nicht ausgeführt. AP03 |
-| Bloom readiness | **NOT READY** | Rechte/Metadaten/Dependencies, Versionskonsistenz, Changelogs und installierter Betrieb offen; kein Release-Repository/-Track in dieser Ausführung geprüft/angelegt. AP01-AP04/AP08/AP10 |
-| Buildfarm readiness | **NOT READY** | Begrenzte Copy-Builds/43 Runtime-/Configfälle und Lizenzmitnahme belegt, aber rosdep/Runtimevollständigkeit, Versions-/Metadaten-/Defaultinstall-/Releasegates offen; kein Debian-/Farmjob |
+| Bloom readiness | **NOT READY** | Manifest-/Setupversion 0.0.1 nun konsistent; öffentliche Releaseversion/-politik/Changelogs, rosdep-/Runtime-/Defaultinstall-/Rechts-/Releaseorganisation offen. Kein Release-Track/-Repository/Farmjob |
+| Buildfarm readiness | **NOT READY** | AP02-Parser-/Wheel-Metadaten und bisherige begrenzte Copy-/Configprüfungen bestehen; Dependencyvollständigkeit/rosdep/Defaultinstall/Release-/Rechtsgates offen. Keine neue Buildfarmabnahme |
 | Tatsächliche offizielle Index-/Binärveröffentlichung | **NOT VERIFIED** | Keine neue rosdistro-/Release-/Buildfarm-Statusabfrage oder externe Bestätigung; historische Abwesenheit nicht als aktuelle Serverprüfung ausgeben |
 | ROS 2 Humble / Ubuntu 22.04 / Python 3.10 | **NOT VERIFIED** | Primäres dokumentiertes Ziel; historisch berichtete Tests, aber kein neuer vollständiger Clean-Nachweis für V4 |
 | Jazzy / neuere ROS-Distributionen / andere Plattformen | **NOT VERIFIED** | Keine neue Ausführung, keine Supportzusage; weitere Ziele erst nach Auswahl und Prüfung |
@@ -850,9 +953,11 @@ Der beauftragte technische AP01-Umfang ist nach V4-006 VERIFIED: Apache-2.0-Ents
 
 Die bisherigen zwei Karten waren bereits beim Auftragseingang im Working Tree gelöscht und sind nun in normalem V4-Commit entfernt. Nutzer liefern eigene PCDs über die vorhandene Konfiguration; die Algorithmen/ROS-Verträge bleiben erhalten. 40 Configfälle plus drei vorhandene ROS-/Launchfälle bestehen. Copy-Installation ohne Karten und externe Nutzerkonfiguration bei nicht verfügbarem ursprünglichem Sourcepfad sind geprüft; allgemeine Copy-Default-/Ausgabepolitik ist nicht umfassend refaktoriert. Systembuild ohne User-Site ist kein vollständiger Runtime-Dependencynachweis, da dort Open3D/NetworkX fehlen; Runtimefälle benutzen vorhandene User-Site und behalten eine SciPy-/NumPy-Warnung.
 
-**Vollständige rechtliche Releasefreigabe nicht verifiziert:** Verträge/Arbeitgeberbefugnisse, sonstige Dateiprovenienz, historische Karten-Gitobjekte und konkrete transitive/native/zusammen verteilte Binaries bleiben offen. Die Karte ist aus aktuellem Tree/Artefakten, nicht aus Git-Historie, Forks oder Kopien entfernt. AP01 insgesamt daher BLOCKED nur für dieses Rechts-/Releasegesamtgate. AP04/AP06/AP08/AP10 IN PROGRESS, AP02/AP03 NOT STARTED. ROS Index/Bloom/Buildfarm NOT READY; kein neuer Quality Level oder Plattform-Supportanspruch.
+**Vollständige rechtliche Releasefreigabe nicht verifiziert:** Verträge/Arbeitgeberbefugnisse, sonstige Dateiprovenienz, historische Karten-Gitobjekte und konkrete transitive/native/zusammen verteilte Binaries bleiben offen. Die Karte ist aus aktuellem Tree/Artefakten, nicht aus Git-Historie, Forks oder Kopien entfernt. AP01 insgesamt daher BLOCKED nur für dieses Rechts-/Releasegesamtgate. AP04/AP06/AP08/AP10 IN PROGRESS, AP02 VERIFIED; AP03 NOT STARTED. ROS Index/Bloom/Buildfarm NOT READY; kein neuer Quality Level oder Plattform-Supportanspruch.
 
 Zwei logisch getrennte lokale Commits halten Karten-/Configänderung und Lizenzmitnahme/Verifikation fest. Historische V4-Einträge/Branchreferenzen/PDFs erhalten, keine History-Rewrites, externen Repository-/GitHub-/Remoteänderungen, keine Veröffentlichung und kein Push. Weitere Arbeit wartet auf den nächsten Auftrag.
+
+AP02-Fortschritt V4-008: Version/Description/URLs/Autor-/Maintainer-/Pythonkonstanz im freigegebenen Umfang VERIFIED. V4-007 versioniert unveränderte historische Referenz. V4-009 ergänzt Herkunfts-/Datenschutzselbstauskunft und lediglich den Wunsch späterer anderer Branchbereinigung. AP01 technisch VERIFIED, vollständige Rechtsfreigabe weiterhin getrennt; AP03 NOT STARTED. Metadaten-/Versionsdiskrepanz beseitigt, Releasepolitik/Dependencies/Defaultinstall/Rechte/Serverreview weiterhin offen.
 
 ## 11. Open-Source-Lizenzanalyse und Copyright-Strategie
 
@@ -1412,8 +1517,8 @@ Der Fragenkatalog ist als konkrete Abnahmevorbereitung zu beantworten, möglichs
 | R04 | Bestehen ausschließliche Nutzungsrechte, Geheimhaltungs-, Sponsor-, Hochschul- oder sonstige Vertragsbindungen? | Geltender Umfang und etwaige Zustimmung zur Open-Source-Verteilung; keine Vereinbarungen erfinden |
 | R05 | Deckt die Berechtigung Source, Binärpakete, Modifikationen, Unterlizenzierung und erforderliche Patentgrants ab? | Dokumentierte Autorisierung für vorgesehenen Distributionsumfang |
 | R06 | Welche Lizenz galt bereits für vor dem Root-Import übernommene Teile? | Originaltexte/Notices; Apache-Templates bestätigt, weitere Herkunft offen |
-| R07 | Herkunft/Weitergabe der historischen Karten weiterhin unbekannt; keine aktiven V4-PCDs mehr | Kein aktueller Tree-Datenreleaseblocker; historische Objekte, Forks/Kopien und vollständiger Git-Releaseumfang separat prüfen |
-| R08 | Historische Kartendaten oder sonstige Artefakte möglicherweise sensibel/vertraulich | PCDs aus aktuellem Tree entfernt; historischer Inhalts-/Vertragsstatus weiterhin nicht bestimmbar |
+| R07 | Eigene historische Kartenaufnahme und Verarbeitung laut Entwickler bestätigt; V4 ohne aktive PCDs | Selbstauskunft dokumentiert, unabhängige Vertrags-/Nutzungs-/historische Verteilungsrechte weiterhin separat prüfen |
+| R08 | Entwickler erklärt keine verletzten Datenschutzauflagen bei den eigenen Kartenaufnahmen | Erklärung dokumentiert, keine unabhängige Datenschutz-/Inhalts-/Vertragsprüfung; spätere Branchbereinigung eigene Aufgabe |
 | R09 | Welche exakten Dependencies/Artefakte werden beim späteren Release tatsächlich mitgeliefert? | Versions-/Plattforminventar, mitzugebende Texte/Notices und gegebenenfalls besondere Binärbedingungen |
 | R10 | Gibt es bekannte Patentansprüche oder Rechtebeschränkungen bei Beitragenden/Arbeitgebern? | Gezielte Auskunft; keine allgemeine Patentfreiheit behaupten |
 | R11 | Wie werden künftige externe Beiträge und deren Berechtigungsbestätigung behandelt? | Passende Contribution-Regel; CLA/DCO nur bewusst wählen, keine Urheberrechtsübertragung voraussetzen |
@@ -1437,7 +1542,7 @@ Der Fragenkatalog ist als konkrete Abnahmevorbereitung zu beantworten, möglichs
 | LiDAR-Modification-Notice-Dokumentation | Verifizierte historische Revisionen/Diffs und markierte unbekannte Felder | COMPLETED; keine externe Anwendung |
 | AP01 insgesamt | Technische Teilmaßnahmen abgeschlossen, rechtliches Gesamtgate offen | BLOCKED |
 | AP08 / AP10 | Dokumentation/Releasevorbereitung laufend | IN PROGRESS |
-| AP02 / AP03 | Keine allgemeine Metadaten-/Dependencyimplementierung | NOT STARTED |
+| AP02 / AP03 | AP02-Metadaten unter V4-008 abgenommen; Dependencyarbeit nicht begonnen | AP02 VERIFIED / AP03 NOT STARTED |
 
 #### 11.21.1 Offizielle LICENSE und unveränderter Geltungsbereich
 
@@ -1502,7 +1607,7 @@ V4-004 ließ Installationsregeln unverändert. V4-006 ergänzt nun paketlokale i
 
 #### 11.21.4 Abschluss und verbleibende Gates
 
-Für den beauftragten eigenen Code sind Auswahl, Attribution, Lizenzdatei und Lizenzfelder umgesetzt und statisch geprüft. Keine weitere allgemeine Lizenzrecherche ist für den nächsten unabhängigen technischen AP vorgesehen. Noch offen sind konkrete arbeits-/dienstvertragliche Rechte, Rechte an historischen Karten-Gitobjekten, unklare Artefaktprovenienz und sämtliche zusätzlichen Texte/Pflichten bei einer vollständigen transitiven/nativen Binärdistribution. Die aktive Karte ist entfernt und eigene sdist-/Wheel-/Copy-Sharetextmitnahme ist unter V4-006 geprüft. Diese Grenzen bleiben AP01-Rechtsgesamtgate/AP10-Releasegate; keine rechtliche Gesamtfreigabe, Patentgarantie oder Veröffentlichung. AP02/AP03 werden erst nach einem neuen Auftrag begonnen.
+Für den beauftragten eigenen Code sind Auswahl, Attribution, Lizenzdatei und Lizenzfelder umgesetzt und statisch geprüft. Keine weitere allgemeine Lizenzrecherche ist für den nächsten unabhängigen technischen AP vorgesehen. Noch offen sind konkrete arbeits-/dienstvertragliche Rechte, Rechte an historischen Karten-Gitobjekten, unklare Artefaktprovenienz und sämtliche zusätzlichen Texte/Pflichten bei einer vollständigen transitiven/nativen Binärdistribution. Die aktive Karte ist entfernt und eigene sdist-/Wheel-/Copy-Sharetextmitnahme ist unter V4-006 geprüft. Diese Grenzen bleiben AP01-Rechtsgesamtgate/AP10-Releasegate; keine rechtliche Gesamtfreigabe, Patentgarantie oder Veröffentlichung. AP02 wurde unter V4-008 separat beauftragt/technisch verifiziert; AP03 wird erst nach einem neuen Auftrag begonnen.
 
 #### 11.21.5 Abschließende Verifikation und Distributionsgrenzen, 14. Oktober 2026
 
@@ -1513,10 +1618,10 @@ Roottext und zwei paketlokale LICENSEs entsprechen dem erneut abgerufenen offizi
 | Distributionsweg | Aktueller Nachweis | Rechts-/Technikgrenze |
 | --- | --- | --- |
 | Aktueller Source-Tree/Sourcearchive | Keine PCDs, Root-/Paket-Lizenztexte und Originaltemplates erhalten; zwei konkrete sdists geprüft | Vollständiger Git-Klon enthält historische Kartenobjekte; individuelle Befugnisse/sonstige Provenienz offen |
-| ROS-Index-Registrierung | Lizenzfelder/Text und datenfreier aktiver Tree vorhanden | Public-V4-Ref nicht übertragen; übrige Metadaten/Namens-/Review-/Rechteprüfung offen |
+| ROS-Index-Registrierung | Lizenzfelder/Text und datenfreier aktiver Tree vorhanden | Public-V4-Ref nicht übertragen; AP02-Metadaten geprüft, Namenskollision/Serverreview/individuelle Rechte weiter offen |
 | Installation über rosdep | Lizenzwahl verändert weder Keys noch installierte Dependencies | AP03 nicht begonnen; keine rosdep-Auflösung/Installation/Gesamtlizenzfreigabe |
 | Wheels / colcon-Copy-Shares | Beide Wheels mit .dist-info- und Share-LICENSE; zwei Shares aus isolierten sdists; 0 PCDs | Konkrete temporäre Artefakte, keine transitive Librarymitlieferung bzw. allgemeine Copy-Defaultabnahme |
-| Debian/Bloom/Buildfarm | Paketlokale Originaltexte und data_files schaffen technische Voraussetzung | Kein Debianpaket/Farmjob erzeugt; Versionen/Dependencies/Installverträge/sonstige Rechte weiterhin offen |
+| Debian/Bloom/Buildfarm | Paketlokale Originaltexte und data_files schaffen technische Voraussetzung | Kein Debianpaket/Farmjob erzeugt; Entwicklungsversionskonsistenz durch AP02 geprüft, Releasepolitik/Dependencies/Installverträge/sonstige Rechte weiterhin offen |
 | Gemeinsames LiDAR-/NumPy-/Native-Bundle | Inventar trennt Eigen-/Fremdsource, externe Installation und mögliche Runtime-/LGPL-/BSD-/MPL-Anteile | Vollständige transitive/native SBOM und Pflichttext-/Source-/Binärprüfung nicht durchgeführt |
 
 | Temporäres Artefakt | SHA-256 | Lizenz-/Datenprüfung |
@@ -1708,3 +1813,78 @@ Ausstehend sind: Wahl A/B, bei B die eigenständige Repositoryerstellung und Zug
 | G06 | [Geplantes Development-Ziel, Get-Repo-API](https://api.github.com/repos/RoboProjekt/R3D-Planner-Development) | 13.10.2026, 404; Nichtexistenz vs fehlender Zugriff nicht abschließend unterscheidbar |
 | G07 | [Git: git-config](https://git-scm.com/docs/git-config) | 13.10.2026; push.default, pushurl, remote.pushDefault, branch.pushRemote |
 | G08 | [Git: git-remote](https://git-scm.com/docs/git-remote) | Befehlsvorlage anhand lokalem `git remote -h` und Git-Konfigurationsdokumentation; nicht gegen das Projekt ausgeführt |
+
+## 13. AP02-Metadatenabnahme und neue Kartenerklärung
+
+### 13.1 Paketmetadaten vor/nach V4-008
+
+| Feld | r3d_planner nach AP02 | r3d_preprocessor nach AP02 | Vorbestand / Änderung |
+| --- | --- | --- | --- |
+| ROS-/Python-Eingangsname | r3d_planner | r3d_preprocessor | Unverändert, gültige lexikalische REP-144-Namen mit bestehendem r3d_-Präfix |
+| Manifestformat / Buildtyp | 3 / ament_python | 3 / ament_python | Unverändert; keine CMake-Konvertierung oder neue Buildtool-/Dependencydeklaration |
+| Manifestversion | 0.0.1 | 0.0.1 | Vorher jeweils 0.0.0; ausdrücklich auf bestehende Setupversion vereinheitlicht |
+| Setupversion | 0.0.1 | 0.0.1 | War schon so; keine Herabstufung/4.0.0-Ableitung |
+| Description | Identisch zu setup.py, siehe unten | Identisch zu setup.py, siehe unten | TODO-Manifeste und alte unterschiedliche Setup-Kurztexte ersetzt |
+| Maintainer | bauya / baau1001@stud.hs-kl.de | bauya / baau1001@stud.hs-kl.de | Vorhanden/strukturell gültig/konsistent; unverändert, keine neue Kontaktadresse |
+| Author | Bastian Aumer, keine Author-E-Mail | Bastian Aumer, keine Author-E-Mail | Bekannte Entwicklererklärung, optional ergänzt; kein Ersatz fremder Copyrights |
+| License | Apache-2.0 | Apache-2.0 | Unverändert; Root-/Paket-/Sharetext-/SPDX-Konzept aus AP01 erhalten |
+| Repository | https://github.com/RoboProjekt/R3D-Planner | https://github.com/RoboProjekt/R3D-Planner | XML type=repository; Python url/Home-page |
+| Bugtracker | https://github.com/RoboProjekt/R3D-Planner/issues | https://github.com/RoboProjekt/R3D-Planner/issues | XML type=bugtracker; Python project_urls/Bug Tracker |
+| Console-Scripts | fünf bestehende Ziele | zwei bestehende Ziele | Unverändert, Modulpfade/main-Funktionen vorhanden |
+| Indexmarker / setup.cfg / Launches | Bestehender leerer Marker/Scriptinstallation/vier Launches | Bestehender leerer Marker/Scriptinstallation | Unverändert, keine Umstrukturierung |
+| Dependencies | Vorhandene XML/Python-Kategorien exakt erhalten | Vorhandene XML/Python-Kategorien exakt erhalten | Noch nicht rosdep-validiert; AP03 folgt erst nach Freigabe |
+
+Neue englische Beschreibungen (jeweils exakt XML=Setup):
+
+- **r3d_planner:** Graph-based A* path planning on classified PCD traversability data with a ComputePathToPose action, RViz integration, local obstacle filtering and path following.
+- **r3d_preprocessor:** Offline voxel-based analysis and classification of PCD point clouds for robot-specific clearance and traversability assessment, with classified point-cloud output.
+
+Die Texte benennen bestehende PCD-/Graph-/Action-/RViz-/Filter-/Followerfunktionen und keine SLAM-/Live-Mapping-/universelle Nav2-/Sicherheits-/Hardware-/Releasegarantie. Das ist Metadatenstandardisierung, keine neu implementierte Funktion.
+
+### 13.2 Rollen, Entwicklungsversion und Prüfgrenzen
+
+Author, Maintainer und Copyrightinhaber sind getrennte Rollen. Bastian Aumer als Author folgt der dokumentierten Erklärung zur eigenen Software; sechs OSRF-Templates und externe Originalrechte bleiben getrennt. Der gültige bestehende Maintaineralias/Email wird mangels konkreter Notwendigkeit nicht durch eine neue Identität ersetzt. Parsergültigkeit bedeutet keine Mailzustellungs-/Kontaktbefugnisprüfung; vor öffentlichem Release ist organisatorische Pflegezuständigkeit zu bestätigen.
+
+0.0.1 ist eine vorläufige gemeinsame Entwicklungsversion, keine öffentliche Releaseversion/API-/ABI-Stabilitätszusage. Branch V4 ist keine SemVer-4.0.0-Nummer. Changelog-/Versions-/Releasepolitik gehört AP10; dafür wurden keine Tags, Releases, Repositorys oder PRs angelegt.
+
+Die Eingabenamen in ROS/XML/setup.py und die Importmodule bleiben exakt r3d_planner/r3d_preprocessor. Erzeugte Python-Wheelmetadaten führen normierte Distributionnamen r3d-planner/r3d-preprocessor; dies entspricht der PyPA-Namensnormalisierung und ist kein ROS-Paketrename [M04]. Versionen und übrige Felder wurden im echten Wheel-METADATA geprüft. Keine fremden Bibliotheken oder PCDs im Wheel übernommen.
+
+### 13.3 Nachweismatrix der 15 AP02-Abnahmekriterien
+
+| Kriterium | Nachweis | Status / Grenze |
+| --- | --- | --- |
+| 1 Gültige XML-Manifeste | ElementTree und catkin_pkg 1.1.1 parse/validate, 0 warnings | VERIFIED |
+| 2 Fachliche Beschreibungen | Gegen vorhandene Node-/Analyse-/Planungsfunktionen abgeglichen, XML=Setup | VERIFIED |
+| 3 Repository-URLs | type=repository / Python url, exaktes Nutzerziel/HTTPS | VERIFIED strukturell; Live-Erreichbarkeit nicht neu geprüft |
+| 4 Bugtracker-URLs | type=bugtracker / project_urls, exaktes Nutzerziel/HTTPS | VERIFIED strukturell; keine Issue-Erstellung/Serveränderung |
+| 5 Maintainer-Metadaten | Vorhandene Namen/Emailstruktur konsistent, catkin Person.validate | VERIFIED strukturell; kein Zustellungs-/Befugnisnachweis |
+| 6 Versionskonsistenz | Vier Quellen 0.0.1, Wheel-METADATA 0.0.1 | VERIFIED |
+| 7 Apache-Metadaten | Zwei XML/Setup/Wheels, Originaltext in Wheel-/Sharebereichen, Hashschutz | VERIFIED technisch, Rechtegesamtgate separat |
+| 8 ament_python | Export/get_build_type und unveränderte Python-Paketstruktur | VERIFIED |
+| 9 ROS-Paketnamen | REP-144-lexikalische Regeln und Python-Eingangsname | VERIFIED; globale Kollisionen AP10 |
+| 10 Dependencies unverändert | Exakte XML-Elementfolge/Attribute und Setup-Keyword-/ASTvergleich | VERIFIED, keine Auflösung/Installation |
+| 11 Console-Scripts erhalten | Fünf/zwei Literaldefinitionen gleich, Zielmodule/main-Funktionen existent | VERIFIED, keine Nodebewegung |
+| 12 ROS-Interfaces unverändert | Alle Runtime-/Launch-/Konfig-/Algorithmusdateien byte-/ASTgleich | VERIFIED statisch |
+| 13 Geeignete statische Werkzeuge | System-Python 3.10/XML/catkin_pkg/URI-/Resource-/AST-/Hashchecks | VERIFIED, keine zusätzliche Installation |
+| 14 Keine nachgewiesene AP02-Regression | 40 bestehende passende Configfälle bestanden, Wheels erzeugt/geprüft | VERIFIED im ausgeführten Umfang; drei native Fälle nicht neu ausgeführt |
+| 15 Protokoll aktualisiert | V4-007..009, AP-/Version-/Release-/Entscheidungs-/Prüfmatrix | VERIFIED, historische Einträge unverändert |
+
+AP02 VERIFIED ist ausdrücklich keine vollständige Dependency-/Clean-Runtime-/rosdep-/ROS-Index-/Bloom-/Buildfarm-/rechtliche Freigabe. Die Metadatenprüfung liefert keine neue unterstützte Distribution/Plattform.
+
+### 13.4 Neue Nutzererklärung zu historischen Karten
+
+**Erklärung des Projektentwicklers im aktuellen Auftrag, keine unabhängige rechtliche Prüfung:** Die früheren PCD-Beispielkarten wurden von Bastian Aumer selbst aufgenommen und verarbeitet. Er erklärt, dabei keine Datenschutzauflagen verletzt zu haben. Unabhängig davon sollen die Karten künftig auch aus den aktiven Beständen V1/V2/V3/main entfernt werden. V4 ist schon datenfrei. Diese weiteren Löschungen sind nicht Teil von AP02 und wurden nicht ausgeführt.
+
+Die historische Git-Historie bleibt zunächst unverändert. Ein späterer normaler Löschcommit entfernt Daten nur aus dem neuen Tree, nicht aus älteren Gitobjekten/Forks/Kopien. Kein Rewrite/Force-Push/Objektpurge ist hier autorisiert oder vorgenommen. Das nun versionierte historische PDF darf den früheren Bestand weiterhin korrekt darstellen. Separate ausdrückliche Aufgabenfreigabe notwendig; Status anderer Branchbereinigung NOT STARTED. Selbstauskunft ersetzt keine vertragliche Nutzungs-/Verteilungs-/Datenschutzprüfung.
+
+### 13.5 Quellen und nächster technischer Schritt
+
+| ID | Primärquelle / lokaler Nachweis | Zugriff / Aussage |
+| --- | --- | --- |
+| M01 | [REP-149, offizielle Quelle](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-0149.rst) | 14.10.2026; Manifestformat/Metadaten/URL-Typen/Author optional; ros.org-Endpunkt gesperrt |
+| M02 | [REP-144, offizielle Quelle](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-0144.rst) | 14.10.2026; lexikalische Namensregeln/Empfehlungen, keine globale Kollisionsabfrage |
+| M03 | [ROS 2 Humble: Creating Your First ROS 2 Package](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.rst) | 14.10.2026; Python-Paket-/Resource-/setup.cfg-Struktur und konsistente XML/Setup-Felder; docs.ros.org-Endpunkt gesperrt |
+| M04 | [PyPA: Names and normalization](https://packaging.python.org/en/latest/specifications/name-normalization/) | 14.10.2026; kanonische Distributionnamen, Unterstrich/Bindestrich-Vergleich |
+| M05 | Installiertes catkin_pkg.package/Person und packaging.utils unter /usr/lib/python3/dist-packages | 14.10.2026; tatsächlich ausgeführte Parser-/Emailformat-/Namensnormalisierung, catkin_pkg 1.1.1 |
+
+**Nächster vorgeschlagener Schritt: AP03 – Dependency Management und rosdep**, nur nach neuer ausdrücklicher Freigabe. Scope: vollständige ROS-/Python-/Launch-/Build-/Runtime-Dependencies, Open3D/NetworkX/NumPy/SciPy/sensor_msgs_py/std_msgs/tf2_ros-Provider, plattformspezifische rosdep-Keys, reproduzierbare Installation und Beseitigung des bisherigen --skip-keys-Verfahrens. Hier keine Keys geändert, nichts installiert und AP03 nicht begonnen. Weitere Branchbereinigung ist eine eigene Aufgabe, kein automatischer AP03-Schritt. Kein Git-Push oder Veröffentlichung.
