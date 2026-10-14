@@ -56,8 +56,10 @@ directory, not the shell working directory. Absolute external map paths are
 also accepted. Preprocessing validates the input exists; planner/map/follower
 launch validates the analyzed file exists. The other map path may not exist yet.
 Only PCD files are accepted. The analyzer always writes `<input>_analysed.pcd`;
-keep `map_name` aligned manually. The included analyzed map is an example
-artifact, not proof that it was generated using the current selected settings.
+keep `map_name` aligned manually. No example maps are bundled in the current
+branch. Both shipped paths are empty; this historical loader requires both
+paths to be nonempty, including the output path before preprocessing.
+Configure your own PCD paths before launch.
 
 | `shared` key | Default | Unit / effect |
 |---|---:|---|

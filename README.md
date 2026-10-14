@@ -88,10 +88,12 @@ validation, default values and adding a robot.
 
 ## Using the preprocessor: select and analyze a map
 
-Edit `maps.pcd_path` in `planner_config.yaml`. The included input is
-`r3d_preprocessor/maps/voxel_05_minhits_7.pcd`. Set `maps.map_name` to the
-corresponding `*_analysed.pcd`. Other RoboLab, HomeLab and stair maps are not
-included; provide your own PCD and change these two paths.
+No PCD examples are bundled in the current branch; the original files remain
+in Git history. Set both `maps.pcd_path` and `maps.map_name` in
+`planner_config.yaml` to your own input and corresponding `*_analysed.pcd`.
+Both defaults are empty. The unchanged historical loader requires both paths
+to be nonempty and reports `maps.pcd_path: expected a path` until configured.
+The analyzed output need not exist before preprocessing.
 
 ```bash
 ros2 launch r3d_planner preprocessor.launch.py
