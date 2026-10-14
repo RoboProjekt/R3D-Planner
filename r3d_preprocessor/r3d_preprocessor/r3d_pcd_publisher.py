@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -18,29 +31,30 @@ import open3d as o3d
 import numpy as np
 import os
 
+
 class PCDPublisher(Node):
     def __init__(self):
         super().__init__('pcd_publisher')
-        
+
         # Parameter für den Dateipfad
         self.declare_parameter('pcd_path', 'environment.pcd')
         self.declare_parameter('map_frame', 'map')
-        
+
         # QoS: TRANSIENT_LOCAL
         qos_profile = QoSProfile(depth=1)
         qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
 
         self.pub = self.create_publisher(PointCloud2, '/map_pointcloud', qos_profile)
-        
+
         # Laden und Publishen
         self.load_and_publish()
 
     def load_and_publish(self):
         pcd_path = self.get_parameter('pcd_path').get_parameter_value().string_value
         pcd_path = os.path.abspath(os.path.expanduser(pcd_path))
-        
+
         self.get_logger().info(f"Lade PCD Datei: {pcd_path}")
-        
+
         if not os.path.exists(pcd_path):
             self.get_logger().error("Datei nicht gefunden!")
             return
@@ -59,14 +73,15 @@ class PCDPublisher(Node):
             # Farben laden (falls vorhanden)
             colors = []
             if pcd.has_colors():
-                colors = np.asarray(pcd.colors) # Open3D speichert RGB als 0.0-1.0 float
+                colors = np.asarray(pcd.colors)  # Open3D speichert RGB als 0.0-1.0 float
 
             # 3. PointCloud2 Nachricht erstellen
             msg = self.create_pc2_msg(points, colors)
-            
+
             # 4. Publishen
             self.pub.publish(msg)
-            self.get_logger().info("PCD erfolgreich auf /map_pointcloud veröffentlicht. (Mit Farben!)")
+            self.get_logger().info(
+                "PCD erfolgreich auf /map_pointcloud veröffentlicht. (Mit Farben!)")
 
         except Exception as e:
             self.get_logger().error(f"Fehler beim Laden/Publishen: {e}")
@@ -82,18 +97,19 @@ class PCDPublisher(Node):
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
             PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
         ]
-        
+
         if len(colors) > 0:
             # Wenn Farbe dabei ist, hängen wir das RGB-Feld an (Byte-Offset 12)
             fields.append(PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1))
-            msg.point_step = 16 # 3*4 Bytes (XYZ) + 1*4 Bytes (RGB)
-            
+            msg.point_step = 16  # 3*4 Bytes (XYZ) + 1*4 Bytes (RGB)
+
             # Farben von float [0..1] zu uint8 [0..255] konvertieren
             colors_uint8 = (colors * 255.0).astype(np.uint32)
-            
+
             # RGB in einen einzigen 32-Bit Integer packen (Bitshift)
-            rgb_packed = (colors_uint8[:, 0] << 16) | (colors_uint8[:, 1] << 8) | colors_uint8[:, 2]
-            
+            rgb_packed = (colors_uint8[:, 0] << 16) | (
+                colors_uint8[:, 1] << 8) | colors_uint8[:, 2]
+
             # Numpy Array mit gemischten Datentypen erstellen (float32 für XYZ, uint32 für RGB)
             buffer = np.zeros(len(points), dtype=[
                 ('x', np.float32),
@@ -105,7 +121,7 @@ class PCDPublisher(Node):
             buffer['y'] = points[:, 1]
             buffer['z'] = points[:, 2]
             buffer['rgb'] = rgb_packed
-            
+
             msg.data = buffer.tobytes()
         else:
             msg.point_step = 12
@@ -117,21 +133,23 @@ class PCDPublisher(Node):
         msg.is_bigendian = False
         msg.row_step = msg.point_step * points.shape[0]
         msg.is_dense = True
-        
+
         return msg
+
 
 def main(args=None):
     rclpy.init(args=args)
     node = PCDPublisher()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt: 
+    except KeyboardInterrupt:
         pass
     finally:
         node.destroy_node()
         # Prüfen ob ROS noch läuft, bevor wir es beenden (verhindert den Fehler)
         if rclpy.ok():
             rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

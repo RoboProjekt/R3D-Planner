@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -36,6 +49,7 @@ def config(tmp_path):
     central['maps'] = {'pcd_path': 'tiny.pcd', 'map_name': 'tiny.pcd'}
     central['preprocessing']['output_dir'] = 'output'
     path = tmp_path / 'planner_config.yaml'
+
     def save():
         path.write_text(yaml.safe_dump(central))
         (tmp_path / 'robots/Go2W.yaml').write_text(yaml.safe_dump(robot))
@@ -65,7 +79,7 @@ def test_selection_and_restart_reload(config):
 
 
 @pytest.mark.parametrize('fault', ['missing_robot', 'missing_height', 'radius', 'height',
-                                  'topic', 'boolean', 'duplicate', 'malformed', 'shared'])
+                                   'topic', 'boolean', 'duplicate', 'malformed', 'shared'])
 def test_validation(config, fault):
     path, central, robot, save = config
     if fault == 'missing_robot':
@@ -129,6 +143,7 @@ def test_effective_ros_parameters_and_odometry(config):
             overrides = [Parameter(key, value=value) for key, value in cfg[section].items()]
             # Preserve production constructors; inject normal ROS parameter overrides.
             original = rclpy.node.Node.__init__
+
             def init(node, *args, **kwargs):
                 kwargs['parameter_overrides'] = overrides
                 original(node, *args, **kwargs)
@@ -172,12 +187,15 @@ def test_effective_ros_parameters_and_odometry(config):
         goal = ComputePathToPose.Goal()
         goal.goal.header.frame_id = 'map'
         goal.goal.pose.position.x = 0.1
+
         class Handle:
             request = goal
             succeeded = False
             aborted = False
+
             def succeed(self):
                 self.succeeded = True
+
             def abort(self):
                 self.aborted = True
         handle = Handle()
@@ -300,16 +318,19 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
                     deadline = time.monotonic() + 12
                     while time.monotonic() < deadline:
                         names = {name for name in observer.get_node_names()
-                                 if not name.startswith('_') and name != 'configuration_test_observer'}
+                                 if not name.startswith('_')
+                                 and name != 'configuration_test_observer'}
                         if names == expected:
                             break
-                        assert process.poll() is None, (path.parent / f'launch-{index}.log').read_text()
+                        assert process.poll() is None, (path.parent /
+                                                        f'launch-{index}.log').read_text()
                         rclpy.spin_once(observer, timeout_sec=0.1)
                     assert names == expected
                     dump = subprocess.run(['ros2', 'param', 'dump', '/global_graph_planner',
                                            '--no-daemon', '--spin-time', '2'],
                                           capture_output=True, text=True, timeout=12, check=True)
-                    values = yaml.safe_load(dump.stdout)['/global_graph_planner']['ros__parameters']
+                    values = yaml.safe_load(dump.stdout)[
+                        '/global_graph_planner']['ros__parameters']
                     assert values['robot_height_cm'] == 80.0 + index
                     assert values['robot_narrow_radius_cm'] == 30.0
                     assert values['robot_radius_cm'] == 40.0
@@ -322,11 +343,13 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
                         if enabled:
                             extra = subprocess.run(['ros2', 'param', 'dump', remote,
                                                     '--no-daemon', '--spin-time', '2'],
-                                                   capture_output=True, text=True, timeout=12, check=True)
+                                                   capture_output=True, text=True,
+                                                   timeout=12, check=True)
                             params = yaml.safe_load(extra.stdout)[remote]['ros__parameters']
                             assert params[key] == central[section][key]
                             if section == 'rviz_interface':
-                                assert params['publish_map_odom'] is central[section]['publish_map_odom']
+                                assert (params['publish_map_odom']
+                                        is central[section]['publish_map_odom'])
                 finally:
                     if process.poll() is None:
                         os.killpg(process.pid, signal.SIGINT)

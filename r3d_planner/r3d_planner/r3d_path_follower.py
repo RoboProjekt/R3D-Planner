@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -18,6 +31,7 @@ from sensor_msgs.msg import PointCloud2
 import sensor_msgs_py.point_cloud2 as pc2
 import math
 from .odometry import OdometryInput
+
 
 class PathFollower(Node):
     def __init__(self):
@@ -42,10 +56,10 @@ class PathFollower(Node):
 
         # --- PUBLISHER & SUBSCRIBER ---
         self.cmd_pub = self.create_publisher(Twist, self.cmd_vel_topic, 10)
-        
+
         self.path_sub = self.create_subscription(
             Path, '/global_path', self.path_callback, 10)
-            
+
         self.obstacle_sub = self.create_subscription(
             PointCloud2, '/local/filtered_obstacles', self.obstacle_callback, 10)
 
@@ -60,18 +74,18 @@ class PathFollower(Node):
 
     def obstacle_callback(self, msg):
         obstacle_detected = False
-        
+
         for point in pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True):
             x, y, z = point
             if self.obstacle_x_min < x < self.stop_distance and abs(y) < self.obstacle_half_width:
                 obstacle_detected = True
                 break
-                
+
         if obstacle_detected and not self.obstacle_in_front:
             self.get_logger().warn("DYNAMISCHES HINDERNIS! Stoppe...")
         elif not obstacle_detected and self.obstacle_in_front:
             self.get_logger().info("Weg ist wieder frei.")
-            
+
         self.obstacle_in_front = obstacle_detected
 
     def get_robot_pose(self):
@@ -79,14 +93,14 @@ class PathFollower(Node):
             pose = self.odometry.map_pose().pose
             x = pose.position.x
             y = pose.position.y
-            
+
             q = pose.orientation
             siny_cosp = 2 * (q.w * q.z + q.x * q.y)
             cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
             yaw = math.atan2(siny_cosp, cosy_cosp)
-            
+
             return x, y, yaw
-        except Exception as e:
+        except Exception:
             return None, None, None
 
     def control_loop(self):
@@ -108,17 +122,17 @@ class PathFollower(Node):
         goal_x = self.current_path[-1].pose.position.x
         goal_y = self.current_path[-1].pose.position.y
         dist_to_goal = math.hypot(goal_x - rx, goal_y - ry)
-        
+
         if dist_to_goal < self.goal_tolerance:
             self.get_logger().info("ZIEL ERREICHT!")
-            self.current_path = [] 
-            self.cmd_pub.publish(msg) 
+            self.current_path = []
+            self.cmd_pub.publish(msg)
             return
 
         target_point = None
         closest_dist = float('inf')
         closest_idx = 0
-        
+
         for i, pose in enumerate(self.current_path):
             px = pose.pose.position.x
             py = pose.pose.position.y
@@ -133,12 +147,12 @@ class PathFollower(Node):
             px = self.current_path[i].pose.position.x
             py = self.current_path[i].pose.position.y
             dist = math.hypot(px - rx, py - ry)
-            
+
             if dist >= self.lookahead_distance:
                 target_point = (px, py)
                 target_idx = i
                 break
-                
+
         if target_point is None:
             target_point = (goal_x, goal_y)
             target_idx = len(self.current_path) - 1
@@ -148,30 +162,35 @@ class PathFollower(Node):
 
         dx = target_point[0] - rx
         dy = target_point[1] - ry
-        
+
         target_yaw = math.atan2(dy, dx)
-        
+
         angle_error = target_yaw - ryaw
-        while angle_error > math.pi: angle_error -= 2.0 * math.pi
-        while angle_error < -math.pi: angle_error += 2.0 * math.pi
+        while angle_error > math.pi:
+            angle_error -= 2.0 * math.pi
+        while angle_error < -math.pi:
+            angle_error += 2.0 * math.pi
 
         # --- NEU: Dynamische Bewegungskontrolle ---
         if is_narrow:
             # Engstellen-Modus (Sehr vorsichtig!)
             max_ang_narrow = self.max_angular_speed_narrow
-            
+
             if abs(angle_error) > self.angle_threshold:
                 # NUR auf der Stelle drehen, KEIN Vorwärtsfahren in der Tür!
-                msg.linear.x = 0.0 
-                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * self.steering_gain))
+                msg.linear.x = 0.0
+                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow,
+                                    angle_error * self.steering_gain))
             else:
                 # Er ist gut ausgerichtet -> Langsam durchfahren
                 msg.linear.x = self.max_linear_speed * self.narrow_speed_factor
-                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow, angle_error * self.steering_gain))
+                msg.angular.z = max(-max_ang_narrow, min(max_ang_narrow,
+                                    angle_error * self.steering_gain))
         else:
             # Normaler Modus (Grüner Boden)
-            msg.angular.z = max(-self.max_angular_speed, min(self.max_angular_speed, angle_error * self.steering_gain))
-            
+            msg.angular.z = max(-self.max_angular_speed,
+                                min(self.max_angular_speed, angle_error * self.steering_gain))
+
             if abs(angle_error) > self.angle_threshold:
                 msg.linear.x = self.max_linear_speed * self.turning_speed_factor
             else:
@@ -179,12 +198,14 @@ class PathFollower(Node):
 
         self.cmd_pub.publish(msg)
 
+
 def main(args=None):
     rclpy.init(args=args)
     node = PathFollower()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

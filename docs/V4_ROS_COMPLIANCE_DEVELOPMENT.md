@@ -910,6 +910,38 @@ Output-I/O und 50 passende Fälle bestanden, keine unerwartete Configregression.
 
 Kein neuer Topic/Action/Frame/Controller, keine Version-/Manifest-/Lizenztextänderung. Alte Daten unverändert, Tests nur temporäre synthetische PCDs.
 
+### V4-015 - Flake8 und Copyrightprüfungen tatsächlich ausführen
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP06, AP08. **Status:** VERIFIED für tatsächliche Lints/Copyright/AST-/Notice-Anwendung; Gesamt-AP06 folgt V4-016. **Git-Commit:** `test(quality): resolve lint and copyright checks`. **Betroffene Dateien:** 22 Python-Dateien und zentrales Protokoll; genaue Diff-/AST-Liste unten in 16.4. Root-/Paket-LICENSEs/Manifeste/Setupmetadaten unverändert.
+
+#### Ausgangssituation
+
+Eingang im frischen Apt/Humble-Container reproduziert: 49 Tests, 45 PASS/2 Flake8 FAIL/2 Copyright SKIP. Flake8 166 Planner-/150 Preprocessorbefunde, bestehende und frühere V4-Config-/Teststyles; keine alleinige Zuschreibung an historische Source. Direkter Copyrightlauf am Eingang 13/3 Fehler: traditioneller Humble-Parser erkennt alte eigene SPDX-only/no-year-Header nicht. OSRF-Header gültig, leere Marker kein Fehler.
+
+#### Ziel der Änderung
+
+Bestehende Linter regulär grün ohne globale Threshold-/Ignore-Abschwächung, Copyright-Skips entfernen, Original-Fremdnotices und AP01-SPDX bewahren. Keine Algorithmen oder ROS-Verträge ändern.
+
+#### Technische Umsetzung
+
+Temporärer Containerformatter autopep8 1.6.0, nur E/W und max-line-length99/aggressive0. Manuelle AST-erhaltende Restumbrüche für Strings/Importlisten/Comprehensions/Kommentare. Drei unbenutzte Standardbibliotheksimports math/struct/os entfernt, unbenutzte except-e-Bindung im Follower entfernt, f-Präfix eines konstanten Logstrings im Analyzer entfernt (text-/berechnungsidentisch). Diese kleinen Ausnahmen vom exakten AST-Dump separat normalisiert, sonst AST-Gleichheit. 18 bereits zugeordnete eigene Dateien ergänzen unveränderten traditionellen Apache-Hinweis mit Copyright2026Bastian, vorhandene Namens-/SPDX-Zeilen erhalten. Zwei neue eigene Outputdateien SPDX hinter vollständigem Lizenzblock anordnen, damit Humble-Parser die License erkennt. Beide Copyright-Skipdecorators entfernen; sechs originale OSRF-Copyright-/Lizenzblöcke unverändert, keine Fremdrechte überschrieben.
+
+#### Begründung
+
+Ein gültiger SPDX-Identifier allein wird vom traditionellen ament_copyright 0.12-Parser nicht unterstützt; ergänzender gleichlautender Standardhinweis ermöglicht echten Test statt Skip. Stilfehler beheben, nicht globale Regeln lockern. Unbenutzte Standardbibliothek/Exceptionbindung und konstanter Logfstring ändern weder Zahlen noch ROS-Verhalten.
+
+#### Verifikation
+
+Vor Anwendung an Containerkopien beide Pakete je pytest -k "copyright or flake8 or pep257" Exit0: 3 passed, keine Skips (0.36/0.38s), 43 bzw.10 Funktionsfälle bewusst für diesen Lintlauf deselected und später vollständig geprüft. Erste Formatterprobe ließ 16/4 Lintbefunde sowie zwei Licenseunknowns neuer SPDX-vor-Notice-Dateien zurück, gezielt korrigiert, keine Ignore-Endlösung. AST-Vergleich vor/nach normalisiert ausschließlich drei Standardimporte, die tote Exceptionbindung, konstanten fstring und die zwei Skipdecorators; übrige Funktionstokens/-ASTs unverändert. Alle sechs Original-Noticeblöcke byteidentisch, Root-/Paketlizenzhashes/Manifeste/Setupaufrufe geschützt. Vollständige native Gesamtsuite folgt V4-016; hier kein pauschaler AP06-/Coverageabschluss.
+
+#### Ergebnis
+
+Beide Qualitätsgates bestanden, alle 22 angewandten Dateien bytegleich zu geprüften finalen Kopien; alle Pythondateien parsebar, sechs Noticeblöcke geschützt, exakte Commit-Whitelist. AP06 IN PROGRESS bis Gesamtsuite/Installregressionen; keine Hardware/CI/Multi-Distrobehauptung.
+
+#### Auswirkungen
+
+Keine neue Lizenzwahl/Versions-/Dependency-/ROS-Namens-/Parameter-/Algorithmusänderung. B09-B13-Interfaceprobleme bewusst für AP05 erhalten, keine kosmetische Korrektur als neue Planung ausgeben.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -2497,3 +2529,12 @@ Neuer optionaler ROS-Parameter output_dir im Analyzer, zentrale Zuordnung prepro
 Kein Outputbesitz aus Inputpfad abgeleitet: tempfile ausschließlich im gewählten Ziel, Open3D schreibt dort, os.link veröffentlicht atomar ohne replace. Existierende Datei oder (auch dangling) Symlink bleibt unverändert, Tempdatei nach Erfolg/Fehler entfernt. Fehlendes/ungültiges Input, unbeschreibbare Ausgabe, Open3D-false/Exception liefern sichtbare Fehlermeldung und Analyzer-main Exit1; Erfolg Exit0. Kein Package-Share als impliziter Writeort. Explizite Nutzerwahl kann natürlich ein beliebiges eigenes beschreibbares Verzeichnis bestimmen. Keine neuen Planungs-/Klassifikationsberechnungen.
 
 Unprivilegierter echter I/O-Nachweis (kein root-Rechte-Pseudobeweis): 10 Outputfälle PASS/0 FAIL/0 SKIP, 40 bestehende Configfälle PASS/3 ROSfälle bewusst später; Voxel-/Floor-/Clearance-/Stairfunktion-ASTs identisch. Root würde den reinen DAC-Test skippen; finale Gesamtsuite wird deshalb als regulärer User ausgeführt, kein Skip-PASS. Die Dateioutput-Tests sind neue AP04-Regressionen, nicht nachträglich der Baseline zugerechnet. Lizenzentscheidung/SPDX-/Fremdnotices unverändert; neue eigene Helper-/Testdateien tragen passenden Apache-/SPDX-Hinweis.
+
+
+### 16.4 V4-015 – Qualitätskorrekturen
+
+Alle 22 betroffenen Pythonpfade wurden vor Anwendung in Containerkopien geprüft; Flake8-Grenze99/ROS-Lintregeln unverändert. Kein flake8-disable/noqa-Pauschalfix. AST-normierte Ausnahmen: local_filter import math, Preprocessor setup import os, alternativer Publisher import struct (unbenutzte Standardbibliothek); PathFollower tote except-e-Bindung; Analyzer konstantes fstring-Präfix; zwei Copyright-skipdecorators. Restliche ASTs unverändert, Stringinhalte/Parameterwerte/Rechnungen/ROS-Namen erhalten. Neue Daten-/Ausgabefunktionen werden nur formatiert, nicht algorithmisch umgebaut.
+
+18 frühere eigene Pythondateien erhalten einen zusätzlichen traditionellen Apache-2.0-Header, ihre alten Copyright-/SPDX-Zeilen bleiben. Zwei neue eigene Outputdateien ordnen ihre unveränderten SPDX-Zeilen nach dem vollständigen Licenseblock an. Sechs OSRF-Lizenz-/Copyrightblöcke byteidentisch, nur der obsolete Skipcode der zwei Copyrighttests entfernt. Leere Pythonmarker bleiben leer; keine Attribution unbekannter YAML/TXT/PYC. Root-/Paket-LICENSE und Manifestversion0.0.1/Apache-2.0 erhalten. Echter ament_copyright-Test passt, keine selbstgeschriebene Ersatzprüfung.
+
+Temporäre finale Lintresultate: Planner3PASS/43deselected, Preprocessor3PASS/10deselected, beide Exit0; keine SKIPs. Vorherige formatterbedingte 16/4 Restbefunde/two-license-unknowns transparent korrigiert. Verbleibende externe ament_flake8 SelectableGroups-/optparse-Warnungen ändern Teststatus nicht. Die vollständige Suite wird unter V4-016 ohne Ausklammerung erneut ausgeführt.

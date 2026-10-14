@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -22,15 +35,15 @@ from tf2_ros import Buffer, TransformListener
 def quaternion_product(a, b):
     ax, ay, az, aw = a
     bx, by, bz, bw = b
-    return (aw*bx + ax*bw + ay*bz - az*by,
-            aw*by - ax*bz + ay*bw + az*bx,
-            aw*bz + ax*by - ay*bx + az*bw,
-            aw*bw - ax*bx - ay*by - az*bz)
+    return (aw * bx + ax * bw + ay * bz - az * by,
+            aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw,
+            aw * bw - ax * bx - ay * by - az * bz)
 
 
 def components(q):
     values = (q.x, q.y, q.z, q.w)
-    norm = math.sqrt(sum(v*v for v in values))
+    norm = math.sqrt(sum(v * v for v in values))
     if not math.isfinite(norm) or norm < 1e-9:
         raise ValueError('invalid pose quaternion')
     return tuple(v / norm for v in values)

@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -15,13 +28,13 @@ from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
 from geometry_msgs.msg import PointStamped
 import numpy as np
-import math
+
 
 def create_cloud_xyz32(header, points):
     # Hilfsfunktion zum Erstellen der PC2 Nachricht
     if len(points) == 0:
         return PointCloud2(header=header, height=1, width=0)
-        
+
     fields = [
         PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
         PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
@@ -39,6 +52,7 @@ def create_cloud_xyz32(header, points):
         data=points.tobytes()
     )
 
+
 class ObstacleCliffFilter(Node):
     def __init__(self):
         super().__init__('obstacle_cliff_filter')
@@ -52,23 +66,23 @@ class ObstacleCliffFilter(Node):
                     'cliff_wall_height': 0.5}
         for key, value in defaults.items():
             self.declare_parameter(key, value)
-        
+
         self.sub = self.create_subscription(
             PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback, 10)
-        
+
         self.pub_obstacles = self.create_publisher(PointCloud2, '/local/filtered_obstacles', 10)
         self.pub_cliff = self.create_publisher(PointCloud2, '/local/cliff_virtual_wall', 10)
-        
+
         # NEU: Publisher für Stufenerkennung
         self.pub_stair_detect = self.create_publisher(PointStamped, '/stair_detect', 10)
 
         # --- PARAMETER ---
         # 1. Hindernis-Filter
-        
+
         # 2. Stufen-Parameter (Preprocessing sagt max 20cm)
-        
+
         # 3. Klippen-Erkennung
-        
+
         # 4. Stufen-Erkennung ROI (Region of Interest)
         for key in defaults:
             setattr(self, key, self.get_parameter(key).value)
@@ -79,21 +93,21 @@ class ObstacleCliffFilter(Node):
         try:
             cloud_arr = np.frombuffer(msg.data, dtype=np.dtype(dtype_list, align=True))
         except Exception:
-             return
+            return
 
         # NumPy Array erstellen
         points = np.zeros((cloud_arr.shape[0], 3), dtype=np.float32)
         points[:, 0] = cloud_arr['x']
         points[:, 1] = cloud_arr['y']
         points[:, 2] = cloud_arr['z']
-        
+
         # NaNs entfernen
         points = points[~np.isnan(points).any(axis=1)]
 
         # --- SCHRITT 2: TOTZONEN-FILTER (Noise Removal) ---
         # Berechne Distanz in der XY-Ebene
         dist_sq = points[:, 0]**2 + points[:, 1]**2
-        
+
         # Filter: Alles was näher als 0.65m ist, wird ignoriert (Rauschen am Rand der Totzone)
         min_reliable_dist_sq = self.min_reliable_distance**2
         mask_reliable = dist_sq > min_reliable_dist_sq
@@ -101,32 +115,34 @@ class ObstacleCliffFilter(Node):
 
         # --- SCHRITT 3: STUFEN-ERKENNUNG ---
         mask_stair_roi = (
-            (points[:, 0] > self.stair_roi_x_min) & 
-            (points[:, 0] < self.stair_roi_x_max) & 
+            (points[:, 0] > self.stair_roi_x_min) &
+            (points[:, 0] < self.stair_roi_x_max) &
             (np.abs(points[:, 1]) < self.stair_roi_width)
         )
-        
-        mask_step_height = (points[:, 2] > self.min_step_height) & (points[:, 2] < self.max_step_height)
+
+        mask_step_height = (points[:, 2] > self.min_step_height) & (
+            points[:, 2] < self.max_step_height)
         stair_candidate_points = points[mask_stair_roi & mask_step_height]
-        
+
         is_stair = False
         if len(stair_candidate_points) > self.stair_min_points:
             avg_step_z = np.mean(stair_candidate_points[:, 2])
             avg_step_x = np.mean(stair_candidate_points[:, 0])
-            
+
             stair_msg = PointStamped()
             stair_msg.header = msg.header
             stair_msg.point.x = float(avg_step_x)
             stair_msg.point.y = 0.0
             stair_msg.point.z = float(avg_step_z)
             self.pub_stair_detect.publish(stair_msg)
-            
-            self.get_logger().info(f"Stufe erkannt! Höhe: {avg_step_z:.3f}m", throttle_duration_sec=1.0)
+
+            self.get_logger().info(
+                f"Stufe erkannt! Höhe: {avg_step_z:.3f}m", throttle_duration_sec=1.0)
             is_stair = True
 
         # --- SCHRITT 4: HINDERNIS-OUTPUT ---
         mask_obstacle = (points[:, 2] > self.min_height) & (points[:, 2] < self.max_height)
-        
+
         if is_stair:
             # Stufe erkannt -> Ignoriere Punkte im Stufenbereich, die niedrig genug sind
             mask_ignorable_step = mask_stair_roi & (points[:, 2] < self.max_step_height)
@@ -139,48 +155,52 @@ class ObstacleCliffFilter(Node):
         if len(obstacle_points) > 0:
             self.pub_obstacles.publish(create_cloud_xyz32(msg.header, obstacle_points))
         else:
-            self.pub_obstacles.publish(create_cloud_xyz32(msg.header, np.zeros((0, 3), dtype=np.float32)))
+            self.pub_obstacles.publish(create_cloud_xyz32(
+                msg.header, np.zeros((0, 3), dtype=np.float32)))
 
-	# --- SCHRITT 5: KLIPPEN-ERKENNUNG (Korrigiert für Totzone) ---
-        
+        # --- SCHRITT 5: KLIPPEN-ERKENNUNG (Korrigiert für Totzone) ---
+
         # WICHTIG: Wir können nur dort nach Boden suchen, wo der Sensor etwas sieht!
         # Deine Totzone ist ca 0.6m. Der Filter oben löscht alles < 0.65m.
         # Also prüfen wir den Bereich von 0.7m bis 1.2m auf Boden.
-        
+
         check_start_x = self.cliff_roi_x_min
         check_end_x = self.cliff_roi_x_max
-        
+
         mask_roi_cliff_visible = (
-            (points[:, 0] > check_start_x) & (points[:, 0] < check_end_x) & 
-            (np.abs(points[:, 1]) < self.cliff_width) & 
+            (points[:, 0] > check_start_x) & (points[:, 0] < check_end_x) &
+            (np.abs(points[:, 1]) < self.cliff_width) &
             (points[:, 2] < self.min_height)
         )
-        
+
         # Zähle Bodenpunkte im SICHTBAREN Bereich
         ground_points_count = np.sum(mask_roi_cliff_visible)
-        
+
         # Schwellwert anpassen: Da der Bereich weiter weg ist, sind die Punkte weniger dicht.
         # Wir senken den Threshold etwas zur Sicherheit.
         MIN_SAFE_POINTS = self.cliff_min_ground_points
-        
+
         if ground_points_count < MIN_SAFE_POINTS:
             # Wir sehen ab 0.7m keinen Boden mehr -> Klippe oder Loch voraus!
             # Wir bauen die Wand genau an die Grenze der Sichtbarkeit
-            
+
             y_fill = np.linspace(-self.cliff_width, self.cliff_width, self.cliff_wall_points)
             cliff_wall = np.zeros((self.cliff_wall_points, 3), dtype=np.float32)
-            
+
             # Wand muss bei 0.7m stehen (Beginn des sichtbaren Bereichs)
-            cliff_wall[:, 0] = check_start_x 
+            cliff_wall[:, 0] = check_start_x
             cliff_wall[:, 1] = y_fill
             cliff_wall[:, 2] = self.cliff_wall_height
-            
+
             self.pub_cliff.publish(create_cloud_xyz32(msg.header, cliff_wall))
             # Optional: Warnung nur ab und zu loggen, um Spam zu vermeiden
-            # self.get_logger().warn(f"Klippe/Loch ab {check_start_x}m erkannt! (Bodenpunkte: {ground_points_count})", throttle_duration_sec=2.0)
+            # Optional debug log: cliff/hole at check_start_x, ground_points_count.
+            # Throttle debug messages to two seconds.
         else:
             # Boden ist da, Weg ist sicher
-            self.pub_cliff.publish(create_cloud_xyz32(msg.header, np.zeros((0, 3), dtype=np.float32)))
+            self.pub_cliff.publish(create_cloud_xyz32(
+                msg.header, np.zeros((0, 3), dtype=np.float32)))
+
 
 def main(args=None):
     rclpy.init(args=args)

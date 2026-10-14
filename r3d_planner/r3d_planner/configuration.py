@@ -1,3 +1,16 @@
+# Copyright 2026 Bastian Aumer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
 # R3D-Planner
 #
@@ -168,7 +181,8 @@ def load_configuration(path=None, mode='planner'):
                          'fill_plane_min_neighbors'], 'preprocessing', optional=('output_dir',))
     output_dir = preprocessing.get('output_dir', '')
     if not isinstance(output_dir, str) or (output_dir and not output_dir.strip()):
-        raise ConfigurationError('preprocessing.output_dir: expected a directory path or empty string')
+        raise ConfigurationError(
+            'preprocessing.output_dir: expected a directory path or empty string')
     if output_dir:
         output_dir = str((path.parent / Path(output_dir).expanduser()).resolve())
         if Path(output_dir).exists() and not Path(output_dir).is_dir():
@@ -245,13 +259,15 @@ def load_configuration(path=None, mode='planner'):
                          'pcd_path': maps['pcd_path'], 'output_dir': output_dir},
         'planner': {**common, **shared, **ros_parameters(planner), 'map_name': maps['map_name']},
         'live_filter': {**ros_parameters(live, (
-                            'stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points')),
-                        'pointcloud_topic': robot['topics']['pointcloud']},
+            'stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points')),
+            'pointcloud_topic': robot['topics']['pointcloud']},
         'rviz_interface': {'match_radius': float(rviz['match_radius']),
                            'publish_map_odom': rviz['publish_map_odom'],
-                           'map_frame': planner['map_frame'], 'odom_frame': odometry['odom_frame']},
+                           'map_frame': planner['map_frame'],
+                           'odom_frame': odometry['odom_frame']},
         'components': cfg['components'],
-        'path_follower': {'odometry_topic': odometry['topic'], 'odom_frame': odometry['odom_frame'],
+        'path_follower': {'odometry_topic': odometry['topic'],
+                          'odom_frame': odometry['odom_frame'],
                           'base_frame': odometry['base_frame'],
                           **ros_parameters(follower), 'map_frame': planner['map_frame'],
                           'odometry_timeout_sec': float(planner['odometry_timeout_sec']),
