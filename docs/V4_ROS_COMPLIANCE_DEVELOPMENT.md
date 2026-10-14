@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-016 (isolierte Humble-Dependencyinstallation, Source-freie Copy-Installation und vollständige Testabnahme). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-017 (AP05-Schnittstelleninventar und noch nicht freigegebene Migrationsstrategie). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -243,7 +243,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Kopplung an geplante öffentliche API vor Release klären |
 | Abhängigkeiten | AP03/AP04 für reproduzierbare Ausführung; AP06 pro Vertragsänderung; AP09 bei distributionsverschiedenen Action-/Python-APIs |
 | Abschlusskriterien | Normierte semantisch sinnvolle Orientierungen; erhaltenes Engstellenverhalten; konsistente interne Namen und Namespace-Test; Cloud-Varianten und Frames geprüft; Action-Erfolg/Fehler/Cancel entsprechend dokumentiertem Zielvertrag; keine stille API-Änderung |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **IN PROGRESS** — aktuelles Inventar/V4-017; konkrete narrow-/Follower-Migration vorbereitet, ohne gesonderte Freigabe nicht implementieren; unabhängige kompatible Korrekturen separat prüfen |
 
 ### 4.7 AP06 - Tests und Qualitätssicherung
 
@@ -987,6 +987,38 @@ AP03 VERIFIED Humble/Jammy; AP04 VERIFIED gemäß ursprünglichen Copy-/Sourcefr
 #### Auswirkungen
 
 Manifestbytes/Paketnamen/0.0.1/Apache-2.0 unverändert; neue Tests keine ROS-API-/Algorithmusänderung. Historische Einträge und PDF erhalten. Zwei eigene Testcontainer nach Sicherung relevanter Ergebnisse gestoppt/entfernt; keine vorher vorhandenen Images gelöscht, offizielles gezogenes Image behalten. Host-Apt/pip/Conda/NVIDIA/ROS/Dockerkonfiguration unverändert. Kein Push/Release/Hardwarebetrieb; AP05/AP07 nicht begonnen.
+
+### V4-017 - AP05-Schnittstelleninventar und konkrete Migrationsentscheidung
+
+**Datum:** 14. Oktober 2026. **Arbeitspaket:** AP05, begleitend AP06/AP08/AP10. **Status:** Analyse COMPLETED; inkompatible Migration BLOCKED bis gesonderter Nutzerfreigabe, übrige AP05-Analyse/kompatible Korrekturen freigegeben. **Git-Commit:** `docs(ros): inventory interfaces and propose migration`. **Betroffene Datei:** ausschließlich dieses zentrale Protokoll.
+
+#### Ausgangssituation
+
+Sauberer V4-HEAD22be9830e8d783a9a5a9dffc62e3ddfe223c179c. Keine zusätzlichen fremden Änderungen/Worktrees; Baseline c65642f weiterhin Vorfahr. Alle bisherigen Ereignisse V4-001..016 und vollständiges bereits bearbeitetes Protokoll gelten als historische Nachweise. Frühere86/37Tests werden nicht als neue Ausführung ausgegeben. Geschützte Hash-/Ref-/Gitconfigdaten erneut vor Änderungen gesichert, PDF identisch. Auftrag erlaubt AP05..AP10 in Reihenfolge, verbietet Breaking Changes ohne konkrete Migrationsstrategie und separate Freigabe.
+
+#### Ziel der Änderung
+
+Tatsächliche Node-/Publisher-/Subscriber-/Service-/Action-/Parameter-/TF-/QoS-Verträge erfassen. Konkrete Nachrichtensemantikfehler von optionaler Namingpräferenz trennen; narrow-Funktion weder löschen noch in einem anderen geometrischen Standardfeld verstecken. Entscheidungsfähige Strategie vor Produktionsänderung festhalten.
+
+#### Technische Umsetzung
+
+Statische Untersuchung aller eigenen Node-/Launch-/Loader-/Odometrymodule, parameterbezogener YAMLs, bestehender Tests und Manifeste. Inventar und Risikomatrix in Kapitel17. Humble ComputePathToPose und sensor_msgs_py offiziell neu gelesen; in tatsächlich eingesetztem Container zusätzlich zu prüfen. Keine Algorithmen/API/Manifeste geändert. Neue Planung nach originaler Phasenreihenfolge, keine Veröffentlichung.
+
+#### Begründung
+
+Quaternionflagwriter im Planner und decoder im Follower sind öffentlich gekoppelt: neue geometrisch korrekte Orientierungen machen den alten z>0.5-Decoder unzuverlässig. Ein normalisiertes Flag bleibt eine willkürliche geometrische Kodierung. Bloße Namens- oder QoS-Präferenzen rechtfertigen keinen stillen Defaultbruch.
+
+#### Verifikation
+
+Statisches AST-/Sourceinventar, konkrete Quellen/Zeilen nach17.1/17.2. Git/Branch/Ref/Baseline/PDF vor Änderungen geprüft. Kein neuer colcon-/Runtime-/CI-/Hardware-PASS behauptet. Offizielle Humble-Action besitzt path und planning_time, aber keine error_code-Felder und kein Feedbackpayload; APIstand später aus installiertem Paket bestätigen.
+
+#### Ergebnis
+
+Migration ist konkret vorbereitet und noch nicht implementiert. Verbleibende Freigabe betrifft Quaternion/narrow und den strengeren Follower-Eingangsvertrag. Kompatible PointCloud2-Feldkorrektur kann getrennt getestet werden. AP05 IN PROGRESS, AP06 bisheriger Umfang VERIFIED, spätere neue Gesamtabnahme offen. AP07/AP09 noch nicht begonnen; AP08/AP10 begleiten ohne Releaseaktion.
+
+#### Auswirkungen
+
+Nur Dokumentation, keine öffentliche ROS-Schnittstelle oder Controllerfunktion geändert. Keine Änderungen an V1/V2/V3/main/Remotes/PDF/Lizenztexten, keine externen Projekte, kein Push/Release/Hardwarebetrieb. R3D_null bleibt ausgeschlossen.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -2729,3 +2761,146 @@ Verbleibende Release-Gates: vollständige rechtliche Rechte-/Distributions-/hist
 Nächster sinnvoller Schritt ist ausschließlich nach ausdrücklicher neuer Freigabe AP05 – ROS Interfaces and Configuration. Schwerpunkt: dokumentierte bestehende Grenzen von absoluten Topics/Namespaces/Remapping, TF-Verträgen, gepackter PointCloud2-Annahme und nichtnormalisierten Quaternion-Markern. Keine neue SLAM-/Nav2-/Algorithmusarbeit begonnen. AP07/Releaseautomatisierung erst nach stabilen Verträgen; AP09-Plattformdependencies getrennt klären.
 
 Abschlussgrenzen: nur V4; V1/V2/V3/main und Remote-Tracking-Refs unverändert; Baseline c65642fe56015556f696364a724cb5b976a27888 bleibt Vorfahr. Historisches PDF SHA256 8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383 unverändert; Root-/beide Paket-LICENSE SHA256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 unverändert. Sechs Fremdnoticeblöcke erhalten, neun getrackte alte PYC nicht bereinigt. Keine History-Rewrites, Remote-/Sichtbarkeits-/öffentliche Repositoryänderung, kein Push, keine Veröffentlichung und keine realen Roboterbewegungen. Kein R3D_null untersucht/geändert.
+
+
+## 17. AP05 – Schnittstellenanalyse und Migration (ab V4-017)
+
+### 17.1 Verifizierter Eingang und Anforderungen
+
+Datum14.10.2026, Eingang22be983. AP01 technisch/02/03/04 und der bisherige AP06-Umfang vorhanden, keine neue Ausführung daraus ableiten. Historische Vorleistungen bleiben A*, Graph-/PCD-/Voxel-/Clearance-/Stairfunktion, ROS-Nodes, vier Launches, zentrale YAML, Standard-Odometry/TF,86Bestandstestfälle. Neue Aufgabe ist Schnittstellenfinalisierung plus spätere Tests/CI/Dokumentation/Distribution/Releasevorbereitung in festgelegter Reihenfolge. Die neuen Phasen sind ausdrücklich beauftragt; für inkompatible Verträge gilt weiterhin separate Freigabe.
+
+Offizielle Quellen neu gelesen: [Humble ComputePathToPose](https://raw.githubusercontent.com/ros-navigation/navigation2/humble/nav2_msgs/action/ComputePathToPose.action), [Humble sensor_msgs_py](https://raw.githubusercontent.com/ros2/common_interfaces/humble/sensor_msgs_py/sensor_msgs_py/point_cloud2.py), [Quaterniondefinition](https://raw.githubusercontent.com/ros2/common_interfaces/humble/geometry_msgs/msg/Quaternion.msg). Inference: Action-Server/-Client sind im Rootnamespace passend, aber bei Namespacebetrieb serverrelativ/clientabsolut inkonsistent. sensor_msgs_py stellt Feld-Dtypebau bereit; sein Humble read_points verarbeitet row_step nicht explizit und byteswap ist inplace, deshalb dürfen Rowpadding/readonly Daten nicht ungeprüft durch diesen Helfer geleitet werden. Kein fremder Quelltext kopiert, nur API/Verhalten untersucht.
+
+### 17.2 Tatsächliche ROS-Schnittstellen am Eingang
+
+| Package / Executable | Node | Publikationen / Subscriptionen | Service / Action | TF / QoS / Launch |
+|---|---|---|---|---|
+| r3d_planner / pcd_path_planner | global_graph_planner | /global_path Path, /planned_path Marker; robot.odometry.topic Odometry | relativer Server compute_path_to_pose, Nav2 ComputePathToPose | map<-odom zum Odometry-Stempel, kein Broadcaster; Path/Marker reliable volatile keep-last10, Odometry SensorDataQoS; planner.launch.py |
+| r3d_planner / local_filter | obstacle_cliff_filter | Sensorcloud input konfiguriert; /local/filtered_obstacles und /local/cliff_virtual_wall PointCloud2, /stair_detect PointStamped | keine | Keine TF, Verarbeitung im incoming sensor frame; alle depth10 reliable volatile; optional in planner.launch.py |
+| r3d_planner / rviz_interface | r3d_rviz_interface | /clicked_point, /initialpose, /goal_pose Subscriptions | relativer Trigger-Service recalibrate_pose; absoluter Client /compute_path_to_pose | optional static map->odom Kalibrierung, externe Lokalisierung bei publish_map_odom=false; Subs depth10 reliable volatile; optional planner.launch.py |
+| r3d_planner / path_follower | r3d_path_follower | /global_path Path, /local/filtered_obstacles PointCloud2, configured Odometry; configured cmd_vel Twist | keine | map<-odom zum Posezeitstempel, kein Broadcaster; Cloud/Path/Twist depth10 reliable volatile, Odometry SensorDataQoS; nur follower.launch.py |
+| r3d_planner / path_test | r3d_path_test | keine normalen Topics | keine | Test static odom->base_link Identität; keine Launchintegration; nicht parallel zum echten Odometry-TF-Owner starten |
+| r3d_preprocessor / pcd_server | pcd_publisher | /map_pointcloud PointCloud2 | keine | configured map_frame als Label ohne Transformation; reliable transient-local keep-last1; map.launch.py |
+| r3d_preprocessor / pcd_analyser | pcd_to_graph_node | keine | keine | Offline-PCD/read-only Input, separate exklusive Dateioutput; kein TF/QoS; preprocessor.launch.py |
+| r3d_preprocessor / kein Console-Entry-Point | pcd_publisher (alternatives Modul) | /map_pointcloud XYZ-only | keine | hardcoded map frame, reliable transient-local keep-last1; nicht installiert als Executable, Namenskollision falls manuell parallel gestartet |
+
+QoS-Defaults für depth10: KEEP_LAST/RELIABLE/VOLATILE, Deadline/Lifespan Default unbeschränkt, Liveliness system-default und Lease default. SensorDataQoS: KEEP_LAST depth5/BEST_EFFORT/VOLATILE. Action/Service verwenden rclpy-Defaults; kein benutzerdefiniertes Deadline/Livelinessprotokoll. TF-Publisher/Listenerbibliothek regelt /tf bzw./tf_static selbst, nicht neu konfiguriert. Keine eigenen Message-/Service-/Actiontypen am Eingang.
+
+Vollständiger statischer Parameter-/Schnittstellenstellenindex (Literal-/Dictionarydefaultdeklarationen, keine Ausführung):
+
+**r3d_planner/r3d_planner/odometry.py**
+
+- Zeile57: `Parameterdefaults: {'odometry_topic': '/lidar_odometry', 'odom_frame': 'odom', 'base_frame': 'base_link', 'map_frame': 'map', 'odometry_timeout_sec': 1.0}`
+- Zeile61: `node.declare_parameter(key, value)`
+- Zeile70: `node.create_subscription(Odometry, self.topic, self.callback, qos_profile_sensor_data)`
+
+**r3d_planner/r3d_planner/r3d_local_filter.py**
+
+- Zeile59: `Parameterdefaults: {'pointcloud_topic': '/hesai_ros_driver/hesai/lidar_points', 'min_height': 0.05, 'max_height': 1.0, 'max_step_height': 0.22, 'min_step_height': 0.06, 'cliff_width': 0.4, 'stair_roi_x_min': 0.7, 'stair_roi_x_max': 1.1, 'stair_roi_width': 0.5, 'min_reliable_distance': 0.65, 'stair_min_points': 50, 'cliff_roi_x_min': 0.7, 'cliff_roi_x_max': 1.2, 'cliff_min_ground_points': 30, 'cliff_wall_points': 20, 'cliff_wall_height': 0.5}`
+- Zeile68: `self.declare_parameter(key, value)`
+- Zeile70: `self.create_subscription(PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback, 10)`
+- Zeile73: `self.create_publisher(PointCloud2, '/local/filtered_obstacles', 10)`
+- Zeile74: `self.create_publisher(PointCloud2, '/local/cliff_virtual_wall', 10)`
+- Zeile77: `self.create_publisher(PointStamped, '/stair_detect', 10)`
+
+**r3d_planner/r3d_planner/r3d_path_follower.py**
+
+- Zeile41: `Parameterdefaults: {'lookahead_distance': 0.5, 'max_linear_speed': 0.35, 'max_angular_speed': 0.6, 'stop_distance': 0.6, 'goal_tolerance': 0.2, 'control_period_sec': 0.1, 'obstacle_x_min': 0.1, 'obstacle_half_width': 0.3, 'max_angular_speed_narrow': 0.2, 'angle_threshold': 0.5, 'steering_gain': 1.5, 'narrow_speed_factor': 0.4, 'turning_speed_factor': 0.3, 'cmd_vel_topic': '/cmd_vel'}`
+- Zeile49: `self.declare_parameter(key, value)`
+- Zeile58: `self.create_publisher(Twist, self.cmd_vel_topic, 10)`
+- Zeile60: `self.create_subscription(Path, '/global_path', self.path_callback, 10)`
+- Zeile63: `self.create_subscription(PointCloud2, '/local/filtered_obstacles', self.obstacle_callback, 10)`
+
+**r3d_planner/r3d_planner/r3d_pcd_path.py**
+
+- Zeile56: `self.declare_parameter('map_dir', default_dir)`
+- Zeile57: `self.declare_parameter('map_name', 'map_analysed.pcd')`
+- Zeile61: `self.declare_parameter('voxel_size_cm', 5.0)`
+- Zeile62: `self.declare_parameter('min_step_height_cm', 5.0)`
+- Zeile63: `self.declare_parameter('max_step_height_cm', 25.0)`
+- Zeile68: `self.declare_parameter(key, value)`
+- Zeile91: `self.create_publisher(Marker, '/planned_path', 10)`
+- Zeile93: `self.create_publisher(Path, '/global_path', 10)`
+
+**r3d_planner/r3d_planner/r3d_rviz_interface.py**
+
+- Zeile42: `self.declare_parameter('match_radius', 0.8)`
+- Zeile43: `self.declare_parameter('publish_map_odom', True)`
+- Zeile44: `self.declare_parameter('map_frame', 'map')`
+- Zeile45: `self.declare_parameter('odom_frame', 'odom')`
+- Zeile51: `self.create_subscription(PointStamped, '/clicked_point', self.point_cb, 10)`
+- Zeile53: `self.create_subscription(PoseWithCovarianceStamped, '/initialpose', self.initial_pose_cb, 10)`
+- Zeile55: `self.create_subscription(PoseStamped, '/goal_pose', self.goal_pose_cb, 10)`
+- Zeile59: `self.create_service(Trigger, 'recalibrate_pose', self.recalibrate_callback)`
+
+**r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py**
+
+- Zeile329: `self.declare_parameter('pcd_path', 'environment.pcd')`
+- Zeile330: `self.declare_parameter('output_dir', '')`
+- Zeile331: `self.declare_parameter('voxel_size_cm', 5.0)`
+- Zeile332: `self.declare_parameter('max_step_height_cm', 25.0)`
+- Zeile334: `self.declare_parameter('min_points_per_sqm', 10.0)`
+- Zeile335: `self.declare_parameter('min_points_per_voxel', 3)`
+- Zeile336: `self.declare_parameter('floor_height_tolerance', 0.02)`
+- Zeile337: `self.declare_parameter('ground_fill', True)`
+- Zeile339: `self.declare_parameter('robot_base_clearance_cm', 10.0)`
+- Zeile340: `self.declare_parameter('robot_narrow_radius_cm', 30.0)`
+- Zeile341: `self.declare_parameter('min_step_height_cm', 5.0)`
+- Zeile342: `self.declare_parameter('robot_radius_cm', 40.0)`
+- Zeile343: `self.declare_parameter('robot_height_cm', 80.0)`
+- Zeile344: `self.declare_parameter('analysis_grid_size_cm', 20.0)`
+- Zeile345: `self.declare_parameter('cluster_gap_threshold_cm', 20.0)`
+- Zeile346: `self.declare_parameter('fill_plane_iterations', 2)`
+- Zeile347: `self.declare_parameter('fill_plane_search_radius', 2)`
+- Zeile348: `self.declare_parameter('fill_plane_min_neighbors', 4)`
+
+**r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py**
+
+- Zeile40: `self.declare_parameter('pcd_path', 'environment.pcd')`
+- Zeile41: `self.declare_parameter('map_frame', 'map')`
+- Zeile47: `self.create_publisher(PointCloud2, '/map_pointcloud', qos_profile)`
+
+**r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py**
+
+- Zeile40: `self.declare_parameter('pcd_path', 'environment.pcd')`
+- Zeile47: `self.create_publisher(PointCloud2, '/map_pointcloud', qos_profile)`
+
+Die vier bestehenden Launchfiles führen jeweils description(mode) aus; configured_nodes lädt strikte YAML/Robotprofile und gibt Dictionaries als ROS-Parameter weiter. Keine Launchargumente für Namespace/Remapping am Eingang. Preprocessor-/Map-/Follower-Modus separiert; optionale LiveFilter/RViz-Komponenten bleiben unabhängig. Vollständige Einheiten/Bounds und Output-/Map-/Robotprofile stehen bereits in docs/CONFIGURATION.md; obiger Index benennt zusätzliche Standalone-/Odometrydefaults. Node-Namen werden nicht durch Executable-Namen ersetzt.
+
+### 17.3 Vertragsbefunde und Veränderungsgrenzen
+
+| ID | Befund / tatsächliche Evidenz | Einordnung | Externe Auswirkung / geplante Behandlung |
+|---|---|---|---|
+| I01 | Planner execute_callback setzt narrow z=1,w=1; Follower control_loop liest z>0.5 | konkrete Quaternion-/Pose-Semantikverletzung | Generische Poseconsumer und Legacy-narrowdecoder betroffen; nur nach17.4-Freigabe migrieren |
+| I02 | LocalFilter pc_callback interpretiert jedes Byte als gepacktes12-byteXYZ; row_step/fields/endian ignoriert | konkrete PointCloud2-Datenvertragsverletzung | Gültige XYZI/RGB/Padding/Organizedwolken falsch; feldbasierter stride-/endianbewusster Decoder, XYZ finite, Inputbytes nicht ändern |
+| I03 | LocalFilter benutzt ausdrücklich sensorbezogene YAML-Schwellen und Header, Follower interpretiert X/Y für Vorwärtsfahrt ohne Frameprüfung | definierter Filtervertrag, aber ungesicherter Follower-Framevertrag | Filter nicht still auf Baseframe ändern; Follower-Cloud bei Sensorstempel nach base_frame transformieren, bei fehlender TF stoppen; Freigabe17.4 |
+| I04 | Server compute_path_to_pose relativ; Client /compute_path_to_pose absolut, viele Topics absolut | Root gültig; namespacefähige Komposition fehlt, Namen allein kein ROS-Verbot | Optionaler Launchnamespace plus konsistente explizite Remaps, Rootdefaults erhalten; keine stillen Umbenennungen |
+| I05 | Action hat keinen Cancelcallback; synchroner Execute im Singlethreadexecutor, planner_id ignoriert; positionsfinite/startorient nicht geprüft; planning_time nie gesetzt | konkrete Action-/Validierungsgrenzen | Humble besitzt kein error_code/Feedbackpayload; Status/result/cancel/finite/plannerID tests nötig, kein Lifecycle-/Pluginredesign |
+| I06 | Cloudinput Reliable depth10 trotz möglicher BestEffortsensoren; Odometry SensorData und MapTL bereits sinnvoll | QoS-Interoperabilitätsverbesserung, kein einheitlicher QoS-Zwang | Sensorinput BestEffort empfängt beide Publisherarten; Änderungen der Nutzeranforderungen konkret dokumentieren/testen |
+| I07 | Follower cached obstacle_in_front ohne Alter/Ersteingang, verwertet Header/TF nicht | ungesicherter Kommunikations-/Frischevertrag | Neue fail-closed-Datenvalidierung ist Verhaltensänderung, gesonderte17.4-Freigabe; kein Sicherheitszertifikat |
+| I08 | min_reliable_distance0.65 im Filter versus stop_distance0.6 beim Follower | konkrete Integrationsgrenze, nicht universelle Controllerlösung | In identisch ausgerichteten/gleichursprünglichen Frames liegen Filterpoints außerhalb Stopzone; Defaulttuning nicht blind ändern, Grenzen und Kalibrierung dokumentieren |
+| I09 | RVizpunkt/Posenheader/-quaternion nicht geprüft, wait_for_server unbeschränkt | konkrete Frame-/Validierungs-/Blockierungsgrenze | Ungültige/fremdframe/geometrisch ungültige Eingaben klar ablehnen, Wartezeit begrenzen; keine konkurrierende map->odom-Publikation |
+| I10 | Cliff/Stair publiziert, Follower konsumiert beide nicht; planarXY und narrowdecode | vorhandener Funktionsumfang und externe Sicherheitsintegration | Dokumentierte Grenze, kein vollständiger neuer 3DController/Cliffintegration |
+
+TF-Eigentümer: map->odom ausschließlich globale Lokalisierung oder ausdrücklich eingeschaltete Legacy-RVizkalibrierung; odom->base_link ausschließlich externe Odometryquelle. Planner/Follower lesen nur. Posezeitstempel ist maßgeblich; fehlende/extrapolierte/ungültige TF darf nicht als Identität ersetzt werden. Sensorachsen/-ursprung bleiben eigener dokumentierter Vertrag, nicht aus Framezeichenketten erschlossen.
+
+### 17.4 Konkrete Migrationsstrategie – noch nicht freigegeben
+
+**Entscheidung M01 (Quaternion/narrow):** Statt einer Flag-Normalisierung wird die bestehende geometrische Path-Ausgabe auf echte, normierte Orientierungen entlang der Pfadtangente umgestellt (Endpunkt letzter gültiger Tangentenheading; Einpunktpfad validierte Zielorientierung). Positionen/Graphfarben/Kosten/A* bleiben erhalten. Der Typ nav_msgs/Path und /global_path sowie ComputePathToPose bleiben erhalten; ihre Orientierungssemantik ändert sich ausdrücklich. Alte Consumer dürfen z>0.5 danach nicht als narrow lesen.
+
+Ergänzung eines kleinen ROS-Interfacepakets r3d_interfaces (0.0.1/Apache-2.0, rosidl/ament_cmake ausschließlich für die Nachrichtengenerierung), Nachricht PathWithMetadata:
+
+```text
+nav_msgs/Path path
+bool[] narrow
+```
+
+Neues /global_path_metadata publiziert den kompletten geometrischen Path und genau ein narrow-Bool pro Pose atomar in derselben Nachricht. Dadurch keine stamp-only-Zuordnung zweier getrennt transportierter Arraytopics, kein Flagverlust/race beim Pairing; Pathheader/Koordinaten sind identisch mit Actionresult und Standard-Pathausgabe. Metadatentransport reliable/transient-local/keep-last1 (Publisher und Follower): später Follower bekommt letzten kompletten Pfad inklusive Flags. Standard-/global_path behält seinen bisherigen QoS. Follower verwendet ausschließlich die angereicherte Nachricht; prüft Länge, Frames, finite Geometrie und Quaternionen. Fehlende/inkonsistente Metadaten führen zu Stop, kein interpretierter Legacyfallback. Neuplanung ersetzt Path+Flags gemeinsam. Empty-Path löscht beides gemeinsam.
+
+Rollout: neues Interfacepaket, Planner und Follower gemeinsam bauen/installieren; bestehenden `path_follower` nicht mit einem Legacyplanner mischen. Generic Pathconsumer behalten Topic/Typ und erhalten geometrisch gültige Posen. Eigene/externe Legacy-narrowdecoder auf PathWithMetadata migrieren. In lokalen V4-Entwicklungsdocs Breaking-Change/Migrationsanweisung und paketweisen unreleased Changelog festhalten; keine Releaseversion/Tag/Push auswählen. Keine alten Invalidquaternionen als dauerhaften Parallelkanal ausgeben, keine narrowkodierung in Position/Covariance/anderen geometrischen Standardfeldern.
+
+**Entscheidung M02 (Followerdaten):** Fehlende, ungültige, future-datierte oder ältere-als-Timeout Hindernisdaten sollen in der vorgeschlagenen strikten V4-Betriebsart Null-Twist auslösen. Vorgeschlagener neuer Parameter obstacle_timeout_sec=1.0s, zentral validiert und dokumentiert. Hindernisse anhand ihres Messstempels nach robot.base_frame transformieren; keine gültige TF/ungültige Transformation -> Eingabe ungültig/Stop. Nur neue gültige zeitaktuelle Wolke kann Freigabe liefern; leere aber gültige Wolke ist ein legitimer clear-Befund. Frische Pose/Pfad/Metadaten weiter nötig. Controllerberechnungen/Geschwindigkeitswerte bleiben erhalten, keine Cliff/Stairintegration oder komplette neue Bewegungssteuerung. Dies ändert bisherige Weiterfahrt ohne Hinderniseingang und muss vor Umsetzung separat genehmigt werden.
+
+Alternativen/Tradeoffs: (a) getrennter typisierter Header+Boolarray-Kanal spart doppelte Pfadpositionen, benötigt aber exaktes Pairing/Cache/Timeout und bringt zusätzliche Fehlzustände; (b) JSON/String vermeidet Interfacepaket, verliert aber rosidl-Typprüfung/Discovery und erschwert publicAPI; (c) lokal erneutes Map-KDTree-Matching vermeidet neuen Transport, bindet Follower an Graphkarten/Regenerationsparameter und kann Wegpunktzuordnung verlieren. Empfohlen M01 mit atomarer typisierter Nachricht trotz zusätzlichem kleinen Package und transportiertem Path; größere Scopeänderung sichtbar und nicht bereits implementiert.
+
+Freigabequelle ist ausdrücklich der aktuelle Nutzerauftrag, Abschnitt6 („Solche nicht rückwärtskompatiblen Änderungen benötigen eine gesonderte Freigabe“), Abschnitt10 und38. Die allgemeine AP05-Freigabe ersetzt diese konkrete Migrationsfreigabe nicht. Unabhängige PointCloud2-Dekoderkorrektur I02 erfordert kein Legacytopic-/narrow-/Followerstop-Defaultbruch und kann separat geprüft werden. PhasenAP06..AP10 folgen auf die abschließend freigegebene/abgenommene AP05-Schnittstellenbasis; nicht als abgeschlossen erklären, solange M01/M02 offen sind.
