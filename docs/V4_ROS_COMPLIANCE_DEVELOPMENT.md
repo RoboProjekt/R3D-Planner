@@ -1416,11 +1416,27 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Verifikation geplant:** identische Eingabe auf installiertem Eingang und korrigiertem Copybuild; native Sensor→Filter→Follower→Twist-Kette, Grenz-/Negativ-/TF-/Layout-/Recoveryfälle G01–G40; anschließend vollständiger vorhandener Humble-CI-Einstieg mit Sourcefreiem Container. Befehle/Exitcodes/Ergebnisse erst nach tatsächlicher Ausführung ergänzen. Keine physische Sicherheits-/Coverage-/Farmbehauptung. AP05 bis zur Abnahme IN PROGRESS; Rechts-/Remote-/Publikationsgates bleiben offen.
 
+**Abnahmenachtrag 15.10.: VERIFIED im begrenzten Geometrievertrag.** Vorher/identisch nachherT125/T126 und48neue FälleT127; vollständigeCI354 und Sourcefrei298 in20.7. Tatsächlicher Commit `100116706dcae755bde4b492c8aca295557746b9` (`fix(filter): retain height-qualified near obstacles`). Keine bestehende Numericgrenze/ROS-Nachricht geändert; physische Grenzen20.2/20.3 bleiben.
+
 ### V4-034 - Geometriegrenzen und echte Sensor-Filter-Follower-Kette regressionsprüfen
 
 **Datum:** 15. Oktober 2026. **AP:** AP05/AP06/AP07. **Status:** IN PROGRESS vor Testausführung. **Commit:** geplanter Subject `test(ros): verify local obstacle geometry end to end`.
 
 **Ausgang/Anforderung:**306 vorhandene Humblefälle und250 Sourcefreie Fälle bleiben vollständig erhalten. Zwei native Vorherfälle zeigen den Radiusverlust. **Umsetzung:** neue Datei test_obstacle_geometry.py mit geometrischen Grenzen, Sensorhöhen, Kreis/Rechteck, organisiertem/reordered/big-endian/padded Layout, exakter double-ROI, Radius-/Stopvarianten, altem YAML/Robotgeometrie, neuem Bool, Legacyoption und eigener nativer Sensor→Filter→Follower→Twist-Kette einschließlich TF/Recovery/M01; Runtimeexport um diese Datei erweitern. Bestehende Tests nicht gelöscht/ausgeschlossen. Kein produktives Topic/Hardware. **Nachweise:** Copybuild und vollständige Ausführung folgen; Ergebnisse erst danach ergänzen. Typ-/Profile-/Installationsverträge und G01–G40 abschließend zuordnen.
+
+**Abnahmenachtrag 15.10.: VERIFIED.**48neue Fälle plus alle306vorhandenen Tests; vollständige354/0error/0failure/0skip und Sourcefrei298/0/0/0. 301alte Pythonfallidentitäten perCounter erhalten, zusätzlich5bestehende CMakechecks. Neue4native Geometriefälle beobachten echte Ausgänge/Twists; bestehende M01/M02/Action/TF/QoS/Launchfälle ebenfalls erhalten. Flake8/PEP257/Copyright aktiv. CIexport enthält9Runtime-Testdateien. Befehle/Scope/Logs20.7; Commit-SHA nach Erzeugung ergänzen. Keine Coverage-/Hardware-/Remote-/Farmbehauptung.
+
+### V4-035 - Nutzungsverträge und AP05-Abnahme konsolidieren
+
+**Datum:** 15. Oktober 2026. **AP:** AP05/AP08, Nachweise AP06/AP07/AP09. **Status:** IN PROGRESS vor abschließender CI. **Commit:** geplanter Subject `docs(ros): finalize Humble interface compliance assessment`.
+
+**Ausgang/Ursache:** bisherige Anleitungen nennen die noch offene radiale Geometrielücke. **Umsetzung:** README, INSTALL, ARCHITECTURE, CONFIGURATION, KNOWN_ISSUES, Planner-README/Changelog um additive Nahpunkterhaltung, mathematische Frames/Bounds, Konfigurationsbeispiel, Legacyoption, Selbstreflexions-/Höhen-/Körpergrenzen und M02-/Externalproducerbeziehung aktualisieren. Keine neuen Berichtdateien, historische PDF und alte Protokolleinträge unverändert. Vollständige AP05-Befundzuordnung/G01–G40 und endgültige Testergebnisse folgen nach realem CI-Lauf; kein Vorgriff auf eine vollständige Sicherheit oder Remoteabnahme.
+
+### V4-036 - Lokale Bloom-/Debian-Paketierung und Herkunft der Installation verifizieren
+
+**Datum:** 15. Oktober 2026. **AP:** AP04/AP06/AP10, begleitend AP08. **Betroffene Repositorydatei:** nur dieses zentrale Protokoll; technische Probes/Artefakte ausschließlich temporär. **Commit:** geplanter Subject `test(release): verify local Humble Debian packaging`. **Status:** IN PROGRESS; lokale Build-/Install-/erste Importprobe bereits Exit0, Herkunfts-/frischer Runtime-Nachweis wird ergänzt.
+
+**Ausgang:** nachgewiesene Copy-/Sourcefreie CI354/298, drei konsistente0.0.1-Pakete; bisher kein realer Debian-Nachweis. **Problem/Ursache:** standalone bloom-generate kennt unveröffentlichte interne R3D-Peers nicht; /opt-Import allein beweist keine dpkg-Zugehörigkeit. **Anforderung/Ziel:** offizieller lokaler Peer-Generator, unsigned nicht publizierter Debianbuild, Runtime-/Datei-/Version-/Dependencyprüfung und eindeutige Artefaktzuordnung. **Umsetzung:** nur eigene temporäre Container und Paketkopien, keine neuen Repository-Keys/Tracks/Tags/Release-Repos. Prüfscripts auf tatsächliche Pfade/Inhalte geprüft. Zusätzlicher frischer Runtimecontainer soll ausschließlich die erzeugten .deb-Dateien, Probe und Ergebnisverzeichnis sehen. **Nachweise:** tatsächliche Kommandos, Hashes und Grenzen werden in20.9 ergänzt. Keine offizielle Farm-/Index-/Bloom-Release- oder Rechtsfreigabe. **Entscheidungen/Folgeschritte:** finale Version/Public-Ref/Rechte/Releaseorganisation weiterhin Nutzer-/Maintainerentscheidung; kein erneuter Implementierungsbeginn durch den Fortsetzungsauftrag.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -3921,3 +3937,34 @@ Echte ROS-Kette aus unverändertem Filter und Follower, synthetische gültige Po
 Normaler Copybuild aller3Pakete in `/work/geometry1`: `docker exec ... python3 -B /geometry/workspace.py geometry1`, Exit0. Nachher derselbe Probe mit ausschließlich geändertem Installprefix `/work/geometry1/install/setup.bash` und `python3 -B /geometry/probe.py after`, Exit0: beide Ausgangspunkte bleiben nun als XYZ erhalten, M02 BLOCKED, beobachteter Twist(0,0,0,0,0,0). Eingänge/TF/Radius/Stop/Pfad identisch zum Vorherfall, kein Hardware- oder Latenz-/Kollisionsnachweis. Filteroutput bleibt Sensorframe; die TF erst beim Follower ist entscheidend.
 
 Neue gezielte Tests nach Harnesskorrektur: `python3 -m pytest -p no:cacheprovider --basetemp=/work/geometry1/targeted3 --junitxml=/work/geometry1/targeted3.xml /r3d-source/r3d_planner/test/test_obstacle_geometry.py -q`, Exit0: **48 PASS /0FAIL/0SKIP**, 4.33s. Früher Versuch konnte /work/geometry-tests[.xml] als UID1000 nicht schreiben; korrigiert auf eigenes beschreibbares Workspaceverzeichnis. Danach47PASS/1FAIL wegen Race: Test wartete auf bereits initial false Hindernisflag statt auf Empfang des ersten Monitorzustands. Synchronisation explizit auf ACTIVE/BLOCKED korrigiert; keine Produktänderung/Abschwächung der Stopprüfung. Erster Lintdurchgang meldete ausschließlich neue Testformatierung/ungenutzten Import; gezielt korrigiert. Gesamte bisherige306erSuite und Sourcefreiheit folgen noch, hier nicht als bestanden behauptet.
+
+
+**Abgeschlossener Geometriecommit V4-033:** `100116706dcae755bde4b492c8aca295557746b9`; Parent `2f3e1ef690a81da67ebefd0ac7eb8e77852ee309`. Vier geprüfte Pfade: Filter, Loader, zentrale YAML und dieses Protokoll. Nach Commit ausschließlich neue Testdatei/CIexport noch uncommitted; Branch V4. Keine andere Referenz geändert.
+
+
+### 20.6 Fortsetzungsauftrag und vorhandene Artefaktprüfung
+
+Auftrag0efae524 ist eine Fortsetzung, kein neuer Geometrieentwurf. Tatsächlicher HEAD `100116706dcae755bde4b492c8aca295557746b9`; eigene noch uncommittete Test-/CI-/Dokumentationsänderungen vollständig erhalten. NeueIDs033–035 bereits vorhanden, nächstefreie036. Temporäre Verzeichnisse /tmp/r3d-v4-geometry, /tmp/r3d-ci.Zjs9yo6t, /tmp/r3d-ci.LSyTlifS und /tmp/r3d-v4-release tatsächlich vorhanden. Eigener Container r3d-v4-geometry-20261015, ID ef048e201476076e64b9f8af435bb3f93fb8913cf0a5634ca9d53dbd716b5fe8, Label codex.task=r3d-v4-geometry, läuft. Keine alten Ergebnisse verworfen oder unnötig wiederholt.
+
+`verify_artifacts.py` vor Verwendung gelesen: korrekte Paketpfade, Vergleich der tatsächlichen alten/neuen pytest.xml-Testidentitäten per Counter und der Projektdateien aus dem tatsächlichen CI-Installbaum. Ausgeführt mit /usr/bin/python3 -B, Exit0. Alle301 früheren Python-xUnitfälle vorhanden (davon funktionale Fälle und6Lints),48neue ergänzt; zusätzlich unveränderte5gezählte CMakechecks ergeben354. Sourcefreies runtime.xml298/0error/0failure/0skip,9exportierte Runtime-Testdateien bytegleich. Alle17produktiven Pythonmodule bytegleich zum geprüften Source, alle installierten Konfigurationsdateien, Lizenztexte und Changelogs gleich; keine PCD im Installbaum. Projekt-Byteidentität wird nicht auf generierte rosidl-Binaries, Python-Bytecode oder workspaceabhängige Colcon-Hooks ausgedehnt. Hookprefixe können zwischen /work/geometry1, /work/ci und /opt/ros/humble erwartbar verschieden sein; kein Algorithmusunterschied daraus abgeleitet.
+
+`deb_smoke.py` ebenfalls vor Ausführung gelesen. Erste echte Probe im Baucontainer Exit0: Imports/Share/License/Manifest/Changelog/Interface vorhanden, drei Hashes erfasst. Diese frühe Probe belegt /opt-Imports, aber noch nicht allein die dpkg-Dateizugehörigkeit oder Debian-Sourcefreiheit; diese Grenzen werden durch die zusätzliche gezielte Probe adressiert, keine künstliche Umdeutung der vorhandenen Resultate.
+
+
+### 20.7 Vollständige Humble-CI und Testidentitäten (T128–T130)
+
+Tatsächlich ausgeführt nach der letzten Programm-/Test-/Changelogänderung: `bash scripts/ci/run_humble.sh`, ProzessExit0. Builder: regulärer Copybuild aller3Pakete, `colcon test --packages-up-to r3d_planner --event-handlers console_cohesion+`, `colcon test-result --verbose`, jeweils0. Schlussausgaben:
+
+```text
+METADATA_XML_YAML_SYNTAX_DOC_STRUCTURE_PASS
+Summary: 354 tests, 0 errors, 0 failures, 0 skipped
+298 passed, 2 warnings in 24.21s
+CI_LOCAL_BUILD_AND_SOURCEFREE_PASS
+CI logs and artifacts: /tmp/r3d-ci.Zjs9yo6t
+```
+
+Die vorherigen306/250 werden **nicht ersetzt**: alle301vorherigen Python-xUnit-Testidentitäten per Counter weiterhin vorhanden,5bestehende CMakechecks unverändert,48zusätzliche eindeutige Geometriefälle. Neue Datei enthält44deterministische Callback-/ROI-/Konfigurationsfälle und4native tatsächliche ROS-Kettenfälle. Frühere15M01,63deterministische+18nativeM02,83Cloud,14Action,20Composition,43Konfiguration,2Parameterquery,27Install,10Output und6Pythonlint bleiben; Summe349Python+5CMake=354. Sourcefrei alte250+48=298,9exportierte Testdateien. Keine doppelten oder fehlenden alten Testidentitäten, keine Deselektion/Skips. Funktionaler Scope: geometrischePathorientierung/atomareFlags, Cloudformat/ImmutableInput, TF/Frische/QoS/Action/Cancel/Namespace, installierte Launches/Config/Output, M02Clock-/Stop-/Recovery und neue Nahgeometrie mit realer Null-/Nichtnull-Twist-Subscription. Keine vollständige Offlinealgorithmus-Coverage oder reale Navigation daraus ableiten.
+
+Umgebung: unverändert offizielles Image ros:humble-ros-base@sha256:860e53793ccf575e5369b5e9a19939de2bfcfb46a299954d06f54f2af54fed19, Jammy22.04.5/amd64/SystemPython3.10.12, TestsUID1000, FastDDS/localhost, Domains231/232. Echte rosdep install/check in beiden frischen Containern ohne Skip. Beobachtete Aptversionen NumPy1.21.5/SciPy1.8.0/Open3D0.14.1/NetworkX2.4/PyYAML5.4.1, keine neuen Versionspins. Bestehende NetworkXnp.int-/ament-Deprecations als Warnungen, keine Fehler. Laufzeit-Pytest24.21s ist Testdauer, kein Leistungs-/Bremszeitnachweis.
+
+Sourcefreier Container enthält readonly install am Originalprefix /work/ci/install, neun Testdateien, drei Manifestkopien, Helper und beschreibbare Ergebnisdateien; weder /r3d-source noch /work/ci/src oder Buildtree gemountet. Manifest-/Konfig-/17Pythonmodul-/Lizenz-/Changelog-/Testbytevergleich Exit0, keine PCD. Der neue bool und die nativeFilter/Followerkette werden auch dort geprüft. Generierte Colconhooks und rosidl/Bytecode werden nicht als sourcebyteidentisch ausgegeben. Quelle und getesteter Installbaum sind über konkrete CI-Artefakte und SHAvergleich zugeordnet; bis Abschluss nur Dokumentationsänderungen zulässig, sonst erneuter Lauf. Workflow und Runner bleiben Humble-only; nur der Runtimeexport wurde fachlich erweitert. **AP07 LOCALLY VERIFIED / NOT REMOTELY VERIFIED.** Der lokale Lauf hat keine GitHubcheckoutaktion oder offizielle Farm ausgeführt.
