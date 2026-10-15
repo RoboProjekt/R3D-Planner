@@ -1436,6 +1436,8 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Abschlussnachtrag:** VERIFIED im dokumentierten Nutzungs-/Abnahmeumfang. Alle betroffenen Anleitungen/Changelogs/RST/Struktur geprüft, G01–G40/I01–I10/AP05 vollständig20.8; Codegleichheit zu CI/Debian belegt. Nur Dokumentation seit vollständigem Lauf. Release-/Debian-Testphasenbegrenzung ausdrücklich20.12 und in Nutzeranleitungen. Ergebnisdokumentation wird wegen zusammenhängender Abnahme gemeinsam mit V4-036/037 unter `docs(release): finalize Humble geometry and packaging assessment` committed; vollständige SHA nach Erzeugung. Kein neuer öffentlicher Vertrag oder Hardwareversprechen.
 
+**Tatsächlich abgeschlossener gemeinsamer Dokumentationscommit:** `34d00a6dfec165acc940a332d253739cbd833219`, Subject `docs(release): finalize Humble geometry and packaging assessment`. Alle geplanten separaten Dokumentationssubjects oben sind dadurch als Planung erkennbar ersetzt; kein fehlender oder erfundener Implementierungscommit.
+
 ### V4-036 - Lokale Bloom-/Debian-Paketierung und Herkunft der Installation verifizieren
 
 **Datum:** 15. Oktober 2026. **AP:** AP04/AP06/AP10, begleitend AP08. **Betroffene Repositorydatei:** nur dieses zentrale Protokoll; technische Probes/Artefakte ausschließlich temporär. **Commit:** geplanter Subject `test(release): verify local Humble Debian packaging`. **Status:** IN PROGRESS; lokale Build-/Install-/erste Importprobe bereits Exit0, Herkunfts-/frischer Runtime-Nachweis wird ergänzt.
@@ -1444,6 +1446,8 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Abschlussnachtrag:** VERIFIED für tatsächliche lokale Peerpaketierung, drei .deb-Builds/Installationen sowie unabhängige sourcefreie dpkg-/Runtime-/ROS-Geometrieprobe (20.9). Direkte Debian-Buildzeit-Tests ausdrücklich nicht vollständig bestanden: Interface5/8PASS, Planner244PASS/19FAIL/73ERROR, Preprocessor13PASS; R28/20.12 bleibt BLOCKED. Kein Ergebnis wird aus dem tolerierten dpkg-Buildexit0 erschlichen. Hashes/Befehle/fehlerhafte Harnessversuche/Grenzen dokumentiert. Gemeinsamer Dokumentationscommit mitV4-035/037; SHA nach Erzeugung. Keine Runtime-/Manifest-/Release-Infrastrukturänderung nötig.
 
+**Tatsächlich abgeschlossener gemeinsamer Dokumentationscommit:** `34d00a6dfec165acc940a332d253739cbd833219`, Subject `docs(release): finalize Humble geometry and packaging assessment`. Alle geplanten separaten Dokumentationssubjects oben sind dadurch als Planung erkennbar ersetzt; kein fehlender oder erfundener Implementierungscommit.
+
 ### V4-037 - Humble-Release-Gates und wissenschaftlichen Abschlussvergleich konsolidieren
 
 **Datum:** 15. Oktober 2026. **AP:** AP08/AP10, Gesamteinordnung AP01–AP09. **Betroffene Datei:** ausschließlich zentrales Protokoll; Nutzeranleitungen gehörenV4-035. **Commit:** geplanter Subject `docs(release): consolidate Humble release readiness`. **Status:** IN PROGRESS vor abschließender Schutz-/Dokumentationsprüfung.
@@ -1451,6 +1455,8 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 **Ausgang:** reale CI354/298,48neue Fälle und lokaler Debian-/Sourcefrei-Herkunftsnachweis liegen vor. **Problem/Ursache:** alte Gesamtbewertung hat lokale Debianstufen noch nicht getrennt; Rechte, öffentliche Source, Releaseorganisation und externe Review bleiben eigenständige offene Gates. **Ziel/Umsetzung:** R01–R28 konkrete Bedingung/Nachweis/fehlendeVoraussetzung/Verantwortung/nächsterSchritt, 20Aspekte gegen feste historischeBaseline, tatsächliche APstatus und Abschlussprüfungen. **Begründung:** lokale technische Erfolge nicht mit legaler/public/farm Freigabe gleichsetzen; vorhandene Algorithmen als Vorleistung erhalten. **Verifikation:** tatsächliche neue Manifeste34Keys/Metadata-/Dokustrukturprüfung, Hash-/Ref-/Git-/Artefaktvergleich; abschließende Ergebnisse unten. **Grenzen/Entscheidungen:** Humble-only, kein neuer QualityLevel, öffentliche Version/Ref/Support/Rechte/Release nur nach separater Entscheidung; kein Push/Hardware. SHA nach tatsächlichem Commit ergänzen.
 
 **Abschlussnachtrag:** VERIFIED für die vollständige Readiness-Dokumentation und geschützte lokale Fortsetzung; öffentliche Releasefähigkeit weiterhin BLOCKED/NOT READY. R01–R28, 20-Aspekte-Baselinevergleich, APstatuses und konkrete offene Rechte-/Publikations-/Versions-/Organisation-/Debiantestphasen sind belegt, keine Vollfreigabe. Statische Syntax/XML/YAML/Dokustruktur, drei RST-Changelogs, Shellsyntax, neue Tabellen/IDs und Artefakt-/Hash-/Refschutz bestanden. Keine Produktänderung nach grüner CI; daher keine unnötige Wiederholung. Gemeinsamer Subject `docs(release): finalize Humble geometry and packaging assessment`, tatsächliche SHA folgt im reinen Metadatennachtrag. Hardware, Push, andereBranches undR3D_null ausgeschlossen.
+
+**Tatsächlich abgeschlossener gemeinsamer Dokumentationscommit:** `34d00a6dfec165acc940a332d253739cbd833219`, Subject `docs(release): finalize Humble geometry and packaging assessment`. Alle geplanten separaten Dokumentationssubjects oben sind dadurch als Planung erkennbar ersetzt; kein fehlender oder erfundener Implementierungscommit.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -4152,8 +4158,8 @@ Primärquellen neu gelesen: [ROS-Humble Sourceindex](https://raw.githubuserconte
 | R24 | Publikationsfreigabe | ausdrücklichausgesetzt | Nutzerauftrag:keinPush/Release | konkreteFreigabe fürkonkretenUmfang | Nutzer | aufgesondertenAuftragwarten | REQUIRES DECISION |
 | R25 | LokaleBloom-/Debianerzeugung |3echteDebs,unsignedlokal | offiziellerPeerresolver+dpkgBuild0 | keineBehauptungoffiziellerEinzelreleasefähigkeit | Entwickler | Testsatz/Hashesbehalten | VERIFIED |
 | R26 | DebianInstallation/Runtimeherkunft |3installiertePakete,Depends/Versions/Dateieigentümerpass | frischerRuntimecontainer/Dpkg/ROSProbe0 | keinevollständigeallgemeineDebianPolicy-/Rechts-/Farmfreigabe | Entwickler | Artefaktumfangseparatfreigeben | VERIFIED |
-| R28 | Debian-Buildzeit-Testintegration | Paketbau0 toleriert fehlgeschlagene Tests |20.12: Interface3/8fehl, Planner19FAIL/73ERROR; CI separatgrün | staged-/Preinstall-Testtrennung und zuverlässigeFehlerauswertung | Entwickler | als begrenzteFolgearbeit Testphasenportabilität klären,keine unterdrückten Fehler als PASS | BLOCKED |
 | R27 | ÖffentlicheDebianlieferung | nichtbereitgestellt | lokalePaketeausschließlich/tmp | veröffentlichterakzeptierterRelease/Binaries | Maintainer/ROSReleaseprozess | nachallenpassendenGates | NOT VERIFIED |
+| R28 | Debian-Buildzeit-Testintegration | Paketbau0 toleriert fehlgeschlagene Tests |20.12: Interface3/8fehl, Planner19FAIL/73ERROR; CI separatgrün | staged-/Preinstall-Testtrennung und zuverlässigeFehlerauswertung | Entwickler | als begrenzteFolgearbeit Testphasenportabilität klären,keine unterdrückten Fehler als PASS | BLOCKED |
 
 **Aktuell ROSIndex: NOT READY. Offizieller Bloom/Buildfarm/PublicDebianrelease: NOT READY. Lokale technische Humblepaketierung: VERIFIED.** Konkrete verbleibende Blocker sind rechtliche Befugnisse/Distributionsabgrenzung, autorisierter öffentlicher V4-Ref, finale Version/Changelog/Releaseorganisation und notwendige externe Review/Jobs. Zusätzlich bleibt die direkt beobachtete Debian-Buildzeit-Testintegration R28 offen; ein Exit0-Paketbau ist wegen Blooms toleranter Testregel dafür kein PASS. RemoteCI ist offen als Projektqualitätsnachweis, nicht pauschal eine universelle Sourceindexpflicht. Keine MultiDistribution-/Coverage-/optionalTemplatepflicht hinzuerfunden.
 
@@ -4286,3 +4292,27 @@ HistorischesPDF unverändert SHA256 `8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa0
 **Nächste sinnvolle Reihenfolge:** zunächst R28-Testphasenportabilität für eine stärkere Debian-Testabnahme abgrenzen und tatsächliche Fehlerauswertung sicherstellen; parallel unabhängige Rechte/Distributionsnotices und historischeGitdatenbefugnis klären. Danach finalen Release-/Supportumfang, Version/Datum/Ref und Releaseverantwortung entscheiden. Erst nach ausdrücklicher Freigabe den konkreten V4-Source öffentlich bereitstellen, RemoteCI tatsächlich ausführen und Source-/Release-Review/Bloom/Farm separat angehen. Dieser Auftrag löst nichts davon automatisch aus. Keine weitereDistribution oder neueNavigation vorziehen.
 
 Alle maßgeblichen Resultate/Exitcodes/Befehle/Hashes sind hier gesichert. Nur eigene beiden Geometrie-Testcontainer dürfen nach gesicherter Artefaktevidenz entfernt werden; keine Images/Hostpakete/Conda/anderenTmpverzeichnisse anfassen. LokaleLog-/XML-/Debian-Dateien bleiben zurNachprüfung unter /tmp/r3d-v4-geometry bzw. /tmp/r3d-ci.Zjs9yo6t erhalten. Ein letzter reiner Dokumentationsnachtrag verknüpft tatsächliche Commit-SHAs ohne Amend oder neue Implementierung. **Kein Push, keine Veröffentlichung, keine Tags, keine Änderung andererBranches, keine Historienumschreibung, keine realeRoboterbewegung, keine Bearbeitung von R3D_null oder externenRepositories.**
+
+
+### 20.15 Tatsächliche Commitreferenzen und abschließender Metadatennachtrag
+
+| V4-ID / Zweck | Vollständige Commit-SHA | Subject | Tatsächlicher Dateiumfang / Nachweis |
+|---|---|---|---|
+| V4-033 | `100116706dcae755bde4b492c8aca295557746b9` | fix(filter): retain height-qualified near obstacles | docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md, r3d_planner/r3d_planner/r3d_local_filter.py, r3d_planner/r3d_planner/configuration.py, r3d_planner/config/planner_config.yaml; zugehörige tatsächliche Prüfungen20.4–20.14 |
+| V4-034 | `9d1ea22846b5bca8e0767b67b81e731c73c6bd69` | test(ros): verify local obstacle geometry end to end | r3d_planner/test/test_obstacle_geometry.py, scripts/ci/inside.sh, docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md; zugehörige tatsächliche Prüfungen20.4–20.14 |
+| V4-035/036/037 | `34d00a6dfec165acc940a332d253739cbd833219` | docs(release): finalize Humble geometry and packaging assessment | CONTRIBUTING.md, INSTALL.md, MAINTENANCE.md, README.md, docs/ARCHITECTURE.md, docs/CONFIGURATION.md, docs/KNOWN_ISSUES.md, docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md, r3d_planner/CHANGELOG.rst, r3d_planner/README.txt, r3d_preprocessor/README.txt; zugehörige tatsächliche Prüfungen20.4–20.14 |
+
+Der CI-Lauf begann mit HEAD100116706dcae755bde4b492c8aca295557746b9 plus den eigenen noch uncommitteten Test-/CI-/Changelog-/Dokumentationsänderungen. Diese wurden anschließend mit9d1ea22846b5bca8e0767b67b81e731c73c6bd69 und34d00a6dfec165acc940a332d253739cbd833219 gesichert. **Abschließend bestätigt:** alle17Produktionsmodule,9Runtime-Testdateien, alle installierten Configs/Launches/3Manifeste/3Changelogs/Lizenztexte und die PathWithMetadata.msg sind bytegleich zu den real geprüften CI-Artefakten. Der später reine Dokumentationseintrag verändert keinen dieser geprüften Inhalte. Ergebnisse werden keinem vor der Änderung fälschlich sauberen Commit zugeschrieben.
+
+Nach34d00a6 war der Gitbaum sauber. Erneute Quellen-/Artefakt-/Ref-/Hash-/Eventschutzprüfung und git diff --check bestanden. Beide ausschließlich eigenen Geometriecontainer wurden nach Prüfung von exakterID undLabel codex.task=r3d-v4-geometry entfernt; Debianruntime hatte Exit0. Rohlogs, XMLs, generierteDebianmetadaten/CTestdateien und3gehashte.debs bleiben in den genannten eigenen /tmp-Pfaden; keine Images/fremdenContainer/Hostpakete entfernt. Cleanupnachweis lokal /tmp/r3d-v4-geometry/cleanup.json. Vollständige technische/regulatorische Grenzen20.9–20.12 und R28 bleiben unverändert.
+
+Dieser **reine SHA-/Schutzprüfungsnachtrag** ergänzt die nach Erzeugung bekannten Commitidentitäten zu bereits abgeschlossenen IDs033–037. Er ist keine neue Implementierung und erhält deshalb keine erfundene weitere V4-Änderungs-ID. Er wird als separater normaler Commit `docs(v4): record verified geometry and packaging commits` gesichert, ohne Amend/Rebase. Der abschließende Dokumentations-HEAD ist exakt der Commit, der diesen eindeutigen Subject enthält; maschinell vollständig auflösbar:
+
+```bash
+git log -1 --format='%H %s' --fixed-strings --grep='docs(v4): record verified geometry and packaging commits' V4
+git branch --show-current
+git status --short
+git diff --check
+```
+
+Seine eigene SHA kann nicht in seinen eigenen Inhalt eingefügt werden, ohne den Hash wieder zu ändern. Alle fachlichen V4-IDs besitzen hier bereits tatsächliche vollständige SHAs; der reine Abschluss-HEAD wird zusätzlich im abschließenden Nutzerbericht vollständig genannt. Kein endloser selbstreferenzieller Commit-/Amendzyklus.
