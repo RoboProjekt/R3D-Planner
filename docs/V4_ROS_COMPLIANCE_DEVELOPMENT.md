@@ -291,7 +291,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für Humble; P2 für weitere freigegebene Ziele |
 | Abhängigkeiten | AP03-AP06; CI kann später geeignete Matrixnachweise liefern |
 | Abschlusskriterien | Zielbezogene Dependency-/Build-/Test-/Installnachweise mit OS/Python/ROS-Versionen; weitere Distributionen erst nach Ausführung als unterstützt bezeichnen |
-| Aktueller Status | PARTIAL – Humble vollständig im geprüften Umfang; Jazzy/Noble Open3D BLOCKED; Lyrical reguläre Dependencies/Build und218Pythonfälle PASS,2LintFAIL, Colcon-Integration FAILED; Kilted/Rolling nur Quellen/Regeln |
+| Aktueller Status | VERIFIED für den bisherigen Humble/Jammy/Python3.10-Umfang; neue M02-Abnahme folgt. Verbindlich einziges Releaseziel. Neuere Distributionen ausdrücklich verschoben, kein Humble-Releaseblocker (V4-030) |
 
 ### 4.11 AP10 - ROS Index und Releasevorbereitung
 
@@ -1307,6 +1307,54 @@ Erneuter exakter CI-Befehl Exit0 nach allen Code-/Installänderungen: regulärer
 #### Auswirkungen
 
 Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-029 - M02 – Konfigurationsvertrag, gemeinsame Dekodierung und validierte Eingangslage
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/M02, AP06/AP08 begleitend. **Betroffene Dateien:** configuration.py/centralYAML, cloud.py, neues obstacle_monitor.py und Unit-/Konfigurationstests, Protokoll. **Status:** VERIFIED für Konfigurations-/Validierungshelfer bzw. dokumentierte Zielentscheidung; Follower-Stopintegration folgt. **Git-Commit:** `feat(follower): define monitored obstacle input contract` (Nachfolger04d080b).
+
+#### Ausgangszustand und Problem
+
+Eingang04d080b15f9d744086085ccac88d2850d8d555c5, V4 sauber,85 versionierte Dateien. M01 vorhanden;225/169 bisherige Tests sind historische Ausgangsnachweise. Hindernisse bisher ohne Frische-/Frameüberwachung; interner Filter unabhängig optional. Keine neue Lizenz-/Versions-/Releaseentscheidung.
+
+#### Ziel und autorisierte Entscheidung
+
+Die neue Nutzer-Auftragsdatei gibt M02 ausdrücklich frei. Vorherige Rückstellungen bleiben historisch; sie sind für den konkret beschriebenen Monitoringumfang aufgehoben. Kein Push, keine Hardware, keine anderen Branches oder externen Projekte. M01-Schema und alle bisherigen Funktionen bleiben erhalten.
+
+#### Technische Umsetzung und Begründung
+
+Optionales path_follower.obstacle_monitoring mit enabled=false, timeout_sec=1.0, require_transform=true und topic=/local/filtered_obstacles. Fehlende Gruppe bleibt rückwärtskompatibel; vorhandene Gruppe verlangt enabled/timeout_sec/require_transform, topic ist optional; keine unbekannten Schlüssel. ROS-Parameter punktgetrennt und beim Start read-only, keine still ignorierten Laufzeitänderungen. Numerische positive endliche Timeoutvalidierung; Genauigkeit mindestens1ns. Gemeinsam genutzten Decoder für gültige leere Metadaten prüfen; strenger Monitor verwirft jede nichtfinite Geometrie, Legacydecoder behält finiteSelektion. Kein zweiter Byteparser. Kleine Monitor-Klasse mit expliziten Zuständen, Messalter/Steady-Empfangsfrische, exakter Timeoutgrenze einschließlichGleichheit, Rückwärts-/großen Vorwärtssprüngen und invalidiertem Cache; korrekte TF am Messstempel oder AblehnungfremderFrames bei require_transform=false. Bestehende TFbufferinfrastruktur wiederverwenden, nichtblockierender Lookup statt Warten im SingleThread-Callback. Native Integration folgt separat V4-030.
+
+#### Verifikation und Ergebnis
+
+Neuer normaler Drei-Paket-Copybuild /work/core4, UID1000/Humble/Python3.10, Domain91/localhost/FastDDS: build/test/test-result jeExit0, **287PASS/0FAIL/0ERROR/0SKIP**.62 neue deterministische Unit-/Konfigurationsfälle zusätzlich zu225Bestandsfällen. rcl_interfaces jetztdirekteRuntimeabhängigkeitfürreadonlyParameterDescriptor; keineScienceVersionsänderung. Kernprüfungen umfassenReplay, beideZeitgrenzen, Clockreset, TF-Richtung/-Zeit/-Geometrie, Empty/Nonfinite/Layout, alteYAMLohneGruppe undR3D_CONFIG_DIR. Erster Bootstrapaufruf endete nach erfolgreichemrosdep mitfehlenderHarnessvariableR3D_TEST_UID; keinBuildPASS daraus. core1 scheiterte amROS-Start in untauglicherDomain241, nativeProbe/weitereLäufe mitgültigenDomains bestanden; core2/core3 jeweils286PASS/1Flake8FAIL durchvier neueTesteinrückungen, korrigiert undgezielt gelintet. core4 istvollständigPASS. KeinProduktfehler/Skip versteckt. Follower-Gating/nativerTwist/Wiederanlauf/SourcefreieAbnahme werdenerstimnächstenSchritt beansprucht.
+
+#### Auswirkungen und Grenzen
+
+Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default deaktiviert erhält bisherigen Followervertrag einschließlich Hindernisreaktion. Kein Hardware-Notstopp oder Sicherheitsnachweis; bekannte Sensor-/Cliff-/Radiusgrenzen bleiben. Historische Events001..028/PDF/übrigeRefs/Lizenztexte erhalten.
+
+### V4-030 - Verbindliches Ziel – ausschließlich Humble/Jammy/Python3.10
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/M02, AP06/AP08 begleitend. **Betroffene Dateien:** nur zentrales Entwicklungsprotokoll; spätere aktuelle Nutzungs-/Wartungshinweise. **Status:** VERIFIED für Konfigurations-/Validierungshelfer bzw. dokumentierte Zielentscheidung; Follower-Stopintegration folgt. **Git-Commit:** `feat(follower): define monitored obstacle input contract` (Nachfolger04d080b).
+
+#### Ausgangszustand und Problem
+
+Eingang04d080b15f9d744086085ccac88d2850d8d555c5, V4 sauber,85 versionierte Dateien. M01 vorhanden;225/169 bisherige Tests sind historische Ausgangsnachweise. Hindernisse bisher ohne Frische-/Frameüberwachung; interner Filter unabhängig optional. Keine neue Lizenz-/Versions-/Releaseentscheidung.
+
+#### Ziel und autorisierte Entscheidung
+
+Die neue Nutzer-Auftragsdatei gibt M02 ausdrücklich frei. Vorherige Rückstellungen bleiben historisch; sie sind für den konkret beschriebenen Monitoringumfang aufgehoben. Kein Push, keine Hardware, keine anderen Branches oder externen Projekte. M01-Schema und alle bisherigen Funktionen bleiben erhalten.
+
+#### Technische Umsetzung und Begründung
+
+Neue ausdrückliche Nutzerentscheidung: Entwicklung undReleasevorbereitung ausschließlichROS2Humble/Ubuntu22.04Jammy/Python3.10 mitbewährtenSystemabhängigkeiten. KeineJazzy-/Lyrical-/Rollingkorrektur,keineDependencyMigration. HistorischeInkompatibilitäten bleibenbelegt. AP09 wirdbezogenaufHumbleabgenommen; fehlendeMultiDistroUnterstützung istkeinHumbleReleaseblocker. AP07HumbleWorkflowbeibehalten,RemoteCI weiterhinNOTREMOTELYVERIFIED ohnePush; AP08Zielangabenabgleichen; AP10Index/Bloom/Farm/RechtsgatesnurfürgewähltesHumblezielbewerten. M02/HumbleGesamtregression/Sourcefreiheit/lokaleCI priorisieren.
+
+#### Verifikation und Ergebnis
+
+Neuer normaler Drei-Paket-Copybuild /work/core4, UID1000/Humble/Python3.10, Domain91/localhost/FastDDS: build/test/test-result jeExit0, **287PASS/0FAIL/0ERROR/0SKIP**.62 neue deterministische Unit-/Konfigurationsfälle zusätzlich zu225Bestandsfällen. rcl_interfaces jetztdirekteRuntimeabhängigkeitfürreadonlyParameterDescriptor; keineScienceVersionsänderung. Kernprüfungen umfassenReplay, beideZeitgrenzen, Clockreset, TF-Richtung/-Zeit/-Geometrie, Empty/Nonfinite/Layout, alteYAMLohneGruppe undR3D_CONFIG_DIR. Erster Bootstrapaufruf endete nach erfolgreichemrosdep mitfehlenderHarnessvariableR3D_TEST_UID; keinBuildPASS daraus. core1 scheiterte amROS-Start in untauglicherDomain241, nativeProbe/weitereLäufe mitgültigenDomains bestanden; core2/core3 jeweils286PASS/1Flake8FAIL durchvier neueTesteinrückungen, korrigiert undgezielt gelintet. core4 istvollständigPASS. KeinProduktfehler/Skip versteckt. Follower-Gating/nativerTwist/Wiederanlauf/SourcefreieAbnahme werdenerstimnächstenSchritt beansprucht.
+
+#### Auswirkungen und Grenzen
+
+Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default deaktiviert erhält bisherigen Followervertrag einschließlich Hindernisreaktion. Kein Hardware-Notstopp oder Sicherheitsnachweis; bekannte Sensor-/Cliff-/Radiusgrenzen bleiben. Historische Events001..028/PDF/übrigeRefs/Lizenztexte erhalten.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -3525,3 +3573,34 @@ Die beauftragte M01-Implementierung und der M02-Analyseauftrag sind erfüllt. De
 | AP10 | Aktuelle Checkliste/Analyse VERIFIED | IN PROGRESS; Index/Bloom/Farm NOT READY, keine Veröffentlichung |
 
 Die nächste technische Entscheidung ist eine gesonderte M02-Freigabe auf Basis18.2 oder eine ausdrücklich andere Priorität. Rechtsklärung, Publikationsumfang und Ziel-/Releaseentscheidungen können davon getrennt vorbereitet werden. Ohne diese Entscheidungen werden weder Hindernisüberwachung noch neue Dependenciestrategie, Push, Release oder Hardwaretest automatisch ausgeführt.
+
+
+## 19. M02 – freigegebene Implementierung ab15. Oktober 2026
+
+### 19.1 Verifizierter Eingang und bestehende Architektur
+
+Nutzerauftrag1cfa68bb gibt M02 ausdrücklich frei. EingangV4/04d080b ist sauber, Baseline und alle bisherigen Commits sind Vorfahren; Remotes/Worktrees unverändert. Keine AGENTS.md im relevanten gefundenen Umfang. Die komplette bisherige Entwicklung einschließlich17.4/18.2, M01-Vertrag, TF/QoS und früheren Tests ist Ausgangspunkt; alte Ereignisse und Lizenzanalyse bleiben unverändert. Neue IDs beginnen beiV4-029.
+
+Follower empfängt PointCloud2 auf /local/filtered_obstacles, bisher reliable/volatile/depth10. Filterausgaben behalten Sensorheader, Follower wertet XYZ bisher unmittelbar anhand x_min<x<stop_distance und |y|<half_width aus, ohne TF/Messalter. obstacle_in_front startetfalse; leere gültige Wolke setztfalse. Kontrollperiode0.1s, Null-Twist bei fehlendem Pfad, Hindernis, fehlender/frischer globaler Pose oder Zielerreichung. M01-Pfade/Flags werden gemeinsam ersetzt; ungültige Metadaten löschen beide. Planner startet optional Filter/RViz, niemals den Follower; follower.launch.py startet ihn separat mit zentraler YAML/Robotprofil und R3D_CONFIG_DIR-Unterstützung. Externe geeignete Clouds waren bereits prinzipiell möglich; Best-Effort war amFollower bisher nicht kompatibel, obwohl Filtereingang schonSensorDataQoS nutzte.
+
+### 19.2 Entscheidung vor Implementierung
+
+Die Freigabe ergänzt den vorgeschlagenen Monitor, ohne den optionalen Filter zu erzwingen. Gruppe obstacle_monitoring (statt des noch nie implementierten Vorschlagsnamens obstacle_monitor) enthält enabled=false, timeout_sec=1.0, require_transform=true, topic=/local/filtered_obstacles. Kein bisher unterstützter YAML-Schlüssel wird umbenannt. Fehlende Gruppe verwendet Defaults; gelieferte Gruppe wird strikt validiert. require_transform=false bedeutet nurBaseframe akzeptieren, niemals fremde Koordinaten alsBase interpretieren. TFlookup zumMessstempel ohneWarten verhindert dasBlockieren desSingleThread-Executors; fehlendeTF stoppt, nächster neuer gültiger Eingang kann erholen. Die bisher nurvorgeschlagene TFwartezeit wird nicht alsunnötiger neuerParameter eingeführt. Futurestempel werdenohneToleranz abgewiesen.
+
+Aktivierter Monitor verwendet zusätzlich zurROS-Messzeit eine monotoneEmpfangszeit und einenSteady-Controltimer, damit Pause/VerlangsamungvonSimzeit dieEmpfangsgrenze nichtaufhebt. Ein identischer erneut gesendeteralterMessstempel wirdnicht durchEmpfangszeit verjüngt. Zeitbasiswechsel und Rücksprünge invalidierenCaches; großeVorwärtssprünge relativzurSteadyzeit ebenfalls. Grenzen exakt:Alter<=Timeout istgültig, >Timeout stoppt. Überwachung deaktiviert erhält vorhandeneHindernis-/Pose-/Pfad-/Zielbedingungen unddenbisherigenROStimer.
+
+BeimMonitor direkteungültigeClouds sofort verwerfen undNullbefehle auslösen; echteleereWolke mitgültigenXYZ/Layout/Header/TF kannfreigeben. BestehenderDecoder wirdweiterverwendet, Inputbytes bleibengleich. Nonfinite-onlyOriginalcloud darf derinterneFilter nichtalsfrischenleerenClearbefund weiterreichen; gezielteKorrektur vorAusgabeberechnung vorsehen, ohneFiltergeometrie/Schwellen neuabzustimmen. SensorblindeZone0.65m versusFollowerstop0.6m undCliff/Stair-Verbraucher bleibenexpliziteEinsatzgrenzen.
+
+
+### 19.3 Verbindliche Zielentscheidung während M02
+
+Der Nutzer beschränkt Entwicklung und Veröffentlichungsvorbereitung ausdrücklich auf **ROS2 Humble / Ubuntu22.04 Jammy / Python3.10**. Bereits geprüfte Systemabhängigkeiten bleiben der Zielvertrag. Jazzy, Lyrical und Rolling werden auf spätere Phasen verschoben; bekannte Befunde18.8 bleiben historische Recherche, keine aktuell zu schließenden Gates. Ein fehlender Multi-Distribution-Nachweis blockiert den angestrebten Humble-Release nicht.
+
+AP07 bleibt eine Humble-Pipeline; lokale neue M02-Abnahme folgt, Remote-CI ohnePush weiterhinNOTREMOTELYVERIFIED. AP08 nennt nurHumble alsaktuellesZiel. AP09 ist fürdieseneingeschränktenUmfang zuverifizieren; keinePortierungsarbeiten/Dependency-Migration. AP10 bewertet Sourceindex/Bloom/Buildfarm aufHumble; Rechte, öffentlicherSourceRef, autorisierteReleaseversion undexterneAbnahme bleibeneigenständigeGates. M02/HumbleRegression/lokaleCI werdenfortgesetzt; keinandererBranch/Push/Release.
+
+
+### 19.4 Kernabnahme V4-029 und Zielentscheidung V4-030
+
+Neue62 Unit-/Konfigurationsfälle plus225Bestandsfälle bestehen imfrischen /work/core4:287PASS/0FAIL/0SKIP, build/test/test-result0. Der reine Validierungshelfer und die imROSbaum deklarierten readonlyParameter sindabgenommen; dieaktiveFollower-Stopintegration folgtV4-031. NochkeinSourcefreierM02-/Twist-/Gesamtimplementierungsnachweis. Zeitsprünge/Replay/TFwerdenmitkontrolliertenZeiten getestet; alteYAMLohneGruppe bleibtgültig. KeinJazzy/Lyrical/Rolling-Container oderPortierungsversuchdiesesAuftrags.
+
+OffizielleHumblequellen: [Clock/JumpThreshold](https://raw.githubusercontent.com/ros2/rclpy/humble/rclpy/rclpy/clock.py), [NodeTimer/Parameter](https://raw.githubusercontent.com/ros2/rclpy/humble/rclpy/rclpy/node.py), [TFbufferlookup](https://raw.githubusercontent.com/ros2/geometry2/humble/tf2_ros_py/tf2_ros/buffer.py); Signaturen zusätzlich tatsächlich installiert geprüft. LookupTime0 würde latest bedeuten, deshalb werdenNull-Messstempelabgewiesen undMesszeitübergeben. Timer mitSteadyClock undJumpCallback sindinHumblevorhanden. JumpCallback bleibtkurz/nichtblockierend. [DDS-Domainbereiche](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/Concepts/Intermediate/About-Domain-ID.rst) erklären deninitialenHarnessfehler241 außerhalb0..232; finaleKern-Domain91 liegtimsicherenBereich. KeineNetz-/Middleware-Hostkonfiguration geändert.

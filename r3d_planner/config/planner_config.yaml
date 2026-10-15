@@ -79,3 +79,9 @@ path_follower:
   steering_gain: 1.5
   narrow_speed_factor: 0.4
   turning_speed_factor: 0.3
+  # Startup-only: independent of components.live_filter.enabled.
+  obstacle_monitoring:
+    enabled: false
+    timeout_sec: 1.0
+    require_transform: true
+    topic: /local/filtered_obstacles

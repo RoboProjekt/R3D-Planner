@@ -25,10 +25,12 @@
 
 import rclpy
 from rclpy.node import Node
+from rcl_interfaces.msg import ParameterDescriptor
 from geometry_msgs.msg import Twist
 from r3d_interfaces.msg import PathWithMetadata
 from sensor_msgs.msg import PointCloud2
 from .cloud import read_xyz
+from .configuration import MONITOR_DEFAULTS, monitoring_settings
 import math
 from .odometry import OdometryInput
 from .path_metadata import metadata_qos, validate_metadata
@@ -50,6 +52,12 @@ class PathFollower(Node):
             self.declare_parameter(key, value)
             setattr(self, key, self.get_parameter(key).value)
         self.odometry = OdometryInput(self)
+        monitoring = {}
+        for key, value in MONITOR_DEFAULTS.items():
+            name = 'obstacle_monitoring.' + key
+            self.declare_parameter(name, value, ParameterDescriptor(read_only=True))
+            monitoring[key] = self.get_parameter(name).value
+        self.monitoring_settings = monitoring_settings(monitoring)
 
         # --- VARIABLEN ---
         self.current_path = []

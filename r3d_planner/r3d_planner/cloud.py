@@ -20,19 +20,19 @@ from sensor_msgs.msg import PointCloud2, PointField
 from sensor_msgs_py.point_cloud2 import dtype_from_fields
 
 
-def read_xyz(cloud):
+def read_xyz(cloud, *, strict=False):
     """
     Return finite XYZ rows, honoring offsets, endian order and row padding.
 
     Input storage is never mutated. The record view avoids copying extra sensor
-    channels; only XYZ and the finite-row selection are materialized.
+    channels; only XYZ and the finite-row selection are materialized. Strict
+    monitoring rejects any nonfinite row instead of filtering it out.
     """
     if not isinstance(cloud, PointCloud2):
         raise ValueError('expected PointCloud2')
-    if cloud.width == 0 or cloud.height == 0:
-        if len(cloud.data):
-            raise ValueError('empty cloud has nonempty data')
-        return np.empty((0, 3), dtype=np.float32)
+    empty = cloud.width == 0 or cloud.height == 0
+    if empty and (len(cloud.data) or (cloud.height == 0 and cloud.width != 0)):
+        raise ValueError('inconsistent empty cloud')
     if cloud.point_step == 0 or cloud.row_step < cloud.width * cloud.point_step:
         raise ValueError('invalid point_step or row_step')
     if len(cloud.data) < cloud.height * cloud.row_step:
@@ -51,6 +51,8 @@ def read_xyz(cloud):
     for field in cloud.fields:
         if dtype_from_fields([field]).itemsize > cloud.point_step:
             raise ValueError('PointField exceeds point_step')
+    if empty:
+        return np.empty((0, 3), dtype=np.float32)
     dtype = dtype.newbyteorder('>' if cloud.is_bigendian else '<')
     records = np.ndarray((cloud.height, cloud.width), dtype=dtype,
                          buffer=cloud.data, strides=(cloud.row_step, cloud.point_step))
@@ -61,6 +63,8 @@ def read_xyz(cloud):
         points[:, :, axis] = records[name]
     points = points.reshape((-1, 3))
     finite = np.isfinite(points).all(axis=1)
+    if strict and not finite.all():
+        raise ValueError('nonfinite obstacle geometry')
     return points if finite.all() else points[finite]
 
 

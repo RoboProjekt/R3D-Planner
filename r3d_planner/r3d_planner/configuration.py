@@ -109,6 +109,30 @@ def text(value, location, frame=False, topic=False):
             raise ConfigurationError(f'{location}: invalid ROS topic: {exc}') from exc
 
 
+MONITOR_DEFAULTS = {'enabled': False, 'timeout_sec': 1.0,
+                    'require_transform': True, 'topic': '/local/filtered_obstacles'}
+
+
+_MISSING_MONITOR = object()
+
+
+def monitoring_settings(value=_MISSING_MONITOR):
+    """Validate optional startup-only monitoring settings, including ROS types."""
+    if value is _MISSING_MONITOR:
+        return dict(MONITOR_DEFAULTS)
+    keys(value, ['enabled', 'timeout_sec', 'require_transform'],
+         'path_follower.obstacle_monitoring', optional=('topic',))
+    for key in ('enabled', 'require_transform'):
+        if type(value[key]) is not bool:
+            raise ConfigurationError('obstacle_monitoring.' + key + ': expected boolean')
+    number(value['timeout_sec'], 'obstacle_monitoring.timeout_sec')
+    if not 1e-9 <= value['timeout_sec'] <= (2**63 - 1) / 1e9:
+        raise ConfigurationError('obstacle_monitoring.timeout_sec: outside clock range')
+    topic = value.get('topic', MONITOR_DEFAULTS['topic'])
+    text(topic, 'obstacle_monitoring.topic', topic=True)
+    return {**value, 'topic': topic, 'timeout_sec': float(value['timeout_sec'])}
+
+
 def ros_parameters(values, integer_keys=()):
     """Normalize YAML integer spelling for declared ROS double parameters."""
     return {key: float(value) if type(value) in (int, float) and key not in integer_keys else value
@@ -240,7 +264,10 @@ def load_configuration(path=None, mode='planner'):
                     'stop_distance', 'goal_tolerance', 'control_period_sec', 'obstacle_x_min',
                     'obstacle_half_width', 'max_angular_speed_narrow', 'angle_threshold',
                     'steering_gain', 'narrow_speed_factor', 'turning_speed_factor'],
-         'path_follower')
+         'path_follower', optional=('obstacle_monitoring',))
+    monitor = monitoring_settings(follower['obstacle_monitoring']) if (
+        'obstacle_monitoring' in follower) else monitoring_settings()
+    follower = {k: v for k, v in follower.items() if k != 'obstacle_monitoring'}
     for key, value in follower.items():
         number(value, 'path_follower.' + key)
     if follower['obstacle_x_min'] >= follower['stop_distance']:
@@ -275,5 +302,6 @@ def load_configuration(path=None, mode='planner'):
                           'base_frame': odometry['base_frame'],
                           **ros_parameters(follower), 'map_frame': planner['map_frame'],
                           'odometry_timeout_sec': float(planner['odometry_timeout_sec']),
-                          'cmd_vel_topic': robot['topics']['cmd_vel']},
+                          'cmd_vel_topic': robot['topics']['cmd_vel'],
+                          **{'obstacle_monitoring.' + k: v for k, v in monitor.items()}},
     }
