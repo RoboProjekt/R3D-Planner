@@ -344,3 +344,17 @@ bounded by rviz_interface.action_server_timeout_sec (default 1 s).
 See [CONTRIBUTING.md](CONTRIBUTING.md) for focused synthetic reproductions/tests
 and [MAINTENANCE.md](MAINTENANCE.md) for support, version/API/ABI and release gates.
 Each package has a Forthcoming CHANGELOG.rst. None declares a released version.
+
+## Distribution investigation (15 October 2026)
+
+| Target | Current evidence | Support boundary |
+|---|---|---|
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 225 full and169 source-free tests pass | Verified tested scope |
+| Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
+| Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
+| Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
+| Rolling | Current official image uses Resolute; no native verification | Development target only |
+
+Newer Nav2 actions add error fields and, in Lyrical, viapoints. Their full contract
+is not implemented or verified here. No pip/vendor migration was applied.
+See central protocol section18.8 for commands, exact images and remaining work.

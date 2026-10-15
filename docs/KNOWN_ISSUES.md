@@ -17,7 +17,9 @@ architecture and historical limitations explicitly distinguished.
   user-site NumPy 1.26.4 / apt SciPy 1.8.0 compatibility warning is absent in
   the isolated apt set. This does not repair a mixed host environment.
 - **AP09 boundary:** the previously investigated official Open3D key is
-  unavailable for Ubuntu Noble. No Jazzy, other-platform or hardware verification.
+  unavailable for Ubuntu Noble, confirmed in native Jazzy. Lyrical dependencies
+  and build pass, but default colcon Python test discovery and two newer lint
+  checks fail; see central section18.8. No full newer-distro or hardware claim.
 - **Release boundary:** CI is implemented and locally reproduced, but no remote
   CI run, coverage claim, public V4 ref, official
   release or complete legal/distribution approval. See the central protocol.

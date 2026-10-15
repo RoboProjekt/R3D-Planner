@@ -291,7 +291,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für Humble; P2 für weitere freigegebene Ziele |
 | Abhängigkeiten | AP03-AP06; CI kann später geeignete Matrixnachweise liefern |
 | Abschlusskriterien | Zielbezogene Dependency-/Build-/Test-/Installnachweise mit OS/Python/ROS-Versionen; weitere Distributionen erst nach Ausführung als unterstützt bezeichnen |
-| Aktueller Status | **NOT STARTED** — neue AP03-Key-Erkenntnis: python3-open3d unter Noble unavailable; keine Multi-Distribution-Implementierung/Runtimeverifikation |
+| Aktueller Status | PARTIAL – Humble vollständig im geprüften Umfang; Jazzy/Noble Open3D BLOCKED; Lyrical reguläre Dependencies/Build und218Pythonfälle PASS,2LintFAIL, Colcon-Integration FAILED; Kilted/Rolling nur Quellen/Regeln |
 
 ### 4.11 AP10 - ROS Index und Releasevorbereitung
 
@@ -1231,6 +1231,30 @@ Korrekte aktuelle Root-/Namespace-/Metadaten-/Action-/TF-/QoS-/M02-Grenzen erhal
 #### Verifikation und Ergebnis
 
 Frischer normaler Drei-Paket-Copybuild `/work/maintenance1`, UID1000/Humble/FastDDS/Domain227, build/test/test-result jeExit0: **225PASS/0FAIL/0ERROR/0SKIP**. Drei tatsächlich installierte CHANGELOG.rst bytegleich mit Source, docutils-RSTprüfung ohneWarnings; Metadaten/XML/YAML/Python/Markdownstrukturcheck PASS. README-Staleangaben zu2Paketen/fehlendenInterfaces/TODOmanifesten korrigiert; historische Protokolle bleiben datiert. Zwei anfängliche Helperaufrufe scheiterten an fehlendem check.py-Pfadargument bzw. falschem Scratchmountpfad; korrigiert erneut ausgeführt, kein fehlerhafter Aufruf als PASS. Kein spezieller umfassender Markdown-/Rechts-/API-Stabilitätsnachweis. Finale Source-freie CI-Abnahme nach Folgedokumentation folgt. Keine Hardware/Hostinstallation.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-026 - AP09 – reale Distributionsprüfung und Open3D-Abgrenzung
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP09/AP03/AP06/AP08. **Betroffene Dateien:** zentrales Protokoll und aktuelle Kompatibilitätsangaben README/INSTALL/MAINTENANCE/KnownIssues. **Status:** Untersuchung VERIFIED; Gesamtkompatibilität neuerer Targets PARTIAL/BLOCKED. **Git-Commit:** `docs(compat): record native Jazzy and Lyrical investigation` (Nachfolger be44bf4).
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Aktuelle offizielle Release-/rosdep-/Docker-/REPquellen prüfen. Tatsächliche isolierte Jazzy/Noble- und aktuelle Lyrical/Resolute-Container mitreadonlySource, ohnepip/skipkeys/Hoständerungen. Installation/check/OS/API tatsächlichen Status protokollieren; fehlendeDependencies separat von API-Kompatibilität betrachten. Optional Interfacepaket allein nativ bauen/testen, ohne Gesamtplanner-Support daraus abzuleiten. Kilted/Rolling als Quellen-/Regeluntersuchung kennzeichnen, nicht ausgeführte Vollsuite behaupten. Keine genehmigungspflichtige neue Vendor-/pip-/Source-Dependencystrategie implementieren.
+
+#### Verifikation und Ergebnis
+
+Humble alle32externenKeys einzeln aufgelöst, Exit0. Jazzy24.04.5/Python3.12.3: volle rosdep install/check jeExit1, python3-open3d noble:null und AptCandidate none; unabhängiges Interfacepaket nativ build/test/test-result Exit0,5PASS, CDR-RoundtripPASS. APIpakete separat aus offiziellerAptquelle installiert, keinOpen3D/pip/skipKey-Gesamterfolg behauptet. Lyrical26.04.1/Python3.14.4: rosdep install/check Exit0, dreiPakete normalcopybuild Exit0; colcon test Exit5 (Pythonpakete NO TESTS RAN), test-result0 zählt nur5CMakechecks und ist ausdrücklich kein GesamtPASS. Direkter pytest jePaketcwd: Preprocessor12PASS/1Flake8FAIL, Planner206PASS/1Flake8FAIL, jeweils0ERROR/0SKIP; neueLintregeln57/95Befunde, keineFunktionsfailure. Initialer direkterTest im falschen Workspacecwd scannte Build/Install mit,1zusätzlicherCopyrightfailure jePaket war Harnessfehler und ist korrigiert; nicht als Produktfehler darstellen. GenerierteNachrichtCDR unterLyricalPASS. Keine SourcefreieLyrical-/JazzyPlanner-/Kilted-/Rolling-/Hardwarevollabnahme. ZentraleMatrix/Quellen/weitereSchritte18.8. Scratchsummaryhelper hatte zunächst nurletztenExit geprüft: LyricalExit5 bleibtFAILED unabhängig von5TestsSummary. TatsächlicheBefehlszeilen/Exits sind imProtokoll maßgeblich.
 
 #### Auswirkungen
 
@@ -3285,3 +3309,26 @@ Zwei getrennte frische Containersysteme, tatsächliche Apt-/rosdepinstallation/c
 ### 18.7 AP08 – Dokumentationsabnahme
 
 Nutzungsanleitungen, Architektur, Topics/Actions/TF/QoS/Konfiguration/M01-Migration und bekannte Grenzen abgeglichen; CONTRIBUTING und MAINTENANCE trennen Beiträge, vorhandenen Devstand0.0.1, ungarantierteAPI/ABI/Support, Projekt-EOL-Entscheidung und spätere Releases. Drei Forthcoming-Changelogs werden installiert, keine Releaseversion/keinTag gewählt. Nach tatsächlicher Änderung neuer `/work/maintenance1` normalerCopybuild plus Vollsuite225PASS/0FAIL/0SKIP, docutils+Installbytevergleich+MetadatencheckPASS. Alte wissenschaftliche Vorleistungen bleiben im zentralen Protokoll; keine zusätzliche Forschungsberichtdatei angelegt. Umfang AP08 aktuell VERIFIED, Distributions-/Releaseergebnisse werden fortgeschrieben.
+
+
+### 18.8 AP09 – aktuelle Distributionsmatrix und belegte Grenzen
+
+Stichtag15.10.2026. Offizieller [ROS-Releaseindex](https://raw.githubusercontent.com/ros2/ros2_documentation/rolling/source/Releases.rst) nennt HumbleEOLMai2027, JazzyMai2029, KiltedDezember2026 und aktuelle stabile LyricalMai2031. Lyrical erschien22.05.2026, Rolling bleibt Entwicklungslinie. [REP2000](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-2000.rst) nennt beiKilted nochNovember2026 und beschreibtRollingplattform nurStandMai2025; Quellen widersprechen sich beimKiltedmonat. Kein neuesProjekt-Supportversprechen daraus ableiten. Plattformen der tatsächlich gepinnten offiziellen [Dockerimages](https://raw.githubusercontent.com/docker-library/official-images/master/library/ros) und reale /etc/os-release-/Pythonabfragen sind unten getrennt erfasst; dessenRollingimage nutzt inzwischenResolute.
+
+| ROS | Ubuntu / Python (tatsächlich oder Quellenumfang) | rosdep | Build | Tests | Installation | Gesamtstatus |
+|---|---|---|---|---|---|---|
+| Humble | 22.04.5 /3.10.12 amd64, nativ imContainer |32Keys einzelnPASS, install/checkPASS |3PaketeCopyPASS |225PASS/0FAIL/0SKIP |169SourcefreieFällePASS, readonly |VERIFIED im definierten Umfang, finalerLauf folgt18.10 |
+| Jazzy |24.04.5 /3.12.3 amd64, nativ imContainer |Gesamtinstall/checkExit1, Open3Dnotavailable |NurInterfacepaketPASS; Planner/Preproc nichtgebaut |5Interfacechecks+CDRPASS; keinePlanner-Vollsuite |Interfaceinstalliert; keineSourcefreieGesamtabnahme |BLOCKED fürGesamtpaketsatz; InterfacePARTIALnachgewiesen |
+| Kilted |Noble24.04 /Python3.12 lautREP; keinContainerlauf |SystemregelNoble:blockiertOpen3D |NOT TESTED |NOT TESTED |NOT TESTED |BLOCKED Dependencyregel / API NOT TESTED |
+| Lyrical |26.04.1 /3.14.4 amd64, nativ imContainer |install/checkExit0 ohneSkip/Pip |3PaketeCopyPASS |colcon testExit5; nur5CMakePASS, direktePython218PASS/2LintFAIL/0SKIP |3PaketeInstall/Imports/CDRPASS; keinSourcefrei-Lauf |PARTIAL; keineSupport-/Gesamttestfreigabe |
+| Rolling |aktuellesoffiziellesImageResolute; Python hierNOT DETERMINABLE mangelsLauf |WildcardregelOpen3DaufApt; echteInstallationNOT TESTED |NOT TESTED |NOT TESTED |NOT TESTED |NOT TESTED, optionalesEntwicklungsziel |
+
+Eigene temporäre Jazzy-/Lyricalcontainer: `e1af4a3c358a886fe83f66a5401a378c311596b83af7cb8a92c3a023ce5cc7ec` / `49f933375b81d7322586d5740863ec573bccd3558e529c2f32af8b656780bc47`, labelcodex.task=r3d-v4-release, SourceRO, lokaleisolierteDomains229/230, keinHostnetz/Privileged/Hardware. Images `ros:jazzy-ros-base@sha256:066420e07f60aa18262f2479981def87ebcfcec42eefb0c0c57c4a46098348ca` und `ros:lyrical-ros-base@sha256:f79cd486fa218596747c45d00ca42101b0303fc6d94ed5adb72145cd6f54b86c`. BenutzerUID1000 beiBuild/Tests, Apt/rosdep nurContainer. KeinePython3.14-Host-Conda mitLyricaltest verwechseln. RohdatenProbe-/Interface-/Build-/Pytestjson+xUnit temporär/tmp/r3d-v4-release; relevanteErgebnisse dauerhaft hier.
+
+Tatsächlich ausgeführt jeContainer: `rosdep update --rosdistro <jazzy|lyrical>`, `rosdep install --from-paths /r3d-source --ignore-src --rosdistro <distro> -y`, `rosdep check --from-paths /r3d-source --ignore-src --rosdistro <distro>`, `rosdep resolve python3-open3d --rosdistro <distro>`, `apt-cache policy python3-open3d python3-numpy python3-scipy python3-networkx`. Jazzy zusätzlich nurInterfaceDependenciesund `colcon build/test --packages-select r3d_interfaces; colcon test-result --verbose`, jeweils0. Separat offizielleAptpakete nav2_msgs/sensor_msgs_py/SciPy/NetworkX fürAPIanalyse installiert, dadurchGesamtrosdepblocker nichtgelöst. Lyrical regulär `colcon build/test --packages-up-to r3d_planner; colcon test-result --verbose`; build0/test5/result0. **Ein Exit0 von test-result mit nur5CMakefällen ist hier ausdrücklich kein bestandener Gesamttest.** DirektePython-Diagnose ausje `/work/lyrical_full1/src/<paket>`: `python3 -m pytest -p no:cacheprovider --basetemp=<eigenerTemp> --junitxml=<eigeneXML> test -q`, beideExit1 durchFlake8. ErsterDiagnoseversuch falscherCWD korrigiert; keine Tests entfernt/geskippt oderLintregelnabgeschwächt.
+
+**Dependencybefund:** Aktuelle offizielle [rosdep-Regel](https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/python.yaml) enthält fürOpen3D explizitnoble:null, sonstUbuntu-WildcardApt. JazzyApt zeigt `python3-open3d Candidate:(none)` in denkonfiguriertenoffiziellenNoblequellen. Lyrical installiert dagegenAptOpen3D0.19.0-5build4, NumPy2.3.5, SciPy1.16.3, NetworkX3.2.1; alleImportsPASS. Jazzyseparat NumPy1.26.4/SciPy1.11.4/NetworkX2.8.8, keinOpen3D. [PyPI-Metadaten](https://pypi.org/pypi/open3d/json) belegen einePip-Veröffentlichung, keine hiergetestetePip-Lösung. Pipkeys sind laut [rosdistroReview](https://raw.githubusercontent.com/ros/rosdistro/master/REVIEW_GUIDELINES.md) keinWeg zumoffiziellenBinärrelease. LokalerSourcebuild/Vendorisierung könntenNoble untersuchen, brauchen Packaging-/Lizenz-/Transitivitätsprüfung undgesonderteStrategieentscheidung; nichtimplementiert. Lyrical beseitigt konkret dessenSystemdependencyhürde, beweist aberkeineGesamtportierung. KeineVersionspins/Manifests/Repos zurUmgehung geändert.
+
+**APIvergleich:** TatsächlicheImports/Signaturen in beidenneuenTargets bestätigen ActionServer/cancel_callback/callback_group, MultiThreadedExecutor, LaunchNode namespace/remappings, TF2 lookup_transform mitTime/Duration und sensor_msgs_py.read_points. Letzteres bietetstrukturierteArrays/reshape_organized_cloud; eigenerfeldbewussterDecoder bleibtunverändert undbestehtLyrical-Funktionstests. [JazzyComputePathToPose](https://raw.githubusercontent.com/ros-navigation/navigation2/jazzy/nav2_msgs/action/ComputePathToPose.action) ergänzt gegenüberHumble error_code/error_msg. [Lyrical](https://raw.githubusercontent.com/ros-navigation/navigation2/lyrical/nav2_msgs/action/ComputePathToPose.action) ergänzt außerdemviapoints. Der aktuelleHumble-Vertrag fülltdieseZusatzfelder nichtgezielt; Viapoints werdennichtverarbeitet. Zielplattformvertrag mussFehlerzuordnung undViapoint-Annahme/Ablehnung gesondertfestlegen/testen. KeinevolleNav2-Kompatibilität ausbestandenenEinzelfällen ableiten. Lyrical result_timeout-Default10stattJazzy900Sekunden: bestehenderClient fragtsofortResultan, längereRetrieval-/Concurrencygrenzen nichtabgenommen.
+
+**Build-/Testhürden Lyrical:** CMake3.8-Minimum wirdnochgebaut, neueCMakewarnt zurkünftigenEntfernung vonKompatibilität<3.10. Setuptools meldet `Unknown distribution option: tests_require`; installierterColconpytest-Matcher prüfttestDependencies ausSetuptools, findetkeinpytestundwähltsetup.py-test-Fallback (NO TESTS RAN). Manifestpytestistvorhanden, dasistkeinfehlendesAptpaket. NeuereFlake8plugins verlangenzusätzlicheImport-/Quote-/Classnewline-Regeln:57Preproc/95Planner-Befunde, beidePEP257/CopyrightPASS. 218direktePythonfällebelegenbegrenzteFunktionsverträglichkeit, keineColcon-/Gesamt-/Fehlercode-/Viapoint-/SourcefreieAbnahme. Zukunft: pytest-Metadatenkompatibilität (z.B. geprüfte extras_require-Testgruppe), Lintregeln überTargets abstimmen, Actionzusatzfelder explizitabgrenzen, dannvollenBuild+colcon+Sourcefreiheitwiederholen. KeineumfangreichePortierung oderDependenciesmigration in diesemAuftrag stillimplementiert.
