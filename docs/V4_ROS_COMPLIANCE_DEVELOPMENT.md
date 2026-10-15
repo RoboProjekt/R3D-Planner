@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 14. Oktober 2026; fortgeführt bis V4-019 (AP05-Analyse/PointCloud2/Testwerkzeug; M01/M02-Migration noch nicht freigegeben). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 14. Oktober 2026; fortgeführt bis V4-021 (M01 freigegeben/implementiert; M02 ausdrücklich zurückgestellt und nur vorgeschlagen). Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -243,7 +243,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Kopplung an geplante öffentliche API vor Release klären |
 | Abhängigkeiten | AP03/AP04 für reproduzierbare Ausführung; AP06 pro Vertragsänderung; AP09 bei distributionsverschiedenen Action-/Python-APIs |
 | Abschlusskriterien | Normierte semantisch sinnvolle Orientierungen; erhaltenes Engstellenverhalten; konsistente interne Namen und Namespace-Test; Cloud-Varianten und Frames geprüft; Action-Erfolg/Fehler/Cancel entsprechend dokumentiertem Zielvertrag; keine stille API-Änderung |
-| Aktueller Status | **IN PROGRESS** — Inventar/Migrationsstrategie V4-017; PointCloud2 V4-018 VERIFIED; Quaternion/narrow- und strikter Followervertrag M01/M02 BLOCKED bis gesonderter Freigabe, übrige AP05-Aufgaben offen |
+| Aktueller Status | **IN PROGRESS** — M01 ausdrücklich freigegeben und implementiert/V4-020 (191Tests PASS), Cloudteil VERIFIED; M02 nur Analyse/Vorschlag V4-021, ausdrücklich zurückgestellt; weitere kompatible Action-/TF-/Namespace-/QoS-Arbeit folgt |
 
 ### 4.7 AP06 - Tests und Qualitätssicherung
 
@@ -255,7 +255,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | **IN PROGRESS für erweiterten AP05-Umfang** — bisher86Fälle erhalten, aktuell zweimal171PASS/0FAIL/0SKIP plus120Source-frei; Cloud-/Queryumfang VERIFIED, spätere Action-/TF-/Namespace-/Metadaten-/QoS-/Followerregressionen noch offen |
+| Aktueller Status | **IN PROGRESS für erweiterten Umfang** — 171Bestandsfälle erhalten, M01-Suite191gesamtPASS/0FAIL/0SKIP; weitere neue ROS-Verträge und Schluss-/Sourcefreie-/CI-Regressionen folgen |
 
 ### 4.8 AP07 - CI/CD
 
@@ -1089,6 +1089,54 @@ Begrenzte Readinessquery im Testwerkzeug VERIFIED; alle vorhandenen Inhalte/Scha
 #### Auswirkungen
 
 Nur Testwerkzeug plus Protokoll, kein öffentlicher ROS-Vertragsbruch. Historische86Tests weder gelöscht noch geskippt; zwei sinnvolle neue Fehler-/Erfolgsregressionen.
+
+### V4-020 - M01 – Geometrischer Path und atomare narrow-Metadaten
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/AP06, AP03/AP04/AP08 begleitend. **Betroffene Dateien:** neues r3d_interfaces, planner manifest/pathbuilder, planner/follower, neue Regressionen und vorhandene Dokumentation. **Status:** VERIFIED für M01-Umfang; M02 nicht implementiert. **Git-Commit:** `fix(ros): replace quaternion flags with atomic path metadata` (eigener Commit enthält diesen Eintrag).
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Freigegebene Migration17.4/M01: eigenes ament_cmake/rosidl-Paket mit nav_msgs/Path path und bool[] narrow. Standard-/global_path und Actionresult behalten Typ/Positionen, Quaternionen haben echte normierte XY-Tangentenheading. Gemeinsame PathWithMetadata-Nachricht vermeidet Pairing zweier asynchroner Kanäle, reliable/transient-local/depth1 für Latejoin. Follower prüft Länge/Frames/finite Geometrie/Einheitsquaternionen, ersetzt Path+Flags gemeinsam und liest keine Orientationflags mehr. M02 explizit nicht umsetzen; optionalerFilter-Zusammenhang und Vorschlag werden separat dokumentiert. Alle drei Pakete gemeinsam über rosdep/colcon bauen/installieren; vorhandene171Tests erhalten und neue Schema-/Metadaten-/ROS-/Latejoin-/Narrow-Regressionsfälle ergänzen. Grundlage für Interfacegenerierung: offizielles Humble Custom-ROS2-Interfaces Tutorial, rosidl_default_generators/runtime und nav_msgs explizit deklarieren.
+
+#### Verifikation und Ergebnis
+
+Tatsächliche Humble/Jammy-Installation für alle drei Pakete mit rosdep install/check ohne skip: Exit0. Normaler Copy-Build /work/m01_2 aller drei Pakete: Exit0; colcon test und test-result Exit0, Summary191Tests/0errors/0failures/0skipped. Davon186Pythonfälle (171Bestand+15M01) und5CTest/Lintfälle des neuen CMakepakets. Erster Zwischenlauf ohne erweiterte CMakechecks/nativePaircase185PythonPASS. Native serialisierte Pub/Sub-Vergleiche: /global_path == PathWithMetadata.path == Actionresult.path, flagsFalse/True/False auf synthetischer klassifizierter PCD. QoS-Latejoin, realer Followerconstructor ohne Motiontimer, Narrowgeschwindigkeit trotz gleicher geometrischer Headingquaternionen, Neuplanung/clear/invalid-Daten, Header-/Stamp-/Quaternionvalidierung, generiertes Schema/CDRroundtrip/Paketlicense/Message-Share geprüft. Alle171Bestandsfälle erhalten. M01-Nachrichtenbau linear in Wegpunktanzahl, Graph/A*-AST unverändert. Root-/altePaketlizenzen unverändert, neue identische Paketkopie installiert. M02-Hindernisfrische/TF-/Stopregeln nicht eingeführt; Test prüft fehlenden obstacle_timeout_sec-Parameter. Direkte erste Copyright-CLIprobe prüfte0Dateien und ist kein Lizenz-PASS; tatsächliche CMake-/Pythonlintersuite bestand. Vollständiger Source-freier Schlussnachweis nach weiteren freigegebenen Änderungen erneut auszuführen; vorherige120Tests sind historisch.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-021 - M02 – Optionalen Filter und konfigurierbare Überwachung untersuchen
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/AP08 Analyse, M02 nicht zur Implementierung freigegeben. **Betroffene Dateien:** nur zentrales Protokoll. **Status:** VERIFIED als angeforderte Analyse/Vorschlag; Implementierung NICHT FREIGEGEBEN. **Git-Commit:** Begleitdokumentation im M01-Commit; kein M02-Implementierungscommit.
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Expliziter Nutzerauftrag15.10: M02 zuerst hinsichtlich optionalem lokalenFilter untersuchen und konfigurierbare Timeout-/TF-/Stopstrategie vorschlagen. Komponentenfalse ist weiter erlaubter Offline-/externerSensorworkflow; zwingende globale Filteraktivierung würde diesen Vertrag brechen. Follower läuft nur separat, daher Überwachung am Follower konfigurieren, nicht Planner/Preprocessing an Hindernisquelle koppeln. Keine neuen Monitorparameter oder Stoppolicy in Source/YAML implementieren; konkreter Vorschlag in18.2.
+
+#### Verifikation und Ergebnis
+
+Statischer Abgleich launching.py/configuration.py/Follower: local_filter ist optional, Follower wird separat gestartet, kein Pflichtmonitor vorhanden. Konkreter Vorschlag18.2 mit enabled=false Legacydefault, required/wait/clear/blocked/stale/TF-/Clockfehlerzuständen, externemPublisher bei Filterfalse, Bounds und Testplan dokumentiert. Keine neuen Monitorparameter, TF-Transformationen oder Timeout-/Stopbedingungen implementiert; keine technische Sicherheitsfreigabe behauptet.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -3036,3 +3084,63 @@ Fokussierte Commits: Inventar/Migrationsvorschlag60bbe44622deb7f3671b52403a435f6
 **Freigabegrenze:** Die angefragten M01/M02-Verträge sind weiterhin nicht implementiert; kein neues Interfacepaket oder Metadatatopic angelegt, keine Quaternion-/Followerframe-/Hindernistimeout-/Namespace-/QoS-/Actionmigration durchgeführt. AP05 IN PROGRESS, Cloud-/Queryteil VERIFIED; erweiterter AP06-Gesamtumfang IN PROGRESS. AP07/AP09 NOT STARTED; AP08/AP10 begleiten als IN PROGRESS, keine spätere Phase vor der stabilisierten/freigegebenen AP05-Basis abgeschlossen. ROS Index/Bloom/Buildfarm weiterhin NOT READY; rechtliches Gesamtgate unverändert. Der Gesamtauftrag AP05..AP10 ist ausdrücklich noch nicht abgeschlossen und wird nach gesonderter Migrationsentscheidung fortgesetzt.
 
 Es wurden ausschließlich zwei eigene Testcontainer gestoppt/entfernt; bestehende Dockerimages/Hostpakete/Conda/ROS-/NVIDIA-/Daemonkonfiguration unberührt. V1/V2/V3/main/Remote-Trackingrefs/Gitconfig/PDF/Lizenztexte/historischeV4-001..016 unverändert, keine Historienumschreibung/externenRepositoryänderung/Push/Release/Hardwarebewegung. Kein R3D_null untersucht/geändert.
+
+
+## 18. Fortsetzung am 15. Oktober 2026 – M01 und weitere freigegebene Phasen
+
+### 18.1 Freigabe und Phasenabgrenzung
+
+Der Nutzer hat M01 zweimal ausdrücklich bestätigt: nur M01 freigeben, M02 zurückstellen; anschließend PathWithMetadata/standardkonformen Path/eindeutige Paarung und vollständige Build-/rosdep-/Install-/Testintegration konkret beauftragt. M01 wird unter V4-020 implementiert, neue Schnittstelle ist eine freigegebene inkompatible Narrow-Decoder-Migration. Vorschlag17.4 bleibt historisch nachvollziehbar. M02 hat keine Implementierungsfreigabe: nicht als implizite Folge von M01 einschleusen. Weitere ursprüngliche AP05..AP10-Aufgaben bleiben beauftragt; zurückgestellte M02-Gesamtqualität am Ende offen ausweisen, nicht als Grund für unnötiges Stoppen aller unabhängigen Phasen behandeln.
+
+### 18.2 M02-Vorschlag – optionaler Filter, Timeout, TF und Stopzustände
+
+**Status: Analyse abgeschlossen, Vorschlag, keine Umsetzung.** Evidenz: configured_nodes in launching.py startet local_filter ausschließlich bei components.live_filter.enabled. planner.launch.py startet niemals path_follower; follower.launch.py ist separat. Offlineplanung funktioniert ohne Filter/Hardware. Beim heutigen Follower startet obstacle_in_front=false; vorhandene Wolken können Stop setzen, fehlen/veralten sie, besteht keine vollständige Frischeüberwachung. Genau dieser Default bleibt auf Nutzerwunsch bestehen, einschließlich fehlender Sensor->Base-Transformation. M01-Metadatenvalidierung ist davon unabhängig.
+
+Eine global verpflichtende Hindernisquelle würde bei live_filter=false und fehlendem externen Publisher jede Followerfahrt verhindern. Ein automatisches Aktivieren des Filters wäre ein versteckter Konfigurationsbruch; ein automatisches Deaktivieren der Überwachung beim Ausbleiben von Clouds würde die gewünschte Pflicht umgehen. Auch live_filter=true beweist keinen laufenden Sensor/keine geeignete Cloud. Umgekehrt kann live_filter=false mit einem externen geprüften Hindernispublisher sinnvoll sein. Deshalb keine Regel „Pfadplanung benötigt stets local_filter“, keine Ableitung von Sicherheit aus der bloßen Node-/Publisherexistenz.
+
+Vorgeschlagene zukünftige Konfiguration (keine aktuell akzeptierte YAML, noch nicht einfügen):
+
+```yaml
+path_follower:
+  # existing keys retained
+  obstacle_monitor:
+    enabled: false
+    topic: /local/filtered_obstacles
+    timeout_sec: 1.0
+    tf_timeout_sec: 0.1
+    max_future_skew_sec: 0.0
+```
+
+- enabled=false erhält ausschließlich den bisherigen Kommunikationsvertrag: empfangene Hindernisse wirken weiter, aber kein behaupteter Frische-/TFschutz. Deaktivierte Überwachung bedeutet keine Sicherheitsfreigabe.
+- enabled=true verlangt zum Fahren aktuelle gültige Hindernisdaten unabhängig davon, ob sie vom optionalen lokalen Filter oder einem externen Node stammen. Kein gültiger Ersteingang -> WAITING und Null-Twist; keine automatische Abschaltung des Monitors.
+- Follower liest base_frame aus dem bereits gewählten Robotprofil, kein zweites konkurrierendes Framefeld. Bei anderem Cloudframe exakt nach base_frame am Messstempel transformieren; alle numerischen TFwerte/Quaternionen prüfen, normieren und Transformationsrichtung beachten. Bei fehlender/extrapolierter/ungültiger TF kein Identitätsfallback und keine Verwendung einer anderen/latest-Zeit. Statische TF darf legitimerweise Stempel0 haben; nicht pauschal als veraltet verwerfen. Dynamische TF am Messstempel durch TF2 validieren.
+- timeout_sec>0 prüft Messalter mit ROSclock; zulässiger Future-Skew explizit begrenzt. Zusätzlich begrenzte Empfangsfrische verhindert endloses Replaying alter Nachrichten. Clockrücksprung/ungültige Clock -> warten/stoppen bis gültige neue Daten. Externer Base-Command-Watchdog bleibt nötig: ein blockierter Executor oder pausierter ROS-Timer kann keine regelmäßigen Nullbefehle garantieren.
+- Gültige leere XYZ-Wolke ist ein definierter clear-Befund des gewählten Producers; malformed/fehlendeXYZ/nonfinite-only-Daten dürfen nicht still als freier Raum interpretiert werden. Ob eine echte Inputwolke ausschließlich ungültigePunkte enthielt, muss vor dem Wegfiltern erkennbar bleiben. Eigener Dateninvalidstatus statt bloßes bool obstacle_in_front.
+
+| Zustand bei aktiviertem Monitor | Auslöser | Cmd-Verhalten / Wiederanlauf |
+|---|---|---|
+| WAITING | Noch kein gültiger Cloud-/TF-/Clockeingang | Null-Twist; nur gültiger aktueller Eingang hebt Sperre auf |
+| CLEAR | Aktuelle gültige Wolke, richtige TF, kein StopROI-Hindernis | Weiterhin nur bei gültigem Path+Metadaten und frischer Pose fahren |
+| BLOCKED | Aktuelles Hindernis im konfigurierten StopROI | Null-Twist; nächster gültiger freier Befund erforderlich |
+| STALE / FUTURE / CLOCK_ERROR | Alter/Futuregrenze/Clockvertrag verletzt | Null-Twist; keine automatische Monitorabschaltung |
+| TF_ERROR / INVALID_DATA | Fehlende/ungültige Transformation oder Cloud | Null-Twist; nur neuer gültiger Eingang statt altem clearcache |
+| DISABLED | enabled=false ausdrücklich gewählt | Bisherige Hindernislogik ohne behaupteten Monitorvertrag |
+
+LocalFilter=false plus enabled=true bleibt erlaubt, braucht aber externen Publisher und passende TF; ohne diese Eingänge WAITING/Stop. Optionalfilterflag wird nicht still überschrieben. LocalFilter=true plus enabled=true braucht denselben Eingangs-/Frischenachweis. Motionfreigabe/Diagnose beschreibt die Ursache, nicht nur „kein Pfad“; keine zusätzliche öffentliche Statusschnittstelle vor einer begründeten Schemaentscheidung einführen.
+
+**Integrationsgrenzen:** Filter min_reliable_distance0.65 und Follower stop_distance0.6 überlappen bei identischem Ursprung/Achsen nicht sinnvoll; Sensoroffset/TF verschieben die Zone zusätzlich. Frische leere Filterausgabe beweist deshalb keine vollständige Nahbereichsbeobachtung. Grenzen/Kalibrierung müssen vor Motionfreigabe abgestimmt und synthetisch geprüft werden; keine Zahlen automatisch „reparieren“. Cliff/Stair-Ausgaben sind weiterhin keine internen Followerstopquellen. M02 wäre Datenvertragsverbesserung, keine zertifizierte Kollisions-/Cliff-/Robotersteuerung.
+
+Erforderliche zukünftige Regressionen vor M02-Abnahme: enabled=false Legacyverhalten; enabled=true ohneFilter/ohneexternenPublisher WAITING; externesCloudangebot bei Filterfalse; echte statische/dynamische TF am Cloudstempel; falscheRichtung/fehlende/veraltete/nichtfiniteTF; stale/future/Clockjump; invalid versus echte leere Wolke; Hindernis/clear/erneutstale; Pose-/Path-/Metadatenverlust; Zielerreichung; Cmd ausschließlich isoliertes Testtopic. Neue Parameter zentral strikt validieren und proMode dokumentieren, keine Hardware. Die Umsetzung wartet ausdrücklich auf weitere Nutzerfreigabe; diese Analyse beantragt keinen Push/Release.
+
+
+### 18.3 M01-Abnahme und neue Paketintegration
+
+M01 freigegeben/implementiert unter V4-020; M02 nur untersucht unter V4-021. Drei ROSpakete mitVersion0.0.1/Apache-2.0: r3d_interfaces ament_cmake/rosidl sowie zwei bestehende ament_python-Pakete. rosidl_default_generators/build, rosidl_default_runtime/export und nav_msgs/depend plus ament_lint_auto/common(test) deklariert; r3d_planner exec_depend r3d_interfaces. BUILD_TESTING und ament_package im neuen CMakeprojekt; generierte Header/Python/Typesupport und Msgdefinition durch rosidl installiert, LICENSE explizit. Keine manuelle Workspacepfadkopplung oder pip-Pflicht. Offizielle Quelle: [Humble Custom Interfaces](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/Tutorials/Beginner-Client-Libraries/Custom-ROS2-Interfaces.rst).
+
+Befehle im isolierten Container mit readonly-Source, UID1000, Domain221/localhost/FastDDS: rosdep install/check --from-paths /r3d-source --ignore-src --rosdistro humble --os=ubuntu:jammy (install zusätzlich -y); normaler colcon build --packages-up-to r3d_planner, source install/setup.bash, colcon test --packages-up-to r3d_planner, colcon test-result --verbose. Je Exit0. Tatsächliche Ausgabe:
+
+```text
+Summary: 191 tests, 0 errors, 0 failures, 0 skipped
+```
+
+Python-xUnit186, zusätzliche5CMakeprüfungen werden von colcon gezählt; Testhelper darf Pythonzahl nicht mit Gesamtsuite gleichsetzen. Keine neuen Fehler/Skips in dieser M01-Abnahme. Generierte Nachricht/Schema, Qos/Paarung/Migration15neuePythonfälle; neue CMake-/License-/XML-/Stylechecks5. Rohlogs temporär /tmp/r3d-v4-release, dauerhafte relevante Resultate hier. Aktuelle README/INSTALL/PaketREADME/Config-/Architektur-/KnownIssues beschreiben die Migration. Weitere AP05-Korrekturen werden separat getestet; dieser Erfolg gilt nicht vorab für spätere Änderungen oder spätere Source-freie/CI-/Multi-Distro-Abnahmen.

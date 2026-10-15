@@ -26,11 +26,12 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Path
+from r3d_interfaces.msg import PathWithMetadata
 from sensor_msgs.msg import PointCloud2
 from .cloud import read_xyz
 import math
 from .odometry import OdometryInput
+from .path_metadata import metadata_qos, validate_metadata
 
 
 class PathFollower(Node):
@@ -52,13 +53,14 @@ class PathFollower(Node):
 
         # --- VARIABLEN ---
         self.current_path = []
+        self.current_narrow = []
         self.obstacle_in_front = False
 
         # --- PUBLISHER & SUBSCRIBER ---
         self.cmd_pub = self.create_publisher(Twist, self.cmd_vel_topic, 10)
 
         self.path_sub = self.create_subscription(
-            Path, '/global_path', self.path_callback, 10)
+            PathWithMetadata, '/global_path_metadata', self.path_callback, metadata_qos())
 
         self.obstacle_sub = self.create_subscription(
             PointCloud2, '/local/filtered_obstacles', self.obstacle_callback, 10)
@@ -69,7 +71,13 @@ class PathFollower(Node):
         self.get_logger().info("R3D Path Follower gestartet! Warte auf Pfad...")
 
     def path_callback(self, msg):
-        self.current_path = msg.poses
+        try:
+            validate_metadata(msg, self.get_parameter('map_frame').value)
+        except ValueError as exc:
+            self.current_path, self.current_narrow = [], []
+            self.get_logger().warning(f'Path metadata rejected: {exc}')
+            return
+        self.current_path, self.current_narrow = list(msg.path.poses), list(msg.narrow)
         self.get_logger().info(f"Neuer Pfad empfangen mit {len(self.current_path)} Punkten.")
 
     def obstacle_callback(self, msg):
@@ -130,7 +138,7 @@ class PathFollower(Node):
 
         if dist_to_goal < self.goal_tolerance:
             self.get_logger().info("ZIEL ERREICHT!")
-            self.current_path = []
+            self.current_path, self.current_narrow = [], []
             self.cmd_pub.publish(msg)
             return
 
@@ -163,7 +171,7 @@ class PathFollower(Node):
             target_idx = len(self.current_path) - 1
 
         # --- NEU: Engstellen-Flag auslesen ---
-        is_narrow = (self.current_path[target_idx].pose.orientation.z > 0.5)
+        is_narrow = self.current_narrow[target_idx]
 
         dx = target_point[0] - rx
         dy = target_point[1] - ry

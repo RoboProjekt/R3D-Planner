@@ -15,6 +15,7 @@ the Go2W. Other ROS distributions are not supported.
 
 | Package | Role | Executables |
 |---|---|---|
+| `r3d_interfaces` | Generated PathWithMetadata wire contract | none |
 | `r3d_preprocessor` | PCD analysis and visualization | `pcd_analyser`, `pcd_server` |
 | `r3d_planner` | Planning, perception, RViz input and control | `pcd_path_planner`, `local_filter`, `rviz_interface`, `path_follower`, `path_test` |
 
@@ -23,8 +24,8 @@ from V1 are not available here.
 
 ## Development metadata
 
-Both packages use the provisional development version `0.0.1` and the
-`ament_python` build type. `r3d_preprocessor` performs offline voxel-based PCD
+All three packages use the provisional development version `0.0.1`. The two
+executable packages use `ament_python`; `r3d_interfaces` uses `ament_cmake`/rosidl. `r3d_preprocessor` performs offline voxel-based PCD
 clearance/traversability analysis; `r3d_planner` provides graph-based A* planning
 and the existing ROS 2 navigation components listed above.
 
@@ -48,7 +49,7 @@ use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
 Sensor drivers, odometry, global localization and the robot command adapter
 remain external. No specific SLAM package is a dependency.
 
-For the local V4 checkout, follow [INSTALL.md](INSTALL.md) to place both packages
+For the local V4 checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
 below a workspace's `src` directory. The public V3 branch does not contain the
 AP03 manifest corrections. Use the native Humble system interpreter, with no
 Conda or unrelated workspace overlays:
@@ -59,11 +60,11 @@ source /opt/ros/humble/setup.bash
 export PYTHONNOUSERSITE=1
 sudo rosdep init  # only if not initialized on this machine
 rosdep update --rosdistro humble
-rosdep install --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+rosdep install --from-paths src/R3D-Planner \
   --ignore-src --rosdistro humble --os=ubuntu:jammy -y
-rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+rosdep check --from-paths src/R3D-Planner \
   --ignore-src --rosdistro humble --os=ubuntu:jammy
-colcon build --packages-select r3d_preprocessor r3d_planner
+colcon build --packages-up-to r3d_planner
 source install/setup.bash
 ```
 
@@ -85,6 +86,23 @@ not rebuilding or sourcing again. Copy installations use the regular installed
 package-share YAML and robot profiles. Set `R3D_CONFIG_DIR` to a user-owned
 configuration directory for editable overrides; no source checkout is required.
 Rebuild a copy installation to refresh its installed templates.
+
+## M01 interface migration
+
+Build and install `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner` together.
+`/global_path` remains `nav_msgs/Path` and the action result contains that same
+geometric path, with normalized XY tangent orientations. Narrow flags are no
+longer encoded in quaternion fields. `/global_path_metadata` carries
+`r3d_interfaces/msg/PathWithMetadata`: the complete Path and exactly one boolean
+per pose, atomically. The follower consumes this message with reliable,
+transient-local, depth-1 QoS; late joining receives both path and flags.
+
+Upgrade planner and follower together. External consumers that decoded
+`orientation.z > 0.5` must use `narrow[index]` on the enriched path instead.
+Inconsistent metadata clears the follower path; there is no legacy decoder.
+M02 obstacle timeout/TF monitoring remains deferred: disabling the optional local
+filter does not silently enable or disable a watchdog. See the proposal in the
+[central protocol](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#182-m02-vorschlag--optionaler-filter-timeout-tf-und-stopzustände).
 
 ## Configuration
 

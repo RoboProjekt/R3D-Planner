@@ -217,3 +217,14 @@ the central YAML automatically. Node defaults preserve standalone compatibility;
 they are not a second normal configuration workflow. Use the logged source
 paths and `ros2 param get /global_graph_planner odometry_topic` to confirm the
 effective configuration.
+
+
+## M01 path metadata and deferred M02 monitoring
+
+The existing narrow speed/steering parameters now use `PathWithMetadata.narrow`
+at the target waypoint index. They never inspect quaternion fields. Build all
+three packages and upgrade planner/follower together; Path/header/flags are
+validated as one message. Standard `/global_path` remains geometric `nav_msgs/Path`.
+No `obstacle_monitor` YAML is currently accepted: M02 is a proposal only.
+The local filter remains optional, and no obstacle timeout/TF stop policy is
+introduced by M01. See the central protocol section 18.2 before requesting M02.

@@ -84,11 +84,11 @@ active V4 tree. General PCD analysis, classification, loading and planning remai
 
 Each package also contains the standard Ament Python resource file and three
 template tests for copyright, Flake8, and PEP257. There is no map metadata file,
-or custom interface package. Four planner-package launch entry points are installed. The shared `cloud.py`
+or standalone map metadata file. The generated r3d_interfaces package supplies PathWithMetadata. Four planner-package launch entry points are installed. The shared `cloud.py`
 decoder honors PointCloud2 XYZ fields, point/row strides and endian order for
 both local filter and follower; it preserves input storage and excludes NaN/Inf.
 Filter geometry and output headers remain in the incoming sensor frame. The
-proposed typed path/narrow interface package is not implemented pending approval.
+implemented r3d_interfaces package generates the atomic PathWithMetadata contract.
 
 ## Offline map processing
 
@@ -148,9 +148,12 @@ or Odometry. The planner subscribes with SensorDataQoS and broadcasts no TF.
 Its Odometry topic and odom/base frames come from the robot YAML; no particular
 SLAM package is a dependency or is launched by this workspace.
 
-Narrow-area metadata is encoded in `Path.poses[*].pose.orientation.z` (`1.0`
-for `narrow`, otherwise `0.0`) while `orientation.w` is always `1.0`. This is an
-internal protocol for `path_follower`, not a generally valid pose quaternion.
+Path orientations are normalized XY tangent headings. Narrow metadata is no
+longer encoded in a geometric field. `/global_path_metadata` transports the same
+complete Path plus one boolean per pose as `r3d_interfaces/msg/PathWithMetadata`.
+The follower validates this atomic payload, clears invalid metadata, and retains
+narrow speed/steering behavior. Upgrade the interface, planner and follower
+together; external legacy orientation-flag decoders must migrate.
 
 ## Local perception
 
@@ -215,7 +218,7 @@ odometry, or the sensor installation.
 
 `r3d_path_follower` is a simple 2D lookahead controller:
 
-1. Receive `/global_path`.
+1. Receive atomic `/global_path_metadata` (Path plus narrow flags).
 2. Check `/local/filtered_obstacles` for points 0.1–0.6 m forward and ±0.3 m
    laterally.
 3. Transform the configured Odometry base pose into map and use XY/yaw.
@@ -250,7 +253,8 @@ produces a zero Twist, but external command supervision remains necessary.
 | `/lidar_odometry` (robot-configurable) | `nav_msgs/msg/Odometry` | external source | planner, follower | SensorDataQoS; robot odom/base frames |
 | `/map_pointcloud` | `sensor_msgs/msg/PointCloud2` | `pcd_server` | external/RViz | depth 1, transient-local; configured map frame (default `map`) |
 | `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | external/RViz | depth 10 |
-| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` | depth 10 |
+| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | generic consumers | depth 10 |
+| `/global_path_metadata` | `r3d_interfaces/msg/PathWithMetadata` | `pcd_path_planner` | `path_follower` | depth1, reliable, transient-local |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` | depth 10 |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 | depth 10; retains input header |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | none internally | depth 10 |

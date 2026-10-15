@@ -75,8 +75,11 @@ For ComputePathToPose:
 - planner_id is accepted but not evaluated; feedback/cancellation are unchanged.
 
 See ../README.md for complete offline/online action requests.
-Path orientations retain the legacy narrow-area flag (z=1,w=1 for narrow);
-generic pose consumers must not interpret it as a normalized quaternion.
+Path orientations are normalized geometric XY headings; no quaternion field
+encodes narrow. /global_path_metadata uses r3d_interfaces/msg/PathWithMetadata
+with the complete Path and index-aligned bool[] narrow in one atomic message.
+Planner/follower/interface package must be upgraded together. The follower rejects
+invalid length/header/position/quaternion combinations and clears its path.
 
 ## Topics
 
@@ -88,7 +91,8 @@ generic pose consumers must not interpret it as a normalized quaternion.
 | Topic | Type | Publisher | Consumer/purpose |
 |---|---|---|---|
 | `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | RViz `LINE_STRIP` |
-| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | `path_follower` |
+| `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | generic consumers |
+| `/global_path_metadata` | `r3d_interfaces/msg/PathWithMetadata` | `pcd_path_planner` | `path_follower`; reliable/transient-local/depth1 |
 | robot-configured cloud (default `/hesai_ros_driver/hesai/lidar_points`) | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional external Nav2 costmap |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | no internal subscriber |
@@ -155,7 +159,7 @@ ros2 launch r3d_planner follower.launch.py
 
 This separate launch can produce motion. It loads central path_follower settings
 and robot Odometry/command topics. It uses XY/yaw only, including the existing
-narrow-area flag. No path, detected obstacles or unavailable/stale global pose
+index-aligned narrow metadata. No path, detected obstacles or unavailable/stale global pose
 produces zero Twist. This is not an emergency stop or complete command watchdog.
 
 The external Go2W command adapter directly forwards velocity and can change

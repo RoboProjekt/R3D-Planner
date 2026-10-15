@@ -155,9 +155,9 @@ cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
 export PYTHONNOUSERSITE=1
 rosdep update --rosdistro humble
-rosdep install --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+rosdep install --from-paths src/R3D-Planner \
   --ignore-src --rosdistro humble --os=ubuntu:jammy -y
-rosdep check --from-paths src/R3D-Planner/r3d_planner src/R3D-Planner/r3d_preprocessor \
+rosdep check --from-paths src/R3D-Planner \
   --ignore-src --rosdistro humble --os=ubuntu:jammy
 ```
 
@@ -165,8 +165,8 @@ V4 needs no dependency skip list. AP03 separately verified key resolution,
 actual installation, imports and rosdep check; the last two install/check runs
 were performed in fresh isolated containers rather than on the audit host.
 A successful check proves package presence, not successful build or runtime.
-The workspace contains both R3D packages, so `--ignore-src` excludes the local
-`r3d_preprocessor` dependency. Every external manifest key was also resolved
+The workspace contains all three R3D packages, so `--ignore-src` excludes the
+local `r3d_preprocessor` and `r3d_interfaces` dependencies. Every external manifest key was also resolved
 individually to avoid mistaking an installed ROS overlay for key validation.
 
 ## Build
@@ -174,7 +174,7 @@ individually to avoid mistaking an installed ROS overlay for key validation.
 ```bash
 cd <path-to-workspace>
 source /opt/ros/humble/setup.bash
-colcon build --packages-select r3d_preprocessor r3d_planner
+colcon build --packages-up-to r3d_planner
 source install/setup.bash
 ```
 
@@ -362,7 +362,7 @@ in its own test process:
 
 ```bash
 cd <path-to-workspace>
-colcon test --packages-select r3d_preprocessor r3d_planner
+colcon test --packages-up-to r3d_planner
 colcon test-result --verbose
 ```
 

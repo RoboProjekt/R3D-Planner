@@ -27,7 +27,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionServer
 from nav2_msgs.action import ComputePathToPose
-from geometry_msgs.msg import PoseStamped, Point
+from geometry_msgs.msg import Point
 from nav_msgs.msg import Path
 from visualization_msgs.msg import Marker
 from std_msgs.msg import ColorRGBA
@@ -39,6 +39,8 @@ import os
 import networkx as nx
 from ament_index_python.packages import get_package_share_directory
 from .odometry import OdometryInput
+from .path_metadata import build_path, metadata_qos
+from r3d_interfaces.msg import PathWithMetadata
 
 
 class GlobalGraphPlanner(Node):
@@ -91,6 +93,8 @@ class GlobalGraphPlanner(Node):
         self.pub_viz_path = self.create_publisher(Marker, '/planned_path', 10)
         self.path_color = ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0)
         self.pub_path = self.create_publisher(Path, '/global_path', 10)
+        self.pub_metadata = self.create_publisher(
+            PathWithMetadata, '/global_path_metadata', metadata_qos())
 
         # --- ACTION SERVER ---
         self._action_server = ActionServer(
@@ -275,26 +279,16 @@ class GlobalGraphPlanner(Node):
         path_msg.header.frame_id = goal_req.goal.header.frame_id
         path_msg.header.stamp = self.get_clock().now().to_msg()
 
-        for node_key in path_ids:
-            pose = PoseStamped()
-            pose.header = path_msg.header
-
-            # Koordinaten direkt aus dem Graph holen
-            pos = self.graph.nodes[node_key]['pos']
-            pose.pose.position.x = pos[0]
-            pose.pose.position.y = pos[1]
-            pose.pose.position.z = pos[2]
-
-            node_type = self.graph.nodes[node_key].get('type', 'floor')
-            if node_type == 'narrow':
-                pose.pose.orientation.z = 1.0
-            else:
-                pose.pose.orientation.z = 0.0
-
-            pose.pose.orientation.w = 1.0
-            path_msg.poses.append(pose)
-
+        try:
+            metadata = build_path(self.graph, path_ids, path_msg.header,
+                                  goal_req.goal.pose.orientation)
+        except ValueError as exc:
+            self.get_logger().error(f'Invalid path geometry: {exc}')
+            goal_handle.abort()
+            return result
+        path_msg = metadata.path
         self.pub_path.publish(path_msg)
+        self.pub_metadata.publish(metadata)
 
         result.path = path_msg
         goal_handle.succeed()

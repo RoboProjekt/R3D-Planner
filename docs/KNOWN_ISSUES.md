@@ -79,16 +79,16 @@ launched by this workspace.
 - **Next step:** Verify an external consumer for the cliff output before the
   standalone follower controls the robot.
 
-## 7. Path orientation is used as a narrow-area flag
+## 7. M01 replaces the incompatible legacy narrow encoding
 
-- **Location:** `r3d_pcd_path.py`, `r3d_path_follower.py`
-- **Current behavior:** The planner sets `orientation.z=1.0` for narrow areas and
-  always sets `orientation.w=1.0`, producing a non-normalized quaternion in
-  narrow areas.
-- **Impact:** General Pose consumers may treat the internal flag as a real
-  orientation.
-- **Next step:** Consider explicit backward-compatible metadata later;
-  preserve the current interface for now.
+- **Implemented:** Standard Path/action-result orientations are normalized
+  geometric headings. The follower uses complete PathWithMetadata messages,
+  not orientation.z flags; invalid metadata clears the path. Reliable,
+  transient-local, depth-1 delivery retains path and flags for late joining.
+- **Migration:** Build all three packages and upgrade planner/follower together.
+  Old external narrow decoders must consume the typed metadata instead.
+- **Remaining boundary:** This is not full Nav2 plugin/lifecycle compatibility
+  or new obstacle freshness/TF monitoring. M02 is deferred by user decision.
 
 ## 8. Request frame validation added; PCD coordinates remain implicit
 
