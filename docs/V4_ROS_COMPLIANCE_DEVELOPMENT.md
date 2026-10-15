@@ -267,7 +267,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 |
 | Abhängigkeiten | AP03/AP04 und tragfähige AP06-Tests; Lizenzprüfung als offenes Release-Gate sichtbar halten |
 | Abschlusskriterien | Workflow geprüft; tatsächlicher CI-Lauf samt Commit und Ergebnis nachweisbar; Konfigurationsdatei allein ist kein ausgeführter CI-Nachweis; Fernlauf nicht durch ungefragten Push erzwingen |
-| Aktueller Status | **NOT STARTED** |
+| Aktueller Status | **IN PROGRESS** — Workflow/Skripte IMPLEMENTED, lokaler exakter Dockerlauf225+169PASS VERIFIED; NOT REMOTELY VERIFIED, tatsächlicher GitHub-Lauf nach autorisiertem späterem Push offen |
 
 ### 4.9 AP08 - Dokumentation und Wartung
 
@@ -1183,6 +1183,30 @@ Rootnamen und absolute Robotprofil-Topics bleiben unverändert. Optionaler names
 Frische dreiPaket-Copy-Builds in /work/compose3 und compose4 jeweils0, Tests/test-result0. compose3:224PASS/0FAIL/0SKIP; zusätzlicher echter ROSRemappingfall danach compose4:225PASS/0FAIL/0ERROR/0SKIP, Domains225/226, UID1000/localhost/FastDDS. 20neue Kompositionsfälle gegenüber205Actionstand:4Topic-/Timeoutconfig,4RVizfaults,8TF/Odometry (statischeTF gültig, missing/stale/nonfinite/invalidQuaternion/futurePose/invalidPose/wrongFrame),2nativeCloudpublisher-QoS,1echter namespacedLaunch samtAction/Path und1explizites nativeTopicremapping. Alle191M01-/205Action-/171früherenFälle erhalten. M02-Cmd-/Inputfrische unverändert.
 
 Fehlversuche compose1:222PASS/2FAIL/0SKIP (100Zeichen Testdekoration und bestehender Rootgraphfall meldet extraRViz); compose2:223PASS/1FAIL/0SKIP. Rootassertion jetzt korrekt root-namespacespezifisch, unverändert strikte Komponentenliste. Verbliebene Kontamination ging mit ersetztem echtemRVizActionclient einher: Humble Node.destroy_node zerstört create_client-Einträge, aber keine Actionwaitables. Test zerstört echtenActionclient ausdrücklich vor Mockersetzung; compose3 danach allePASS, compose4 erneutPASS. Keine Rootassertion entfernt/gelockert, kein globaler DDS-/ROSdaemon-/Produkteingriff. Ein fehlerhafter zwischenzeitlicher Testzeilenumbruch wurde gezielt vor Vollsuite vom Linter abgefangen/korrigiert, nicht als Suite-PASS ausgegeben. Kein Testskip/Regelignore. README/Config-/Architektur-/KnownIssues aktualisiert.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-024 - AP07 – Reproduzierbare Humble-CI und Source-freier zweiter Container
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP07/AP06/AP04, AP08 begleitend. **Betroffene Dateien:** .github/workflows/ros2-humble.yml, scripts/ci/run_humble.sh und inside.sh/check.py, Protokoll. **Status:** IMPLEMENTED / NOT REMOTELY VERIFIED; lokale Reproduktion VERIFIED, AP07 insgesamt IN PROGRESS. **Git-Commit:** `ci: prepare isolated Humble build and runtime verification`.
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+GitHub Actions mit Ubuntu22.04 und perSHA gepinntem offiziellem Checkoutv7.0.1/Node24; lediglich readcontents, keineCredentialpersistenz/Push-/Releaseaktion. Derselbe lokale Shellrunner startet zwei eigene nichtprivilegierte Humble-Container: Buildcontainer mitSourceReadonly, rosdepactualinstall/check für dreiManifeste, Metadata/Docstrukturprüfung, regulärer Copybuild/fullsuite/colcontest-result als unprivilegierterUser; danach Runtimecontainer nur mitreadonlyInstall/Testfiles/Manifestkopien, ohneSource. KeineHost-Apt/pip/Dockerdaemonänderung, keine sensitivenMounts oder Imagelöschung. M02nichtimplementiert. Lokaler Lauf ist ausdrücklich kein RemoteCI-PASS; AP07 IMPLEMENTED/NOT REMOTELY VERIFIED nach tatsächlichem lokalen Nachweis, ursprüngliches Remoteabnahmekriterium bleibt offen.
+
+#### Verifikation und Ergebnis
+
+Exakter Workflowbefehl bash scripts/ci/run_humble.sh lokal tatsächlich Exit0 ausgeführt. Zwei frisch erzeugte Container, gepinnter Humble-Image-Digest860e5379..., SourceReadonly/noprivileged/bridge/localhost/Domains231/232, unprivilegierteTests. Je echte rosdep install/check0. Metadata/XML/YAML/AST-/strukturellerDoklint0; shell bash -n beiderSkripte0; CIcheck.py Flake8/PEP2570. Normaler dreiPaket-Copybuild0/fullcolcontest0/test-result0:225PASS/0FAIL/0ERROR/0SKIP. RuntimezweiterContainer ohne/r3d-source,/work/ci/src und ohneBuildmount:169PASS/0FAIL/0SKIP, tatsächliches generiertesM01-Modul/CDR/NS/Action/QoS mit enthalten; readonlyInstall am ursprünglichen Prefix. Exports getrennt von Runtimeoutputmount; Sourcefree169 umfasst37Install/Output+83Cloud+15M01+14Action+20Komposition, nicht die restlichen56CTest/Config/Query/Lintfälle. Originalrootbranch/history unverändert. Alle eigenenCIcontainer perID entfernt, keineImages gelöscht. Logs/xUnit /tmp/r3d-ci.WPxUz4NT, Treiber /tmp/r3d-v4-release/ci-first.log. AusgabeCI_LOCAL_BUILD_AND_SOURCEFREE_PASS. Keine neue CI-Funktion durch ungetestete Herstelleractions ersetzt; ausschließlichCheckoutAction v7.0.1-Pin aus offiziellerReleasequelle geprüft, action.ymlNode24. Tatsächlicher CheckoutAction-/GitHubRunner-/RemoteCI-Lauf NICHT ausgeführt/NOT VERIFIED; kein Badge/keinPush/keinePR erzeugt. KeinActionlintlauf behauptet, YAML/Actions/Shell/Python geprüft und Dockerjob tatsächlich reproduziert. Externe NetworkX-/ament-Deprecations sichtbar, kein SciPy/NumPy-Konflikt.
 
 #### Auswirkungen
 
@@ -3216,3 +3240,19 @@ Summary: 225 tests, 0 errors, 0 failures, 0 skipped
 ```
 
 Rootnames/absoluteRobotTopics bleiben, neue opt-inNamespacekomposition und relativeProfile/ROSRemapping nativ geprüft. Namespace ist keine automatische TF-Frameisolation. RViz/TF/SensorQoS-Verträge belegt, alte Filtergeometrie und FollowerObstaclepolicy erhalten. M02 bleibt ausdrücklich zurückgestellt: keine Hindernisfrische/TF-Stoppolicy, kein Safety-Nachweis. Die freigegebene aktuelle Schnittstellenbasis ist für CI stabilisiert; ursprüngliches vollständiges AP05-Sicherheits-/Followerziel nicht künstlich VERIFIED setzen. AP06 implementierter Umfang verifiziert, endgültiger Copy-/Sourcefree-/CI-Lauf nach neuen CI-/Dokumentänderungen folgt. Weitere unabhängige AP07..AP10-Arbeit bleibt beauftragt und wird ohne erneute allgemeine Freigabefrage fortgesetzt.
+
+
+### 18.6 AP07 lokale Pipeline und fehlende Remoteabnahme
+
+Offizielle Checkoutquellen geprüft15.10.2026: [Releasev7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1), [vollständiger Commit3d3c42e5aac5ba805825da76410c181273ba90b1](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1), [Actiondefinition](https://raw.githubusercontent.com/actions/checkout/v7.0.1/action.yml). Workflow pinnt exakt diesen Stand/Node24, read-onlycontents, persist-credentialsfalse; keine externen Schreibaktionen. Shell/Python/Workflowstrukturen tatsächlich geprüft. Kein spezifischerWorkflowlinter oder GitHubActioncheckout lokal vorgetäuscht.
+
+Exakter lokaler Befehl bash scripts/ci/run_humble.sh, Exit0. Tatsächliche Ausgaben:
+
+```text
+METADATA_XML_YAML_SYNTAX_DOC_STRUCTURE_PASS
+Summary: 225 tests, 0 errors, 0 failures, 0 skipped
+169 passed, 2 warnings in 5.77s
+CI_LOCAL_BUILD_AND_SOURCEFREE_PASS
+```
+
+Zwei getrennte frische Containersysteme, tatsächliche Apt-/rosdepinstallation/check. Runtime hat keinen Source-/Buildbaum, alle3installiertenPakete und generierteNachricht funktionieren. DockercontainerExitcodes zusätzlich explizit geprüft, damit dockerstart/tee keine Containerfehler als Erfolg verdecken. Trap entfernt nur zurückgelieferte eigeneContainerIDs; keineImages/Dockerdaemon-/Hostpackageänderung. LogsArtifacts temporär, kein weiterer Forschungsbericht. Pipeline enthält wederCoverage nochMultiDistro/Hardware, behauptet keinenREP2004QualityLevel. AP07 bleibt wegen ursprünglichem tatsächlichem Remoteabnahmekriterium IN PROGRESS: IMPLEMENTED / NOT REMOTELY VERIFIED. Weitere AP08..AP10-Arbeit ist unabhängig freigegeben und folgt; keinPush zur Erfüllung des Remote-Kriteriums erzwingen.

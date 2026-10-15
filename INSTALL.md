@@ -396,3 +396,19 @@ warnings from NetworkX `np.int` and ament tooling remain; they are not test fail
   upgrade global packages.
 - **Cliff handling:** No internal follower subscriber consumes cliff/stair output.
   Supply and verify the safety integration externally.
+
+
+## Reproduce the prepared Humble CI locally
+
+With Docker already available, run `bash scripts/ci/run_humble.sh` from the local
+V4 checkout. It installs packages only inside two temporary nonprivileged
+containers, keeps the source read-only and tests as an ordinary user. The second
+container receives only the read-only install tree, tests and manifest copies;
+no source or build tree is mounted. Temporary logs/artifacts stay under the
+printed `/tmp/r3d-ci.*` directory. Only containers created by this run are removed;
+no images, host packages, ROS installation or Conda environment are changed.
+The same command is configured in `.github/workflows/ros2-humble.yml`.
+
+Local reproduction passed the full 225-case suite (0 failure/skip) and169
+source-free cases. This is not a GitHub Actions result. The workflow remains
+IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
