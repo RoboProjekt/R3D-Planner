@@ -2,7 +2,7 @@ robot_config: robots/Go2W.yaml
 
 # No PCD maps are bundled. Configure your own input/output before launch.
 # Relative paths resolve against this directory; absolute paths and ~ are accepted.
-# The analyzer writes <input>_analysed.pcd beside the input.
+# The analyzer writes <input>_analysed.pcd in preprocessing.output_dir/user data.
 maps:
   pcd_path: ""
   map_name: ""
@@ -60,6 +60,7 @@ live_filter:
 
 rviz_interface:
   match_radius: 0.8
+  action_server_timeout_sec: 1.0
   # Disable when another global localization node owns map -> odom.
   publish_map_odom: true
 

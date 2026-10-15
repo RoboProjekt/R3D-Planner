@@ -25,6 +25,7 @@
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PointStamped
 import numpy as np
@@ -46,7 +47,8 @@ class ObstacleCliffFilter(Node):
             self.declare_parameter(key, value)
 
         self.sub = self.create_subscription(
-            PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback, 10)
+            PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback,
+            qos_profile_sensor_data)
 
         self.pub_obstacles = self.create_publisher(PointCloud2, '/local/filtered_obstacles', 10)
         self.pub_cliff = self.create_publisher(PointCloud2, '/local/cliff_virtual_wall', 10)

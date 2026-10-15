@@ -25,7 +25,7 @@
 
 """Launch-time parameter forwarding shared by the two entry points."""
 from launch import LaunchDescription
-from launch.actions import OpaqueFunction, LogInfo
+from launch.actions import OpaqueFunction, LogInfo, DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from .configuration import load_configuration
@@ -33,29 +33,44 @@ from .configuration import load_configuration
 
 def configured_nodes(context, mode):
     cfg = load_configuration(mode=mode)
+    namespace = context.launch_configurations.get('namespace', '')
+    if namespace:
+        from rclpy.validate_namespace import validate_namespace
+        validate_namespace('/' + namespace.strip('/'))
+    names = ['global_path', 'global_path_metadata', 'planned_path', 'compute_path_to_pose',
+             'clicked_point', 'initialpose', 'goal_pose', 'recalibrate_pose',
+             'local/filtered_obstacles', 'local/cliff_virtual_wall', 'stair_detect',
+             'map_pointcloud']
+
+    def configured_node(**kwargs):
+        return Node(namespace=namespace, remappings=[('/' + name, name) for name in names],
+                    **kwargs)
     actions = [LogInfo(msg=f"R3D config: {cfg['config_path']}; robot: {cfg['robot_path']}")]
     if mode == 'preprocessor':
-        actions.append(Node(package='r3d_preprocessor', executable='pcd_analyser',
-                            parameters=[cfg['preprocessor']], output='screen'))
+        actions.append(configured_node(package='r3d_preprocessor', executable='pcd_analyser',
+                                       parameters=[cfg['preprocessor']], output='screen'))
     elif mode == 'follower':
-        actions.append(Node(package='r3d_planner', executable='path_follower',
-                            parameters=[cfg['path_follower']], output='screen'))
+        actions.append(configured_node(package='r3d_planner', executable='path_follower',
+                                       parameters=[cfg['path_follower']], output='screen'))
     elif mode == 'map':
-        actions.append(Node(package='r3d_preprocessor', executable='pcd_server',
-                            parameters=[{'pcd_path': cfg['planner']['map_name'],
-                                         'map_frame': cfg['planner']['map_frame']}],
-                            output='screen'))
+        actions.append(configured_node(package='r3d_preprocessor', executable='pcd_server',
+                                       parameters=[{'pcd_path': cfg['planner']['map_name'],
+                                                    'map_frame': cfg['planner']['map_frame']}],
+                                       output='screen'))
     else:
-        actions.append(Node(package='r3d_planner', executable='pcd_path_planner',
-                            parameters=[cfg['planner']], output='screen'))
+        actions.append(configured_node(package='r3d_planner', executable='pcd_path_planner',
+                                       parameters=[cfg['planner']], output='screen'))
         for section, executable in [('live_filter', 'local_filter'),
                                     ('rviz_interface', 'rviz_interface')]:
             enabled = str(cfg['components'][section]['enabled']).lower()
-            actions.append(Node(package='r3d_planner', executable=executable,
-                                parameters=[cfg[section]], output='screen',
-                                condition=IfCondition(enabled)))
+            actions.append(configured_node(package='r3d_planner', executable=executable,
+                                           parameters=[cfg[section]], output='screen',
+                                           condition=IfCondition(enabled)))
     return actions
 
 
 def description(mode):
-    return LaunchDescription([OpaqueFunction(function=configured_nodes, kwargs={'mode': mode})])
+    return LaunchDescription([
+        DeclareLaunchArgument('namespace', default_value='',
+                              description='Optional ROS namespace; TF frame IDs remain explicit'),
+        OpaqueFunction(function=configured_nodes, kwargs={'mode': mode})])

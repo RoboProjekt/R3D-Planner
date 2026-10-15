@@ -26,12 +26,13 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import (
-    PointStamped, PoseStamped, PoseWithCovarianceStamped, TransformStamped)
+    PointStamped, PoseStamped, PoseWithCovarianceStamped, TransformStamped, Quaternion)
 from nav2_msgs.action import ComputePathToPose
 from rclpy.action import ActionClient
 from std_srvs.srv import Trigger  # Einfacher Service für den Reset
 import tf2_ros
 import math
+from .odometry import components
 
 
 class RVizInterfaceNode(Node):
@@ -40,6 +41,7 @@ class RVizInterfaceNode(Node):
 
         # --- PARAMETER & STATE ---
         self.declare_parameter('match_radius', 0.8)
+        self.declare_parameter('action_server_timeout_sec', 1.0)
         self.declare_parameter('publish_map_odom', True)
         self.declare_parameter('map_frame', 'map')
         self.declare_parameter('odom_frame', 'odom')
@@ -60,7 +62,7 @@ class RVizInterfaceNode(Node):
             Trigger, 'recalibrate_pose', self.recalibrate_callback)
 
         # --- ACTION & TF ---
-        self.action_client = ActionClient(self, ComputePathToPose, '/compute_path_to_pose')
+        self.action_client = ActionClient(self, ComputePathToPose, 'compute_path_to_pose')
         self.tf_broadcaster = tf2_ros.StaticTransformBroadcaster(self)
 
         self.get_logger().info("--- R3D RViz Smart Interface GESTARTET ---")
@@ -79,7 +81,23 @@ class RVizInterfaceNode(Node):
         response.message = "Interface ist wieder im Kalibrierungs-Modus."
         return response
 
+    def _valid_selection(self, position, frame, orientation=None):
+        try:
+            if frame != self.get_parameter('map_frame').value:
+                raise ValueError('RViz selection must use map_frame')
+            if not all(math.isfinite(v) for v in (position.x, position.y, position.z)):
+                raise ValueError('RViz position must be finite')
+            if orientation is not None:
+                components(orientation)
+            return True
+        except ValueError as exc:
+            self.get_logger().warning(f'RViz selection rejected: {exc}')
+            return False
+
     def point_cb(self, msg):
+        if not self._valid_selection(msg.point, msg.header.frame_id):
+            self.latest_point = None
+            return
         self.latest_point = msg
         mode = ('KALIBRIERUNG' if self.get_parameter('publish_map_odom').value and
                 not self.initial_calibration_done else 'ZIELSETZUNG')
@@ -94,6 +112,11 @@ class RVizInterfaceNode(Node):
                 "ℹ️ Kalibrierung bereits aktiv. Nutze '2D Goal Pose' für neue Ziele.")
             return
 
+        position = msg.pose.pose.position if hasattr(msg.pose, 'pose') else msg.pose.position
+        orientation = (msg.pose.pose.orientation if hasattr(msg.pose, 'pose')
+                       else msg.pose.orientation)
+        if not self._valid_selection(position, msg.header.frame_id, orientation):
+            return
         if self.latest_point is None:
             self.get_logger().warn("⚠️ Klicke erst auf 'Publish Point' für die Höhe!")
             return
@@ -120,6 +143,11 @@ class RVizInterfaceNode(Node):
             self.get_logger().warn("⚠️ Roboter noch nicht lokalisiert! Setze erst den Startpunkt.")
             return
 
+        position = msg.pose.pose.position if hasattr(msg.pose, 'pose') else msg.pose.position
+        orientation = (msg.pose.pose.orientation if hasattr(msg.pose, 'pose')
+                       else msg.pose.orientation)
+        if not self._valid_selection(position, msg.header.frame_id, orientation):
+            return
         if self.latest_point is None:
             self.get_logger().warn("⚠️ Klicke erst auf 'Publish Point' für die Zielhöhe!")
             return
@@ -130,8 +158,8 @@ class RVizInterfaceNode(Node):
 
         if dist <= self.match_radius:
             self.get_logger().info("🎯 ZIEL BESTÄTIGT! Sende Pfadanfrage...")
-            self.send_path_request(self.latest_point.point, msg.pose.orientation)
-            self.latest_point = None  # Speicher leeren
+            if self.send_path_request(self.latest_point.point, msg.pose.orientation):
+                self.latest_point = None  # Speicher leeren
         else:
             self.get_logger().error(f"❌ Ziel-Match fehlgeschlagen (Distanz: {dist:.2f}m)")
 
@@ -148,7 +176,8 @@ class RVizInterfaceNode(Node):
         t.transform.translation.x = point.x
         t.transform.translation.y = point.y
         t.transform.translation.z = point.z
-        t.transform.rotation = orientation
+        q = components(orientation)
+        t.transform.rotation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
         self.tf_broadcaster.sendTransform(t)
         self.get_logger().info("🗺️ TF 'map -> odom' fixiert. Odometrie ist nun synchronisiert.")
 
@@ -160,7 +189,8 @@ class RVizInterfaceNode(Node):
             goal_pose.pose.position.x = target_point.x
             goal_pose.pose.position.y = target_point.y
             goal_pose.pose.position.z = target_point.z
-            goal_pose.pose.orientation = target_orientation
+            q = components(target_orientation)
+            goal_pose.pose.orientation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
 
             goal_msg = ComputePathToPose.Goal()
             # The planner resolves the start from its standard Odometry input.
@@ -168,10 +198,15 @@ class RVizInterfaceNode(Node):
             goal_msg.goal = goal_pose
             goal_msg.planner_id = 'GridBased'
 
-            self.action_client.wait_for_server()
+            timeout = self.get_parameter('action_server_timeout_sec').value
+            if not self.action_client.wait_for_server(timeout_sec=timeout):
+                self.get_logger().warning('Planning action server unavailable')
+                return False
             self.action_client.send_goal_async(goal_msg)
+            return True
         except Exception as e:
-            self.get_logger().error(f"Konnte Roboterposition für Planung nicht ermitteln: {e}")
+            self.get_logger().error(f'Planning request failed: {e}')
+            return False
 
 
 def main(args=None):

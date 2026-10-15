@@ -52,7 +52,7 @@ does not reinterpret existing PCD colors using new dimensions.
 
 Height and radii must be positive; narrow radius must not exceed normal radius.
 Base clearance is nonnegative and smaller than height. Topics must be valid
-absolute ROS topic names; the map, odometry and base frames must be distinct.
+valid relative or absolute ROS topic names; the map, odometry and base frames must be distinct.
 
 ## Central YAML
 
@@ -168,6 +168,7 @@ the existing sensor-axis assumptions. The unused legacy `cliff_dist` attribute i
 
 | `rviz_interface` key | Default | Effect |
 |---|---:|---|
+| `action_server_timeout_sec` | 1.0 | s; positive bounded action-server wait, optional for older YAML |
 | `match_radius` | 0.8 | m; maximum XY distance between point and pose selections |
 | `publish_map_odom` | true | Retain legacy static calibration TF; false for external global localization |
 
@@ -228,3 +229,22 @@ validated as one message. Standard `/global_path` remains geometric `nav_msgs/Pa
 No `obstacle_monitor` YAML is currently accepted: M02 is a proposal only.
 The local filter remains optional, and no obstacle timeout/TF stop policy is
 introduced by M01. See the central protocol section 18.2 before requesting M02.
+
+
+## Namespace and QoS contract
+
+Each launch accepts `namespace:=robot_a`; the empty default preserves existing
+root names. Internal absolute topic literals are consistently remapped to
+namespace-relative names, including global_path_metadata and the planning action.
+Explicit absolute robot topics remain global; relative robot topics inherit the
+node namespace. Frame IDs and /tf ownership remain explicitly configured, with
+no automatic TF prefix or new broadcaster.
+
+Live PointCloud2 input uses SensorDataQoS (best-effort, volatile, keep-last5),
+accepting both reliable and best-effort producers. Local outputs remain reliable,
+volatile, depth10; Odometry remains SensorDataQoS, map publication reliable
+transient-local/depth1, metadata reliable transient-local/depth1. Deadline/lifespan
+and liveliness settings retain library defaults; no real-time guarantee is made.
+RViz rejects foreign-frame/nonfinite/invalid-quaternion selections; valid
+orientations are normalized. The new positive action timeout defaults to1s even
+when omitted from older YAML. This does not introduce the deferred M02 monitor.

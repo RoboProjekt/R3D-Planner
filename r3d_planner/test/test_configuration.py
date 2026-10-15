@@ -333,8 +333,9 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
                         expected.add('r3d_rviz_interface')
                     deadline = time.monotonic() + 12
                     while time.monotonic() < deadline:
-                        names = {name for name in observer.get_node_names()
-                                 if not name.startswith('_')
+                        discovered = observer.get_node_names_and_namespaces()
+                        names = {name for name, namespace in discovered
+                                 if namespace == '/' and not name.startswith('_')
                                  and name != 'configuration_test_observer'}
                         if names == expected:
                             break

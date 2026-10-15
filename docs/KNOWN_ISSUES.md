@@ -226,3 +226,14 @@ planner_id is retained as a compatibility field and does not choose a plugin;
 feedback has no Humble payload. Four workers are not a real-time latency guarantee.
 A previous published path remains active after another request aborts/cancels;
 cancellation is not a controller stop command. M02 remains deferred.
+
+## AP05 composition verification and remaining boundaries
+
+Root and namespaced launch/action/Path exchange and explicit ROS remapping pass
+native tests. Live filter input accepts best-effort and reliable clouds; output
+headers remain sensor-frame labels. RViz validates map-frame finite selections
+and normalizes valid quaternion inputs, with bounded action-server wait. Existing
+Odometry/TF rules reject invalid/future/stale inputs and nonfinite translation.
+None of this implements follower obstacle monitoring or sensor-to-base TF: M02
+remains a separately documented proposal. Namespace isolation does not prefix
+TF frames or rewrite explicitly absolute hardware topics.

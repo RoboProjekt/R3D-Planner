@@ -102,6 +102,8 @@ class OdometryInput:
         result.header.frame_id = self.map_frame
         result.header.stamp = msg.header.stamp
         translation = transform.transform.translation
+        if not all(math.isfinite(v) for v in (translation.x, translation.y, translation.z)):
+            raise ValueError('nonfinite TF translation')
         result.pose.position.x = rotated[0] + translation.x
         result.pose.position.y = rotated[1] + translation.y
         result.pose.position.z = rotated[2] + translation.z

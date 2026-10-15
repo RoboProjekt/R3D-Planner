@@ -319,3 +319,21 @@ processing during planning, but makes no real-time or unlimited-concurrency prom
 Planner IDs remain accepted without plugin selection for compatibility. Humble's
 result has no error_code field and its feedback payload is empty. This is an
 action contract, not a full Nav2 planner plugin/lifecycle integration.
+
+## Namespace composition
+
+All four launches accept an optional namespace argument, for example:
+
+```bash
+ros2 launch r3d_planner planner.launch.py namespace:=robot_a
+```
+
+Internal Path, metadata, marker, map, RViz, action and service names compose
+under that namespace. The empty default preserves root names. Explicit absolute
+robot-profile topics remain global; use relative `odometry`, `cloud` and
+`cmd_vel` names when those robot interfaces should inherit the namespace.
+Direct executables support normal ROS remapping arguments. TF topics/frame IDs
+are not automatically prefixed: configure robot-specific frames and a single
+owner of each transform. Launching the follower remains a separate motion step.
+RViz selections must use map_frame and finite valid poses; action lookup is
+bounded by rviz_interface.action_server_timeout_sec (default 1 s).

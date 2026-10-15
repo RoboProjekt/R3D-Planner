@@ -102,11 +102,11 @@ def text(value, location, frame=False, topic=False):
     if frame and (value.startswith('/') or '//' in value):
         raise ConfigurationError(f'{location}: TF frame must not start with /')
     if topic:
-        from rclpy.validate_full_topic_name import validate_full_topic_name
+        from rclpy.validate_topic_name import validate_topic_name
         try:
-            validate_full_topic_name(value)
+            validate_topic_name(value)
         except Exception as exc:
-            raise ConfigurationError(f'{location}: invalid absolute ROS topic: {exc}') from exc
+            raise ConfigurationError(f'{location}: invalid ROS topic: {exc}') from exc
 
 
 def ros_parameters(values, integer_keys=()):
@@ -229,7 +229,9 @@ def load_configuration(path=None, mode='planner'):
         if live[low] >= live[high]:
             raise ConfigurationError(f'live_filter.{low} must be < {high}')
     rviz = cfg['rviz_interface']
-    keys(rviz, ['match_radius', 'publish_map_odom'], 'rviz_interface')
+    keys(rviz, ['match_radius', 'publish_map_odom'], 'rviz_interface',
+         optional=('action_server_timeout_sec',))
+    number(rviz.get('action_server_timeout_sec', 1.0), 'rviz_interface.action_server_timeout_sec')
     number(rviz['match_radius'], 'rviz_interface.match_radius')
     if type(rviz['publish_map_odom']) is not bool:
         raise ConfigurationError('rviz_interface.publish_map_odom must be boolean')
@@ -262,6 +264,8 @@ def load_configuration(path=None, mode='planner'):
             'stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points')),
             'pointcloud_topic': robot['topics']['pointcloud']},
         'rviz_interface': {'match_radius': float(rviz['match_radius']),
+                           'action_server_timeout_sec': float(
+                               rviz.get('action_server_timeout_sec', 1.0)),
                            'publish_map_odom': rviz['publish_map_odom'],
                            'map_frame': planner['map_frame'],
                            'odom_frame': odometry['odom_frame']},

@@ -255,7 +255,7 @@ produces a zero Twist, but external command supervision remains necessary.
 | `/planned_path` | `visualization_msgs/msg/Marker` | `pcd_path_planner` | external/RViz | depth 10 |
 | `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | generic consumers | depth 10 |
 | `/global_path_metadata` | `r3d_interfaces/msg/PathWithMetadata` | `pcd_path_planner` | `path_follower` | depth1, reliable, transient-local |
-| `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` | depth 10 |
+| `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` | SensorDataQoS: depth5, best-effort, volatile |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 | depth 10; retains input header |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | none internally | depth 10 |
 | `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | none internally | sent only when a step is detected |
@@ -338,3 +338,16 @@ Both packages install Python modules, their Ament resource index entry, and
 `r3d_preprocessor` explicitly does not install `maps/`. No libraries, headers,
 or custom interfaces are built; launch files are installed rather than compiled. See [../INSTALL.md](../INSTALL.md)
 for commands.
+
+
+## Current AP05 composition and frame validation
+
+Four launches accept optional namespace; root names remain the default. Internal
+interfaces remap consistently, while explicit absolute robot-profile topics and
+TF frame IDs remain intentional global contracts. Relative robot topic names
+are valid. RViz action lookup uses the node namespace and a bounded configurable
+wait. Selection frame/finite geometry and quaternion checks precede calibration
+or planning; normalized valid quaternions are published. Odometry TF composition
+rejects nonfinite translation and unavailable/time-incompatible transforms.
+Local filter sensor data accepts best-effort/reliable input; outputs retain their
+original frame and QoS. Follower obstacle TF/freshness remains deferred M02.

@@ -1162,6 +1162,32 @@ Frischer Copy-Build /work/action1 mit allen drei Paketen Exit0; colcon test/test
 
 Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
 
+### V4-023 - ROS-Komposition – Namespace, RViz-Framevalidierung und Sensor-QoS
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/AP06. **Betroffene Dateien:** launching.py/configuration.py/centralYAML, RViz/Odometry/Filter, neue Kompositions-/TF-/QoSregressionen und Protokoll. **Status:** VERIFIED für implementierten kompatiblen Kompositionsumfang; M02 zurückgestellt. **Git-Commit:** `fix(ros): compose namespaces and validate interface inputs`.
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Rootnamen und absolute Robotprofil-Topics bleiben unverändert. Optionaler namespace-Launchparameter plus konsistente interne Remaps für Paths/Metadaten/Marker/Action/RViz/Cliff/Stair/Map erlaubt NS-Komposition; TFframes werden nicht automatisch umbenannt. Relative Robot-Themennamen ergänzend validieren/zulassen, explizite absolute Namen bleiben global. RViz prüft map-Frame/finiteAuswahlen/Quaternionen, normalisiert nur gültige Quaternionen und begrenzt Actionserver-Warten durch optionalen action_server_timeout_sec=1.0 (alte YAMLs kompatibel). Keine konkurrierenden TF-Owner hinzufügen; Odometrymap_pose verwirft nichtfiniteTFtranslation. LiveCloudinput SensorDataQoS/BEST_EFFORT akzeptiert best-effort und reliable Producer, bestehende OutputQos und Odometry-/MapQos erhalten. Follower-SensorTF und Hindernisfrische bleiben ausdrücklich M02 und werden nicht geändert.
+
+#### Verifikation und Ergebnis
+
+Frische dreiPaket-Copy-Builds in /work/compose3 und compose4 jeweils0, Tests/test-result0. compose3:224PASS/0FAIL/0SKIP; zusätzlicher echter ROSRemappingfall danach compose4:225PASS/0FAIL/0ERROR/0SKIP, Domains225/226, UID1000/localhost/FastDDS. 20neue Kompositionsfälle gegenüber205Actionstand:4Topic-/Timeoutconfig,4RVizfaults,8TF/Odometry (statischeTF gültig, missing/stale/nonfinite/invalidQuaternion/futurePose/invalidPose/wrongFrame),2nativeCloudpublisher-QoS,1echter namespacedLaunch samtAction/Path und1explizites nativeTopicremapping. Alle191M01-/205Action-/171früherenFälle erhalten. M02-Cmd-/Inputfrische unverändert.
+
+Fehlversuche compose1:222PASS/2FAIL/0SKIP (100Zeichen Testdekoration und bestehender Rootgraphfall meldet extraRViz); compose2:223PASS/1FAIL/0SKIP. Rootassertion jetzt korrekt root-namespacespezifisch, unverändert strikte Komponentenliste. Verbliebene Kontamination ging mit ersetztem echtemRVizActionclient einher: Humble Node.destroy_node zerstört create_client-Einträge, aber keine Actionwaitables. Test zerstört echtenActionclient ausdrücklich vor Mockersetzung; compose3 danach allePASS, compose4 erneutPASS. Keine Rootassertion entfernt/gelockert, kein globaler DDS-/ROSdaemon-/Produkteingriff. Ein fehlerhafter zwischenzeitlicher Testzeilenumbruch wurde gezielt vor Vollsuite vom Linter abgefangen/korrigiert, nicht als Suite-PASS ausgegeben. Kein Testskip/Regelignore. README/Config-/Architektur-/KnownIssues aktualisiert.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -3179,3 +3205,14 @@ Summary: 205 tests, 0 errors, 0 failures, 0 skipped
 ```
 
 14neue Actionfälle zusätzlich zu191M01-Gesamtfällen. Schema-Humble path+planning_time, keine erfundenen Error-/Feedbackfelder. Ungültige Frames/finitePoses/Quaternionen/fehlendeoderstalePose/TF/unreachable/emptyPath ergebenAbort. Realer CancellationService während laufendemExecute erreichtCanceled. Modifizierter Testsearch simuliert längere Laufzeit; echte A*-Cancelbedingung separat geprüft. Keine Kollisions-/Robotersicherheits-/Echtzeit-/Plugin-/Lifecyclezusage. Alle bereits im Eintrag genannten Grenzen bleiben dokumentiert. M02 nicht umgesetzt.
+
+
+### 18.5 Komposition und freigegebene AP05-/AP06-Grenze
+
+V4-023 finale Befehle: normaler colcon build/test --packages-up-to r3d_planner und colcon test-result --verbose in /work/compose4, jeweils0. Tatsächliche Ausgabe:
+
+```text
+Summary: 225 tests, 0 errors, 0 failures, 0 skipped
+```
+
+Rootnames/absoluteRobotTopics bleiben, neue opt-inNamespacekomposition und relativeProfile/ROSRemapping nativ geprüft. Namespace ist keine automatische TF-Frameisolation. RViz/TF/SensorQoS-Verträge belegt, alte Filtergeometrie und FollowerObstaclepolicy erhalten. M02 bleibt ausdrücklich zurückgestellt: keine Hindernisfrische/TF-Stoppolicy, kein Safety-Nachweis. Die freigegebene aktuelle Schnittstellenbasis ist für CI stabilisiert; ursprüngliches vollständiges AP05-Sicherheits-/Followerziel nicht künstlich VERIFIED setzen. AP06 implementierter Umfang verifiziert, endgültiger Copy-/Sourcefree-/CI-Lauf nach neuen CI-/Dokumentänderungen folgt. Weitere unabhängige AP07..AP10-Arbeit bleibt beauftragt und wird ohne erneute allgemeine Freigabefrage fortgesetzt.
