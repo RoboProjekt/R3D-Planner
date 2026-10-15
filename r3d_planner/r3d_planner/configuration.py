@@ -243,8 +243,13 @@ def load_configuration(path=None, mode='planner'):
                 'cliff_width', 'stair_roi_x_min', 'stair_roi_x_max', 'stair_roi_width',
                 'min_reliable_distance', 'stair_min_points', 'cliff_roi_x_min',
                 'cliff_roi_x_max', 'cliff_min_ground_points', 'cliff_wall_points',
-                'cliff_wall_height'], 'live_filter')
+                'cliff_wall_height'], 'live_filter', optional=('retain_near_obstacles',))
+    retain_near = live.get('retain_near_obstacles', True)
+    if type(retain_near) is not bool:
+        raise ConfigurationError('live_filter.retain_near_obstacles: expected boolean')
     for key, value in live.items():
+        if key == 'retain_near_obstacles':
+            continue
         number(value, 'live_filter.' + key,
                integer=key in ('stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points'))
     for low, high in [('min_height', 'max_height'), ('min_step_height', 'max_step_height'),
@@ -289,7 +294,8 @@ def load_configuration(path=None, mode='planner'):
         'planner': {**common, **shared, **ros_parameters(planner), 'map_name': maps['map_name']},
         'live_filter': {**ros_parameters(live, (
             'stair_min_points', 'cliff_min_ground_points', 'cliff_wall_points')),
-            'pointcloud_topic': robot['topics']['pointcloud']},
+            'pointcloud_topic': robot['topics']['pointcloud'],
+            'retain_near_obstacles': retain_near},
         'rviz_interface': {'match_radius': float(rviz['match_radius']),
                            'action_server_timeout_sec': float(
                                rviz.get('action_server_timeout_sec', 1.0)),

@@ -27,6 +27,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import PointCloud2
+from rcl_interfaces.msg import ParameterDescriptor
 from geometry_msgs.msg import PointStamped
 import numpy as np
 from .cloud import create_cloud_xyz32, read_xyz
@@ -45,6 +46,10 @@ class ObstacleCliffFilter(Node):
                     'cliff_wall_height': 0.5}
         for key, value in defaults.items():
             self.declare_parameter(key, value)
+
+        self.declare_parameter(
+            'retain_near_obstacles', True, ParameterDescriptor(read_only=True))
+        self.retain_near_obstacles = self.get_parameter('retain_near_obstacles').value
 
         self.sub = self.create_subscription(
             PointCloud2, self.get_parameter('pointcloud_topic').value, self.pc_callback,
@@ -79,11 +84,13 @@ class ObstacleCliffFilter(Node):
                                       throttle_duration_sec=2.0)
             return
 
+        raw_points = points
+
         # --- SCHRITT 2: TOTZONEN-FILTER (Noise Removal) ---
         # Berechne Distanz in der XY-Ebene
         dist_sq = points[:, 0]**2 + points[:, 1]**2
 
-        # Filter: Alles was näher als 0.65m ist, wird ignoriert (Rauschen am Rand der Totzone)
+        # Preserve the legacy radial gate for stair/cliff classification.
         min_reliable_dist_sq = self.min_reliable_distance**2
         mask_reliable = dist_sq > min_reliable_dist_sq
         points = points[mask_reliable]
@@ -126,6 +133,12 @@ class ObstacleCliffFilter(Node):
             mask_final_obstacle = mask_obstacle
 
         obstacle_points = points[mask_final_obstacle]
+        if self.retain_near_obstacles:
+            # Add finite, height-qualified near returns before the radial gate can
+            # erase them. Keep sensor coordinates/header; the follower owns TF/ROI.
+            near = (~mask_reliable & (raw_points[:, 2] > self.min_height) &
+                    (raw_points[:, 2] < self.max_height))
+            obstacle_points = np.concatenate((obstacle_points, raw_points[near]), axis=0)
 
         if len(obstacle_points) > 0:
             self.pub_obstacles.publish(create_cloud_xyz32(msg.header, obstacle_points))
@@ -136,8 +149,8 @@ class ObstacleCliffFilter(Node):
         # --- SCHRITT 5: KLIPPEN-ERKENNUNG (Korrigiert für Totzone) ---
 
         # WICHTIG: Wir können nur dort nach Boden suchen, wo der Sensor etwas sieht!
-        # Deine Totzone ist ca 0.6m. Der Filter oben löscht alles < 0.65m.
-        # Also prüfen wir den Bereich von 0.7m bis 1.2m auf Boden.
+        # The legacy ground/stair pipeline still uses min_reliable_distance.
+        # Near-obstacle retention does not change ground visibility or cliff logic.
 
         check_start_x = self.cliff_roi_x_min
         check_end_x = self.cliff_roi_x_max
