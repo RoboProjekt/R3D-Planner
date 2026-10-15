@@ -8,8 +8,8 @@ architecture and historical limitations explicitly distinguished.
 - **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
 - **Verified:** real rosdep install and check exit 0 for all three packages in
   fresh isolated apt containers, without skip keys. The current clean-copy CI
-  reproduction passes 225 tests (0 fail, 0 skip), including active lint checks. A
-  separate source-free, read-only installation passes 169 installed/output/interface cases.
+  reproduction passes 306 tests (0 fail, 0 skip), including active lint checks. A
+  separate source-free, read-only installation passes 250 installed/output/interface cases.
 - **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
   SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
   still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
@@ -65,9 +65,10 @@ launched by this workspace.
   strides and truncated buffers are logged and rejected, not published as clear.
 - **Remaining frame boundary:** Filter thresholds deliberately use sensor
   coordinates with X forward, Y lateral, Z up; outputs retain the sensor header.
-  The current follower does not yet establish a timestamped sensor-to-base
-  transformation or obstacle timeout. Those behavioral migrations need the
-  separate approval recorded in central protocol section 17.4.
+  With monitoring enabled, the follower establishes timestamped sensor-to-base
+  TF and bounds measurement/receipt freshness. Default disabled mode retains
+  legacy sensor-coordinate evaluation. The filter still uses sensor axes;
+  calibration and the near-field radius gap are not repaired by monitoring.
 - **Verification boundary:** Synthetic byte-layout and node-output regressions
   establish decoding; no new physical sensor calibration or robot test.
 
@@ -91,7 +92,8 @@ launched by this workspace.
 - **Migration:** Build all three packages and upgrade planner/follower together.
   Old external narrow decoders must consume the typed metadata instead.
 - **Remaining boundary:** This is not full Nav2 plugin/lifecycle compatibility
-  or new obstacle freshness/TF monitoring. M02 is deferred by user decision.
+  or full safety-controller behavior. M02 monitoring is opt-in and keeps these
+  integration limits explicit.
 
 ## 8. Request frame validation added; PCD coordinates remain implicit
 
@@ -185,13 +187,13 @@ launched by this workspace.
 
 - **Location:** both `test/` directories and Python sources.
 - **Current result:** Flake8, PEP257 and activated copyright checks all pass;
-  the complete colcon suite has 225 PASS / 0 FAIL / 0 SKIP. Own Apache headers
+  the complete colcon suite has 306 PASS / 0 FAIL / 0 SKIP. Own Apache headers
   use a form recognized by Humble's checker; original OSRF notices are preserved.
 - **Invocation limitation:** raw combined pytest collection of both package test
   directories can collide on their existing template filenames. Use `colcon test`
   (separate package processes), or test package directories separately.
-- **Remaining scope:** comprehensive algorithm/API coverage, remote CI and deferred M02
-  regressions remain work items. Root runs cannot prove ordinary-user write
+- **Remaining scope:** comprehensive algorithm/API coverage, remote CI and deployment-specific geometric
+  coverage remain work items. Root runs cannot prove ordinary-user write
   permissions; the final output tests were run as UID 1000, with no skips.
 
 ## 17. Standard Odometry integration requires deployment regression
@@ -228,7 +230,8 @@ not require Odometry/TF. Online requests require the existing fresh pose and TF.
 planner_id is retained as a compatibility field and does not choose a plugin;
 feedback has no Humble payload. Four workers are not a real-time latency guarantee.
 A previous published path remains active after another request aborts/cancels;
-cancellation is not a controller stop command. M02 remains deferred.
+cancellation is not a controller stop command. M02 gates obstacle input
+when explicitly enabled; it does not bind follower motion to action cancellation.
 
 ## AP05 composition verification and remaining boundaries
 
@@ -237,6 +240,18 @@ native tests. Live filter input accepts best-effort and reliable clouds; output
 headers remain sensor-frame labels. RViz validates map-frame finite selections
 and normalizes valid quaternion inputs, with bounded action-server wait. Existing
 Odometry/TF rules reject invalid/future/stale inputs and nonfinite translation.
-None of this implements follower obstacle monitoring or sensor-to-base TF: M02
-remains a separately documented proposal. Namespace isolation does not prefix
+M02 now provides optional follower obstacle monitoring and measurement-time
+sensor-to-base TF. It preserves TF ownership. Namespace isolation does not prefix
 TF frames or rewrite explicitly absolute hardware topics.
+
+## Current Humble release scope and M02 limits
+
+Jazzy/Lyrical/Rolling are postponed by explicit user decision. Their recorded
+limitations do not block the Humble/Jammy/Python3.10 release target. M02 is
+implemented and disabled by default; see CONFIGURATION.md for exact semantics.
+When enabled, absent/stale/invalid data or required TF blocks motion until new
+fully valid input and every existing path/pose/goal condition permit recovery.
+Non-advancing stamps cannot refresh clearance. No Cliff/Stair input, command
+watchdog, hardware stop or safety certification is introduced. In particular,
+the default filter exclusion0.65m and follower stop bound0.6m remain a geometric
+integration issue; valid fresh input does not prove complete obstacle coverage.

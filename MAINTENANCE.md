@@ -31,7 +31,7 @@ Humble test. Refer to INSTALL.md and the compatibility matrix in the protocol.
 The CI workflow is implemented and locally reproducible, but NOT REMOTELY
 VERIFIED until an authorized push and actual GitHub Actions run. Do not display a
 successful remote badge without evidence. Coverage and hardware certification
-are not available. M02 obstacle monitoring/TF stop behavior remains deferred;
+are not available. M02 obstacle monitoring/TF stop behavior is implemented as an opt-in feature;
 a fresh published path or cloud is not a guarantee of physical safety.
 
 ## Support, EOL and security
@@ -62,7 +62,7 @@ reviews. Forthcoming changelogs and local tests are preparation, not a release.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 225 full and169 source-free tests pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 306 full and250 source-free tests pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -71,3 +71,13 @@ reviews. Forthcoming changelogs and local tests are preparation, not a release.
 Newer Nav2 actions add error fields and, in Lyrical, viapoints. Their full contract
 is not implemented or verified here. No pip/vendor migration was applied.
 See central protocol section18.8 for commands, exact images and remaining work.
+
+## Binding target decision during M02
+
+The only current development/release target is ROS2 Humble, Ubuntu22.04 Jammy,
+Python3.10 with the verified apt dependencies. Jazzy/Lyrical/Rolling are deferred,
+so lack of multi-distribution support is not a Humble release blocker. Their
+previous investigation results remain dated evidence. AP07 retains the Humble
+workflow and an unverified remote status; AP09 is assessed against Humble.
+AP10 still requires rights/public-source/version/release-organization and
+external release checks. M02 monitoring does not close these separate gates.

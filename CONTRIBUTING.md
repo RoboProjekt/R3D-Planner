@@ -21,3 +21,8 @@ input requirements need an explicit compatibility/migration assessment. M01 is
 the approved PathWithMetadata migration; M02 is a proposal and requires separate
 authorization before implementation. See MAINTENANCE.md for current support,
 versioning and release boundaries.
+
+Current changes target only Humble/Jammy/Python3.10. For obstacle-monitoring
+reports include the four startup parameters, original measurement stamps, frames,
+TF timing, state transition and synthetic reproduction. Use unique isolated
+command topics and retain M01, disabled-mode and stop/recovery regressions.

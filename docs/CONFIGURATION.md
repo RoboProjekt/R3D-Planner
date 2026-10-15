@@ -220,15 +220,16 @@ paths and `ros2 param get /global_graph_planner odometry_topic` to confirm the
 effective configuration.
 
 
-## M01 path metadata and deferred M02 monitoring
+## M01 path metadata and M02 monitoring
 
 The existing narrow speed/steering parameters now use `PathWithMetadata.narrow`
 at the target waypoint index. They never inspect quaternion fields. Build all
 three packages and upgrade planner/follower together; Path/header/flags are
 validated as one message. Standard `/global_path` remains geometric `nav_msgs/Path`.
-No `obstacle_monitor` YAML is currently accepted: M02 is a proposal only.
-The local filter remains optional, and no obstacle timeout/TF stop policy is
-introduced by M01. See the central protocol section 18.2 before requesting M02.
+M01 remains independent of the implemented optional M02 monitor. The accepted
+YAML group is `obstacle_monitoring`; the earlier unimplemented proposal name
+`obstacle_monitor` is not an alias. The local filter remains optional.
+See the complete M02 contract below.
 
 
 ## Namespace and QoS contract
@@ -247,4 +248,125 @@ transient-local/depth1, metadata reliable transient-local/depth1. Deadline/lifes
 and liveliness settings retain library defaults; no real-time guarantee is made.
 RViz rejects foreign-frame/nonfinite/invalid-quaternion selections; valid
 orientations are normalized. The new positive action timeout defaults to1s even
-when omitted from older YAML. This does not introduce the deferred M02 monitor.
+when omitted from older YAML. Obstacle monitoring is separately configured below; it does not depend on RViz.
+
+
+## Obstacle monitoring (M02, Humble)
+
+The optional follower monitor validates its obstacle input. It is independent of
+`components.live_filter.enabled`: either the R3D filter or an external ROS
+producer can supply the same PointCloud2 contract. Planner startup still does
+not start the follower. Offline planning needs no obstacle producer.
+
+```yaml
+path_follower:
+  # Keep the other existing controller keys.
+  obstacle_monitoring:
+    enabled: false
+    timeout_sec: 1.0
+    require_transform: true
+    topic: /local/filtered_obstacles
+```
+
+This is an excerpt to merge into the existing central YAML. An older YAML without
+`obstacle_monitoring` uses these defaults. When the group is present, `enabled`,
+`timeout_sec` and `require_transform` are required; `topic` may be omitted.
+Unknown keys and a null/non-mapping group are rejected. Both switches require
+actual booleans. Timeout must be numeric, finite and positive, representable
+between 1 ns and the signed 64-bit nanosecond clock limit; bool, null, strings,
+NaN, Inf, zero and negative values are rejected. Integer YAML spelling is
+normalized to a ROS double. Direct ROS overrides must use the declared type
+(e.g. `1.0`).
+
+The four ROS parameters have the names `obstacle_monitoring.enabled`,
+`obstacle_monitoring.timeout_sec`, `obstacle_monitoring.require_transform` and
+`obstacle_monitoring.topic`. They are read-only after startup: edit the selected
+YAML and restart `follower.launch.py` to apply changes. This avoids a partially
+changed timer, topic or monitoring policy during motion. `R3D_CONFIG_DIR` and
+normal installed package-share configuration work as before.
+
+With `enabled: false`, the existing obstacle ROI, path/metadata validation,
+Odometry/global-TF checks and goal stop remain active. No new missing-cloud
+blockade is added, and the original ROS-clock control timer is retained. This
+mode does not establish obstacle freshness or correct sensor-to-base geometry.
+`require_transform` has no effect on this legacy mode.
+
+With `enabled: true`, no movement is allowed until a complete valid current
+measurement has been evaluated. Every regular command is gated, and an invalid
+cloud or detected obstacle also publishes an immediate zero command through the
+same publisher. All six Twist components are zero. State and reason are logged
+on state transitions; no new public status topic is introduced.
+
+| State | Meaning and movement policy |
+|---|---|
+| DISABLED | Legacy obstacle policy, without monitoring guarantees |
+| WAITING_FOR_DATA | No successful measurement yet; zero command |
+| ACTIVE | Valid current clear input; other controller conditions still apply |
+| BLOCKED | Valid measurement contains an obstacle in the existing stop ROI; zero |
+| STALE_DATA | Measurement age or successful-input silence exceeds timeout; zero |
+| FUTURE_DATA | Measurement timestamp is later than current ROS time; zero |
+| INVALID_DATA | Invalid header/layout/geometry, zero stamp or non-advancing stamp; zero |
+| TF_UNAVAILABLE | Required timestamped transform missing/invalid, or foreign frame rejected; zero |
+| CLOCK_ERROR | Uninitialized/discontinuous clock or changed ROS time basis; zero |
+
+**Time:** `header.stamp` must represent the original measurement in the current
+ROS time basis, be nonzero and not future-dated. Measurement age and monotonic
+time since the last fully validated input must both be at most `timeout_sec`.
+Equality is valid; exceeding either limit stops. Repeated or out-of-order stamps
+within an epoch are rejected, so replay cannot refresh the receipt deadline.
+A steady-clock timer runs monitoring at the configured control period even when
+simulation time pauses. Backward/time-basis changes invalidate cached input;
+a forward ROS discontinuity exceeding timeout relative to monotonic elapsed
+time also invalidates it. Initialization at ROS time zero cannot grant motion;
+the first fully valid measurement after clock initialization can recover.
+Clock changes require new validation in the new epoch.
+
+**Frames:** Evaluation uses the existing robot profile's `base_frame`. Input
+already in that frame requires no TF lookup. With `require_transform: true`,
+foreign-frame XYZ is transformed to base at the measurement stamp, with direction,
+finite translation, normalized rotation and result time checked. Static TF may
+legitimately have stamp zero. Lookup is nonblocking: missing/extrapolated TF
+stops; adding TF alone does not reactivate an old failed sample. There is no
+latest-time or identity fallback. With `require_transform: false`, only clouds
+already in base are accepted; foreign frames are rejected. No TF is broadcast
+by the monitor.
+
+**Geometry:** XYZ must use metres in the declared frame. The producer must
+preserve original measurement time in the same ROS time basis. The monitor
+cannot detect mislabeled physical units or frames. The existing shared decoder
+handles fields, numeric scalar XYZ,
+offsets, strides, endian order, organized clouds and padding without changing
+input bytes. A true empty cloud with valid XYZ metadata, layout, header, time
+and any required TF is a valid clear measurement. Finite points outside the stop
+ROI are also a valid clear result. Missing XYZ, truncated/unsupported layout,
+nonfinite-only or mixed nonfinite geometry in the monitored input is invalid.
+The internal filter continues selecting finite points from mixed raw input;
+nonempty raw input with no finite geometry now produces no output instead of
+a false fresh empty clearance. The monitor validates the supplied obstacle
+message, not the physical completeness of upstream sensing.
+
+**Recovery:** Errors revoke cached clearance. A new measurement must pass every
+check and clear the existing obstacle ROI. A valid current PathWithMetadata,
+matching flags, fresh valid Odometry/global TF and an unreached goal are still
+required. The controller computes a new command; it does not replay an old
+velocity. A path arriving during a stop replaces the current path and flags
+normally and does not bypass the monitor. There is no manual-reset service or
+new mode. With the filter disabled, an external publisher can recover monitoring;
+without any producer an enabled monitor stays stopped.
+
+**ROS transport:** The obstacle subscription uses SensorDataQoS (best-effort,
+volatile, keep-last depth 5) and accepts both best-effort and reliable offers.
+Path metadata retains reliable/transient-local/depth 1. The existing namespace
+remap applies to the default obstacle topic; custom relative topics resolve in
+the node namespace, and explicit absolute hardware topics remain intentional.
+Publisher replacement or loss does not bypass the timeout. External publishers
+must preserve measurement stamps and provide suitable base/sensor TF.
+
+**Limits:** A zero Twist is a software command, not a demonstrated physical
+emergency stop. The control period, callback execution and transport add latency;
+a blocked executor, process failure or actuator queue needs independent command
+watchdogs and stop facilities. The internal filter's default 0.65 m exclusion
+and the follower's 0.6 m stop bound still need deployment-specific geometric
+reconciliation; fresh empty output does not prove complete near-field coverage.
+Cliff/stair outputs are still not internal follower stop inputs. No thresholds,
+new navigation algorithm, hardware driver or safety certification were added.

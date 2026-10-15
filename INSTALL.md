@@ -7,7 +7,8 @@ The installation commands use:
 - Ubuntu 22.04.5 LTS
 - ROS 2 Humble
 - Python 3.10
-- `ament_python` and `colcon`
+- `ament_python`/setuptools for planner/preprocessor, `ament_cmake`/rosidl for
+  r3d_interfaces, and `colcon`
 
 ROS 2 Humble is the supported ROS distribution. Other ROS distributions are
 not supported. The complete stack has run successfully on a Unitree Go2W with
@@ -45,6 +46,8 @@ shown below; a parallel global pip installation is not required.
 | `open3d` | `python3-open3d` | python3-open3d, 0.14.1 |
 | `yaml` | `python3-yaml` | python3-yaml, 5.4.1 |
 | `tf2_ros` | `tf2_ros_py` | ros-humble-tf2-ros-py |
+| `rcl_interfaces.msg.ParameterDescriptor` | `rcl_interfaces` | ros-humble-rcl-interfaces; M02 runtime |
+| `rosgraph_msgs.msg.Clock` | `rosgraph_msgs` | ros-humble-rosgraph-msgs; synthetic clock tests |
 
 These are observed Jammy reference versions, not manifest version pins. NumPy,
 SciPy, Open3D and NetworkX provide point-cloud/geometry, nearest-node and graph
@@ -63,8 +66,9 @@ digest, failures during test-tool preparation and results are in the
 [central protocol](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#16-ap03ap04ap06--isolierte-humble-abnahme-und-portabilität).
 
 The current official `python3-open3d` rule is explicitly unavailable on Ubuntu
-24.04 Noble. A Humble/Jammy result does not establish Jazzy support. Resolving
-that platform separately belongs to AP09; do not silently substitute a pip key.
+24.04 Noble. A Humble/Jammy result does not establish Jazzy support. That target
+is postponed by the Humble-only release decision; it is not a
+Humble release blocker. Do not silently substitute a pip key.
 
 RViz (`ros-humble-rviz2`) is optional for visualization and starts separately.
 `tf2_ros` command-line tools are optional when users supply an external static
@@ -189,10 +193,10 @@ ros2 pkg executables r3d_planner
 `colcon list` must include `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner`.
 
 The current regular copy installation was verified by the local CI reproduction:
-its build exited 0, the full suite passed 225 tests and `colcon test-result`
+its build exited 0, the full suite passed 306 tests and `colcon test-result`
 exited 0. Earlier independent two-workspace proofs remain dated in the protocol. Standard configuration/robot resources work through package share;
 use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
-container with a read-only installed tree passed 169 installation/output/interface tests.
+container with a read-only installed tree passed 250 installation/output/interface tests.
 The install prefix remained at its build-time path: relocating a workspace is
 not established by this test. Optional `--symlink-install` is a developer workflow.
 
@@ -366,11 +370,11 @@ colcon test --packages-up-to r3d_planner
 colcon test-result --verbose
 ```
 
-The verified total is 225 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
+The verified total is 306 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
 10 output cases, 27 installation cases, 83 PointCloud2 cases, two parameter-query
 cases, 15 metadata cases, 14 action cases, 20 composition cases, six Python lint
-checks and five CMake-package checks. Launch
-lookup covers all four files using `--show-args`; seven node constructors use
+checks, five CMake-package checks, 63 deterministic monitoring cases and18
+native monitoring/launch cases. Launch lookup covers all four files using `--show-args`; seven node constructors use
 synthetic inputs and an isolated command topic without running follower control.
 This does not prove full navigation, motion safety, coverage or a remote CI run. Dependency
 warnings from NetworkX `np.int` and ament tooling remain; they are not test failures.
@@ -410,7 +414,7 @@ printed `/tmp/r3d-ci.*` directory. Only containers created by this run are remov
 no images, host packages, ROS installation or Conda environment are changed.
 The same command is configured in `.github/workflows/ros2-humble.yml`.
 
-Local reproduction passed the full 225-case suite (0 failure/skip) and169
+Local reproduction passed the full 306-case suite (0 failure/skip) and250
 source-free cases. This is not a GitHub Actions result. The workflow remains
 IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
@@ -418,7 +422,7 @@ IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 225 full and169 source-free tests pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 306 full and250 source-free tests pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -427,3 +431,13 @@ IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 Newer Nav2 actions add error fields and, in Lyrical, viapoints. Their full contract
 is not implemented or verified here. No pip/vendor migration was applied.
 See central protocol section18.8 for commands, exact images and remaining work.
+
+## M02 configuration and current target
+
+Only Humble/Jammy/Python3.10 is the current release target. Newer distributions
+remain postponed investigation results, not prerequisites for this release.
+To opt into follower obstacle monitoring, edit the existing central YAML or its
+R3D_CONFIG_DIR override and restart follower.launch.py. See the complete
+[parameter, input, TF and stop/recovery contract](docs/CONFIGURATION.md#obstacle-monitoring-m02-humble).
+The default is disabled; enabling it requires a current valid obstacle producer
+even when the internal filter is disabled. This does not change planner startup.

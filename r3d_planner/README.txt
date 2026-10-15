@@ -147,7 +147,7 @@ RGB/intensity/array fields are ignored; NaN/Inf rows are removed regardless of
 is_dense. Malformed input is logged and rejected without a false clear output;
 input storage is unchanged. Filter coordinates still use X-forward, Y-lateral,
 Z-up sensor axes; no cloud transform is added in this step. Recheck calibration
-and the follower's remaining frame/freshness limitations after a sensor change.
+and the follower's configured monitoring/TF contract after a sensor change.
 Outputs keep the incoming header. Cliff and stair outputs have no internal
 motion-control consumer.
 
@@ -179,5 +179,19 @@ V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
 ../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
 On Humble/Jammy the real dependency install/check and two fresh copy builds pass;
-each full suite passes 225 cases, and a source-free install passes 169 cases.
+each full suite passes 306 cases, and a source-free install passes 250 cases.
 This establishes the tested installation scope, not remote CI, motion or Jazzy support.
+
+## M02 obstacle input
+
+path_follower.obstacle_monitoring adds enabled=false, timeout_sec=1.0,
+require_transform=true and topic=/local/filtered_obstacles in central YAML.
+The corresponding dotted ROS parameters are read-only after startup. Older YAML
+without the group retains defaults. Enabled mode uses timestamped base-frame
+geometry, ROS measurement age and monotonic successful-input age; invalid input
+revokes clearance and publishes zero Twist. New valid input can recover only
+with a valid current PathWithMetadata, fresh pose and no existing stop condition.
+The internal filter is optional; external reliable or best-effort publishers
+are supported. See ../docs/CONFIGURATION.md for strict validation, empty-cloud,
+clock/TF and stop/recovery details. This is software monitoring, not a physical
+safety claim. Only Humble/Jammy/Python3.10 is the current release target.

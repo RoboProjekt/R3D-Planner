@@ -221,8 +221,9 @@ odometry, or the sensor installation.
 `r3d_path_follower` is a simple 2D lookahead controller:
 
 1. Receive atomic `/global_path_metadata` (Path plus narrow flags).
-2. Check `/local/filtered_obstacles` for points 0.1–0.6 m forward and ±0.3 m
-   laterally.
+2. Check the configured obstacle topic for points 0.1–0.6 m forward and ±0.3 m
+   laterally. With M02 enabled, validate freshness/geometry and transform to the
+   base frame at measurement time before this existing ROI test.
 3. Transform the configured Odometry base pose into map and use XY/yaw.
 4. Select a path point at least 0.5 m ahead.
 5. Reduce speed and turning in narrow areas; otherwise command at most 0.35 m/s
@@ -258,7 +259,7 @@ produces a zero Twist, but external command supervision remains necessary.
 | `/global_path` | `nav_msgs/msg/Path` | `pcd_path_planner` | generic consumers | depth 10 |
 | `/global_path_metadata` | `r3d_interfaces/msg/PathWithMetadata` | `pcd_path_planner` | `path_follower` | depth1, reliable, transient-local |
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external driver | `local_filter` | SensorDataQoS: depth5, best-effort, volatile |
-| `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 | depth 10; retains input header |
+| `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | `local_filter` | `path_follower`, optional Nav2 | reliable output depth10; follower best-effort/volatile/depth5; retains input header |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | `local_filter` | none internally | depth 10 |
 | `/stair_detect` | `geometry_msgs/msg/PointStamped` | `local_filter` | none internally | sent only when a step is detected |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | `path_follower` | external base | 10 Hz control output |
@@ -353,4 +354,20 @@ wait. Selection frame/finite geometry and quaternion checks precede calibration
 or planning; normalized valid quaternions are published. Odometry TF composition
 rejects nonfinite translation and unavailable/time-incompatible transforms.
 Local filter sensor data accepts best-effort/reliable input; outputs retain their
-original frame and QoS. Follower obstacle TF/freshness remains deferred M02.
+original frame and QoS. Follower obstacle monitoring is now an opt-in feature;
+its parameter/input/TF/time/recovery contract is documented in CONFIGURATION.md.
+
+## M02 placement
+
+The follower owns monitoring, reuses its Odometry TF buffer and keeps a single
+Twist publisher. Its default mutually exclusive callbacks serialize input and
+control. Clock jump notifications only set an event; no command is published
+from the clock callback. Enabled monitoring uses a steady control timer, an
+immediate zero on invalid input/obstacles and a final gate before command output.
+The standalone monitor class stores only successful measurements, their receipt
+time and explicit failure reason. It does not own a sensor/filter lifecycle or
+broadcast TF. A failed sample cannot recover merely because TF later appears.
+
+The optional filter retains sensor-axis thresholds. Nonfinite-only input now
+yields no clear output; valid empty output still has complete XYZ metadata.
+See [the monitoring reference](CONFIGURATION.md#obstacle-monitoring-m02-humble).

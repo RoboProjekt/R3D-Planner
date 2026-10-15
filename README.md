@@ -73,11 +73,11 @@ passes actual rosdep installation and rosdep check
 (exit 0) in two fresh isolated ROS 2 Humble / Ubuntu 22.04.5 containers using
 system Python 3.10.12. Apt NumPy 1.21.5, SciPy 1.8.0, Open3D 0.14.1 and NetworkX
 2.4 worked without the former NumPy/SciPy compatibility warning. Two fresh copy
-workspaces each passed 225 tests (0 failures, 0 skips), including active lint and
-copyright checks; a separate container without the source tree passed 169
+workspaces each passed 306 tests (0 failures, 0 skips), including active lint and
+copyright checks; a separate container without the source tree passed 250
 installation/output/interface cases. The audit host was unchanged and still lacks apt
 Open3D/NetworkX. These results establish the tested Humble installation scope;
-CI, newer distributions, hardware deployment and official release remain separate.
+Remote CI, postponed distributions, hardware deployment and official release remain separate.
 
 Replace angle-bracket placeholders before running commands. Source ROS and the
 workspace once in each new terminal. Optional developer `--symlink-install` makes source
@@ -101,9 +101,11 @@ transient-local, depth-1 QoS; late joining receives both path and flags.
 Upgrade planner and follower together. External consumers that decoded
 `orientation.z > 0.5` must use `narrow[index]` on the enriched path instead.
 Inconsistent metadata clears the follower path; there is no legacy decoder.
-M02 obstacle timeout/TF monitoring remains deferred: disabling the optional local
-filter does not silently enable or disable a watchdog. See the proposal in the
-[central protocol](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#182-m02-vorschlag--optionaler-filter-timeout-tf-und-stopzustände).
+M02 obstacle monitoring is implemented as an opt-in follower feature, disabled
+by default. It checks measurement/receipt freshness and timestamped sensor-to-base
+TF, then gates every command and defines automatic recovery after valid new input.
+The local filter remains independently optional. See the
+[monitoring contract](docs/CONFIGURATION.md#obstacle-monitoring-m02-humble).
 
 ## Configuration
 
@@ -349,7 +351,7 @@ Each package has a Forthcoming CHANGELOG.rst. None declares a released version.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 225 full and169 source-free tests pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 306 full and250 source-free tests pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -358,3 +360,11 @@ Each package has a Forthcoming CHANGELOG.rst. None declares a released version.
 Newer Nav2 actions add error fields and, in Lyrical, viapoints. Their full contract
 is not implemented or verified here. No pip/vendor migration was applied.
 See central protocol section18.8 for commands, exact images and remaining work.
+
+## Current release target
+
+V4 development and release preparation target only ROS 2 Humble on Ubuntu22.04
+Jammy with Python3.10 and the verified apt dependency set. Jazzy, Lyrical and
+Rolling are postponed; their recorded limitations are not blockers for the
+Humble release. The distribution investigation above is historical evidence,
+not a multi-distribution support promise. No push or release has been performed.
