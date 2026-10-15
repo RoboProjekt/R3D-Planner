@@ -306,3 +306,16 @@ before enabling the Go2W adapter, which may change posture on startup.
 - [Preprocessor reference](r3d_preprocessor/README.txt)
 - [Planner reference](r3d_planner/README.txt)
 - [Historical V2 deployment comparison](docs/REFERENCE_COMPARISON.md)
+
+## Action result and cancellation scope
+
+ComputePathToPose succeeds with the geometric Path and measured planning_time,
+aborts with an empty result on invalid frame/position/quaternion, missing/stale
+pose or TF, and unreachable/empty paths. The existing A* checks accepted
+cancellation cooperatively; active requests can reach CANCELED without publishing
+a new path. Cancel or failed replanning does not revoke a previously published
+path or command a robot stop. The four-worker executor permits cancel service
+processing during planning, but makes no real-time or unlimited-concurrency promise.
+Planner IDs remain accepted without plugin selection for compatibility. Humble's
+result has no error_code field and its feedback payload is empty. This is an
+action contract, not a full Nav2 planner plugin/lifecycle integration.

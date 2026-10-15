@@ -1138,6 +1138,30 @@ Statischer Abgleich launching.py/configuration.py/Follower: local_filter ist opt
 
 Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
 
+### V4-022 - Action – Fehlerzustände, Cancel und tatsächliche Humble-Resultfelder
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/AP06. **Betroffene Dateien:** r3d_pcd_path.py und neue Actionregressionen; Protokoll. **Status:** VERIFIED für dargestellten Humble-Actionumfang. **Git-Commit:** `fix(action): validate results and support cooperative cancellation`.
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Konkrete Actiongrenzen: kein Cancellationcallback/SingleThreadexecutor, fehlende Finiteposevalidierung, planning_time nie gesetzt. Additiver CancelResponse.ACCEPT, kooperative Prüfung in bestehender A*-Schleife ohne geänderte Kosten/Heuristik/Topologie; ReentrantActioncallbackgruppe und4Threadexecutor für Bearbeitung von Cancel während Planung. Poseframe/finitePosition/Quaternion prüfen, Fehler abort/emptyResult, Erfolg succeed, Cancellation canceled ohne neue Pfadpublikation. Tatsächliches Humble-Result path+planning_time setzen, kein erfundenes error_code-/Feedbackfeld. planner_id bleibt zur Rückwärtskompatibilität wie dokumentiert akzeptiert/ohne Pluginwahl, insbesondere kein stiller Reject bisher akzeptierter IDs. Fehlplanung/Cancel invalidiert keine zuvor ausgegebenen Pfade und ist kein Roboterstopbefehl; diese Grenze dokumentieren. Kein M02.
+
+#### Verifikation und Ergebnis
+
+Frischer Copy-Build /work/action1 mit allen drei Paketen Exit0; colcon test/test-result Exit0:205PASS/0FAIL/0ERROR/0SKIP. 191bisherige Gesamtfälle erhalten,14neue Actionfälle. Native ActionClient Tests für3Planner-IDs mit jeweils wiederholten Erfolgen;9Fehlerfälle (Frame/nan/Quaternion/Startframe/fehlendePose/stalePose/fehlendeTF/disconnected/emptyPath) jeweilsABORTED/empty; Cancellation während künstlich verlängerter aktiver Execute erreichtCANCELED, echte A*-Schleife zusätzlich kooperativ geprüft. Resultplanungstime>0 und realeSchemafelder geprüft; M01-Pub/Sub-Paarung/Narrow-/Copyright-/Lintfälle unverändert bestanden. Begrenzte4Worker, keine unbeschränkte Concurrency-/Echtzeitgarantie; altePfadpublikation wird bei Fehler/Cancel nicht widerrufen. Logs/xUnit /tmp/r3d-v4-release/results/action1-*, keine Hardware/Hoständerung. Alle AST-basierten Kosten/Heuristik/Graph-/Klassifikationsberechnungen außer optionalem Cancelcheck erhalten. M02 unverändert.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -3144,3 +3168,14 @@ Summary: 191 tests, 0 errors, 0 failures, 0 skipped
 ```
 
 Python-xUnit186, zusätzliche5CMakeprüfungen werden von colcon gezählt; Testhelper darf Pythonzahl nicht mit Gesamtsuite gleichsetzen. Keine neuen Fehler/Skips in dieser M01-Abnahme. Generierte Nachricht/Schema, Qos/Paarung/Migration15neuePythonfälle; neue CMake-/License-/XML-/Stylechecks5. Rohlogs temporär /tmp/r3d-v4-release, dauerhafte relevante Resultate hier. Aktuelle README/INSTALL/PaketREADME/Config-/Architektur-/KnownIssues beschreiben die Migration. Weitere AP05-Korrekturen werden separat getestet; dieser Erfolg gilt nicht vorab für spätere Änderungen oder spätere Source-freie/CI-/Multi-Distro-Abnahmen.
+
+
+### 18.4 Tatsächliche Action-Abnahme (V4-022)
+
+Normale colcon build/test --packages-up-to r3d_planner in /work/action1, anschließend colcon test-result --verbose; jeweils Exit0, Domain222/localhost/FastDDS/UID1000, readonlySource und keineHardware. Tatsächliche Ausgabe:
+
+```text
+Summary: 205 tests, 0 errors, 0 failures, 0 skipped
+```
+
+14neue Actionfälle zusätzlich zu191M01-Gesamtfällen. Schema-Humble path+planning_time, keine erfundenen Error-/Feedbackfelder. Ungültige Frames/finitePoses/Quaternionen/fehlendeoderstalePose/TF/unreachable/emptyPath ergebenAbort. Realer CancellationService während laufendemExecute erreichtCanceled. Modifizierter Testsearch simuliert längere Laufzeit; echte A*-Cancelbedingung separat geprüft. Keine Kollisions-/Robotersicherheits-/Echtzeit-/Plugin-/Lifecyclezusage. Alle bereits im Eintrag genannten Grenzen bleiben dokumentiert. M02 nicht umgesetzt.

@@ -216,3 +216,13 @@ launched by this workspace.
   conditions. The early failures do not establish a planner or middleware bug.
 - **Next step:** Use the corrected harness for regression; validate deployment
   middleware independently on the Go2W.
+
+## Current action behavior after AP05 fixes
+
+Pose/frame/nonfinite checks, empty/unreachable errors, result timing and accepted
+cancellation are covered by real ROS clients. Explicit-start map coordinates do
+not require Odometry/TF. Online requests require the existing fresh pose and TF.
+planner_id is retained as a compatibility field and does not choose a plugin;
+feedback has no Humble payload. Four workers are not a real-time latency guarantee.
+A previous published path remains active after another request aborts/cancels;
+cancellation is not a controller stop command. M02 remains deferred.
