@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 15. Oktober 2026; fortgeführt bis V4-027. M01 ist freigegeben und implementiert, M02 ausdrücklich zurückgestellt und ausschließlich als Vorschlag dokumentiert. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und18. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 15. Oktober 2026; fortgeführt bis V4-028. M01 ist freigegeben und implementiert, M02 ausdrücklich zurückgestellt und ausschließlich als Vorschlag dokumentiert. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und18. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -255,7 +255,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1; Voraussetzung für Nachweis jedes technischen Schritts |
 | Abhängigkeiten | Begleitet AP02-AP05; vollständige ROS-Läufe nach AP03; Copyright-Lizenzprüfung hängt von AP01 ab; keine Bewegung/hardwareabhängige Prüfung automatisch ausführen |
 | Abschlusskriterien | Dokumentierte Auswahl und Abdeckung; neue Regressionen und Bestandsfälle erfolgreich; colcon test und test-result mit ausgewiesenen Skips; bekannte Restfehler nicht verstecken; keine historischen Ergebnisse als V4-Nachweis übernehmen |
-| Aktueller Status | VERIFIED für implementierten Humble-Umfang:225PASS/0FAIL/0SKIP,169SourcefreieFälle; abschließender neuer LaufV4-028 folgt; keine Coverage-/Hardware-/M02-Abnahme |
+| Aktueller Status | VERIFIED für implementierten Humble-Umfang: finale225PASS/0FAIL/0ERROR/0SKIP,169SourcefreieFälle; keine Coverage-/Hardware-/M02-/vollständige Neuere-ROS-Abnahme |
 
 ### 4.8 AP07 - CI/CD
 
@@ -1279,6 +1279,30 @@ Aktuelle offizielle Anforderungen von Sourceindex/rosdep/Bloom/ReleaseRepo/Build
 #### Verifikation und Ergebnis
 
 Offizielle Index-/REP144-/REP149-/Bloom-/Track-/Reviewquellen erneut gelesen; fünf offizielle distribution.yaml-Dateien tatsächlich geparst, keinR3D-Treffer im beschriebenen Umfang. Lokale dreiManifeste/Versionen/Lizenz- undInstallregeln abgeglichen; strukturelle Metadaten-/DokumentprüfungPASS. Vorhandene22Lizenzunterkapitel nicht umgedeutet, historischeGitkarten undexterneLiDARNotice-Anwendung bleibenseparat offen. KeineReleaseoperation. AktuelleReadiness, bereits vorhandeneStärken undverbleibendeGates in4,7–9,18.9. FinalerHumble-Regressionslauf folgtV4-028, nichtvorweggenommen.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-028 - Abschluss – finale Humble-Regression und Forschungsabgrenzung
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP03/AP04/AP05/AP06/AP07/AP08/AP10. **Betroffene Dateien:** nur zentrales Protokoll; Prüfartefakte ausschließlich temporär. **Status:** VERIFIED für finale Humble-Regression, Schutzprüfung und Forschungsdokumentation; Gesamtgates bleiben offen. **Git-Commit:** `docs(v4): record final regression and research assessment` (Nachfolger aae71c37f4bb663ec408ca0f4487a5c747cda327, keine selbstreferenzielle SHA/kein Amend).
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Nach allen produktiven Änderungen/Installregeln erneut den exakten vorbereiteten CI-Befehl bash scripts/ci/run_humble.sh ausführen. Neue normaleCopyinstallation undseparaterSourcefreierReadonly-Container, alle3Pakete,UID1000,DDSlocalhost,keineHardware. Dependencyinstall/check,Manifeste/Syntax/Dokustruktur,vollecolconSuite/test-result,installierteRessourcen/Interfaces/EntryPoints/SyntheticPCD/Graph/A*/Action/Cloud/TF/Namespace/QoS/Follower/Lints prüfen. Danach tatsächlicheProduktions-/Testkopien mitSourcebytesvergleichen, eigeneContaineraufräumen,refs/PDF/LICENSEs/OSRF/alteEvents/Versionen/Algorithmen/altePYC kontrollieren. KonsolidiertenVorher-Nachher-Vergleich,Forschungsbewertung,AP-/Readiness-/Commit-/Testreferenzen imselbenProtokollabschließen. Keine Gesamtprojekt-VERIFIED-Wertung fürzurückgestelltesM02,RemoteCI,neuereTargets,Rechts-/Releasegates.
+
+#### Verifikation und Ergebnis
+
+Erneuter exakter CI-Befehl Exit0 nach allen Code-/Installänderungen: regulärer frischer Humble-Copybuild, colcon test/test-result0 und **225PASS/0FAIL/0ERROR/0SKIP**; zweiter Source-freier readonly-Container **169PASS/0FAIL/0ERROR/0SKIP**. Echte rosdep install/check in beiden0, keine Skipkeys/Pip. Aktuelle Module, sechs Runtime-Testdateien, YAML/Launch/Manifeste/Lizenztexte/Changelogs/Interfaceschema mit Installartefakten bytegleich, keinePCDs. Schutzprüfung0: Baseline/übrigeRefs/Remotes/22Lizenzabschnitte/alteEvents001..019/PDF/Lizenztexte/sechsOSRF-Notices/neunaltePYC erhalten; Preprocessing-/Graph-/A*-Berechnung/Filtergeometrie unverändert; Follower-Hinderniscallback unverändert und Control nurfreigegebeneMetadatenzuordnung. Drei eigeneAnalysecontainer nachexakterID-/Label-/Isolationsprüfung entfernt, CIeigeneContainer durchTrapentfernt, keineImagesgelöscht. Aktueller strukturellerDoc-/Metadata-/Linkcheck0.22Source-/Runtime-Pythonbytevergleiche sowieSharevergleichePASS. KeineHardware,keinPush,keineanderenBranches. Belege/T97..T111/Commitzuordnung/Forschungsbewertung in18.10–18.13.
 
 #### Auswirkungen
 
@@ -3342,7 +3366,7 @@ Stichtag15.10.2026. Offizieller [ROS-Releaseindex](https://raw.githubusercontent
 
 | ROS | Ubuntu / Python (tatsächlich oder Quellenumfang) | rosdep | Build | Tests | Installation | Gesamtstatus |
 |---|---|---|---|---|---|---|
-| Humble | 22.04.5 /3.10.12 amd64, nativ imContainer |32Keys einzelnPASS, install/checkPASS |3PaketeCopyPASS |225PASS/0FAIL/0SKIP |169SourcefreieFällePASS, readonly |VERIFIED im definierten Umfang, finalerLauf folgt18.10 |
+| Humble | 22.04.5 /3.10.12 amd64, nativ imContainer |32Keys einzelnPASS, install/checkPASS |3PaketeCopyPASS |225PASS/0FAIL/0SKIP |169SourcefreieFällePASS, readonly |VERIFIED im definierten Umfang, finalerLauf bestanden18.10 |
 | Jazzy |24.04.5 /3.12.3 amd64, nativ imContainer |Gesamtinstall/checkExit1, Open3Dnotavailable |NurInterfacepaketPASS; Planner/Preproc nichtgebaut |5Interfacechecks+CDRPASS; keinePlanner-Vollsuite |Interfaceinstalliert; keineSourcefreieGesamtabnahme |BLOCKED fürGesamtpaketsatz; InterfacePARTIALnachgewiesen |
 | Kilted |Noble24.04 /Python3.12 lautREP; keinContainerlauf |SystemregelNoble:blockiertOpen3D |NOT TESTED |NOT TESTED |NOT TESTED |BLOCKED Dependencyregel / API NOT TESTED |
 | Lyrical |26.04.1 /3.14.4 amd64, nativ imContainer |install/checkExit0 ohneSkip/Pip |3PaketeCopyPASS |colcon testExit5; nur5CMakePASS, direktePython218PASS/2LintFAIL/0SKIP |3PaketeInstall/Imports/CDRPASS; keinSourcefrei-Lauf |PARTIAL; keineSupport-/Gesamttestfreigabe |
@@ -3390,3 +3414,114 @@ Am Stichtag wurden die offiziellen distribution.yaml-Dateien für [Humble](https
 **Abgrenzung von Anforderungen:** Geklärte Rechte, gültige Paketmetadaten, öffentlicher prüfbarer Source und externe Review sind Source-/Indexgrundlagen. Zielauflösbare Dependencies, passende installierte Inhalte und tatsächliche Release-/Buildfarm-/Debianergebnisse betreffen die Binärveröffentlichung. M02, mehr Algorithmusabdeckung, Remote-CI und Unterstützung zusätzlicher Distributionen sind konkrete Projektziele bzw. Qualitätsnachweise, keine erfundenen allgemeinen ROS-Index-Pflichtdateien. CONTRIBUTING und Wartungshinweise sind nützlich; dedizierte SECURITY-/Issue-/PR-Templates oder eine QUALITY_DECLARATION sind nicht pauschal Voraussetzung jeder Registrierung. [REP-2004](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-2004.rst) dient hier zur Einordnung von Versionpolitik, Change-Control, API/ABI, Dokumentation, Tests/Coverage, Dependencies, Plattformen und Security. Ein Quality Level wird nicht beansprucht: insbesondere fehlen vollständige Coverage-, stabile API-/ABI-, Remote-CI- und umfassende Plattform-/Sicherheitsnachweise.
 
 **Nächste abhängige Schritte:** Zuerst offene Rechte und Publikationsumfang entscheiden. Parallel kann M02 nach separater Freigabe mit dem Vorschlag18.2 bearbeitet werden. Danach den zugesagten Zielvertrag, insbesondere eine neuere ROS-Zielplattform und deren Dependency-/Action-/Teststrategie, festlegen und vollständig prüfen. Anschließend endgültige Releaseversion/Changelog, öffentlichen Source-Ref und autorisierten Remote-CI-Lauf vorbereiten. Erst danach externe Source-Review, Releaseorganisation/Bloom und tatsächliche Farm-/Debianabnahme. Kosmetik oder zusätzliche Templates schließen keine grundlegenden Gates.
+
+
+### 18.10 Abschließende Regression und Schutzprüfung – V4-028
+
+Nach allen Änderungen an Produktion, Paketintegration und Installationsregeln wurde erneut exakt `bash scripts/ci/run_humble.sh` ausgeführt, Prozess-Exit0. Build und Runtime installierten/checkten ihre Dependencies tatsächlich und ohne Skipkeys; beide rosdep-Checks meldeten „All system dependencies have been satisfied“. Tatsächliche Schlussausgaben:
+
+```text
+METADATA_XML_YAML_SYNTAX_DOC_STRUCTURE_PASS
+Summary: 225 tests, 0 errors, 0 failures, 0 skipped
+169 passed, 2 warnings in 5.83s
+CI_LOCAL_BUILD_AND_SOURCEFREE_PASS
+```
+
+Das sind zwei getrennte frische Humble/Jammy-Containersysteme mit UID1000, FastDDS, Domains231/232 und lokaler ROS-Kommunikation. Die Runtime erhält ausschließlich die schreibgeschützte Installation am ursprünglichen Buildprefix, sechs Testdateien, drei Manifestkopien und den Helper; Source- und Buildtree sind nicht gemountet und werden ausdrücklich als abwesend geprüft. Der Container-Exitcode wird zusätzlich kontrolliert, damit docker start/tee keinen Fehler verdeckt. Die erste Pipelineprüfung und AP08-Copyprüfung sind separate frühere Nachweise. Der Schlusslauf ist kein GitHub-Actions- oder Buildfarm-Lauf.
+
+Die Artefaktprüfung vergleicht16 aktuelle Pythonmoduldateien und sechs Runtime-Testdateien byteweise sowie installierte Manifeste, vier Lizenztexte einschließlich Rootvergleich, Changelogs, Interface-README/-Schema, YAML und vier Launchdateien mit dem Repository. Alle Vergleiche bestehen; die Installation enthält keine PCDs. Metadaten/XML/YAML/Python/Markdownstruktur wurden erneut erfolgreich geprüft. Der Check ist strukturell, keine vollständige manuelle Prüfung jedes externen Dokumentationslinks. Deprecation-Warnungen aus NetworkX/ament bleiben sichtbar; kein NumPy/SciPy-Mischversionsfehler in der Humble-Aptumgebung. Die zwei Runtime-Warnungen sind keine ausgeblendeten Failures.
+
+Baseline und Eingang bleiben Vorfahren von V4. Alle übrigen lokalen Branches/Remote-Tracking-Refs, Tags und die Git-Konfiguration sind unverändert. Das historische PDF hat weiterhin SHA-256 `8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383`; Root-/ursprüngliche Paket-LICENSEs bleiben bytegleich, das neue Interfacepaket trägt denselben Text. V4-001..019 und die gesamten22 Lizenz-Unterkapitel sind identisch mit dem Eingang. Die sechs OSRF-Noticeblöcke und neun alten versionierten PYC-Dateien bleiben unverändert. Fünf lokale aktuelle Branch-Trees sind PCD-frei; historische Gitobjekte sind nicht umgeschrieben.
+
+AST-/Byteprüfungen bestätigen erhaltene Preprocessing-, Graph-, A*-Berechnungen und Filtergeometrie. Beim A* ist ausschließlich der optionale kooperative Cancelcheck hinzugekommen. Follower-Obstaclecallback bleibt unverändert; in der Kontrollberechnung sind ausschließlich die freigegebene Flagquelle und das gemeinsame Leeren der Arrays geändert. Kein M02-Monitorparameter und keine Sensor→Base-Stopüberwachung wurden implementiert.
+
+Die drei eigenen Analysecontainer wurden anhand exakter IDs und Aufgabenlabel kontrolliert, dann gestoppt/entfernt. Zuvor wurden readonly-Source, kein privilegierter Modus, kein Hostnetz und keine Hardware-Gerätefreigabe verifiziert. CI-Container wurden durch die eigene ID-basierte Trap entfernt. Keine fremden Container oder Images wurden gelöscht; Host-Apt/Pip/Conda und externe Projekte bleiben unangetastet. Im Repository sind85 Dateien versioniert. Rohlogs/xUnit/Hashvergleiche liegen temporär unter `/tmp/r3d-v4-release` und `/tmp/r3d-ci.5ynwiewN`; dauerhafte relevante Befunde und Exits stehen hier. Abschließende reine Git-/Schutzkontrolle nach dem Protokollcommit gehört zur Abnahme; dessen SHA wird über den eindeutigen Subject aufgelöst.
+
+### 18.11 Konsolidierter M01-Vertrag und verbleibender M02-Vorschlag
+
+**M01 ist implementiert.** `r3d_interfaces/msg/PathWithMetadata` enthält `nav_msgs/Path path` und `bool[] narrow`. `narrow[i]` gehört ausschließlich zu `path.poses[i]` derselben Nachricht; die Längen müssen übereinstimmen. Pfad- und Pose-Header stimmen einschließlich Frame und Zeitstempel überein. Positionen sind endlich, Quaternionen normiert. Die Orientierung beschreibt die XY-Pfadrichtung; bei fehlender horizontaler Richtung wird eine gültig normalisierte Zielorientierung verwendet. Graphpositionen und Klassifikationen werden dadurch nicht geändert.
+
+Der Planner stellt denselben geometrischen Path auf `/global_path`, innerhalb `/global_path_metadata` und als erfolgreiches Actionresult bereit. `/global_path` bleibt `nav_msgs/Path`; generische ROS-Verbraucher brauchen das Metadatenpaket nicht zum Lesen dieses Topics. Eine Lieferung über mehrere Topics ist jedoch nicht atomar: Reihenfolge und Beobachtungszeit können sich unterscheiden. Deshalb koppelt der Follower keine zwei Topics über Zeitstempel, sondern übernimmt ausschließlich die vollständige Metadatennachricht. Das verhindert eine Zuordnung alter Flags zu einem neueren Pfad auch bei gleichen oder zurückgesetzten ROS-Zeitstempeln. Die Nachricht definiert keine globale Goal-ID oder Multi-Planner-Arbitration.
+
+Metadaten nutzen reliable/transient-local/depth1; der Follower verwendet ein kompatibles Profil. Ein nachträglich startender Follower erhält den zuletzt vom noch vorhandenen Publisher gehaltenen Pfad mit Flags. Das ist kein Hindernisfrische- oder Bewegungsfreigabenachweis. Ungültige Metadaten löschen Pfad und Flags gemeinsam; die bestehende Kontrollschleife erzeugt dann Nullbefehle. Ein neuer gültiger Pfad ersetzt beide Arrays gemeinsam in der serialisierten Callback-Ausführung. Zielerreichung löscht beide. Die Engstellengeschwindigkeit liest den zugehörigen Flagindex, keine Quaternion. Die 15 Metadatenregressionen prüfen unter anderem CDR, Längen/Header/Frame/Geometrie, Ersetzung/Verwerfen, Engstellengeschwindigkeit, Late-Join und tatsächliche Gleichheit von Standard-Path, Metadaten-Path und Actionresult.
+
+Die Migration erfordert gemeinsam aktualisierte Planner, Follower und Interfaceinstallation. Externe alte Narrow-Decoder müssen auf das neue Topic wechseln; es gibt keinen Legacy-Decoder oder eine zweite versteckte Flagkodierung. Die bisherigen Standardtopicnamen bleiben am Root erhalten; opt-in Namespace und explizites ROS-Remapping sind geprüft. Ein Namespace präfigiert keine TF-Frame-IDs.
+
+**M02 bleibt unimplementiert.** Eine obligatorische Hindernisquelle würde bei ausgeschaltetem lokalen Filter ohne externen Producer den Follower dauerhaft stoppen. Der Vorschlag in18.2 trennt daher die optionalen Filter- und Monitor-Schalter. Bei aktiviertem Monitor wird nur mit aktuellem gültigem Eingang und passender TF am Messstempel gefahren; fehlen Daten, sind sie zu alt, ungültig oder nicht transformierbar, ist ein Null-Twist vorgesehen. Deaktivierter Monitor erhält das bisherige Verhalten. Timeout, zulässige Zeitabweichung, TF-Wartezeit, Start-/Fehler-/Wiederanlaufzustände und synthetische Tests sind vorgeschlagen, noch keine akzeptierten Konfigurationsfelder. Die bestehende Hinderniscallback-Logik bleibt byte-/AST-semantisch erhalten. Radiuslücke0.65m Filter gegenüber0.6m Follower, Sensorversatz und fehlende Cliff/Stair-Verbraucher bleiben ausdrücklich offen. Der Vorschlag ist keine Sicherheitszertifizierung und wartet auf gesonderte Freigabe.
+
+### 18.12 Wissenschaftliche Abschlussbewertung und Vorher/Nachher
+
+Vergleichsreferenz bleibt **c65642fe56015556f696364a724cb5b976a27888**. PCD-Verarbeitung, Voxelisierung, Boden-/Clearance-/Treppenanalyse, RGB-Ausgabe, Graphrekonstruktion und A*, Odometry/TF, RViz, lokaler Filter, Follower, strikte zentrale YAML, Robotprofile und vier Launchdateien waren vorher vorhanden. Das sind keine im Forschungsprojekt neu entwickelten Navigationsalgorithmen. Der historische Baselinebericht enthält20 parametrische Funktionstestfälle und Lintertemplates. Frühere V4-Schritte erweiterten diese Grundlage auf86 und anschließend171 Fälle; diese Stände bleiben datierte Vorleistungen der jeweiligen Schritte.
+
+Der konkrete Eingang dieser Fortsetzung war **11d594a**, bereits171 vollständige und120 Source-freie Tests. Neu hinzugekommen sind49 Pythonfälle (15 Metadaten,14 Action,20 Komposition) sowie5 CMake-Paketprüfungen. Damit umfasst die aktuelle Humble-Suite225 Tests; der Source-freie Teil169. Die ursprünglichen171 Fälle wurden nicht gelöscht oder übersprungen; die Root-Graph-Erwartung des bestehenden Launchtests wurde begründet auf den Root-Namespace beschränkt, damit neue Namespace-Tests keine falschen Mehrnode-Befunde erzeugen. Die Zahlen zählen parametrische Fälle und Lints, keine Prozentabdeckung. Sie begründen weder eine vollständige Algorithmusprüfung noch ein REP-2004-Quality-Level.
+
+| Technischer Bereich | Historische Baseline | Implementierte V4-Verbesserung | Messbarer Nachweis / Grenze | Status |
+|---|---|---|---|---|
+| Lizenzierung | Keine vollständige Projektlizenzdatei, Manifest-TODO und ungeklärte Karten | Autorisierte Apache-Texte/Header/Metadaten; aktive Karten entfernt; Fremdnotices erhalten | Lizenzmitnahme/Hashes; Rechts-/Git-Historien-/Bundlefragen bleiben | Technisch VERIFIED, Rechtsgesamtgate BLOCKED |
+| Paketmetadaten | Zwei Manifeste, Version/Description widersprüchlich | Konsistentes0.0.1 und zweckgebundene Metadaten; zusätzliches Interfacepaket | Drei validierte Manifeste; keine neue Releaseversion | VERIFIED technisch |
+| Dependencies | Unvollständige direkte Deklarationen und Skip-Anleitung | Direkte rosdep-Keys, interne Pakete und Test-/rosidl-Abhängigkeiten |32 externe Humble-Keys; tatsächliche Installation/check | VERIFIED Humble; andere Ziele getrennt |
+| Installation / Daten | Copy-Konfiguration abgewiesen; Sourcekarten und Ausgabe neben Input | Normale Share-Auflösung, externer Override, getrennte exklusive Ausgabe, eigene Karten | Normale kopierte Installation und Source-freier readonly-Test, keine PCDs gebündelt | VERIFIED im geprüften Umfang |
+| ROS-Nachrichten | Engstellenflag als ungültige Quaternion | Gültiger Standard-Path und atomarer typisierter Pfad mit Flags |15 Metadatenfälle und native Gleichheits-/Geschwindigkeits-/Late-Join-Tests | M01 VERIFIED |
+| PointCloud2 | Gepacktes XYZ vorausgesetzt | Feld-/Stride-/Endian-bewusster gemeinsamer Decoder |83 Cloudfälle; Input bleibt unverändert; Sensorachsen bleiben Integrationsvertrag | VERIFIED Decoder |
+| Action | Begrenzte Validierung, Cancel-/Zeitsemantik unvollständig | Endliche gültige Posen, Fehler/Cancel und monotone Planungsdauer |14 neue echte ROS-Actionfälle; bestehende A*-Berechnung erhalten | VERIFIED Humble-Vertrag; keine volle Nav2-Zusage |
+| TF / RViz | Odometry-/TF-Basis bereits vorhanden | Weitere ungültige TF-/RViz-Werte abgewiesen; begrenzte Serverwartezeit | Synthetische native TF-/RViz-Regression; kein neuer Sensor→Base-Monitor | Implementierter Umfang VERIFIED |
+| Namespace / QoS | Teilweise absolut gekoppelte Namen und inkompatibles Sensorangebot möglich | Opt-in Namespace/relative Profile/Remaps; SensorData-Eingangsprofil |20 neue Kompositionsfälle insgesamt; alte Rootnamen erhalten | VERIFIED im getesteten Umfang |
+| Follower | Engstellenfahrt und einfache Hindernisprüfung vorhanden | Metadateneingang validiert und eindeutig zugeordnet | Isoliertes Kommandotopic; keine Hardware; M02 unverändert | M01 VERIFIED, Überwachung zurückgestellt |
+| Tests / Qualität | Funktionstests und Lintertemplates vorhanden | Gezielte Regressionen und aktive Python-/CMake-Lints |225 vollständige /169 Source-freie Humblefälle; keine Coveragequote | VERIFIED Umfang |
+| CI | Keine Pipeline | Gleicher gepinnter Zwei-Container-Befehl lokal und im Workflow | Lokal tatsächlich reproduziert; kein GitHub-Remote-Lauf | IMPLEMENTED / NOT REMOTELY VERIFIED |
+| Dokumentation / Wartung | Umfangreiche vorhandene Anleitungen | Aktuelle Verträge, Migration, Contributor-/Wartungsgrenzen und drei installierte Changelogs | Struktur-/Link-/Metadaten-/RST-/Installprüfungen; keine Support-SLA erfunden | VERIFIED aktueller Devumfang |
+| Distributionen | Humble als historisches Ziel | Reale Humble-, Jazzy- und Lyrical-Prüfung, aktuelle Quellenmatrix | Jazzy Open3D blockiert; Lyrical Build/218 Pythonfälle PASS,2 LintFAIL und Colcon-Problem | PARTIAL für neue Targets |
+| Releasevorbereitung | Kein hier belegter Releaseabschluss | Separate Index/rosdep/Bloom/Farm/Debian-Checkliste | Öffentlicher V4-Ref, Rechte, endgültige Version und externe Abnahme offen | NOT READY |
+
+Die nachgewiesene Verbesserung liegt in überprüfbaren ROS-Verträgen, installierbaren Ressourcen, vollständigerer Dependency-Deklaration und wiederholbarer lokaler Qualitätssicherung. Reproduzierbarkeit ist auf die protokollierten Images, Plattformen und konkreten Aptstände begrenzt: Die Basisimages sind gepinnt, Apt-/rosdep-Repositories sind keine eingefrorenen Zeitsnapshots. Ein späterer Lauf kann andere kompatible Updates erhalten. Mehr Tests sind ein überprüfbarer Umfangszuwachs, kein allgemeines Qualitäts- oder Sicherheitsmaß.
+
+Interoperabilität ist unter Humble durch Standardgeometrie, typisierte Metadaten, Remapping/Namespace und Sensor-QoS konkret verbessert. Die Source-freie Prüfung beseitigt belegte Checkout-Abhängigkeiten, beweist aber keinen beliebigen Umzug des Installationsprefixes, keine Debian-Lieferung und keine Hardwareintegration. Moderne Abhängigkeiten sind nicht pauschal problematisch: Lyrical kann sie regulär installieren; dessen konkrete Test-/Lint-/Actionvertragsgrenzen bleiben trotzdem offen. Die rechtliche Bewertung ist technisch nicht entscheidbar. Öffentliche Releasefähigkeit bleibt durch die benannten Gates eingeschränkt.
+
+Die beauftragte M01-Implementierung und der M02-Analyseauftrag sind erfüllt. Der ursprüngliche Gesamtumfang AP05–AP10 wird wegen zurückgestelltem M02, fehlendem autorisiertem Remote-CI-Lauf, nicht vollständig abgenommenen neuen Distributionen und offenen Rechte-/Releasegates **nicht als vollständig technisch abgeschlossen** ausgegeben. Weitere Entscheidungen und Arbeiten bleiben nachvollziehbar abgegrenzt; aus diesem Bericht folgt keine neue Implementierungs-, Push- oder Motionfreigabe.
+
+
+### 18.13 Test-, Commit- und Arbeitspaketübersicht
+
+| ID | Bereich / tatsächlicher Befehl | Ergebnis | Status / Grenze |
+|---|---|---|---|
+| T97 | Eingang, Git-/Datei-/Manifestinventar, geschützte Hashes | V4 bei11d594a sauber,67 Dateien; Baseline vorhanden; Schutzsnapshot | VERIFIED Eingang |
+| T98 | M01 `/work/m01_2`: rosdep install/check, normaler colcon build/test/test-result |191PASS/0FAIL/0SKIP;15 neue Pythonfälle+5 CMakechecks | VERIFIED M01; spätere Änderungen separat |
+| T99 | Optionalfilter-/Followeranalyse, konkreter Monitorvorschlag18.2 und Codevergleich | Kein M02-Timeout oder Sensor→Base-Monitor implementiert | VERIFIED Analyse; Implementierung zurückgestellt |
+| T100 | `/work/action1`: colcon build/test/test-result und echte ROS-Actionclients |205PASS/0FAIL/0SKIP;14 neue Actionfälle | VERIFIED Humble-Vertrag |
+| T101 | `/work/compose4`: colcon build/test/test-result, echte Namespaces/Remaps/QoS/TF/RViz |225PASS/0FAIL/0SKIP;20 neue Kompositionsfälle | VERIFIED; vorangegangene Harness-/Lintfehler inV4-023 ausgewiesen |
+| T102 | Erster exakter lokaler `bash scripts/ci/run_humble.sh` |225 volle+169 Source-freie Fälle PASS, Exit0 | Lokale Reproduktion VERIFIED; kein Remote-Lauf |
+| T103 | AP08 `/work/maintenance1`: normaler Copybuild/Tests, Sharevergleich und docutils |225PASS/0FAIL/0SKIP; drei installierte Changelogs/RST PASS | VERIFIED Install-/Dokumentumfang |
+| T104 | Native Jazzy-rosdep und Interfacepaket-Build/Test/CDR |Gesamtinstall/check1, Open3D fehlt; Interface5PASS+CDR | BLOCKED Gesamtpaketsatz; Interface geprüft |
+| T105 | Native Lyrical-rosdep/build/colcon test/test-result |Install/check/build0; test5, nur5CMakefällePASS/result0 | FAILED vollständige Colcon-Abnahme; kein falscher GesamtPASS |
+| T106 | Lyrical pytest aus jeweils eigenem Paketverzeichnis |218PASS/2Flake8FAIL/0ERROR/0SKIP; CDR PASS | PARTIAL; erster falscher Harness-CWD getrennt korrigiert |
+| T107 | Fünf offizielle distribution.yaml geparst; aktuelle offizielle Index-/Releasequellen |Kein R3D-Treffer im beschriebenen Umfang; Readiness getrennt dokumentiert | VERIFIED Analyse; keine externe Review/Registrierung |
+| T108 | Abschließender exakter lokaler CI-Befehl nach allen Code-/Installänderungen |225 volle+169 Source-freie PASS,0FAIL/0ERROR/0SKIP, Exit0 | VERIFIED Humble-Schlussumfang |
+| T109 | Install-/Sourcebytes, Schema/YAML/Launch/Lizenzen; Git-/AST-/Event-/PDFvergleich |22Pythonvergleiche und Sharevergleiche PASS;85 versionierte Dateien | VERIFIED Schutz-/Identitätsumfang; keine Relokationsgarantie |
+| T110 | Eigene drei Analysecontainer perexakterID/Label stoppen/entfernen; CI-Trap |Keine eigenen Analysecontainer übrig; keineImages gelöscht; Isolation geprüft | VERIFIED Cleanup |
+| T111 | Finaler struktureller Check `PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B scripts/ci/check.py .`, `git diff --check` |Exit0, Struktur/Metadaten/Links PASS | VERIFIED lokal; kein umfassender externer Link-/Rechtscheck |
+
+| Ereignis | Commit-SHA | Inhalt |
+|---|---|---|
+| V4-020/021 |410ed3aa2de53cccfa55935468d3283c887385b4 | M01 implementieren; M02 ausschließlich analysieren |
+| V4-022 |35f547f6cbb681f1acb727af250a8b1dad34136c | Humble-Actionvalidierung und kooperative Cancellation |
+| V4-023 |45d14766b0bd885182cf81284c99ef31b82d1d23 | Namespace/Remapping, RViz/TF-Eingänge, Sensor-QoS |
+| V4-024 |2dd10975faa726c994cd75ed43c0a97eec61ab2f | Humble-CI und Source-freie lokale Reproduktion |
+| V4-025 |be44bf4a9fe8a9a9fe86ead03552850b3017903f | Nutzer-/Wartungsdokumentation und installierte Changelogs |
+| V4-026 |b91cdb909491aa511dde221cba156e4585aed400 | Tatsächliche Jazzy-/Lyrical-Untersuchung |
+| V4-027 |aae71c37f4bb663ec408ca0f4487a5c747cda327 | Getrennte Release-Readiness und externe Gates |
+| V4-028 | Subject `docs(v4): record final regression and research assessment`, Parent aae71c3 | Dieser Protokollabschluss; vollständige SHA über `git log -1 --format=%H --fixed-strings --grep='docs(v4): record final regression and research assessment'` bestimmbar |
+
+| Arbeitspaket | Aktueller Abschlussumfang | Verbleibende Grenze |
+|---|---|---|
+| AP01 | Technische Lizenzimplementierung VERIFIED | Rechtsgesamtgate BLOCKED, keine erneute Lizenzwahl |
+| AP02 | Drei konsistente Manifeste/0.0.1 und vorhandene Metadaten VERIFIED | Endgültige Releaseversion bleibt Entscheidung |
+| AP03 | Humble32 Keys/Installation/check VERIFIED | Noble-Open3D; neuer Zielumfang separat |
+| AP04 | Humble-Copy-/Sourcefrei-/Ressourcen-/Outputumfang VERIFIED | Keine beliebige Relokation/Debian-/Mehrplattformabnahme |
+| AP05 | M01 und übrige implementierte ROS-Korrekturen VERIFIED | Gesamtumfang IN PROGRESS: M02 ausdrücklich zurückgestellt, Integrationsgrenzen bleiben |
+| AP06 | Aktuelle Humble225/169 Regressionen VERIFIED | Keine umfassende Coverage-/Hardware-/M02- oder neuere Zielabnahme |
+| AP07 | IMPLEMENTED; lokale Reproduktion VERIFIED | IN PROGRESS / NOT REMOTELY VERIFIED |
+| AP08 | Aktuelle Nutzer-/Wartungs-/Protokolldokumentation VERIFIED | Keine erfundene SLA/API-/ABI-Stabilitätszusage |
+| AP09 | Untersuchungsauftrag mit realen Nachweisen dokumentiert | Neue Ziele PARTIAL/BLOCKED, keine pauschale Supportfreigabe |
+| AP10 | Aktuelle Checkliste/Analyse VERIFIED | IN PROGRESS; Index/Bloom/Farm NOT READY, keine Veröffentlichung |
+
+Die nächste technische Entscheidung ist eine gesonderte M02-Freigabe auf Basis18.2 oder eine ausdrücklich andere Priorität. Rechtsklärung, Publikationsumfang und Ziel-/Releaseentscheidungen können davon getrennt vorbereitet werden. Ohne diese Entscheidungen werden weder Hindernisüberwachung noch neue Dependenciestrategie, Push, Release oder Hardwaretest automatisch ausgeführt.
