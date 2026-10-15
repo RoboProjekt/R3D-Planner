@@ -269,3 +269,11 @@ def test_config_override_and_legacy_group(config, monkeypatch, mode):
     path.write_text(yaml.safe_dump(cfg))
     with pytest.raises(ConfigurationError):
         load_configuration(mode=mode)
+
+
+def test_first_valid_sample_after_uninitialized_clock():
+    item = monitor()
+    assert not item.available(0, 100*NS)
+    assert item.state == 'CLOCK_ERROR'
+    assert item.receive(cloud(), 10*NS, 100*NS+1)
+    assert item.state == 'ACTIVE'

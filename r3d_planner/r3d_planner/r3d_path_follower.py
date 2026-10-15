@@ -23,8 +23,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # =============================================================================
 
+import threading
+import time
+
 import rclpy
 from rclpy.node import Node
+from rclpy.clock import Clock, ClockType, JumpThreshold
+from rclpy.duration import Duration
+from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import ParameterDescriptor
 from geometry_msgs.msg import Twist
 from r3d_interfaces.msg import PathWithMetadata
@@ -34,6 +40,7 @@ from .configuration import MONITOR_DEFAULTS, monitoring_settings
 import math
 from .odometry import OdometryInput
 from .path_metadata import metadata_qos, validate_metadata
+from .obstacle_monitor import ObstacleMonitor
 
 
 class PathFollower(Node):
@@ -63,6 +70,18 @@ class PathFollower(Node):
         self.current_path = []
         self.current_narrow = []
         self.obstacle_in_front = False
+        self.obstacle_monitor = ObstacleMonitor(
+            self.monitoring_settings, self.odometry.base_frame,
+            (self.obstacle_x_min, self.stop_distance, self.obstacle_half_width),
+            self.odometry.buffer.lookup_transform)
+        self._monitor_state = None
+        self._clock_reset = threading.Event()
+        self._jump_handle = None
+        if self.monitoring_settings['enabled']:
+            self._jump_handle = self.get_clock().create_jump_callback(
+                JumpThreshold(min_forward=None, min_backward=Duration(nanoseconds=-1),
+                              on_clock_change=True),
+                post_callback=lambda jump: self._clock_reset.set())
 
         # --- PUBLISHER & SUBSCRIBER ---
         self.cmd_pub = self.create_publisher(Twist, self.cmd_vel_topic, 10)
@@ -71,11 +90,15 @@ class PathFollower(Node):
             PathWithMetadata, '/global_path_metadata', self.path_callback, metadata_qos())
 
         self.obstacle_sub = self.create_subscription(
-            PointCloud2, '/local/filtered_obstacles', self.obstacle_callback, 10)
+            PointCloud2, self.monitoring_settings['topic'], self.obstacle_callback,
+            qos_profile_sensor_data)
 
         # --- TF (Transformationen) ---
         # --- CONTROL LOOP ---
-        self.timer = self.create_timer(self.control_period_sec, self.control_loop)
+        self.control_clock = (Clock(clock_type=ClockType.STEADY_TIME)
+                              if self.monitoring_settings['enabled'] else self.get_clock())
+        self.timer = self.create_timer(
+            self.control_period_sec, self.control_loop, clock=self.control_clock)
         self.get_logger().info("R3D Path Follower gestartet! Warte auf Pfad...")
 
     def path_callback(self, msg):
@@ -89,6 +112,15 @@ class PathFollower(Node):
         self.get_logger().info(f"Neuer Pfad empfangen mit {len(self.current_path)} Punkten.")
 
     def obstacle_callback(self, msg):
+        if self.monitoring_settings['enabled']:
+            now, steady = self.monitor_times()
+            self.obstacle_monitor.receive(msg, now, steady)
+            if self.obstacle_monitor.state in ('ACTIVE', 'BLOCKED'):
+                self.obstacle_in_front = self.obstacle_monitor.obstacle
+            self.log_monitor_state()
+            if self.obstacle_monitor.state != 'ACTIVE':
+                self.publish_command(Twist())
+            return
         obstacle_detected = False
 
         try:
@@ -109,6 +141,41 @@ class PathFollower(Node):
 
         self.obstacle_in_front = obstacle_detected
 
+    def monitor_times(self):
+        """Consume clock notifications in the serialized node callback group."""
+        if self._clock_reset.is_set():
+            self._clock_reset.clear()
+            self.obstacle_monitor.clock_reset()
+        return self.get_clock().now().nanoseconds, time.monotonic_ns()
+
+    def log_monitor_state(self):
+        """Log transitions rather than flooding every controller cycle."""
+        state = self.obstacle_monitor.state
+        if state != self._monitor_state:
+            self.get_logger().info(f'Obstacle monitoring: {state}: '
+                                   f'{self.obstacle_monitor.reason}')
+            self._monitor_state = state
+
+    def monitor_available(self):
+        """Check freshness even with no path or a paused simulation clock."""
+        now, steady = self.monitor_times()
+        available = self.obstacle_monitor.available(now, steady)
+        self.log_monitor_state()
+        return available
+
+    def publish_command(self, message):
+        """Recheck monitored clearance immediately before the single command publisher."""
+        if self.monitoring_settings['enabled'] and not self.monitor_available():
+            message = Twist()
+        self.cmd_pub.publish(message)
+
+    def destroy_node(self):
+        """Remove the clock callback before destroying the node's ROS entities."""
+        if self._jump_handle is not None:
+            self._jump_handle.unregister()
+            self._jump_handle = None
+        return super().destroy_node()
+
     def get_robot_pose(self):
         try:
             pose = self.odometry.map_pose().pose
@@ -126,18 +193,21 @@ class PathFollower(Node):
 
     def control_loop(self):
         msg = Twist()
+        if self.monitoring_settings['enabled'] and not self.monitor_available():
+            self.publish_command(msg)
+            return
 
         if not self.current_path:
-            self.cmd_pub.publish(msg)
+            self.publish_command(msg)
             return
 
         if self.obstacle_in_front:
-            self.cmd_pub.publish(msg)
+            self.publish_command(msg)
             return
 
         rx, ry, ryaw = self.get_robot_pose()
         if rx is None:
-            self.cmd_pub.publish(msg)
+            self.publish_command(msg)
             return
 
         goal_x = self.current_path[-1].pose.position.x
@@ -147,7 +217,7 @@ class PathFollower(Node):
         if dist_to_goal < self.goal_tolerance:
             self.get_logger().info("ZIEL ERREICHT!")
             self.current_path, self.current_narrow = [], []
-            self.cmd_pub.publish(msg)
+            self.publish_command(msg)
             return
 
         target_point = None
@@ -217,7 +287,7 @@ class PathFollower(Node):
             else:
                 msg.linear.x = self.max_linear_speed
 
-        self.cmd_pub.publish(msg)
+        self.publish_command(msg)
 
 
 def main(args=None):

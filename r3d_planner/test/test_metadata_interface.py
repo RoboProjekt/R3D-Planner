@@ -128,8 +128,9 @@ def test_follower_narrow_speed_pairing_replan_clear_and_invalid():
         node.path_callback(message)
         node.path_callback(PathWithMetadata(path=Path(header=Header(frame_id='map'))))
         assert not node.current_path and not node.current_narrow
-        # M02 is deferred: no added obstacle timeout or TF gating.
+        # The default retains the legacy obstacle policy; M01 is independent.
         assert not node.has_parameter('obstacle_timeout_sec')
+        assert node.get_parameter('obstacle_monitoring.enabled').value is False
     finally:
         node.destroy_node()
         rclpy.shutdown()

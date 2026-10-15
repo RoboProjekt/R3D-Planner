@@ -1356,6 +1356,30 @@ Neuer normaler Drei-Paket-Copybuild /work/core4, UID1000/Humble/Python3.10, Doma
 
 Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default deaktiviert erhält bisherigen Followervertrag einschließlich Hindernisreaktion. Kein Hardware-Notstopp oder Sicherheitsnachweis; bekannte Sensor-/Cliff-/Radiusgrenzen bleiben. Historische Events001..028/PDF/übrigeRefs/Lizenztexte erhalten.
 
+### V4-031 - M02 – Follower-Stop, TF-Zeitvertrag und nativer Wiederanlauf
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP05/M02, AP06/AP08 begleitend. **Betroffene Dateien:** Follower/LocalFilter, native ROS-/Launchtests, M01-Defaulttestkommentar, manifest/CI-Runtimeexport, Protokoll. **Status:** VERIFIED für implementierte Humble-Integration und native Regression; neue Source-freie CI-Abnahme folgt. **Git-Commit:** `fix(follower): enforce monitored stop and recovery` (Nachfolger103f0f5).
+
+#### Ausgangszustand und Problem
+
+Eingang04d080b15f9d744086085ccac88d2850d8d555c5, V4 sauber,85 versionierte Dateien. M01 vorhanden;225/169 bisherige Tests sind historische Ausgangsnachweise. Hindernisse bisher ohne Frische-/Frameüberwachung; interner Filter unabhängig optional. Keine neue Lizenz-/Versions-/Releaseentscheidung.
+
+#### Ziel und autorisierte Entscheidung
+
+Die neue Nutzer-Auftragsdatei gibt M02 ausdrücklich frei. Vorherige Rückstellungen bleiben historisch; sie sind für den konkret beschriebenen Monitoringumfang aufgehoben. Kein Push, keine Hardware, keine anderen Branches oder externen Projekte. M01-Schema und alle bisherigen Funktionen bleiben erhalten.
+
+#### Technische Umsetzung und Begründung
+
+Den geprüftenMonitor amFollower integrieren: beienabledtrueSteadyTimer, bestehenderOdometry-TFbuffer, nonblockingLookup amMessstempel, StartWAITING, Fehler-/Hindernis-/Timeout-Stop undneuevollständigvalidierteDaten fürRecovery. EinzigerCmdPublisher, sofortNullbeiCallbackfehlerundKontrollgateamEnde; frischerTwistjeAusgabe, altePfad-/Pose-/Zielstopbedingungen erhalten. DefaultCallbackGroupserialisiertControl/Subscriptions; JumpCallbacksetzteinEventohnePublisher/TF/Clockaufruf,Nodeverarbeitetes. readonlyStartup-ParameterkeineliveModusänderung. SubscriptionSensorDataQoSBestEffort/volatile/keepLast5 erlaubtBestEffortundReliable. LokalerFilterverwirftnonfinite-onlyOriginalcloudstattfalschemfrischemClear; gültigeEmpty/finiteSelektions-/Filtergeometriebleiben. AlleA–ESzenarienmitnativenisoliertenPublishern, tatsächlichenTwists, statischer/dynamischerTF, ROSClockpause/-sprung, Publisher-/Subscriptionrestart und echteminstalliertemFollowerlaunchprüfen. rosgraph_msgsalsTestabhängigkeit, beideM02-TestdateienindenSourcefreienCIexport.
+
+#### Verifikation und Ergebnis
+
+Frischer normalerDrei-Paket-Copybuild /work/integration2, UID1000/Humble/Python3.10/FastDDS/Domain91/localhost: build/test/test-result jeExit0, **306PASS/0FAIL/0ERROR/0SKIP**. Alle225Bestandsfälle plus63deterministischeM02fälle und18nativeROS-/Launchfälle. TatsächlicheTwists aufeinzigartigbenanntenisoliertenTesttopics geprüft, alle6KomponentenNullbeiStop; echteTF/ROSClock/BestEffort+Reliable/Publisher+Subscriptionrestart/externerProducer/optionalerFilter/Installlaunch3Modi. M01-Schemaunverändert; alterDefaultteststelltjetztexplizitenMonitoringdefaultfalsefest. FehlerdeserstenIntegrationslaufs:301PASS/4FAIL (einfürColconfalscherInstallimportpfadassert, dreiHumble-nichtvorhandeneAsyncParameterClient-Importe); durchRuntime-onlyInstallassertundtatsächlichenGetParameters-Serviceersetzt, keineInhaltstestsentfernt. ZusätzlicherClockinitfallprüftErholungvomZeitwert0beimerstengültigenDatensatz;63sterUnitfall. GezieltvierFormatfehlerderneuenDateienvorherkorrigiert; Lints/CopyrightallesPASS. NativeFunktionenundHumbleAPIsbestätigt; keinHardwaretest. SourcefreieTestlisteum2Dateienerweitert,bashsyntaxgeprüft, tatsächlicheSourcefreieCIwirdnachDokumentations-/Changelogabschlussneuausgeführt.
+
+#### Auswirkungen und Grenzen
+
+Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default deaktiviert erhält bisherigen Followervertrag einschließlich Hindernisreaktion. Kein Hardware-Notstopp oder Sicherheitsnachweis; bekannte Sensor-/Cliff-/Radiusgrenzen bleiben. Historische Events001..028/PDF/übrigeRefs/Lizenztexte erhalten.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -3604,3 +3628,10 @@ AP07 bleibt eine Humble-Pipeline; lokale neue M02-Abnahme folgt, Remote-CI ohneP
 Neue62 Unit-/Konfigurationsfälle plus225Bestandsfälle bestehen imfrischen /work/core4:287PASS/0FAIL/0SKIP, build/test/test-result0. Der reine Validierungshelfer und die imROSbaum deklarierten readonlyParameter sindabgenommen; dieaktiveFollower-Stopintegration folgtV4-031. NochkeinSourcefreierM02-/Twist-/Gesamtimplementierungsnachweis. Zeitsprünge/Replay/TFwerdenmitkontrolliertenZeiten getestet; alteYAMLohneGruppe bleibtgültig. KeinJazzy/Lyrical/Rolling-Container oderPortierungsversuchdiesesAuftrags.
 
 OffizielleHumblequellen: [Clock/JumpThreshold](https://raw.githubusercontent.com/ros2/rclpy/humble/rclpy/rclpy/clock.py), [NodeTimer/Parameter](https://raw.githubusercontent.com/ros2/rclpy/humble/rclpy/rclpy/node.py), [TFbufferlookup](https://raw.githubusercontent.com/ros2/geometry2/humble/tf2_ros_py/tf2_ros/buffer.py); Signaturen zusätzlich tatsächlich installiert geprüft. LookupTime0 würde latest bedeuten, deshalb werdenNull-Messstempelabgewiesen undMesszeitübergeben. Timer mitSteadyClock undJumpCallback sindinHumblevorhanden. JumpCallback bleibtkurz/nichtblockierend. [DDS-Domainbereiche](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/Concepts/Intermediate/About-Domain-ID.rst) erklären deninitialenHarnessfehler241 außerhalb0..232; finaleKern-Domain91 liegtimsicherenBereich. KeineNetz-/Middleware-Hostkonfiguration geändert.
+
+
+### 19.5 Native M02-Abnahme V4-031
+
+Die vollständigeHumble-Suite in /work/integration2 umfasst306Fälle undbestehtohneFailure/Error/Skip. Neue63deterministischeTests und18nativeROS-/Launchfälleergänzen225vorhandeneTests. Die nativePrüfungbeobachtetTwists überROS-Subscriptions; reineMock-Publisher werdennichtalsGesamtnachweisgewertet. EchteStatic-/DynamicTF, exakterMesszeitpunkt, fehlende/falschzeitigeTF, Clockpause/-sprung/-basiswechsel, Ausfall/Recovery, neuerM01PfadimStop, Pose-/Path-/Goal-/Hindernisstop, BestEffort/Reliable unddreiinstallierteLaunchkonfigurationenwerdengeprüft. AlleNodesnutzenisolierteTesttopics; keineHardware/Driver-/Motionfreigabe.
+
+Der ersteIntegrationslauf scheitertenuran4Harnessannahmen: ColconimportiertbeimPakettestzulässigerweiseSourcekopien; InstallpfadwirdnunexplizitimSourcefreienRuntime-Modusverlangt. HumblebesitztkeinenAsyncParameterClient-ImportdesanfänglichenTests; derTestverwendetjetztdenrealenrcl_interfaces/GetParameters-Service. KeinneueresROS-APIvorausgesetzt. DieseKorrekturenändernkeinenProduktvertragundschwächendieTwist-/Parameter-/Installprüfungnichtab. sourcefreieM02-AbnahmefolgtmitderbestehendenCIroutineundbeidenneuenDateien.

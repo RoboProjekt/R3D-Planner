@@ -74,6 +74,11 @@ class ObstacleCliffFilter(Node):
             self.get_logger().warning(f'PointCloud2 rejected: {exc}', throttle_duration_sec=2.0)
             return
 
+        if msg.width * msg.height and not len(points):
+            self.get_logger().warning('PointCloud2 has no finite geometry; no clear output',
+                                      throttle_duration_sec=2.0)
+            return
+
         # --- SCHRITT 2: TOTZONEN-FILTER (Noise Removal) ---
         # Berechne Distanz in der XY-Ebene
         dist_sq = points[:, 0]**2 + points[:, 1]**2

@@ -59,6 +59,7 @@ class ObstacleMonitor:
         previous = (self.last_ros_ns, self.last_steady_ns)
         self.last_ros_ns, self.last_steady_ns = now_ns, steady_ns
         if now_ns <= 0 or steady_ns < 0:
+            self.last_ros_ns = self.last_steady_ns = None
             return self.invalidate('CLOCK_ERROR', 'clock is not initialized')
         if previous[0] is not None:
             ros_delta, steady_delta = now_ns - previous[0], steady_ns - previous[1]
