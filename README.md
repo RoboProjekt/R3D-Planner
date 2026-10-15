@@ -68,13 +68,14 @@ colcon build --packages-up-to r3d_planner
 source install/setup.bash
 ```
 
-AP03 verified all 26 external keys, actual rosdep installation and rosdep check
+AP03 verified the original external keys; the current three-package set also
+passes actual rosdep installation and rosdep check
 (exit 0) in two fresh isolated ROS 2 Humble / Ubuntu 22.04.5 containers using
 system Python 3.10.12. Apt NumPy 1.21.5, SciPy 1.8.0, Open3D 0.14.1 and NetworkX
 2.4 worked without the former NumPy/SciPy compatibility warning. Two fresh copy
-workspaces each passed 171 tests (0 failures, 0 skips), including active lint and
-copyright checks; a separate container without the source tree passed 120
-installation/output/PointCloud2 cases. The audit host was unchanged and still lacks apt
+workspaces each passed 225 tests (0 failures, 0 skips), including active lint and
+copyright checks; a separate container without the source tree passed 169
+installation/output/interface cases. The audit host was unchanged and still lacks apt
 Open3D/NetworkX. These results establish the tested Humble installation scope;
 CI, newer distributions, hardware deployment and official release remain separate.
 
@@ -337,3 +338,9 @@ are not automatically prefixed: configure robot-specific frames and a single
 owner of each transform. Launching the follower remains a separate motion step.
 RViz selections must use map_frame and finite valid poses; action lookup is
 bounded by rviz_interface.action_server_timeout_sec (default 1 s).
+
+## Maintenance
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for focused synthetic reproductions/tests
+and [MAINTENANCE.md](MAINTENANCE.md) for support, version/API/ABI and release gates.
+Each package has a Forthcoming CHANGELOG.rst. None declares a released version.

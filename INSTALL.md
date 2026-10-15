@@ -186,13 +186,13 @@ ros2 pkg executables r3d_preprocessor
 ros2 pkg executables r3d_planner
 ```
 
-`colcon list` must include `r3d_preprocessor` and `r3d_planner`.
+`colcon list` must include `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner`.
 
-The regular copy installation above was verified in two empty workspaces.
-Both builds exited 0; each full suite passed 171 tests and `colcon test-result`
-exited 0. Standard configuration/robot resources work through package share;
+The current regular copy installation was verified by the local CI reproduction:
+its build exited 0, the full suite passed 225 tests and `colcon test-result`
+exited 0. Earlier independent two-workspace proofs remain dated in the protocol. Standard configuration/robot resources work through package share;
 use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
-container with a read-only installed tree passed 120 installation/output/PointCloud2 tests.
+container with a read-only installed tree passed 169 installation/output/interface tests.
 The install prefix remained at its build-time path: relocating a workspace is
 not established by this test. Optional `--symlink-install` is a developer workflow.
 
@@ -354,7 +354,7 @@ ROS_DOMAIN_ID=83 ROS_LOCALHOST_ONLY=1 RMW_IMPLEMENTATION=rmw_fastrtps_cpp python
 These tests use temporary PCD/config files, publish synthetic Odometry, exercise
 action start selection and restart actual planner launches for all four
 component combinations. No hardware driver or motion follower is launched.
-The complete original Go2W system is tested; the V3 refactor requires deployment
+The original Go2W deployment has historical test evidence; the V3 refactor requires deployment
 regression testing before motion. The current V4 package-level Flake8, PEP257
 and copyright checks pass; both copyright skips have been removed. Run the full
 suite through colcon, which keeps each package's duplicate template module names
@@ -366,12 +366,13 @@ colcon test --packages-up-to r3d_planner
 colcon test-result --verbose
 ```
 
-The verified total is 171 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
-10 new output cases, 27 new installation cases, 83 PointCloud2 cases, two
-parameter-query cases and six lint checks. Launch
+The verified total is 225 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
+10 output cases, 27 installation cases, 83 PointCloud2 cases, two parameter-query
+cases, 15 metadata cases, 14 action cases, 20 composition cases, six Python lint
+checks and five CMake-package checks. Launch
 lookup covers all four files using `--show-args`; seven node constructors use
 synthetic inputs and an isolated command topic without running follower control.
-This does not prove full navigation, motion safety, coverage or CI. Dependency
+This does not prove full navigation, motion safety, coverage or a remote CI run. Dependency
 warnings from NetworkX `np.int` and ament tooling remain; they are not test failures.
 
 ## Troubleshooting

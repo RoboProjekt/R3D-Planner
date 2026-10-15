@@ -30,7 +30,9 @@ LiDAR (external) -> local filter -----------------+-> Nav2 action + Path
                                                           +-> /cmd_vel
 ```
 
-The package dependency flows from `r3d_planner` to `r3d_preprocessor`.
+The package dependencies flow from `r3d_planner` to `r3d_preprocessor` and
+`r3d_interfaces`. The latter generates PathWithMetadata, containing the complete
+Path and index-aligned narrow flags used by the follower.
 Both central launch entry points belong to the existing planner package.
 The preprocessor does not depend on the planner or any odometry implementation.
 
@@ -333,10 +335,11 @@ remain, and no launch file loads this YAML.
 
 ## Build and installation
 
-Both packages install Python modules, their Ament resource index entry, and
-`package.xml`. `r3d_planner` also installs central/robot YAML and four launch files.
-`r3d_preprocessor` explicitly does not install `maps/`. No libraries, headers,
-or custom interfaces are built; launch files are installed rather than compiled. See [../INSTALL.md](../INSTALL.md)
+The two Python packages install modules, Ament resource entries, manifests,
+LICENSE and Forthcoming changelogs. `r3d_planner` also installs central/robot YAML and four launch files.
+`r3d_preprocessor` explicitly does not install `maps/`. `r3d_interfaces` uses ament_cmake/rosidl to generate and install message code,
+headers and typesupport libraries, with manifest, schema, LICENSE, README and
+changelog. Launch files are installed rather than compiled. See [../INSTALL.md](../INSTALL.md)
 for commands.
 
 

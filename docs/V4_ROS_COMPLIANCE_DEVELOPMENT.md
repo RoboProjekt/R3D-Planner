@@ -279,7 +279,7 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P1 für korrekte Nutzung; P2/P3 für weitergehende Policies |
 | Abhängigkeiten | Begleitet alle APs; Lizenztext nur nach AP01; konkrete Support-/API-Zusagen erst anhand AP06/AP09 |
 | Abschlusskriterien | Nachvollziehbare Änderungs-IDs und Commitreferenzen, zutreffende Prüfberichte, reproduzierbare aktualisierte Nutzeranleitungen; dokumentierte Grenzen statt pauschaler Quality-Level-/ABI-Garantie |
-| Aktueller Status | **IN PROGRESS** — Protokoll bisV4-019, aktuelle Cloud-/Installations-/Testanleitungen aktualisiert; vollständige AP05-Verträge/Wartungspolicies später nach Phasenfreigabe |
+| Aktueller Status | VERIFIED für aktuelle Benutzer-/Wartungsdokumentation und installierte Forthcoming-Metadaten; Distributions-/Releasefortschreibung folgt, keine rechtliche/Support-/API-Stabilitätszusage |
 
 ### 4.10 AP09 - ROS-Distributionskompatibilität
 
@@ -1207,6 +1207,30 @@ GitHub Actions mit Ubuntu22.04 und perSHA gepinntem offiziellem Checkoutv7.0.1/N
 #### Verifikation und Ergebnis
 
 Exakter Workflowbefehl bash scripts/ci/run_humble.sh lokal tatsächlich Exit0 ausgeführt. Zwei frisch erzeugte Container, gepinnter Humble-Image-Digest860e5379..., SourceReadonly/noprivileged/bridge/localhost/Domains231/232, unprivilegierteTests. Je echte rosdep install/check0. Metadata/XML/YAML/AST-/strukturellerDoklint0; shell bash -n beiderSkripte0; CIcheck.py Flake8/PEP2570. Normaler dreiPaket-Copybuild0/fullcolcontest0/test-result0:225PASS/0FAIL/0ERROR/0SKIP. RuntimezweiterContainer ohne/r3d-source,/work/ci/src und ohneBuildmount:169PASS/0FAIL/0SKIP, tatsächliches generiertesM01-Modul/CDR/NS/Action/QoS mit enthalten; readonlyInstall am ursprünglichen Prefix. Exports getrennt von Runtimeoutputmount; Sourcefree169 umfasst37Install/Output+83Cloud+15M01+14Action+20Komposition, nicht die restlichen56CTest/Config/Query/Lintfälle. Originalrootbranch/history unverändert. Alle eigenenCIcontainer perID entfernt, keineImages gelöscht. Logs/xUnit /tmp/r3d-ci.WPxUz4NT, Treiber /tmp/r3d-v4-release/ci-first.log. AusgabeCI_LOCAL_BUILD_AND_SOURCEFREE_PASS. Keine neue CI-Funktion durch ungetestete Herstelleractions ersetzt; ausschließlichCheckoutAction v7.0.1-Pin aus offiziellerReleasequelle geprüft, action.ymlNode24. Tatsächlicher CheckoutAction-/GitHubRunner-/RemoteCI-Lauf NICHT ausgeführt/NOT VERIFIED; kein Badge/keinPush/keinePR erzeugt. KeinActionlintlauf behauptet, YAML/Actions/Shell/Python geprüft und Dockerjob tatsächlich reproduziert. Externe NetworkX-/ament-Deprecations sichtbar, kein SciPy/NumPy-Konflikt.
+
+#### Auswirkungen
+
+Kein Push/Release/Historyrewrite, keine Änderungen an V1/V2/V3/main/Remotes/historischerPDF. Bestehende Paketversionen0.0.1 und Apache-2.0 erhalten. Keine Algorithmen neu entwickeln; konkrete ROS-Vertragskorrekturen separat testen.
+
+### V4-025 - AP08 – Nutzungsverträge, Changelogs und proportionale Wartungsregeln
+
+**Datum:** 15. Oktober 2026 (Europe/Berlin). **Arbeitspaket:** AP08/AP10 Metadata, AP06 Prüfnachweise. **Betroffene Dateien:** bestehende README/INSTALL/Architektur/Config/KnownIssues/PaketREADME, CONTRIBUTING.md/MAINTENANCE.md und3Paket-CHANGELOG.rst, Installregeln, Protokoll. **Status:** VERIFIED für dokumentierten AP08-Umfang. **Git-Commit:** `docs: align usage and maintenance metadata with V4 interfaces` (direkter Nachfolger von2dd1097; vollständige Zuordnung siehe Abschluss).
+
+#### Ausgangssituation
+
+V4-Eingang11d594aa5dca45293d14aed185a07a21fcb16d8e, sauber; bisherige V4-001..019 unverändert historisch. 171/120 vorherige Tests nicht als aktueller Nachweis nach Codeänderung ausgeben.
+
+#### Ziel und Freigabe
+
+M01 ausdrücklich im Chat freigegeben am15.10.2026; M02 ausdrücklich zurückgestellt, daher kein neuer Hindernistimeout/keine Sensor-zu-Basis-TF-Stoppolicy. Sonstige AP05..AP10-Phasen weiterhin nach ursprünglichem Auftrag autorisiert, keine erneute pauschale Freigabe nötig.
+
+#### Technische Umsetzung und Begründung
+
+Korrekte aktuelle Root-/Namespace-/Metadaten-/Action-/TF-/QoS-/M02-Grenzen erhalten; reale225/169Nachweise mit historischer Vorleistung trennen. Drei Forthcoming-Changelogs als ReleaseMetadaten, keine endgültigeVersion/Datum/Tag. Kurze Beitrags-/Support-/Version-/API-/ABI-/Security-/Releaseinformationen mit tatsächlichen Zusagen (Humble/Jammyamd64 getestet, keineV4Hardware-/Coverage-/QL-/RemoteCIzusage). Root9AltPYC als bekannt belassen, kein unaufgeforderter Cleanup. PaketChangelogs/InterfaceREADME als Shares installieren; keine Runtimeberechnung/Versionsänderung. StrukturellerDoclint/Metadata/Installpipeline nach Änderungen erneut prüfen.
+
+#### Verifikation und Ergebnis
+
+Frischer normaler Drei-Paket-Copybuild `/work/maintenance1`, UID1000/Humble/FastDDS/Domain227, build/test/test-result jeExit0: **225PASS/0FAIL/0ERROR/0SKIP**. Drei tatsächlich installierte CHANGELOG.rst bytegleich mit Source, docutils-RSTprüfung ohneWarnings; Metadaten/XML/YAML/Python/Markdownstrukturcheck PASS. README-Staleangaben zu2Paketen/fehlendenInterfaces/TODOmanifesten korrigiert; historische Protokolle bleiben datiert. Zwei anfängliche Helperaufrufe scheiterten an fehlendem check.py-Pfadargument bzw. falschem Scratchmountpfad; korrigiert erneut ausgeführt, kein fehlerhafter Aufruf als PASS. Kein spezieller umfassender Markdown-/Rechts-/API-Stabilitätsnachweis. Finale Source-freie CI-Abnahme nach Folgedokumentation folgt. Keine Hardware/Hostinstallation.
 
 #### Auswirkungen
 
@@ -3256,3 +3280,8 @@ CI_LOCAL_BUILD_AND_SOURCEFREE_PASS
 ```
 
 Zwei getrennte frische Containersysteme, tatsächliche Apt-/rosdepinstallation/check. Runtime hat keinen Source-/Buildbaum, alle3installiertenPakete und generierteNachricht funktionieren. DockercontainerExitcodes zusätzlich explizit geprüft, damit dockerstart/tee keine Containerfehler als Erfolg verdecken. Trap entfernt nur zurückgelieferte eigeneContainerIDs; keineImages/Dockerdaemon-/Hostpackageänderung. LogsArtifacts temporär, kein weiterer Forschungsbericht. Pipeline enthält wederCoverage nochMultiDistro/Hardware, behauptet keinenREP2004QualityLevel. AP07 bleibt wegen ursprünglichem tatsächlichem Remoteabnahmekriterium IN PROGRESS: IMPLEMENTED / NOT REMOTELY VERIFIED. Weitere AP08..AP10-Arbeit ist unabhängig freigegeben und folgt; keinPush zur Erfüllung des Remote-Kriteriums erzwingen.
+
+
+### 18.7 AP08 – Dokumentationsabnahme
+
+Nutzungsanleitungen, Architektur, Topics/Actions/TF/QoS/Konfiguration/M01-Migration und bekannte Grenzen abgeglichen; CONTRIBUTING und MAINTENANCE trennen Beiträge, vorhandenen Devstand0.0.1, ungarantierteAPI/ABI/Support, Projekt-EOL-Entscheidung und spätere Releases. Drei Forthcoming-Changelogs werden installiert, keine Releaseversion/keinTag gewählt. Nach tatsächlicher Änderung neuer `/work/maintenance1` normalerCopybuild plus Vollsuite225PASS/0FAIL/0SKIP, docutils+Installbytevergleich+MetadatencheckPASS. Alte wissenschaftliche Vorleistungen bleiben im zentralen Protokoll; keine zusätzliche Forschungsberichtdatei angelegt. Umfang AP08 aktuell VERIFIED, Distributions-/Releaseergebnisse werden fortgeschrieben.

@@ -179,5 +179,5 @@ V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
 ../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
 On Humble/Jammy the real dependency install/check and two fresh copy builds pass;
-each full suite passes 171 cases, and a source-free install passes 120 cases.
-This establishes the tested installation scope, not CI, motion or Jazzy support.
+each full suite passes 225 cases, and a source-free install passes 169 cases.
+This establishes the tested installation scope, not remote CI, motion or Jazzy support.

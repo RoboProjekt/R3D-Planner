@@ -36,7 +36,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml', 'LICENSE']),
+        ('share/' + package_name, ['package.xml', 'LICENSE', 'CHANGELOG.rst']),
         # Die Zeilen für den maps-Ordner wurden hier entfernt!
     ],
     install_requires=['setuptools'],

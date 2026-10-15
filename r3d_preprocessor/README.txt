@@ -131,7 +131,7 @@ Tests declare `python3-pytest`, `ament_copyright`, `ament_flake8` and
 
 Actual rosdep installation and check pass in two fresh isolated Humble/Jammy
 containers, with apt Open3D 0.14.1 and NetworkX 2.4. The audit host was unchanged.
-Two fresh copy builds each pass the full 171-case suite; 120 installation/output/PointCloud2
+Two fresh copy builds each pass the full 225-case suite; 169 installation/output/interface
 cases also pass without a source tree. Six package lint checks include active
 copyright verification with no skips. See `../INSTALL.md` and
 `../docs/KNOWN_ISSUES.md` for commands and remaining platform/release boundaries.

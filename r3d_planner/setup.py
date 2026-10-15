@@ -36,7 +36,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml', 'LICENSE']),
+        ('share/' + package_name, ['package.xml', 'LICENSE', 'CHANGELOG.rst']),
         # Hier installieren wir die Config Datei, damit launch files sie finden
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         (os.path.join('share', package_name, 'config', 'robots'), glob('config/robots/*.yaml')),
