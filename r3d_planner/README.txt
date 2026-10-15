@@ -178,8 +178,8 @@ unattached incomplete Nav2 fragment, not an active configuration entry point.
 V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
 ../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
-On Humble/Jammy the real dependency install/check and two fresh copy builds pass;
-each full suite passes 306 cases, and a source-free install passes 250 cases.
+On Humble/Jammy the current clean-copy CI build and actual dependency install/check pass;
+the colcon reports 354 successful test records, and a source-free install passes 298 cases.
 This establishes the tested installation scope, not remote CI, motion or Jazzy support.
 
 ## M02 obstacle input
@@ -195,3 +195,13 @@ The internal filter is optional; external reliable or best-effort publishers
 are supported. See ../docs/CONFIGURATION.md for strict validation, empty-cloud,
 clock/TF and stop/recovery details. This is software monitoring, not a physical
 safety claim. Only Humble/Jammy/Python3.10 is the current release target.
+
+
+Local obstacle geometry: the filter now additionally retains finite, height-qualified
+near returns by default (`live_filter.retain_near_obstacles: true`). This prevents
+radial filtering from erasing points before the follower's stop-rectangle test.
+Existing numeric defaults, frames, M01 and optional M02 are unchanged. Explicit
+false restores the documented legacy radial loss. Self returns, sensor coverage
+and robot/body clearances still need deployment validation. The new boolean is
+startup-only; old configurations without it remain valid. See the local geometry
+contract in docs/CONFIGURATION.md (repository root) for formulas and limits.

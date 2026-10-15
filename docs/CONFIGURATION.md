@@ -151,7 +151,8 @@ is a separate explicit motion-producing command.
 | `stair_roi_x_min`, `stair_roi_x_max` | 0.7, 1.1 | m; step ROI X bounds |
 | `stair_roi_width` | 0.5 | m; step ROI half-width |
 | `stair_min_points` | 50 | integer; detection needs strictly more points |
-| `min_reliable_distance` | 0.65 | m; discard XY returns at/below this radius |
+| `min_reliable_distance` | 0.65 | m; legacy XY radial gate for stair/cliff and far-obstacle classification |
+| `retain_near_obstacles` | true | Startup-only bool; additionally pass height-qualified near returns to the obstacle output |
 | `cliff_roi_x_min`, `cliff_roi_x_max` | 0.7, 1.2 | m; visible-floor X bounds; wall at lower bound |
 | `cliff_width` | 0.4 | m; cliff ROI and wall half-width |
 | `cliff_min_ground_points` | 30 | integer; fewer floor points produce a wall |
@@ -365,8 +366,83 @@ must preserve measurement stamps and provide suitable base/sensor TF.
 **Limits:** A zero Twist is a software command, not a demonstrated physical
 emergency stop. The control period, callback execution and transport add latency;
 a blocked executor, process failure or actuator queue needs independent command
-watchdogs and stop facilities. The internal filter's default 0.65 m exclusion
-and the follower's 0.6 m stop bound still need deployment-specific geometric
-reconciliation; fresh empty output does not prove complete near-field coverage.
+watchdogs and stop facilities. The internal filter now retains height-qualified near returns by default;
+this fixes the demonstrated radial loss before the follower's stop check.
+Physical sensor coverage, self returns and body clearances still need deployment
+validation; fresh empty output does not prove complete near-field coverage.
 Cliff/stair outputs are still not internal follower stop inputs. No thresholds,
 new navigation algorithm, hardware driver or safety certification were added.
+
+
+## Local obstacle geometry and near-return retention
+
+All distances below are metres. The filter evaluates incoming sensor XYZ without
+TF. It requires X forward, Y lateral and Z up; sensor-Z is not automatically height
+above the ground. The existing radial gate is `x*x + y*y > min_reliable_distance**2`.
+Stair and cliff processing continues using that gated set with the existing
+thresholds. The obstacle height range is strictly `min_height < z < max_height`
+(default 0.05 to 1.0 in the input frame).
+
+With `live_filter.retain_near_obstacles: true` (new default), finite raw points
+inside or exactly on the excluded radius are additionally published as obstacles
+when they satisfy that height range. Near points are not suppressed by stair
+classification. The far-obstacle, stair and cliff branches retain their previous
+logic. No point is duplicated between near and far branches. Output remains XYZ32
+with the original frame and measurement stamp; cloud point order has no contract.
+No missing or physically unreliable sensor returns are reconstructed.
+
+```yaml
+live_filter:
+  # Keep all other existing live_filter keys in the selected configuration.
+  min_reliable_distance: 0.65
+  retain_near_obstacles: true
+path_follower:
+  # Keep all other existing path_follower keys.
+  obstacle_x_min: 0.1
+  stop_distance: 0.6
+  obstacle_half_width: 0.3
+```
+
+This is a partial example, not a complete replacement YAML. Old configurations
+without the new key remain valid and default to true. The key requires a boolean;
+null, numbers and strings are rejected. The ROS parameter is read-only after
+startup: edit your `R3D_CONFIG_DIR` copy and restart. Explicit false restores the
+old radial loss on the obstacle output; this compatibility option is not a
+validated sensing or safe-operation mode. The meaning and defaults of existing
+numeric parameters and robot profiles remain unchanged. The new default may
+produce additional conservative stops from valid but unwanted self/noise returns;
+use an upstream calibrated self-filter, not a larger exclusion radius as a
+substitute for complete obstacle coverage.
+
+With M02 enabled, the follower transforms XYZ to `robot.odometry.base_frame` at
+the original measurement time, then stops if **any** point meets the open
+rectangle `obstacle_x_min < x < stop_distance` and `abs(y) < obstacle_half_width`.
+There is no additional Z test: the producer supplies classified obstacles.
+`stop_distance` is an upper X coordinate from the base origin, not a circular
+radius or clearance from the body front. Exact upper/lower/lateral boundaries
+are excluded. XYZ32 serialization rounds decimals: a mathematical boundary must
+be distinguished from its transmitted value. For example, float32(0.6) is
+0.6000000238418579, while the stored ROS double limit is0.6.
+
+Without M02, the existing follower evaluates the same rectangle directly in the
+received coordinates; correct frame alignment remains the integrator's obligation.
+Filter and monitor switches remain independent. With the filter off, external
+publishers need no new parameter or message type; they must supply classified
+obstacles and fulfill the unchanged M02 frame/time/layout/QoS contract when enabled.
+
+At equal origins, a point (0.59,0,0.2) was previously erased before reaching the
+follower; it now reaches the open stop rectangle. At (0.625,0,0.2), the base-frame
+point remains outside the default stop rectangle, while a sensor-to-base X offset
+of-0.125 places it at0.5 and requires a stop. The offset is a synthetic test,
+not a Go2W calibration. Points outside the rectangle can continue to permit
+software motion when all other conditions hold. Changed stop/filter limits do
+not require synchronizing duplicated parameters: near returns are passed before
+the follower applies its own ROI.
+
+The robot profile's offline radius, narrow radius, height and base clearance use
+centimetres for PCD classification. They do not define a measured local footprint,
+body-front offset, sensor transform, braking distance or turn envelope. They are
+not automatically reused here. Sensor coverage, height alignment, self filtering,
+body geometry, braking and actuator watchdogs need deployment-specific validation.
+An empty valid cloud is not proof of obstacle-free space. No Cliff/Stair consumer,
+reverse-motion protection or certified safety function is added.

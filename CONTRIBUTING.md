@@ -18,8 +18,9 @@ Tests must use isolated ROS domains/topics and no hardware drivers or motion.
 
 Changes to message fields, names, geometry semantics, TF ownership or controller
 input requirements need an explicit compatibility/migration assessment. M01 is
-the approved PathWithMetadata migration; M02 is a proposal and requires separate
-authorization before implementation. See MAINTENANCE.md for current support,
+the approved PathWithMetadata migration; M02 is implemented as optional monitoring.
+Retain its fail-closed contract when enabled and assess changes to local geometry,
+including the startup-only retain_near_obstacles policy. See MAINTENANCE.md for current support,
 versioning and release boundaries.
 
 Current changes target only Humble/Jammy/Python3.10. For obstacle-monitoring

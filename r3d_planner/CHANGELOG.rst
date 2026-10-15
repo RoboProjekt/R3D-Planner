@@ -4,6 +4,11 @@ Changelog for package r3d_planner
 Forthcoming
 -----------
 
+* Retain height-qualified near obstacle returns before the legacy radial gate
+  can erase the follower stop region; add optional startup-only
+  retain_near_obstacles (true by default, false restores legacy output).
+* Add geometry boundaries, configuration and native sensor/filter/follower
+  command regressions; preserve M01/M02 and existing numeric limits.
 * Existing graph reconstruction, A* and navigation components retained from the baseline.
 * Consistent metadata/dependencies and source-independent configuration/install behavior.
 * Replace legacy quaternion narrow flags with atomic typed metadata; migrate follower.

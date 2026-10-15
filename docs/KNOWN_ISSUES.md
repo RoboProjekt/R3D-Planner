@@ -8,8 +8,8 @@ architecture and historical limitations explicitly distinguished.
 - **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
 - **Verified:** real rosdep install and check exit 0 for all three packages in
   fresh isolated apt containers, without skip keys. The current clean-copy CI
-  reproduction passes 306 tests (0 fail, 0 skip), including active lint checks. A
-  separate source-free, read-only installation passes 250 installed/output/interface cases.
+  reproduction reports 354 successful colcon test records (0 fail, 0 skip), including active lint checks. A
+  separate source-free, read-only installation passes 298 installed/output/interface cases.
 - **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
   SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
   still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
@@ -68,7 +68,9 @@ launched by this workspace.
   With monitoring enabled, the follower establishes timestamped sensor-to-base
   TF and bounds measurement/receipt freshness. Default disabled mode retains
   legacy sensor-coordinate evaluation. The filter still uses sensor axes;
-  calibration and the near-field radius gap are not repaired by monitoring.
+  calibration is not repaired by monitoring. The demonstrated radial data loss
+  is separately fixed by default near-return retention; physical coverage remains
+  a deployment obligation.
 - **Verification boundary:** Synthetic byte-layout and node-output regressions
   establish decoding; no new physical sensor calibration or robot test.
 
@@ -187,7 +189,7 @@ launched by this workspace.
 
 - **Location:** both `test/` directories and Python sources.
 - **Current result:** Flake8, PEP257 and activated copyright checks all pass;
-  the complete colcon suite has 306 PASS / 0 FAIL / 0 SKIP. Own Apache headers
+  the complete colcon suite has 354 PASS / 0 FAIL / 0 SKIP. Own Apache headers
   use a form recognized by Humble's checker; original OSRF notices are preserved.
 - **Invocation limitation:** raw combined pytest collection of both package test
   directories can collide on their existing template filenames. Use `colcon test`
@@ -253,5 +255,30 @@ When enabled, absent/stale/invalid data or required TF blocks motion until new
 fully valid input and every existing path/pose/goal condition permit recovery.
 Non-advancing stamps cannot refresh clearance. No Cliff/Stair input, command
 watchdog, hardware stop or safety certification is introduced. In particular,
-the default filter exclusion0.65m and follower stop bound0.6m remain a geometric
-integration issue; valid fresh input does not prove complete obstacle coverage.
+the demonstrated radial loss before the follower ROI is fixed by default near-return
+retention. Valid fresh input still does not prove complete obstacle coverage.
+
+
+## Local near-return retention and remaining geometry limits
+
+`retain_near_obstacles=true` fixes the reproduced loss of height-qualified near
+returns. False explicitly restores the legacy radial-loss behavior. Finite self
+returns or noise can now cause additional conservative stops; actual sensor minimum
+range and robot self-filter geometry have not been measured. Sensor-Z thresholds,
+far-field stair suppression and separate unused cliff/stair outputs remain the
+existing classification contract. The open forward rectangle is not a complete
+footprint, side/rear/turn envelope or dynamic braking controller. Offline robot
+radius/height parameters are not a local collision model. External obstacle
+publishers and disabled-monitor operation retain their documented obligations.
+These deployment limits are not unimplemented universal ROS Index requirements.
+
+
+Local Debian packaging was also exercised for all three packages: peer-aware Bloom
+preparation, unsigned package build/install and a fresh source-free runtime probe
+with dpkg file ownership, versions, dependencies and ROS interfaces passed.
+These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
+generated rules tolerate failing build-time tests: interface C++ linters find no
+own sources, and planner pre-install tests lack their installed package shares.
+That direct Debian test phase remains open (central gate R28); successful package
+generation does not mean those tests passed. The green colcon/source-free CI
+results above describe their own complete installation context.

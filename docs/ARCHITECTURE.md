@@ -164,10 +164,13 @@ together; external legacy orientation-flag decoders must migrate.
 ```text
 /hesai_ros_driver/hesai/lidar_points
         |
-        +-> remove dead zone at radius <= 0.65 m
-        +-> step ROI and height threshold -> /stair_detect
-        +-> obstacle height filter        -> /local/filtered_obstacles
-        +-> missing floor points ahead    -> /local/cliff_virtual_wall
+        +-> legacy XY radial gate (> min_reliable_distance)
+        |      +-> step ROI              -> /stair_detect
+        |      +-> far obstacle heights  --+
+        |      +-> missing ground        -> /local/cliff_virtual_wall
+        +-> near returns (<= radius)       |
+               +-> obstacle heights -----+-> /local/filtered_obstacles
+                    (retain_near_obstacles=true)
 ```
 
 Output clouds retain the incoming header and frame; no TF transform is applied.
@@ -371,3 +374,15 @@ broadcast TF. A failed sample cannot recover merely because TF later appears.
 The optional filter retains sensor-axis thresholds. Nonfinite-only input now
 yields no clear output; valid empty output still has complete XYZ metadata.
 See [the monitoring reference](CONFIGURATION.md#obstacle-monitoring-m02-humble).
+
+
+## AP05 local geometry contract
+
+The additional near-obstacle branch prevents the demonstrated radial loss while
+preserving the stair/cliff branch. Filter output stays in the input frame.
+M02 evaluates timestamped sensor-to-base TF and the existing open forward
+rectangle; it validates geometry as well as data freshness, without proving
+physical sensing coverage. With monitoring disabled, the legacy direct-frame
+ROI remains. No new dependency, ROS type, topic, planner or body model is added.
+See [configuration](CONFIGURATION.md#local-obstacle-geometry-and-near-return-retention)
+for formulas, optional legacy mode and the distinction from offline robot geometry.

@@ -193,10 +193,10 @@ ros2 pkg executables r3d_planner
 `colcon list` must include `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner`.
 
 The current regular copy installation was verified by the local CI reproduction:
-its build exited 0, the full suite passed 306 tests and `colcon test-result`
+its build exited 0, the full suite reported 354 successful colcon test records and `colcon test-result`
 exited 0. Earlier independent two-workspace proofs remain dated in the protocol. Standard configuration/robot resources work through package share;
 use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
-container with a read-only installed tree passed 250 installation/output/interface tests.
+container with a read-only installed tree passed 298 installation/output/interface tests.
 The install prefix remained at its build-time path: relocating a workspace is
 not established by this test. Optional `--symlink-install` is a developer workflow.
 
@@ -370,11 +370,11 @@ colcon test --packages-up-to r3d_planner
 colcon test-result --verbose
 ```
 
-The verified total is 306 PASS / 0 FAIL / 0 SKIP: 43 retained functional cases,
+The verified colcon total is 354 reported records / 0 FAIL / 0 SKIP: 43 retained functional cases,
 10 output cases, 27 installation cases, 83 PointCloud2 cases, two parameter-query
 cases, 15 metadata cases, 14 action cases, 20 composition cases, six Python lint
-checks, five CMake-package checks, 63 deterministic monitoring cases and18
-native monitoring/launch cases. Launch lookup covers all four files using `--show-args`; seven node constructors use
+checks, five CMake report records (three CTest runs plus two xUnit entries), 63 deterministic monitoring cases and18
+native monitoring/launch cases, plus48geometry cases (44deterministic and4native). Launch lookup covers all four files using `--show-args`; seven node constructors use
 synthetic inputs and an isolated command topic without running follower control.
 This does not prove full navigation, motion safety, coverage or a remote CI run. Dependency
 warnings from NetworkX `np.int` and ament tooling remain; they are not test failures.
@@ -414,7 +414,7 @@ printed `/tmp/r3d-ci.*` directory. Only containers created by this run are remov
 no images, host packages, ROS installation or Conda environment are changed.
 The same command is configured in `.github/workflows/ros2-humble.yml`.
 
-Local reproduction passed the full 306-case suite (0 failure/skip) and250
+Local reproduction passed the full suite (354 reported colcon records) (0 failure/skip) and298
 source-free cases. This is not a GitHub Actions result. The workflow remains
 IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
@@ -422,7 +422,7 @@ IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 306 full and250 source-free tests pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 354 colcon records and298 unique source-free cases pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -441,3 +441,29 @@ R3D_CONFIG_DIR override and restart follower.launch.py. See the complete
 [parameter, input, TF and stop/recovery contract](docs/CONFIGURATION.md#obstacle-monitoring-m02-humble).
 The default is disabled; enabling it requires a current valid obstacle producer
 even when the internal filter is disabled. This does not change planner startup.
+
+
+Local obstacle geometry: the filter now additionally retains finite, height-qualified
+near returns by default (`live_filter.retain_near_obstacles: true`). This prevents
+radial filtering from erasing points before the follower's stop-rectangle test.
+Existing numeric defaults, frames, M01 and optional M02 are unchanged. Explicit
+false restores the documented legacy radial loss. Self returns, sensor coverage
+and robot/body clearances still need deployment validation. The new boolean is
+startup-only; old configurations without it remain valid. See the local geometry
+contract in docs/CONFIGURATION.md (repository root) for formulas and limits.
+
+
+Local Debian packaging was also exercised for all three packages: peer-aware Bloom
+preparation, unsigned package build/install and a fresh source-free runtime probe
+with dpkg file ownership, versions, dependencies and ROS interfaces passed.
+These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
+generated rules tolerate failing build-time tests: interface C++ linters find no
+own sources, and planner pre-install tests lack their installed package shares.
+That direct Debian test phase remains open (central gate R28); successful package
+generation does not mean those tests passed. The green colcon/source-free CI
+results above describe their own complete installation context.
+
+The 354 reported colcon records comprise 349 unique Python cases and the five
+CMake records described above. CTest and xUnit represent some of the same lint
+executions; they are not five independent CMake checks. The separate runtime
+suite contains 298 unique pytest cases, including all 48 new geometry cases.

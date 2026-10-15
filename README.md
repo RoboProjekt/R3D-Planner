@@ -72,9 +72,9 @@ AP03 verified the original external keys; the current three-package set also
 passes actual rosdep installation and rosdep check
 (exit 0) in two fresh isolated ROS 2 Humble / Ubuntu 22.04.5 containers using
 system Python 3.10.12. Apt NumPy 1.21.5, SciPy 1.8.0, Open3D 0.14.1 and NetworkX
-2.4 worked without the former NumPy/SciPy compatibility warning. Two fresh copy
-workspaces each passed 306 tests (0 failures, 0 skips), including active lint and
-copyright checks; a separate container without the source tree passed 250
+2.4 worked without the former NumPy/SciPy compatibility warning. The current clean-copy CI
+workspace reported 354 successful colcon test records (0 failures, 0 skips), including active lint and
+copyright checks; a separate container without the source tree passed 298
 installation/output/interface cases. The audit host was unchanged and still lacks apt
 Open3D/NetworkX. These results establish the tested Humble installation scope;
 Remote CI, postponed distributions, hardware deployment and official release remain separate.
@@ -351,7 +351,7 @@ Each package has a Forthcoming CHANGELOG.rst. None declares a released version.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 306 full and250 source-free tests pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 354 colcon records and298 unique source-free cases pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -368,3 +368,24 @@ Jammy with Python3.10 and the verified apt dependency set. Jazzy, Lyrical and
 Rolling are postponed; their recorded limitations are not blockers for the
 Humble release. The distribution investigation above is historical evidence,
 not a multi-distribution support promise. No push or release has been performed.
+
+
+Local obstacle geometry: the filter now additionally retains finite, height-qualified
+near returns by default (`live_filter.retain_near_obstacles: true`). This prevents
+radial filtering from erasing points before the follower's stop-rectangle test.
+Existing numeric defaults, frames, M01 and optional M02 are unchanged. Explicit
+false restores the documented legacy radial loss. Self returns, sensor coverage
+and robot/body clearances still need deployment validation. The new boolean is
+startup-only; old configurations without it remain valid. See the local geometry
+contract in docs/CONFIGURATION.md (repository root) for formulas and limits.
+
+
+Local Debian packaging was also exercised for all three packages: peer-aware Bloom
+preparation, unsigned package build/install and a fresh source-free runtime probe
+with dpkg file ownership, versions, dependencies and ROS interfaces passed.
+These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
+generated rules tolerate failing build-time tests: interface C++ linters find no
+own sources, and planner pre-install tests lack their installed package shares.
+That direct Debian test phase remains open (central gate R28); successful package
+generation does not mean those tests passed. The green colcon/source-free CI
+results above describe their own complete installation context.
