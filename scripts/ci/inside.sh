@@ -50,7 +50,8 @@ root=Path('/results')
 shutil.copytree('/work/ci/install',root/'install')
 shutil.copytree('/work/ci/build',root/'build-results',ignore=shutil.ignore_patterns('*.o'))
 (root/'runtime-tests').mkdir()
-for name in ['test_installation.py','test_pointcloud.py','test_metadata_interface.py',
+for name in ['conftest.py','installation_contract.py','test_configuration.py',
+             'test_installation.py','test_pointcloud.py','test_metadata_interface.py',
              'test_action_interface.py','test_composition_interface.py',
              'test_obstacle_monitor.py','test_obstacle_monitor_ros.py',
              'test_obstacle_geometry.py']:

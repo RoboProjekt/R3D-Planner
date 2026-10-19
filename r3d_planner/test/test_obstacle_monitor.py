@@ -16,13 +16,11 @@
 
 """Exercise deterministic monitoring boundaries, frame contracts and configuration."""
 import math
-from pathlib import Path
 from unittest.mock import Mock
 
 import numpy as np
 import pytest
 import yaml
-from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import TransformStamped
 from std_msgs.msg import Header
 
@@ -239,8 +237,8 @@ def test_static_tf_stamp_zero_is_valid():
 
 
 @pytest.fixture
-def config(tmp_path):
-    share = Path(get_package_share_directory('r3d_planner'))/'config'
+def config(tmp_path, installed_share):
+    share = installed_share / 'config'
     cfg = yaml.safe_load((share/'planner_config.yaml').read_text())
     (tmp_path/'robots').mkdir()
     (tmp_path/'robots/Go2W.yaml').write_bytes((share/'robots/Go2W.yaml').read_bytes())

@@ -34,13 +34,11 @@ import yaml
 from r3d_planner.configuration import ConfigurationError, load_configuration
 
 
-SOURCE = Path(__file__).resolve().parents[1] / 'config'
-
-
 @pytest.fixture
-def config(tmp_path):
-    central = yaml.safe_load((SOURCE / 'planner_config.yaml').read_text())
-    robot = yaml.safe_load((SOURCE / 'robots/Go2W.yaml').read_text())
+def config(tmp_path, installed_share):
+    source = installed_share / 'config'
+    central = yaml.safe_load((source / 'planner_config.yaml').read_text())
+    robot = yaml.safe_load((source / 'robots/Go2W.yaml').read_text())
     (tmp_path / 'robots').mkdir()
     cloud = tmp_path / 'tiny.pcd'
     cloud.write_text('VERSION .7\nFIELDS x y z rgb\nSIZE 4 4 4 4\nTYPE F F F U\n'
@@ -220,10 +218,15 @@ def test_effective_ros_parameters_and_odometry(config):
         rclpy.shutdown()
 
 
-def test_default_live_source_config(monkeypatch):
-    from r3d_planner.configuration import default_config_path
+def test_default_live_source_config(monkeypatch, tmp_path, installed_share):
+    import shutil
+    import r3d_planner.configuration as module
+    source = tmp_path / 'live_package/config'
+    shutil.copytree(installed_share / 'config', source)
+    monkeypatch.setattr(module, '__file__',
+                        str(tmp_path / 'live_package/r3d_planner/configuration.py'))
     monkeypatch.delenv('R3D_CONFIG_DIR', raising=False)
-    assert default_config_path().resolve() == SOURCE / 'planner_config.yaml'
+    assert module.default_config_path().resolve() == source / 'planner_config.yaml'
 
 
 def test_copied_install_loads_package_share_and_override(config, monkeypatch):
@@ -382,10 +385,11 @@ def test_real_launch_restart_and_all_components(config, monkeypatch):
 
 
 @pytest.mark.parametrize('mode', ['preprocessor', 'planner', 'map', 'follower'])
-def test_default_configuration_requires_user_map(mode):
+def test_default_configuration_requires_user_map(mode, installed_share):
+    source = installed_share / 'config'
     selected = 'pcd_path' if mode == 'preprocessor' else 'map_name'
     with pytest.raises(ConfigurationError, match=r'maps\.' + selected + ': configure'):
-        load_configuration(SOURCE / 'planner_config.yaml', mode=mode)
+        load_configuration(source / 'planner_config.yaml', mode=mode)
 
 
 @pytest.mark.parametrize('mode', ['preprocessor', 'planner', 'map', 'follower'])

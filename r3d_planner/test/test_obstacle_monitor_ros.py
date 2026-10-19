@@ -40,6 +40,8 @@ from std_msgs.msg import Header
 from sensor_msgs.msg import PointCloud2
 from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
 
+from installation_contract import assert_installed_module
+
 from r3d_planner.cloud import create_cloud_xyz32
 from r3d_planner.path_metadata import metadata_qos
 from r3d_planner.r3d_local_filter import ObstacleCliffFilter
@@ -405,13 +407,14 @@ def test_monitor_parameters_readonly_and_installed_import(harness):
     assert not result[0].successful
     import r3d_planner.obstacle_monitor as module
     if os.environ.get('R3D_EXPECT_NO_SOURCE') == '1':
-        assert '/install/' in module.__file__
+        assert_installed_module('r3d_planner', module.__file__)
         assert not Path('/r3d-source').exists()
     assert not item.follower.count_publishers('/cmd_vel')
     assert item.follower.obstacle_sub.topic_name == item.namespace + '/obstacles'
     assert item.follower.obstacle_sub.qos_profile.depth == 5
 
 
+@pytest.mark.installed
 @pytest.mark.parametrize('mode', ['enabled', 'disabled', 'legacy'])
 def test_installed_launch_external_config_parameters_and_no_filter(tmp_path, mode):
     from rcl_interfaces.srv import GetParameters

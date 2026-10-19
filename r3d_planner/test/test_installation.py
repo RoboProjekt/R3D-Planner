@@ -22,7 +22,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 import pytest
 import yaml
 
@@ -33,6 +33,8 @@ EXECUTABLES = {
                     'pcd_path_planner', 'rviz_interface'],
     'r3d_preprocessor': ['pcd_analyser', 'pcd_server'],
 }
+pytestmark = pytest.mark.installed
+
 LAUNCHES = ['planner.launch.py', 'preprocessor.launch.py',
             'map.launch.py', 'follower.launch.py']
 
@@ -43,7 +45,8 @@ def probe(code, directory, config_dir=None):
     environment.pop('R3D_CONFIG_DIR', None)
     if config_dir is not None:
         environment['R3D_CONFIG_DIR'] = str(config_dir)
-    result = subprocess.run([sys.executable, '-c', code], cwd=directory,
+    check = Path(__file__).with_name('installation_contract.py').read_text()
+    result = subprocess.run([sys.executable, '-c', check + '\n' + code], cwd=directory,
                             env=environment, capture_output=True, text=True, timeout=25)
     assert result.returncode == 0, result.stdout + result.stderr
     return json.loads(result.stdout)
@@ -92,7 +95,7 @@ for ep in dist.entry_points:
     if ep.group == 'console_scripts':
         assert callable(ep.load())
         module = importlib.import_module(ep.module)
-        assert '/install/' in module.__file__, module.__file__
+        assert_installed_module(pkg, module.__file__)
         entries.append(ep.name)
 print(json.dumps({'share': str(share), 'version': dist.version, 'entries': entries}))
 '''.replace('PACKAGE', repr(package))
@@ -147,7 +150,7 @@ def test_installed_override_and_robot_profile(user_config):
 import json
 import r3d_planner.configuration as module
 cfg = module.load_configuration()
-assert '/install/' in module.__file__
+assert_installed_module('r3d_planner', module.__file__)
 print(json.dumps(cfg))
 ''', directory, directory)
     assert result['robot_path'] == str(alternate)
@@ -299,7 +302,7 @@ names = []
 try:
     for module_name, class_name, values in classes:
         module = importlib.import_module(module_name)
-        assert '/install/' in module.__file__
+        assert_installed_module(module_name.split('.')[0], module.__file__)
         def init(node, *args, **kwargs):
             kwargs['parameter_overrides'] = [Parameter(k, value=v) for k, v in values.items()]
             original(node, *args, **kwargs)
@@ -319,7 +322,7 @@ def test_source_free_execution_contract(tmp_path):
 import json, os
 from pathlib import Path
 import r3d_planner.configuration as module
-assert '/install/' in module.__file__, module.__file__
+assert_installed_module('r3d_planner', module.__file__)
 if os.environ.get('R3D_EXPECT_NO_SOURCE') == '1':
     assert not Path('/r3d-source').exists()
     assert not Path('/work/final1/src').exists()
@@ -327,4 +330,5 @@ if os.environ.get('R3D_EXPECT_NO_SOURCE') == '1':
     assert not Path('/work/final3/src').exists()
 print(json.dumps(module.__file__))
 '''
-    assert '/install/' in probe(code, tmp_path)
+    assert Path(probe(code, tmp_path)).resolve().is_relative_to(
+        Path(get_package_prefix('r3d_planner')).resolve())

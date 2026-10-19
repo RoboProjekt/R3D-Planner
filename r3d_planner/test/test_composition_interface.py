@@ -17,13 +17,11 @@
 """Check namespace composition, sensor reliability and existing TF ownership."""
 import copy
 import os
-from pathlib import Path
 import signal
 import subprocess
 import time
 from unittest.mock import Mock
 
-from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import PointStamped, PoseStamped, TransformStamped
 from nav2_msgs.action import ComputePathToPose
 from nav_msgs.msg import Odometry, Path as RosPath
@@ -45,8 +43,8 @@ from r3d_planner.r3d_rviz_interface import RVizInterfaceNode
 
 
 @pytest.fixture
-def composed_config(tmp_path):
-    share = Path(get_package_share_directory('r3d_planner')) / 'config'
+def composed_config(tmp_path, installed_share):
+    share = installed_share / 'config'
     central = yaml.safe_load((share / 'planner_config.yaml').read_text())
     robot = yaml.safe_load((share / 'robots/Go2W.yaml').read_text())
     (tmp_path / 'robots').mkdir()

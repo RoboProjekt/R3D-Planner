@@ -16,7 +16,6 @@
 
 """Check the radial-loss fix and actual isolated sensor-to-command geometry."""
 import math
-from pathlib import Path
 import struct
 import uuid
 from unittest.mock import Mock, patch
@@ -24,7 +23,6 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 import rclpy
-from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import TransformStamped
 from rclpy.node import Node
 from rclpy.parameter import Parameter
@@ -175,8 +173,8 @@ def test_changed_stop_distance_still_receives_point(local, stop, blocked):
 
 
 @pytest.fixture
-def config(tmp_path):
-    share = Path(get_package_share_directory('r3d_planner'))/'config'
+def config(tmp_path, installed_share):
+    share = installed_share / 'config'
     cfg = yaml.safe_load((share/'planner_config.yaml').read_text())
     (tmp_path/'robots').mkdir()
     (tmp_path/'robots/Go2W.yaml').write_bytes((share/'robots/Go2W.yaml').read_bytes())
