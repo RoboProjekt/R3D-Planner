@@ -1,7 +1,8 @@
 # Contributing
 
-V4 is local development and is not an official ROS release. Do not publish a
-research checkout, data, tags or releases without the maintainer's authorization.
+The cleaned local main contains the V4 development and is not an official ROS
+release. Do not publish a research checkout, data, tags or releases without the
+maintainer's authorization.
 Use a focused change with a concrete issue, interface impact and suitable tests.
 During the research project, implementation changes also update the single
 `docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md` protocol; do not create replacement reports.

@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 19. Oktober 2026; fortgeführt bis V4-050 (AP10-Audit in22, erneute Dokumentationsprüfung in22.16, R28-Abnahme in21). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 19. Oktober 2026; fortgeführt bis V4-051 (aktuelle lokale Historien-/main-Migration und neue Humble-/Debian-Abnahme in23; historische Audits in21/22). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 
 **Aktuelle Fortschreibung:** Kapitel23 hat für die lokale Historien-/main-Migration und die neue Entwicklererklärung Vorrang vor den datierten Bewertungen in4,7–9 und22. Allgemeine offene Professorenfreigaben in früheren Abschnitten sind historische Befunde und keine erneut gestellte Voraussetzung. Originale Commit-SHAs gelten als historische Nachweise; die bereinigten Zuordnungen stehen in23.5 und COMMIT_MIGRATION_MAP.tsv.
@@ -1562,6 +1562,10 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 ### V4-050 - Vollständigen bereinigten main unter Humble und Debian erneut prüfen
 
 **Datum:**19. Oktober2026. **AP:**AP03/AP04/AP05/AP06/AP07/AP09/AP10. **Eingang:** bereinigter main nach V4-048/049, zu prüfende endgültige Commitreferenz wird vor Runnerstart erfasst. **Branches:** nur Kandidaten-main, nach Abnahme V4 auf gleichen Stand. **Dateien:** ausschließlich dieses Protokoll; bestehende CI-/Test-/Produktionsdateien unverändert. **Fragestellung/Begründung:** lokale Historienmigration darf keinen vorhandenen Build-/Installations-/ROS-Vertrag verlieren. **Verfahren:** bestehende gepinnte Humble/Jammy/Python3.10/amd64-Runner, zwei getrennte frische Container je Runner; tatsächliche Builds, rosdep,351 Pythonfälle/358 Colcon-Darstellungen,343 normale Source-freifälle, vollständiger Debian-Build-/Postinstallvertrag und13 Gatekontrollen. Identitäten mit letzten Originalnachweisen vergleichen; keine Testgruppe deaktivieren. Git-/Byte-/Dokument-/PDF-/Blobprüfung zusätzlich. **Kommandos:** `bash scripts/ci/run_humble.sh`, `bash scripts/ci/run_humble_debian.sh`, `/usr/bin/python3 -B -m pytest -p no:cacheprovider scripts/ci/tests/test_release_gate.py --junitxml=<evidence>/gate.xml -q`; zusätzliche konkrete Negativprobe bei Bedarf separat ausweisen. **Status:** IN PROGRESS, Ergebnisse/Exitcodes erst nach tatsächlicher Ausführung in23.12. **Vorher/Nachher/Gates:** historische erfolgreiche R26/R28 erhalten, neue Abnahme getrennt; R29 bleibt offizielle Integration und wird nicht implementiert oder geschlossen. **Grenzen:** keine öffentlichen Jobs/Releaseaktionen, keine Hardware und keine weitere Distribution. **Commit:** abschließender Dokumentationscommit nach belegten Resultaten; tatsächlicher HEAD im Abschlussbericht.
+
+### V4-051 - Erfolgreiche Kandidatenprüfung, dauerhafte Nachweise und Releasegrenzen abschließen
+
+**Datum:**19. Oktober2026. **AP:**AP01–AP10/AP08. **Ausgang:** sauberer Kandidaten-main `8c29796303587fe56088b25020ded9d489eafa3c`, V4-050 angelegt; beide vollen Runner tatsächlich Exit0. **Branches:** ausschließlich bereinigter Kandidat; main und V4 sollen nach Abschluss identisch sein. Originalrefs einschließlich V4 bleiben unverändert. **Dateien:** zentrales Protokoll, MAINTENANCE.md, CONTRIBUTING.md und docs/KNOWN_ISSUES.md; ausschließlich aktuelle lokale Hauptbranch-/Rechte-/Historienaussagen nachführen. **Technische Fragestellung:** vollständige Übernahme und neue Regression nachweisen, historische/aktuelle Testergebnisse und lokale/offizielle Releasegrenzen trennen. **Verfahren/Kommandos:** bestehende Runner, tatsächliche JUnit-/Fallidentitätsvergleiche, Debianpayload-/dpkg-Herkunftsnachweis, Graph-/Ref-/Hash-/Dokumentprüfung; konkrete Ergebnisse23.12–23.15. **Vorher/Nachher:** ungetestete bereinigte Arbeitskopie → lokal verifizierter neuer Hauptentwicklungsstand mit dauerhaften Rohbelegen. **Alte/neue Referenzen:**59 vollständige Zuordnungen23.5, nicht-Commit-Tree23.4; Implementierungscommits048/049 unten, eigener endgültiger Commit im Abschlussbericht. **Status:** COMPLETED vor abschließender Dokument-/Refprüfung; nach erfolgreicher Ausführung VERIFIED im Abnahmenachtrag. **Gates:** R15 lokal bereinigt, R16 eigene Befugnis erklärt, R26/R28 erneut lokal verifiziert, R29 BLOCKED. **Grenzen:** R14 konkrete Fremdpflichten, öffentliche Migration, Version/Datierung und offizielle externe Vorgänge bleiben offen. **Commit:** `docs(release): record cleaned main Humble verification`; keine Selbst-SHA oder Änderung früherer Messergebnisse.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -5293,7 +5297,7 @@ Dieser Auftrag ist ausschließlich lokal. Kein Push/Force-Push, kein Release-Tag
 
 Später, erst nach gesonderter Freigabe: Serverrefs und eventuelle Pull-/Tagrefs lesend neu inventarisieren; betroffene Mitwirkende und Forkbesitzer koordinieren; Remotezustand und Schutzregeln prüfen; exakt freigegebene Branch-Allowlist und erwartete alte Remote-SHAs bestätigen. Je Branch nur explizite Refänderung mit lease gegen den frisch geprüften alten Wert, niemals Mirrorpush oder unbedingten Force-Push. Falls der Serverzustand abweicht, neu prüfen. Anschließend frischer unabhängiger Serverclone mit vollständiger Ref-/Pfad-/Blobprüfung und Remote-CI; aus alten Klonen nicht mergen, sondern neu klonen. Alte Klone/Forks, GitHub-Caches und nicht abrufbare Serverrefs können die alten Daten behalten; gegebenenfalls Plattformunterstützung für Bereinigung anfragen. **Lokale Bereinigung beweist keine Löschung im Internet.** Dieser Plan führt keine Remoteaktion aus und ist keine entsprechende Autorisierung.
 
-### 23.8 Aktuelle Releasebewertung nach den Entwicklerentscheidungen
+### 23.8 Releasebewertung nach den Entwicklerentscheidungen vor erneuter CI
 
 | Bereich/Gates | Aktueller Status und Abgrenzung |
 |---|---|
@@ -5316,7 +5320,7 @@ Die lokale Pipeline wählt buildzeitfähige Tests, sammelt JUnit und erzwingt st
 
 Erforderlicher gesonderter Folgeauftrag: dauerhafte geeignete Testintegration/Releasekonfiguration und verbindliche Auswahl/Report-/Fehlerweitergabe festlegen und implementieren; alle Installationspflichten gegen exakt zugeordnete Releaseartefakte erhalten. Positive UND negative Abnahme, fehlende Berichte/Tests müssen fehlschlagen, Fallidentitäten vollständig. Welche Stufe Farm und welche Releasefreigabeprozess erzwingt, muss verbindlich entschieden werden. Lokale Vorbereitung kann vor Veröffentlichung erfolgen; reale Remote-CI/akzeptierte Releasejobs und offizielle Artefaktursprünge können nur durch die entsprechenden später autorisierten externen Vorgänge belegt werden. Kein offizieller Bloom-/Buildfarm-Lauf in diesem Auftrag. R29 ist ein offener Projektprüfvertrag, kein universelles ROS-Index-Verbot. Keine R29-Implementierung oder Navigationsänderung hier.
 
-### 23.10 Erhaltene Architektur und noch ausstehende neue Prüfungen
+### 23.10 Erhaltene Architektur und geplante neue Prüfungen (vor deren Ausführung)
 
 Paketabhängigkeiten (Verbraucher → Provider): `r3d_planner → r3d_interfaces` und `r3d_planner → r3d_preprocessor`. Interface und Preprocessor sind unabhängig; eine serielle lokale Baufolge ändert diesen Graphen nicht. Drei Pakete0.0.1/Apache-2.0,17 Produktionsmodule, ROSIDL-Schema, CMake/Setup/Manifeste, Launch/YAML/Robotprofile, CI-/Debian-/Gateskripte und Tests bleiben unverändert. Root- und drei Paketlizenzen identischer SHA-256 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`. Fünf korrigierte Headerklassifikationen und sämtliche048-vorherigen Entwicklungseinträge bleiben erhalten; zusätzliche Dokument-/Bilddateien sind gesonderte beauftragte Ergänzungen, keine rückwirkende Änderung des98-Dateien-Inventars.
 
@@ -5341,3 +5345,87 @@ Bevorzugt PNG, lesbarer Ausschnitt mit kurzer technischer Erklärung, kompakte D
 
 
 **Abnahme V4-049:** technisch erzeugtes PNG visuell geprüft; kompakte vertikale Anordnung ohne überlagerte Beschriftungen. Größe 1403×1574 Pixel, 178570 Bytes. PNG-Chunks enthalten keine Text-, EXIF-, Kommentar- oder eingebetteten Pfadmetadaten. `scripts/ci/check.py .` und `git diff --check` Exit0; relative Links/Zielgrafik vorhanden. Keine Quellcode-/Build-/Test-/Schemaänderung. V4-049 für diesen Dokumentationsumfang VERIFIED.
+
+
+### 23.12 Tatsächlich neue Humble-/Debianabnahme des bereinigten main – V4-050
+
+**Getesteter sauberer Commit:** `8c29796303587fe56088b25020ded9d489eafa3c`. Beide Runner wurden aus diesem Kandidaten aufgerufen. Der anschließende Abschlusscommit verändert ausschließlich Dokumentation; alle ausgeführten Produktions-/Test-/Builddateien sind durch Bytevergleich auch dafür zuzuordnen. Keine Tests nachträglich als Ausführung eines erst später erzeugten Commits bezeichnen. Die neuen Werte sind keine Wiederverwendung der alten Läufe aus21.
+
+**Umgebung:** gepinntes Image `ros:humble-ros-base@sha256:860e53793ccf575e5369b5e9a19939de2bfcfb46a299954d06f54f2af54fed19`, vier frische Container (je zwei für normale CI und Debian), Ubuntu22.04.5 Jammy/amd64, ROS Humble, Python3.10.12/GCC11.4.0. Quellen readonly im Builder, keine Quellen/Buildbäume im normalen Runtimecontainer. Debianruntime mit ausschließlich exakten lokal gebauten .debs und exportierten Tests; Modul-/dpkg-Herkunft geprüft. Getrennte Domains231/232 und94/95, localhost, kein privilegierter Container oder Hardwaregerät. Keine Host-Paketinstallation oder neue ROS-Dependency.
+
+Verifizierte Systemversionen entsprechen dem bisherigen Humbleumfang: NumPy1.21.5, SciPy1.8.0, Open3D0.14.1, NetworkX2.4, PyYAML5.4.1; Bloom0.14.4, pytest6.2.5, rosdep0.27.0, Colcon-Core0.21.3, setuptools59.6.0, CMake3.22.1. APT-/rosdep-Indizes sind nicht vollständig eingefroren; keine byteidentische Reproduzierbarkeit künftiger Binärarchive behauptet. Bekannte Deprecationwarnungen von NetworkX/NumPy und Import-Metadaten bei Lints sind keine neuen Testfehler.
+
+| Tatsächlich ausgeführter Befehl / Phase | Ergebnis | FAIL | ERROR | SKIP | Exit |
+|---|---|---:|---:|---:|---:|
+| `bash scripts/ci/run_humble.sh` | vollständiger Build-/Runtime-Runner PASS |0|0|0|0|
+| rosdep install/check, Clean-Copy-Colconbuild |3 Pakete gebaut, ROSIDL generiert, Dependencies vollständig |0|0|0|0|
+| `colcon test` / `colcon test-result --verbose` |358 Berichtseinträge;349 Pythonpaketfälle,4 CTest-Darstellungen,5 Interface-xUnitfälle |0|0|0|0|
+| Pythonpaketfälle |336 Planner +13 Preprocessor PASS |0|0|0|0|
+| Interface-Header |2 zusätzliche pytest-Fälle PASS; insgesamt351 pytest-Fälle in drei Paketen |0|0|0|0|
+| normale sourcefreie Runtime |343 eindeutige Fälle PASS |0|0|0|0|
+| `bash scripts/ci/run_humble_debian.sh` | vollständiger Build-/Install-/Runtime-Runner PASS |0|0|0|0|
+| Debian Interface-CTest |4 Läufe PASS,5 xUnitfälle einschließlich2 Headerfälle |0|0|0|0|
+| Debian Preprocessor-Buildzeit |13 PASS |0|0|0|0|
+| Debian Planner-Buildzeit |243 PASS;93 Installationspflichten explizit erfasst |0|0|0|0|
+| Debian Planner-Postinstallation |336 PASS, einschließlich aller93 Installationspflichten |0|0|0|0|
+| Debian Preprocessor-Postinstallation |13 PASS |0|0|0|0|
+| ROSIDL-/dpkg-/Runtime-Smoke |3 registrierte installierte Pakete, Modulowner/Schema/Version/Dependencies geprüft |0|0|0|0|
+| `/usr/bin/python3 -B -m pytest -p no:cacheprovider scripts/ci/tests/test_release_gate.py --junitxml=<evidence>/gate.xml -q` |13 Gatekontrollen PASS |0|0|0|0|
+
+Die358 sind keine358 unabhängigen Pythonfälle;4 CTest- und5 xUnitdarstellungen überlappen. Die349 erhaltenen Python-Testidentitäten und343 normalen Runtimeidentitäten sind mit `/tmp/r3d-ci.cRAyDOW3` exakt verglichen; alle erhalten. Debian-Expected-/Build-/Installed-Pflichtlisten und vollständige Postinstall-JUnitidentitäten stimmen mit `/tmp/r3d-debian.kCNsfAuY` überein. Kein versteckter Skip und keine pauschal abgeschaltete Testgruppe. Buildzeit243 und Postinstall336 sind überlappende Phasen, keine579 unabhängigen Plannerfälle. M01, M02-Optionalmodus/Timeout/TF/Stop/Recovery, Filter-/Follower-Geometrie, PointCloud2, QoS, Actions, Namespace/Remapping, Ressourcen/Config und aktive Lints sind durch unveränderte vorhandene Fälle abgedeckt; keine neue Algorithmusvollcoverage oder Hardwareabnahme behauptet.
+
+**R28-Fehlerwirksamkeit:** alle13 Kontrollen erneut ausgeführt, darunter defekte/fehlende/skipped/duplizierte/unvollständige Berichte und falsche CTestnachweise; erwartete Ablehnung wird vom Kontrolltest geprüft. Der frühere echte absichtlich fehlschlagende Debianrunner in `/tmp/r3d-debian.SqlJRdou` bleibt als datierter Negativnachweis erhalten (13PASS/1FAIL, eigentlicher Paketbuild0, strikter Runner1, keine gestartete Runtimephase). Er wurde nicht als neuer Test ausgegeben oder unnötig vollständig wiederholt, da Gateskripte und Tests bytegleich sind. Positive vollständige Kandidatenrunner und13 neue Gatekontrollen sind neue Nachweise. R28 bleibt **LOCALLY VERIFIED**, R29 unverändert **BLOCKED**.
+
+Neue .debs (alle Version0.0.1-0jammy, amd64, unsigned und nur lokal):
+
+| Datei | Bytes | SHA-256 | Legacy-PCD-Mitglieder |
+|---|---:|---|---:|
+| `ros-humble-r3d-interfaces_0.0.1-0jammy_amd64.deb` | 47782 | `8541a27b853c395c4f106e7f1a6abcdda93a066058e1db2ef668ba4b62d5f910` |0|
+| `ros-humble-r3d-planner_0.0.1-0jammy_amd64.deb` | 53646 | `94df7db028bfa610c005e19daaa1bf396936af7831f18747e1f2f17c96a943ad` |0|
+| `ros-humble-r3d-preprocessor_0.0.1-0jammy_amd64.deb` | 21534 | `5cac3ef9d95f788e8b6e1c9e32fedef7b833bb91f33f4b5fa7398565fda35287` |0|
+
+Alle17 enthaltenen Produktions-Pythondateien (12 Planner,5 Preprocessor) wurden aus den tatsächlich erzeugten Debian-Tarstreams direkt bytegleich mit dem Kandidaten verglichen. Ihre Quellbytes sind wiederum bytegleich zum originalen cf6486d. Lizenztexte/Launch-/Konfigurationsressourcen und Interfaceherkunft werden zusätzlich von den unveränderten Installationsfällen geprüft. Neue Archivhashes sind zu diesem Lauf aufgezeichnet; andere Archivhashes gegenüber21 sind kein Beleg für geänderten Navigationscode. Drei konkrete `.deb`-Hashes stimmen mit den installierten Smoke-Artefakten überein. Keine PCD-Datei in den Paketen.
+
+Rohbelege neu: `/tmp/r3d-ci.zqH2VrFs` und `/tmp/r3d-debian.Lbz9USxg`. Zusätzlich dauerhaft privat archiviert: `/home/bauya/Documents/R3D-private-backups/20261019-cf6486d/validation/main-humble` und `main-debian`. Die vorherigen positiven/negativen Rohbelege sind daneben als `historical-humble`, `historical-debian`, `historical-negative-debian` erhalten. Hashmanifest `validation/evidence-sha256.json`:1563 Dateien,7978810 Bytes, SHA-256 `40754b6984de4762993c511365ac93cb4fd16c53cec4e71ad198a15f4d8e567a`. Weitere technische JSONs/Hilfsskripte unter `task-evidence/`. Keine Binär-/Testlogs ins Veröffentlichungsrepository eingecheckt.18 tatsächlich erzeugte Debian-Command-Exitdateien wurden ausgewertet, alle0; ursprüngliche Negativphase bleibt getrennt. Runnerdauer180,12s normal /140,02s Debian, keine Leistungsbenchmark.
+
+### 23.13 Endgültige AP-/Releasebewertung dieses lokalen Auftrags
+
+| AP | Aktueller lokaler Stand | Noch offen / Abgrenzung |
+|---|---|---|
+| AP01 | technische Apache-2.0-Implementierung vorhanden; Eigenentwicklungsbefugnis verbindlich erklärt; alle vier freigegebenen Karten lokal aus Historie entfernt | konkrete Fremd-/Modification-/Dokument-/Bild-/Binärpflichten R14, tatsächlich spätere Publikation; allgemeine Professorenfrage nicht erneut offen |
+| AP02 | drei konsistente0.0.1-Manifeste/Setups, Maintainer bestätigt | endgültige Releaseversion und datierte Changelogs R18/R19 |
+| AP03 | vollständiges Humble-rosdep/install/check erneut PASS | offizieller Release-Peergraph und spätere Indexstände |
+| AP04 | Clean-Copy-/Source-freie und Debianinstallation erneut lokal VERIFIED | keine allgemeine Prefix-/Multi-Plattformgarantie |
+| AP05 | vorhandene M01/M02/Geometrie-/ROS-Verträge unverändert und erneut geprüft | keine neue Funktion, kein Hardware-/Sicherheitsnachweis |
+| AP06 | volle vorhandene Tests/Identitäten/Gatekontrollen erneut PASS | keine Coveragequote/Zertifizierung |
+| AP07 | beide lokalen CI-Einstiege erneut VERIFIED | Remote-CI NOT VERIFIED; Workflow führt kein Debian-Gate aus |
+| AP08 | einzige zentrale Historienfortschreibung, Mapping und nachvollziehbare README-Grafik/Bedarfsplan vorhanden | echte Screenshots und endgültige Supportzusagen fehlen weiterhin |
+| AP09 | Humble/Jammy/Python3.10/amd64 bestätigt | Jazzy/Lyrical/Rolling verschoben; kein Humble-Releaseblocker |
+| AP10 | lokaler bereinigter main vollständig vorbereitet und geprüft | öffentliches Releaseziel weiterhin NOT READY; R14/R17–R24/R27/R29 bzw. externe Nachweise fehlen |
+
+**Aktuelle Gates gegenüber der Zwischenbewertung23.8:** R01–R11/R13/R25/R26/R28 sind für den konkret beschriebenen Umfang lokal bestätigt, mit neuer Ausführung soweit oben angegeben. R15 ist für alle lokalen Kandidatenrefs und die lokale Objektdatenbank **VERIFIED**; Internet-/Remotehistorie ist nicht bereinigt. R16 ist für eigene Software nach der bindenden Entwicklererklärung geklärt; die behauptete allgemeine fehlende Professorenfreigabe ist überholt. R14 konkrete Fremd-/Bundlepflichten bleiben getrennt. R17 main ist lokal vorbereitet, öffentlich weiterhin BLOCKED; R12 Remote-CI NOT VERIFIED. R18/R19/R23/R24 bleiben hinsichtlich tatsächlicher Releaseversion/Datum, Support und Veröffentlichung Nutzerentscheidungen. R20 Index, R21 offizieller Bloom, R22 Farm und R27 öffentliche Debianauslieferung sind nicht erfolgt/nicht verifiziert. R26 ist ausschließlich Debianinstallation und Runtimeherkunft. R29 bleibt die gesonderte offizielle Testintegration, keine Hardwarepflicht und kein automatisches Sourceindexverbot.
+
+**ROS Index:** aktueller öffentlicher Stand NOT READY für die vorbereitete neue Sourcegrundlage, weil der freigegebene bereinigte main noch nicht veröffentlicht und Sourceeintrag/Review nicht durchgeführt sind; konkrete Lizenz-/Distributionspflichten müssen für den tatsächlich gewählten Umfang erfüllt sein. Keine neue aktuelle Server-/Indexabfrage in dieser Migration behauptet. **Bloom/Buildfarm:** NOT READY für offiziellen Release trotz erfolgreicher lokaler drei-Paket-Verifikation; autorisierte Version/Changelog/Tag, Releaseorganisation/Repository/Track, öffentliche Quellen/Peerbereitstellung, R29 und externe akzeptierte Jobs fehlen. Kein Rückschritt beim lokalen R28-Nachweis.
+
+**Abhängige nächste Schritte:** konkrete R14-Notices/Distributionsumfang prüfen und R29 als getrennten technischen Auftrag festlegen → Releaseversion/Datierung/Support und Team/Releasepfad entscheiden → ausdrücklich autorisierte Remote-Historienmigration mit Allowlist und anschließend tatsächlicher Remote-CI → freigegebene Sourceindex-/Releasevorbereitung → offizieller Bloom/Farm/Sync und überprüfte öffentliche Artefakte. Kein Push oder externer Vorgang ist hier freigegeben. Echte Screenshots sind ein separater Dokumentationsbedarf, keine vorgeschobene formale Indexpflicht.
+
+### 23.14 Commitzuordnung und Schutz des Forschungsnachweises
+
+Neue gezielte Commits ausschließlich auf bereinigtem Kandidaten-main:
+
+- `2fbf5d0f2625cb913fc76958e5fb58f5cc4d08c7` – `docs(git): document historical PCD cleanup and main migration`, Parent `3157f7e8b42be62c47b97860eaab7020a02afefd`;048 und technisches Mapping.
+- `8c29796303587fe56088b25020ded9d489eafa3c` – `docs(readme): add reproducible ROS dataflow visualization`, Parent `2fbf5d0f2625cb913fc76958e5fb58f5cc4d08c7`;049, Bilddateien und neuer050-Prüfauftrag. Exakt dieser saubere Commit wurde in beiden Runnern getestet.
+- Nachfolgender `docs(release): record cleaned main Humble verification`: ausschließlich diese Abschlussdokumentation sowie aktuelle Pflege-/Mitwirkungs-/Known-Issues-Aussagen, V4-050/051-Abnahme. Seine tatsächliche endgültige SHA steht im Abschlussbericht und privaten Abschlussnachweis. Kein Amend/Rewrite zur Selbst-SHA.
+
+**Forschungsintegrität:** vollständige59-Zuordnung und Sonder-Tree, Originalbaseline/V4/main erhalten privat; historisches PDF und001–047-Ereignisse bytegleich. Auch die bisherigen Kapitel11–22 bleiben unverändert als datierte Nachweise. Die fünf korrigierten Inventarklassifikationen bleiben P, die45 damaligen tatsächlichen eigenen Kommentarheader bleiben korrekt; zusätzliche neue Dokumentationsgrafik ist kein rückwirkend fehlender Bestand. Abhängigkeitsgraph, R26-Bedeutung und getrennte Testzählung bleiben erhalten. Weitere Tracking-/Forschungsrefs sind lokale technische Nachweise, keine Pushallowlist. Endgültiger main und V4 sollen denselben Commit/Tree besitzen; historische V1/V2/V3 bleiben auf ihren bereinigten Forschungstips.
+
+
+### 23.15 Tatsächliche Abschlussprüfung – V4-050/051
+
+`/usr/bin/python3 -B /tmp/r3d-history-migration-20261019/verify_test_results.py` Exit0: alle349 ursprünglichen Python- und343 Source-freiidentitäten, Debian-Build-/Installationspflichten und alle349 vollständigen Postinstallidentitäten erhalten; alle tatsächlichen XML-Fälle ohne FAIL/ERROR/SKIP. Zusätzlicher Phasencheck bestätigt243/13 Buildfälle,4 Interfaceberichte mit5 xUnitfällen und13 Gatekontrollen;18 Debian-Command-Exits alle0. Drei konkrete Debian-Tarstreams enthalten keine PCD-Dateien und exakt die17 unveränderten Produktions-Pythonmodule.
+
+`/usr/bin/python3 -B /tmp/r3d-history-migration-20261019/audit_graph.py` Exit0:59 exakte Commit-Tree-/Metadaten-/Elternvergleiche, gesonderter Codex-Tree geprüft,798 ursprüngliche erreichbare Blobs einschließlich der Sonderreferenz inhaltlich untersucht; genau vier freigegebene Kartenblobs. Kein solcher Blob und kein PCD-Header im vollständigen bereinigten erreichbaren Graphen; die vier alten Objekte auch direkt nicht vorhanden. Originalrefs, Konfiguration, sauberer V4-Status und alle682 Dateien der Originalvollkopie bytegleich; Original unverändert. V4-001–047 und alte Kapitel11–22/PDF bytegleich. Korrigierte Headerzuordnungen erhalten. Nachrichten/Manifest/CMake/Setup/Launch/YAML/Robotprofile, sämtliche Tests und CI-/Gateskripte unverändert. Nur ausdrücklich beauftragte Dokumentations-/Mapping-/Bilddateien geändert oder ergänzt.
+
+`/usr/bin/python3 -B scripts/ci/check.py .` und `git diff --check` bestanden nach der Abschlussfortschreibung mit Exit0. Alle51 fortlaufenden IDs und lokalen Dokument-/Bildlinks geprüft. Das unabhängige Mapping liegt dauerhaft intern/extern vor; private Daten und Testarchive sind nicht getrackt. Neue Einträge048–051 abgeschlossen, V4-050/051 **VERIFIED für den beauftragten lokalen Umfang**. Der getestete Produktions-/Buildpayload entspricht weiterhin8c29796; nachfolgender Commit ausschließlich Dokumentation. R28 bleibt LOCALLY VERIFIED, R29 BLOCKED. Die unveränderten historischen Zwischenbewertungen werden nicht als heutige allgemeine Professorenfrage wiederholt.
+
+Nach dem letzten gezielten Dokumentationscommit werden main und V4 auf exakt denselben endgültigen Commit/Tree gesetzt und Cleanstatus, Ref-Allowlist, fsck, Originalschutz sowie Bundlehash abschließend erneut geprüft. Die tatsächlich erzeugte SHA und das abschließende Ergebnis stehen außerhalb dieses selbstreferenzfreien Commits im Abschlussbericht und privaten `final-state.json`. Kein Push/Force-Push, keine Veröffentlichung, keine öffentliche Branchänderung, kein Tag/Bloom/Farm, keine reale Roboterbewegung und keine R3D_null-Änderung.

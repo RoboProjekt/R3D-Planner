@@ -4,8 +4,9 @@
 
 All three packages currently use 0.0.1 as an unreleased development version;
 V4 is a branch name, not version 4.0.0. Package changelogs use Forthcoming and
-contain no release tag/date. A release version, public branch, tag and Bloom
-track require a separate maintainer decision. The current CI metadata guard
+contain no release tag/date. The cleaned local main is the selected future
+development source. Public synchronization, release version, tag and Bloom track
+remain separate decisions. The current CI metadata guard
 checks the research development version; review that guard with an authorized
 version change. Keep package.xml/setup.py versions consistent.
 
@@ -49,12 +50,18 @@ facilities outside the current repository.
 ## Release gates
 
 Source indexing, rosdep resolution, Bloom, Buildfarm jobs and Debian delivery are
-separate checks. V4 is local: no public source ref, ROS Index PR, release tag,
+separate checks. The cleaned main remains local: no public migration, ROS Index
+PR, release tag,
 Bloom track or successful farm job is created by this project work. Root/package
-Apache-2.0 notices are implemented; remaining contractual, historical Git-data
-and concrete binary-bundle rights require separate resolution. Do not rewrite
+Apache-2.0 notices are implemented. The developer has confirmed licensing
+authority over his own software after consultation with the supervising professor.
+The four legacy PCD blobs were removed from every local candidate ref, including
+historical copies and the technical tree ref. Original data remain in the private
+backup and old public clones; concrete third-party/binary-bundle obligations and
+any separately used document/image rights remain to be checked. Do not rewrite
 Git history or alter external LiDAR projects as part of routine release prep.
-A future release must confirm rights, select its version/target, publish the
+A future release must resolve concrete redistribution obligations, select its
+version/target, publish the
 approved source ref, validate clean target builds, run CI and obtain the external
 reviews. Forthcoming changelogs and local tests are preparation, not a release.
 
@@ -103,7 +110,11 @@ GitHub workflow also does not run the Debian gate. Approve and verify this
 integration before claiming equivalent official test enforcement.
 
 All packages remain 0.0.1 with Forthcoming changelogs. A common 0.1.0 initial public
-prerelease is a recommendation, not an authorized version change. Rights, public
-Git-history scope, maintainer responsibility, support/EOL terms and release timing
-remain developer decisions. Four historical PCD blobs are reachable from V4,
-including two older root-level maps; a PCD-free tip does not clear the history.
+prerelease is a recommendation, not an authorized version change. Own-code
+licensing authority and the local cleaned main/history scope are now
+confirmed; Bastian Aumer remains maintainer and licensor of his own parts.
+The candidate has no legacy PCD blobs in any reachable ref or its object database.
+Public synchronization, concrete third-party redistribution obligations,
+support/EOL terms and release timing remain separate. See section23 of the
+central protocol for the full mapping, private backup, new successful Humble and
+Debian checks, and the still-open official test-integration gate R29.
