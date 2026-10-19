@@ -8,8 +8,8 @@ architecture and historical limitations explicitly distinguished.
 - **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
 - **Verified:** real rosdep install and check exit 0 for all three packages in
   fresh isolated apt containers, without skip keys. The current clean-copy CI
-  reproduction reports 354 successful colcon test records (0 fail, 0 skip), including active lint checks. A
-  separate source-free, read-only installation passes 298 installed/output/interface cases.
+  reproduction reports 358 successful colcon test records (0 fail, 0 skip), including active lint checks. A
+  separate source-free, read-only installation passes 343 installed/output/interface cases.
 - **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
   SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
   still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
@@ -189,7 +189,7 @@ launched by this workspace.
 
 - **Location:** both `test/` directories and Python sources.
 - **Current result:** Flake8, PEP257 and activated copyright checks all pass;
-  the complete colcon suite has 354 PASS / 0 FAIL / 0 SKIP. Own Apache headers
+  the complete colcon suite has 358 reported colcon records / 0 FAIL / 0 SKIP. Own Apache headers
   use a form recognized by Humble's checker; original OSRF notices are preserved.
 - **Invocation limitation:** raw combined pytest collection of both package test
   directories can collide on their existing template filenames. Use `colcon test`
@@ -277,8 +277,8 @@ Local Debian packaging was also exercised for all three packages: peer-aware Blo
 preparation, unsigned package build/install and a fresh source-free runtime probe
 with dpkg file ownership, versions, dependencies and ROS interfaces passed.
 These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
-generated rules tolerate failing build-time tests: interface C++ linters find no
-own sources, and planner pre-install tests lack their installed package shares.
-That direct Debian test phase remains open (central gate R28); successful package
-generation does not mean those tests passed. The green colcon/source-free CI
-results above describe their own complete installation context.
+generated rules retain their tolerant test exit behavior. The required local
+release wrapper now validates the actual reports and complete test identities,
+rejecting failures, errors, skips and missing evidence independently of Bloom.
+Installation-dependent checks run in a mandatory fresh Debian runtime container.
+Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.

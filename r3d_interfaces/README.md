@@ -21,3 +21,9 @@ Build/install this package together with `r3d_planner` and `r3d_preprocessor`.
 The generated message, typesupport, headers, manifest and LICENSE are installed.
 See the repository INSTALL.md and central development protocol for the verified
 scope and migration. M02 obstacle monitoring is not implemented by this package.
+
+
+Build-time checks explicitly target own sources, not the generated Debian/ROSIDL
+build tree. Copyright/CMake/XML checks remain active, and two source-header cases
+cover CMakeLists.txt and PathWithMetadata.msg. The local Debian gate verifies
+these reports and the generated installed interface; it performs no Bloom release.

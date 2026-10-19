@@ -27,3 +27,11 @@ Current changes target only Humble/Jammy/Python3.10. For obstacle-monitoring
 reports include the four startup parameters, original measurement stamps, frames,
 TF timing, state transition and synthetic reproduction. Use unique isolated
 command topics and retain M01, disabled-mode and stop/recovery regressions.
+
+
+For packaging changes also run `bash scripts/ci/run_humble_debian.sh`. Keep actual
+installation requirements explicit through the `installed` marker/fixture contract;
+all such tests must run in the mandatory post-install stage. Do not use source
+fallbacks, skips or Bloom's tolerated dh_auto_test exit as a green result. Review
+case identities and reports, and keep the deliberately failing temporary-copy
+probe nonzero. No generated release repository or public template is edited here.

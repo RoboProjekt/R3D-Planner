@@ -386,3 +386,13 @@ physical sensing coverage. With monitoring disabled, the legacy direct-frame
 ROI remains. No new dependency, ROS type, topic, planner or body model is added.
 See [configuration](CONFIGURATION.md#local-obstacle-geometry-and-near-return-retention)
 for formulas, optional legacy mode and the distinction from offline robot geometry.
+
+
+## Debian validation phases
+
+R28 changes test/build integration only. Source → build → build-time tests →
+staging → package → installation → mandatory source-free runtime tests remain
+separate phases. Installation-dependent fixtures use actual package shares;
+copy and Debian prefixes are validated through ament registration. The separate
+local release wrapper requires both phases and complete case-identity coverage.
+Navigation algorithms, M01/M02, geometry, ROS names and TF ownership are unchanged.

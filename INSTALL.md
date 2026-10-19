@@ -193,10 +193,10 @@ ros2 pkg executables r3d_planner
 `colcon list` must include `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner`.
 
 The current regular copy installation was verified by the local CI reproduction:
-its build exited 0, the full suite reported 354 successful colcon test records and `colcon test-result`
+its build exited 0, the full suite reported 358 successful colcon test records and `colcon test-result`
 exited 0. Earlier independent two-workspace proofs remain dated in the protocol. Standard configuration/robot resources work through package share;
 use `R3D_CONFIG_DIR` for editable user configuration. A separate source-free
-container with a read-only installed tree passed 298 installation/output/interface tests.
+container with a read-only installed tree passed 343 installation/output/interface tests.
 The install prefix remained at its build-time path: relocating a workspace is
 not established by this test. Optional `--symlink-install` is a developer workflow.
 
@@ -370,10 +370,10 @@ colcon test --packages-up-to r3d_planner
 colcon test-result --verbose
 ```
 
-The verified colcon total is 354 reported records / 0 FAIL / 0 SKIP: 43 retained functional cases,
+The verified colcon total is 358 reported records / 0 FAIL / 0 SKIP: 43 retained functional cases,
 10 output cases, 27 installation cases, 83 PointCloud2 cases, two parameter-query
 cases, 15 metadata cases, 14 action cases, 20 composition cases, six Python lint
-checks, five CMake report records (three CTest runs plus two xUnit entries), 63 deterministic monitoring cases and18
+checks, nine CMake report records (four CTest runs plus five xUnit entries), 63 deterministic monitoring cases and18
 native monitoring/launch cases, plus48geometry cases (44deterministic and4native). Launch lookup covers all four files using `--show-args`; seven node constructors use
 synthetic inputs and an isolated command topic without running follower control.
 This does not prove full navigation, motion safety, coverage or a remote CI run. Dependency
@@ -414,7 +414,7 @@ printed `/tmp/r3d-ci.*` directory. Only containers created by this run are remov
 no images, host packages, ROS installation or Conda environment are changed.
 The same command is configured in `.github/workflows/ros2-humble.yml`.
 
-Local reproduction passed the full suite (354 reported colcon records) (0 failure/skip) and298
+Local reproduction passed the full suite (358 reported colcon records) (0 failure/skip) and343
 source-free cases. This is not a GitHub Actions result. The workflow remains
 IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
@@ -422,7 +422,7 @@ IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 354 colcon records and298 unique source-free cases pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 358 colcon records and343 unique source-free cases pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -457,13 +457,73 @@ Local Debian packaging was also exercised for all three packages: peer-aware Blo
 preparation, unsigned package build/install and a fresh source-free runtime probe
 with dpkg file ownership, versions, dependencies and ROS interfaces passed.
 These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
-generated rules tolerate failing build-time tests: interface C++ linters find no
-own sources, and planner pre-install tests lack their installed package shares.
-That direct Debian test phase remains open (central gate R28); successful package
-generation does not mean those tests passed. The green colcon/source-free CI
-results above describe their own complete installation context.
+generated rules retain their tolerant test exit behavior. The required local
+release wrapper now validates the actual reports and complete test identities,
+rejecting failures, errors, skips and missing evidence independently of Bloom.
+Installation-dependent checks run in a mandatory fresh Debian runtime container.
+Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
 
-The 354 reported colcon records comprise 349 unique Python cases and the five
+The 358 reported colcon records comprise 349 unique Python cases and the nine
 CMake records described above. CTest and xUnit represent some of the same lint
-executions; they are not five independent CMake checks. The separate runtime
-suite contains 298 unique pytest cases, including all 48 new geometry cases.
+executions; they are not nine independent CMake checks. The separate normal-CI runtime
+suite contains 343 unique pytest cases, including all 48 geometry cases and
+the 45 configuration cases now runnable without source resources.
+
+
+## Local Debian release gate (Humble / Jammy / amd64)
+
+Run both independent checks before considering local release readiness:
+
+```bash
+bash scripts/ci/run_humble.sh
+bash scripts/ci/run_humble_debian.sh
+```
+
+The Debian runner uses fresh containers, readonly source/probe mounts and ordinary
+build/test users. It uses the official Bloom peer-package generator and installs
+actual generated Build-Depends with `apt-get build-dep`. New test dependencies
+explicitly declare the runtime APIs imported during test collection/execution.
+No host package, Conda environment, Docker configuration or public release is
+changed. The generated Bloom `debian/rules` files are kept unchanged.
+
+The planner's `installed` pytest marker describes a real resource requirement.
+It is inherited through the explicit `installed_share` fixture; it never skips
+a default test run. Before installation, the Debian phase selects `not installed`:
+243 planner tests run and 93 installation-dependent tests are deferred. The
+preprocessor runs all 13 build tests. The interface runs four explicit CTest
+checks: copyright, CMake lint, XML lint and source headers (two cases).
+
+After package creation, a second fresh container installs all three Debian
+packages and their dependencies. It executes **all 336 planner and 13 preprocessor
+Python cases**, including every deferred installation check. This is mandatory,
+not an optional replacement for missing tests. It also verifies dpkg file owners,
+versions, installed resources, LICENSE/CHANGELOG, generated message imports and
+ROS interface lookup without a source checkout or earlier R3D install prefix.
+
+`release_gate.py` validates actual xUnit/JUnit, CTest discovery and the complete
+unfiltered test inventory. FAIL, ERROR, SKIP, missing/empty/malformed/duplicate
+reports, inconsistent counts or missing case identities fail the release gate,
+even when Bloom tolerates `dh_auto_test` failure. Results remain separated by
+phase; repeated runs are not added as independent tests. Artifact names, sizes,
+SHA-256, control metadata and per-command exits are saved under the printed
+`/tmp/r3d-debian.*` result path. Environment snapshots record actual tool versions.
+The builder must not have the package under test preinstalled.
+
+The diagnostic control is intentionally expected to fail:
+
+```bash
+bash scripts/ci/run_humble_debian.sh --failure-probe
+```
+
+It inserts a failing test only into a private temporary package copy. A nonzero
+exit proves propagation through the actual two-stage entry point; it never alters
+repository tests. Thirteen separate unit controls cover report rejection and
+coverage matching (`/usr/bin/python3 -m pytest scripts/ci/tests -q` in a suitable
+Python/pytest environment). No test deactivation or generated-template edit is a
+permanent project workaround. Build-time source checks and installed checks have
+different contracts; a neutral working directory and the registered ROS prefix
+replace the former literal `/install/` pathname assumption.
+
+These results are local technical evidence. Remote GitHub Actions, the final
+release version, public V4 source, ROS Index/Bloom/Buildfarm operations and legal
+publication clearance remain separate, explicitly unperformed gates.

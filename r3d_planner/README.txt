@@ -179,7 +179,7 @@ V4 declares the direct Humble/Jammy keys, including sensor_msgs_py/std_msgs and
 tf2_ros_py for the Python TF2 provider. See ../INSTALL.md and
 ../docs/KNOWN_ISSUES.md for the rosdep procedure and remaining release boundaries.
 On Humble/Jammy the current clean-copy CI build and actual dependency install/check pass;
-the colcon reports 354 successful test records, and a source-free install passes 298 cases.
+the colcon reports 358 successful test records, and a source-free install passes 343 cases.
 This establishes the tested installation scope, not remote CI, motion or Jazzy support.
 
 ## M02 obstacle input
@@ -205,3 +205,10 @@ false restores the documented legacy radial loss. Self returns, sensor coverage
 and robot/body clearances still need deployment validation. The new boolean is
 startup-only; old configurations without it remain valid. See the local geometry
 contract in docs/CONFIGURATION.md (repository root) for formulas and limits.
+
+
+For local Debian validation run `bash scripts/ci/run_humble_debian.sh` from the
+repository root. Test phase requirements are explicit; deferred installed checks
+are mandatory in its fresh source-free Debian container. Failed/missing evidence
+makes the wrapper fail independently of Bloom's standard tolerant test rule.
+See INSTALL.md and central section21 for the exact scope and local-only status.

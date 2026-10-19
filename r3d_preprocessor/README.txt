@@ -131,7 +131,7 @@ Tests declare `python3-pytest`, `ament_copyright`, `ament_flake8` and
 
 Actual rosdep installation and check pass in two fresh isolated Humble/Jammy
 containers, with apt Open3D 0.14.1 and NetworkX 2.4. The audit host was unchanged.
-The current clean-copy CI build passes the full suite (354 reported colcon records); 298 installation/output/interface
+The current clean-copy CI build passes the full suite (358 reported colcon records); 343 installation/output/interface
 cases also pass without a source tree. Six package lint checks include active
 copyright verification with no skips. See `../INSTALL.md` and
 `../docs/KNOWN_ISSUES.md` for commands and remaining platform/release boundaries.
@@ -142,3 +142,10 @@ copyright verification with no skips. See `../INSTALL.md` and
 `r3d_planner/pcd_path_planner`. `pcd_server` publishes the same file for
 visualization. Both components treat its coordinates as the configured map coordinates;
 neither applies a transform.
+
+
+For local Debian validation run `bash scripts/ci/run_humble_debian.sh` from the
+repository root. Test phase requirements are explicit; deferred installed checks
+are mandatory in its fresh source-free Debian container. Failed/missing evidence
+makes the wrapper fail independently of Bloom's standard tolerant test rule.
+See INSTALL.md and central section21 for the exact scope and local-only status.

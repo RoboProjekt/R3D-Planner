@@ -62,7 +62,7 @@ reviews. Forthcoming changelogs and local tests are preparation, not a release.
 
 | Target | Current evidence | Support boundary |
 |---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 354 colcon records and298 unique source-free cases pass | Verified tested scope |
+| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 358 colcon records and343 unique source-free cases pass | Verified tested scope |
 | Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
 | Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
 | Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
@@ -87,8 +87,8 @@ Local Debian packaging was also exercised for all three packages: peer-aware Blo
 preparation, unsigned package build/install and a fresh source-free runtime probe
 with dpkg file ownership, versions, dependencies and ROS interfaces passed.
 These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
-generated rules tolerate failing build-time tests: interface C++ linters find no
-own sources, and planner pre-install tests lack their installed package shares.
-That direct Debian test phase remains open (central gate R28); successful package
-generation does not mean those tests passed. The green colcon/source-free CI
-results above describe their own complete installation context.
+generated rules retain their tolerant test exit behavior. The required local
+release wrapper now validates the actual reports and complete test identities,
+rejecting failures, errors, skips and missing evidence independently of Bloom.
+Installation-dependent checks run in a mandatory fresh Debian runtime container.
+Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.

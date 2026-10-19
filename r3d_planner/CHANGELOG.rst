@@ -4,6 +4,9 @@ Changelog for package r3d_planner
 Forthcoming
 -----------
 
+* Classify installation-dependent tests explicitly and verify registered ROS prefixes
+  for copied and Debian installations; retain all functional regressions.
+* Declare ROS and science APIs needed during build-time test execution.
 * Retain height-qualified near obstacle returns before the legacy radial gate
   can erase the follower stop region; add optional startup-only
   retain_near_obstacles (true by default, false restores legacy output).
