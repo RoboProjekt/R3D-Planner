@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 19. Oktober 2026; fortgeführt bis V4-042 (R28-Abschlussstatus in21). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und21. Historische Rückstellungen und neuere Distributionsbefunde bleiben datierte Vorstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 19. Oktober 2026; fortgeführt bis V4-046 (finales AP10-Audit in22, R28-Abnahme in21). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und neuere Distributionsbefunde bleiben datierte Vorstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 ## 1. Zielsetzung
 
@@ -303,13 +303,13 @@ AP01-Teilstände nach V4-004 (damalige Abnahme), fortgeführt durch V4-005/V4-00
 | Priorität | P0 für offene Release-Gates; Umsetzung nach technischen Grundlagen |
 | Abhängigkeiten | AP01-AP04 zwingend für belastbaren Abschluss; AP05/AP06 für vorgesehenen Produktvertrag; AP08/AP09 für Ziel-/Wartungszusagen; AP07 als Projektqualitätsnachweis |
 | Abschlusskriterien | Geprüfte Checkliste, konsistente Version/Ref, vollständige Dependencies, funktionierender Copy-Install, geklärte Rechte; Veröffentlichung nur nach gesonderter Autorisierung und externer Bestätigung |
-| Aktueller Status | Lokale technische Humble-/Bloom-Peer-/Debian-Install-/Runtimenachweise VERIFIED; Debian-Buildzeit-/Postinstallgate R28 VERIFIED (19.10.,21.6); öffentlicheIndex-/Bloom-/Farmfreigabe insgesamt BLOCKED/NOT READY wegen R14–R24/R27 |
+| Aktueller Status | Lokale technische Humble-/Bloom-Peer-/Debian-Install-/Runtimenachweise VERIFIED; Debian-Buildzeit-/Postinstallgate R28 VERIFIED (19.10.,21.6); öffentlicheIndex-/Bloom-/Farmfreigabe insgesamt BLOCKED/NOT READY wegen R14–R24/R27 sowie R29 (offizielle Testintegration) |
 
 ### 4.12 Aktuelle Entscheidungsgrenzen nach M02
 
 M02 ist durch den Folgeauftrag ausdrücklich freigegeben und implementiert. M01 und bestehende Algorithmen bleiben erhalten. Die technische Humble-Abnahme besteht aktuell mit358 Colcon-Berichtseinträgen (349 eindeutige Pythonfälle) und343 Sourcefreien Fällen. Die frühere Rückstellung von M02 ist historisch überholt. Das aktuelle Ziel ist ausschließlich Humble/Jammy/Python3.10; keine neuere Distribution muss für diesen Release portiert werden.
 
-Die konkrete radiale Filter-Follower-Nahpunktlücke ist unterV4-033/20 geschlossen; unveränderte Cliff-/Kalibrierungs-/physische Einsatzgrenzen bleiben dokumentiert. Rechte, autorisierte Publikation, endgültige Releaseversion und externe Review/Farmabnahme bleiben gesonderte Gates. Kein Push, Release, Hardwaretest oder fremdes Repository wird daraus automatisch freigegeben.
+Die konkrete radiale Filter-Follower-Nahpunktlücke ist unterV4-033/20 geschlossen; unveränderte Cliff-/Kalibrierungs-/physische Einsatzgrenzen bleiben dokumentiert. Rechte, autorisierte Publikation, endgültige Releaseversion und externe Review/Farmabnahme bleiben gesonderte Gates. Das finale Audit22 bestätigt zusätzlich R29: lokale R28-Testphasen sind noch nicht dauerhaft in den offiziellen Ablauf eingebunden. Kein Push, Release, Hardwaretest oder fremdes Repository wird daraus automatisch freigegeben.
 
 ## 5. Entwicklungsprotokoll
 
@@ -1536,6 +1536,8 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
 
+**Abschlussnachtrag:** V4-046 VERIFIED als begründete Audit-/Forschungsbewertung mit R01–R29, Szenarien A–E, D01–D14 und22-Aspekte-Vergleich. Keine Versions-/Rechte-/Supportentscheidung eigenmächtig getroffen. Aktueller Gesamtstatus AP10 BLOCKED/NOT READY, R28 LOCALLY VERIFIED, R29 BLOCKED. Endgültige Prüfungen/Commitzuordnung22.15.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -1709,7 +1711,7 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 | Bereich | Ausgangsstand main | Änderung V4 | Ergebnis | Nachweis |
 | --- | --- | --- | --- | --- |
 | Entwicklungslinie | main bei `c65642f…`; V1/V2/V3 als Remote-Tracking-Refs | Lokaler Branch V4 unmittelbar von Baseline; ein fokussierter Initial-Dokumentationscommit | Neue getrennte Entwicklungslinie, bestehende Refs unverändert | V4-001, T01/T06, Git-Parent/Refvergleich |
-| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe zentrale Protokoll bis V4-042; aktuelle Benutzer-/Wartungsdokumentation fortgeführt | Historische Events001..037/PDF/22Lizenzkapitel unverändert | V4-038..042; Kapitel21 |
+| Forschungsdokumentation | Historischer Bericht und Bestandsdokumentation, PDF zunächst unversioniert | Dasselbe zentrale Protokoll bis V4-046; aktuelle Benutzer-/Wartungsdokumentation fortgeführt | Historische Events001..037/PDF/22Lizenzkapitel unverändert | V4-038..042; Kapitel21 |
 | Historische PDF | Vorhandene unveränderte, zunächst unversionierte Baseline-Dokumentation | Identische Bytes in V4 unter Git aufgenommen | Keine neue technische Funktion; SHA unverändert und historische Kartendarstellung erhalten | V4-007/T49 |
 | Planung/Preprocessing | Vorhandene PCD-/Voxel-/Traversierbarkeits-/Graph-/A*-Funktionen | Vorhandene Berechnungen erhalten; A* um optionalen kooperativen Cancelcheck ergänzt | Kein neuer Planungsalgorithmus; Nachrichtenausgabe/Actionverträge gezielt korrigiert | V4-022; native Action-/Bestandsregressionen |
 | Paketmetadaten | Version 0.0.0 vs 0.0.1, TODO-Beschreibungen, keine URLs/Author | AP02: 0.0.1 konsistent, Beschreibungen/Repo-/Issue-/Authorfelder ergänzt, Maintainer erhalten | Technischer Metadatenumfang VERIFIED, Namen/Buildtyp/Dependencies/Lizenzen erhalten | V4-008/T50-T53; Kapitel 13 |
@@ -1730,15 +1732,15 @@ Vergleichsreferenz bleibt der festgeschriebene Baseline-Commit, nicht ein späte
 
 ## 9. Veröffentlichungsstatus
 
-Aktueller Stichtag19.10.2026, nach R28-Abnahme V4-038–042. **Einziges Entwicklungs-/Releaseziel: Humble/Jammy/Python3.10** (verbindliche Nutzerentscheidung V4-030). Maßgeblich ist21, ergänzend die datierten Ergebnisse20.7–20.12; frühere Kapitel18.8/18.9 bleiben historisch.
+Aktueller Stichtag19.10.2026, nach R28-Abnahme V4-038–042 und finalem Audit V4-043–046. **Einziges Entwicklungs-/Releaseziel: Humble/Jammy/Python3.10** (verbindliche Nutzerentscheidung V4-030). Maßgeblich ist22, für lokale R28-Abnahme21, ergänzend die datierten Ergebnisse20.7–20.12; frühere Kapitel18.8/18.9 bleiben historisch.
 
 | Gegenstand | Aktueller Status | Konkrete Grenze |
 |---|---|---|
 | Humble-ROS-Paketgrundlagen | VERIFIED im geprüften Umfang | DreiPakete/0.0.1,36Keys, Copybuild,358 colcon-Berichtseinträge/343eindeutige Runtimefälle |
-| ROS Index / öffentlicheSource | NOT READY insgesamt | GeprüfterV4stand weiterhinlokal; Rechte-/Publikationsentscheidung undexterneReview offen |
+| ROS Index / öffentlicheSource | NOT READY insgesamt | GeprüfterV4stand weiterhinlokal; Rechte-/Publikationsentscheidung undexterneReview offen; vier historische PCD-Blobs berücksichtigen |
 | rosdep Humble/Jammy | READY / VERIFIED lokal |36 externeKeys, echteInstallation/check; alle3internenPakete gemeinsamgebaut |
-| Bloom | NOT READY | EndgültigeVersion/Ref,Releaseorganisation,Rechts-/Publicgates offen;Forthcomingvorhanden |
-| Buildfarm / öffentlicherDebianrelease | NOT READY / NOT VERIFIED | Keine offiziellen Release-/Farm-/Publikationsaktionen; lokaleArtefakte separat |
+| Bloom | NOT READY | EndgültigeVersion/Ref,Releaseorganisation,Rechts-/Publicgates und R29 offen; Forthcoming vorhanden |
+| Buildfarm / öffentlicherDebianrelease | NOT READY / NOT VERIFIED | Keine offiziellen Release-/Farm-/Publikationsaktionen; lokale Artefakte separat; R29 Testvertrag offen |
 | Lokale Bloom-/Debianpaketierung | VERIFIED Build/Buildtests/Installation/Runtime |3lokalePakete,Dpkg-Herkunft/Depends/Sourcefrei geprüft; R28 VERIFIED:243/13Buildfälle,4CTest;vollständige336/13Postinstallfälle |
 | M01 | VERIFIED | Schemabytegleich, gültigeQuaternionen/Paarung, alleBestandsfällebestehen |
 | M02 | VERIFIED fürSoftwarevertrag | Daten-/TF-/Clock-/Stop-/Recoveryumfang nativundSourcefreigeprüft;keinephysischeSicherheitszusage |
@@ -4960,3 +4962,122 @@ HistorischeIDs/Ergebnisse20.10und21bleibenunverändert;dieseTabelleersetztnurder
 | R29 | OffizielleTestphasen-/Fehlerwirksamkeit | dauerhafteAuswahl+Reportgate+Pflichtpostinstall | — | verbindlicheReleaseprozessentscheidung | BLOCKED | 22.9neue4ERROR-Probe/Standardregeln/Workflow | implementiertegetesteteoffizielleAnbindung | Maintainer/Releaseteam | gesonderteUmsetzungsfreigabeundNegative2E |
 
 **Readiness getrennt:** TECHNICAL READINESS=LOCALLY VERIFIED fürbestehendenHumbleumfang,R29offizielleAnbindungoffen; LEGAL READINESS=REQUIRES LEGAL REVIEW; ORGANIZATIONAL READINESS=REQUIRES USER DECISION; PUBLIC SOURCE READINESS=BLOCKED; ROS INDEX READINESS=NOT READY; BLOOM RELEASE READINESS=NOT READY; BUILDFARM READINESS=NOT VERIFIED/NOT READY. NichtjedesGateisteineallgemeineROS-Mussregel: R12/R23undtieferlokalerTestumfangsindProjekt-/Qualitätsabnahmen;R26keineHardwarepflichtfürSourceindex;R29bindetdenerklärtenProjektprüfvertrag,nichtdieroboticsweiteDefinitionvonROSIndex.
+
+### 22.11 Veröffentlichungsszenarien als Entscheidungsvorlage
+
+Keine der folgenden Optionen wurde ausgeführt. Ein öffentlicher Source-Stand, eine Quellversion, ein Indexeintrag, ein Bloom-Release und veröffentlichte Debianpakete sind unterschiedliche Ergebnisse.
+
+| Szenario | Technischer Gegenstand / Referenz | Rechte und Dokumentation | Noch erforderliche externe Schritte | Aktuelle Blocker / Entscheidung |
+|---|---|---|---|---|
+| A: Öffentlicher V4-Source auf GitHub | Freigegebener Branch mit den drei Paketen; Umfang vollständige Historie oder bewusst getrennter Publikationsstand | Alle mitveröffentlichten Dateien einschließlich PDF, Notizen und erreichbarer Daten berücksichtigen; Ursprung/Notices erhalten | Autorisierte Veröffentlichung; realen HTTPS-Checkout und CI danach prüfen | R14–R17/R24; D01–D04/D07/D11. Empfehlung: zuerst Umfang und Rechte entscheiden, dann konkreten Candidate freigeben |
+| B: Festgelegter Source-Release | Immutable Upstream-Tag mit freigegebener gemeinsamer Version; nachvollziehbare Verbindung zur Forschungsbaseline | Lizenz-/Änderungshinweise, versionierte Changelogs und Releasenotizen; Treeexport unterscheidet sich von Gitclone | Autorisierter Tag/Source-Release; reproduzierbaren Candidate prüfen | R18/R19/R24; D06–D08. Kein Tag angelegt; 0.1.0 nur Empfehlung |
+| C: ROS-Index-Sourceeintrag | Öffentlicher Branch/HTTPS-.git-URL und konsistente Repository-/Paketmetadaten | Freigegebene Open-Source-Lizenz für den konkreten Sourceumfang | rosdistro-Source-PR, externe Review/Merge und anschließende Indexprüfung | R17/R20; D12. Kein Bloom-Binaryrelease für eine bloße Sourceindexierung behauptet |
+| D: Offizieller Bloom-Release Humble | Release-Repository, Team/Berechtigungen, Track, Upstream-Ref, Version und alle drei Peers | Freigabe des tatsächlichen Source-/Binaryumfangs, Changelogs und Notices | Autorisierte Bloom-Ausführung/Release-PR/Review; offizielle Testphasenentscheidung umsetzen und prüfen | R14/R16/R18/R19/R21/R29. Lokale Peerpaketierung ist vorhanden, offizielle Integration fehlt |
+| E: Offizielle Debianpakete | Source-/Binary-/Import-/Syncjobs für akzeptierte Metadaten und Farmtargets | Konkrete binäre Liefergegenstände und Abhängigkeitsbedingungen prüfen | Tatsächliche Farmjobs beobachten, Fehler bearbeiten, öffentliche Paketverfügbarkeit/Installation verifizieren | R22/R27 und vorgelagerte Gates; keine Farm-/Apt-Publikation ausgeführt |
+
+Sinnvolle spätere Reihenfolge: Rechte und Publikationsumfang → Versions-/Maintainerentscheidung → autorisierter öffentlicher Candidate mit Remote-CI → Sourceindexierung und freigegebener Source-Release → offizielle Release-Testintegration und Bloom → Farm-/Sync-/Auslieferungsnachweis. Sourceindex und Source-Tag können nach den jeweils erfüllten Voraussetzungen vorbereitet werden; beide setzen keine bereits veröffentlichte Debianlieferung voraus. R29 muss vor der Behauptung einer gleichwertigen offiziellen Testabnahme geschlossen werden. Keine dieser Reihenfolgen ist eine Freigabe zum Ausführen.
+
+### 22.12 Konkrete Entscheidungen des Entwicklers
+
+Die Fragen sind eine Entscheidungsvorlage, keine bereits erteilte Zustimmung. EMPFEHLUNG bezeichnet mein technisches Urteil; NOTWENDIGE FREIGABE muss eine berechtigte Person geben. TECHNISCHE VORAUSSETZUNG und RECHTLICHER PRÜFBEDARF bleiben getrennt.
+
+| ID | Konkrete Frage | Begründete Empfehlung | Notwendige Freigabe / technische Voraussetzung | Rechtlicher Prüfbedarf |
+|---|---|---|---|---|
+| D01 | Kannst du die Berechtigung zur öffentlichen Lizenzierung aller vorgesehenen Eigenanteile bestätigen und nachvollziehbar abgrenzen? | Erklärung dateibezogen mit Projektunterlagen verbinden; Code und Dokumente getrennt betrachten | Berechtigter bestätigt konkreten Source-/Binaryumfang; R16 | Urheberschaft und Nutzungs-/Lizenzierungsbefugnis nicht allein aus Git ableiten |
+| D02 | Entstanden betroffene Teile in Arbeits-, Dienst-, Hochschul-, Sponsor- oder anderen Vertragsverhältnissen, und wer muss gegebenenfalls zustimmen? | Tatsächlich einschlägige Vereinbarungen prüfen; keine Arbeitgeberrechte unterstellen | Gegebenenfalls zuständige Institution/Vertragspartner bestätigen Umfang | REQUIRES LEGAL REVIEW bei ungeklärter Vereinbarung/Befugnis |
+| D03 | Welche Fremdanteile oder gemeinsamen Bundles sollen verteilt werden, und wer prüft die konkreten Notices? | OSRF-Änderungshinweise sowie Native-/Generator-/Transitivkomponenten gezielt prüfen; getrennte LiDAR-Software nicht pauschal einbeziehen | Freigegebene Artefakt-/Komponentenliste; R14 | Apache/BSD/MIT und gegebenenfalls weitere konkrete Dateibedingungen |
+| D04 | Soll die vollständige erreichbare Git-Historie einschließlich aller vier PCD-Blobs öffentlich werden, oder ein abgegrenzter Publikationsstand? | Vor einer Historyveröffentlichung alle vier Datenbestände klären; bei ungeklärten Altdaten einen getrennten, rückverfolgbaren Publikationsstand erwägen | Konkreter Scope/Ref; kein Rewrite des Forschungsrepos automatisch freigegeben | Zusätzliche Rootkarten sowie PDF/Notizen nicht durch bisherige Kartenselbstauskunft pauschal freigeben |
+| D05 | Bestätigst du für den ersten Release die drei Pakete r3d_planner, r3d_preprocessor und r3d_interfaces als gemeinsamen Satz? | Gemeinsamen Satz beibehalten; dieser Umfang ist bereits verbindliches technisches Ziel | Kein neuer Paketumfang nötig, nur finale Veröffentlichung dieses Satzes freigeben | Rechte je Bestandteil bleiben separat |
+| D06 | Welche erste öffentliche Paketversion gibst du frei: 0.0.1, empfohlen 0.1.0 oder eine andere begründete Version? | 0.1.0 als funktionalen Vorabrelease mit ausdrücklich instabilen Verträgen wählen | Danach 3 XML, 2 Setups, Guard und Changelogs konsistent ändern und betroffene Validierungen wiederholen | Keine stabile API/ABI allein durch Versionsnummer zusagen |
+| D07 | Welcher öffentliche Branch und welcher spätere Upstream-Tag sollen die verbindlichen Releasequellen sein? | Einen klar bezeichneten Humble-Sourcebranch und einen unveränderlichen Versionstag wählen | Namen/Repository/Scope ausdrücklich festlegen; source-CI-Eintrag braucht Branch | Ref darf keine nicht freigegebenen Daten nachliefern |
+| D08 | Welche versionierten Changelog-Einträge und welches tatsächliche Releasedatum werden freigegeben? | Erst zusammen mit D06 und konkretem Releasezeitpunkt finalisieren | Alle drei Changelogs müssen zum Candidate passen; aktuell Forthcoming korrekt | Öffentliche Texte/Inhalte müssen mitfreigegeben sein |
+| D09 | Wer übernimmt Maintainer- und Releaseverantwortung für alle drei Pakete, und wer besitzt die nötigen Zugriffe beziehungsweise Vertretung? | Bekannte Person nur nach ausdrücklicher Übernahme bestätigen; Ansprechpartner/Vertretung realistisch dokumentieren | Release-Team/-Repo-/Trackrechte vor Bloom nachweisen | Langfristige Kontakt-/Organisationsbefugnisse nicht aus E-Mail ableiten |
+| D10 | Welchen Support-, EOL- und Securityumfang kannst du tatsächlich zusagen? | Humble/Jammy/amd64 und experimentelle Stabilitätsgrenzen klar benennen; keine unbelegte Reaktionsfrist versprechen | Öffentliche Policy und Zuständigkeit beschließen | Keine unautorisierten SLA-/Sicherheitszusagen |
+| D11 | Für welchen freigegebenen Candidate darf erstmals Remote-CI laufen? | Nach Rechte-/Sourcefreigabe den echten GitHub-Lauf prüfen; Debian-Gate als getrennte Pflichtstufe entscheiden | Push/Branchfilter/Workflowfreigabe; heutiger Workflow startet bei Push auf main/V4 automatisch | Keine sensiblen Source-/Dateninhalte ungeprüft hochladen |
+| D12 | Wann und durch wen dürfen Sourceindex-PR, Release-Repo-/Trackeinrichtung und Bloom-Schritte beginnen? | Sourceindex erst mit freigegebenem öffentlichen Branch; Bloom erst nach Version/Team/Testvertrag | Jeweils konkrete externe Aktion separat autorisieren; kein Auditauftrag als Pushfreigabe | Freigabe des jeweiligen Distributionsgegenstands |
+| D13 | Welche offenen Rechtsfragen sollen einer berechtigten Stelle beziehungsweise externen Rechtsprüfung vorgelegt werden? | Vertrags-/Institutionenrechte, vier historische Karten, Dokument-/Bildrechte, konkrete Fremd-/Binarynotices priorisieren | Dokumentierte Antworten beziehungsweise begründete Scopebegrenzung | REQUIRES LEGAL REVIEW; keine pauschale Patent-/Rechtefreiheit ableiten |
+| D14 | Soll die in R29 beschriebene dauerhafte offizielle Build-/Installationstestintegration als nächster technischer Auftrag umgesetzt werden? | Ja, als begrenzten Folgeauftrag mit strikter Fehlerweitergabe und vollständig erhaltener Postinstallabdeckung | Gesonderte Implementierungsfreigabe, akzeptiertes Prozesskonzept, positive/negative Abnahme | Keine neue Lizenz oder Navigationsfunktion dafür erforderlich; Releasefreigaben separat |
+
+D05 ist bereits als Entwicklungsumfang entschieden; D06/D07/D08/D09/D10/D11/D12/D14 bleiben konkrete Entscheidungen. D01/D02/D03/D04/D13 benötigen abhängig von den tatsächlichen Unterlagen eine zuständige Rechtebestätigung oder rechtliche Prüfung. Es werden keine Antworten erfunden und keine fehlende Entscheidung als implementierter technischer Defekt dargestellt.
+
+### 22.13 Wissenschaftliche Abschlussbewertung gegen die feste Baseline
+
+Vergleich ausschließlich mit c65642fe56015556f696364a724cb5b976a27888; technischer Eingangsstand dieses Audits c2e6d067537e840340157f9f1cfb6af03e0a9381. Die Auditcommits verändern nur Dokumentation. Die folgende Zuordnung trennt VORBESTAND, V4-ENTWICKLUNGSLEISTUNG, NACHGEWIESENE VERBESSERUNG und NICHT VERIFIZIERTE EIGENSCHAFT. Keine Leistungsmessung, Hardwarezertifizierung oder neue A*-Erfindung wird daraus abgeleitet.
+
+| Aspekt | Historischer Zustand / Vorbestand | Identifiziertes Defizit | Tatsächliche V4-Änderung | Technische Begründung | Konkreter Nachweis | Aktueller Status | Verbleibende Einschränkung |
+|---|---|---|---|---|---|---|---|
+| 1 Paketstruktur | 2 ament_python-Pakete vorhanden | kein getyptes Metadateninterface | drittes ament_cmake/rosidl-Paket | M01 separat generierbar machen | V4-021/22.6/21 | VERIFIED lokal | keine allgemeine Repo-Neustrukturierung |
+| 2 Lizenzimplementierung | OSRF-Header/Setupangabe vorhanden | Roottext/Manifeste/Grant widersprüchlich | Apachetexte/Headers/Paketressourcen | autorisierte Eigenanteile kennzeichnen | V4-004–006/22.3 | TECHNICALLY VERIFIED | rechtliche Befugnisse separat |
+| 3 ROS-Metadaten | Namen/Maintainer bereits vorhanden | TODOs/0.0.0 vs 0.0.1 | Beschreibungen/URLs/Autor/0.0.1 konsistent | valide Paketmetadaten | V4-008/22.6 erneute Parse0 | VERIFIED | Releaseversion noch entscheiden |
+| 4 Dependencies | zahlreiche ROS/Scienceimporte vorhanden | direkte Keys/Testrollen fehlten | gezielte Runtime-/Testdeklarationen | saubere Zielumgebung versorgen | V4-011/040/21 | VERIFIED Humble | offizieller Peergraph noch nicht ausgeführt |
+| 5 rosdep | Abhängigkeiten teildeklariert/Skipanleitung | nicht vollständig reproduzierbar | 36 passende externe Keys, ohne Skip | standardisierte Systemauflösung | 21 Resolve/Install/Check0 | VERIFIED lokal | Liveindizes sind kein permanenter Lockfile |
+| 6 Installation | Setup/EntryPoints/Marker vorhanden | Copyconfig abgelehnt/Lizenzmitnahme fehlte | Shareauflösung/Lizenzen/Copy- und Debianabnahme | ohne Source nutzbar | V4-006/013–016/21 | VERIFIED lokal | kein beliebiger Präfixumzug |
+| 7 Konfiguration | zentrale YAML/Robotprofil/Launches vorhanden | Sourcekartenpfade und Ausgabe neben Input | eigene Daten/Override/separate exklusive Ausgabe | readonly Paketressourcen erhalten | Config-/Output-/Installtests/22.8 | VERIFIED | Nutzer muss geeignete Karten bereitstellen |
+| 8 ROS-Schnittstellen | Nodes/Topics/Services/Action bereits vorhanden | Semantik-/Namespace-/Remappinggrenzen | gezielte dokumentierte Vertragskorrekturen | interoperable gemeinsame Verbraucher | 17–21 native Tests | VERIFIED im Scope | kein vollständiges Nav2-Redesign |
+| 9 PathWithMetadata | narrow in Quaternion missbraucht | ungültige Standardorientierungen | atomarer Path plus bool[]; Follower migriert | eindeutige Paarung/geometrischer Path | M01/CDR/native/Installationstests | VERIFIED | externe Legacydecoder benötigen Migration |
+| 10 PointCloud2 | verarbeitete bereits Punktwolken | gepackte XYZ-Annahme | Feld-/Stride-/Endian-/Finitevalidierung | allgemeinere zulässige Layouts | 83 PointCloud2-Fälle/17–21 | VERIFIED | keine beliebige Sensorkalibrierung bewiesen |
+| 11 TF | Pose-/TF-/Odometriegrundlagen vorhanden | einzelne Frame-/Finitegrenzen | gezielte Validierung/Monitortransformation | Daten im erklärten Frame verwenden | native TF-/M02-/Geometriefälle | VERIFIED | externe korrekte TF-Kette erforderlich |
+| 12 QoS | ROS-Publisher/Subscriber vorhanden | Robustheit/Vertrag nicht vollständig geprüft | explizite Sensorverträge/Tests | BestEffort/Reliable-Verhalten belegen | native QoS-/Latejoinfälle | VERIFIED | keine Netzwerk-/DDS-Gesamtgarantie |
+| 13 Action | ComputePathToPose/A* vorhanden | Timing/Cancel-/Fehlergrenzen | kooperativer Cancelcheck/Result-/Poseprüfung | passende Actionzustände | 14 Actionfälle/18–21 | VERIFIED | Actioncancel ist kein Follower-Hardwarestop |
+| 14 M02 | lokaler Filter optional vorhanden | keine optionale verbindliche Datenüberwachung | opt-in Zeit-/TF-/Validierungs-/Stop-/Recoveryvertrag | fehlende ungültige Daten explizit behandeln | 19/21 Monitor-/ROS-/Launchfälle | VERIFIED Software | kein Hardwarewatchdog/Notstopp |
+| 15 Filter/Follower | bestehende radiale/ROI-Geometrie | nahe relevante Punkte gingen verloren | retain_near_obstacles vor radialem Gate | nachgewiesenen Softwareverlust schließen | 20 Vorher/Nachher und48 Geometriefälle | VERIFIED | Körper-/Brems-/Sensorgrenzen bleiben |
+| 16 Automatisierte Tests | 20 funktionale Fälle und6 Linttemplates historisch vorhanden | Install-/Schnittstellen-/Lintlücken | Regressionen/Kontrakte/Lint-/Headerchecks | Änderungen nachprüfbar machen | 21:349 Pythonidentitäten,358 Berichte,343 Runtime | LOCALLY VERIFIED | keine Coverage-/Performancequote |
+| 17 Lokale CI | manuelle Buildanleitungen | keine Pipeline | gepinntes Image/Workflow/2-Container-Einstieg | Cleanbuild/Sourcefreiheit nachweisen | 21 echte CI0;22.8 Pinprobe | LOCALLY VERIFIED | Remote noch nicht ausgeführt |
+| 18 Debian-Testintegration | keine äquivalente automatische Abnahme | Installtests im Vorinstallbaum/tolerierter Exit | Phasentrennung/striktes Gate/Identitätsvergleich | Fehler nicht als Buildgrün werten | 21 positiv/negativ;13 Gatekontrollen | R28 LOCALLY VERIFIED | R29 offizielle Einbindung offen |
+| 19 Debianpaketierung | keine hier belegte offizielle Paketierung | Peer-/Installherkunft ungeprüft | 3 reale lokale .debs mit Abhängigkeiten/Ownerprobe | konkrete Artefaktherkunft statt Importbehauptung | 21 Hashes/dpkg-/Runtimebelege | LOCALLY VERIFIED | kein offizieller Source-/Binary-/Syncjob |
+| 20 Releasevorbereitung | keine abgeschlossene Index-/Releaseorganisation | Rechte/PublicRef/Version/Team offen | Gate-/Entscheidungs-/Szenarioinventar | lokal/rechtlich/öffentlich/extern trennen | 20–22/R01–R29/D01–D14 | Audit VERIFIED | Release insgesamt NOT READY |
+| 21 Dokumentation | umfangreiche README/Architektur/Config vorhanden | veraltete Aussagen/fehlende Policies | gezielte Anleitungen/Contracts/Maintenance/Protokoll | Vorbestand und V4-Beitrag nachvollziehbar halten | V4-025/035/042/043–046 | VERIFIED beauftragter Umfang | öffentliche Zusagen/Rechte noch freigeben |
+| 22 Restgates | frühere technische und rechtliche Fragen | Gesamtfreigabe aus Build nicht ableitbar | konkrete getrennte R01–R29 und Verantwortungen | keine falsche READY-Aussage | 22.10–22.12 | AP10 BLOCKED / NOT READY | Rechte/Organisation/PublicRef/R29/externe Jobs |
+
+PCD-/Voxel-/Treppen-/Traversierbarkeitsanalyse, Graphrekonstruktion, A*, Grundnodes, bestehende YAML-Konfiguration und V3-Odometrie sind Vorleistungen. V4 verbessert belegte Paket-, Daten-, Interface-, Installations- und Prüfverträge. Die Erweiterung auf 349 Pythonfälle ist keine Behauptung vollständiger Algorithmusabdeckung; wiederholte Phasen/CTest-xUnit-Darstellungen werden nicht als unabhängige neue Tests addiert. Dieses AP10-Audit schafft ausschließlich Inventare, aktuelle Quellenvergleiche, präzise Dokumentation und Entscheidungsvorlagen; die vorherigen funktionalen Verbesserungen werden ihm nicht nochmals zugerechnet.
+
+| AP | Abschließende Einordnung im vereinbarten Humble-Umfang | Grenze |
+|---|---|---|
+| AP01 | Technische Lizenzimplementierung VERIFIED | Rechts-/Vertrags-/Dokument-/History-/Bundlefreigabe REQUIRES LEGAL REVIEW |
+| AP02 | Metadaten VERIFIED | Öffentliche Version/Datum noch entscheiden |
+| AP03 | Dependencies/rosdep VERIFIED lokal | Offizielle Peer-/Releaseumgebung noch extern nachweisen |
+| AP04 | Copy-/Share-/Debianinstallation VERIFIED lokal | Keine beliebige Plattform-/Prefixgarantie |
+| AP05 | Freigegebene M01/M02/Geometrie-/ROS-Verträge VERIFIED | Keine physische Sicherheit oder neues SLAM/Nav2-Gesamtsystem |
+| AP06 | Regressionen/R28 LOCALLY VERIFIED | Keine Vollcoverage-/Hardwarezertifizierung |
+| AP07 | LOCAL CI VERIFIED | REMOTE GITHUB ACTIONS NOT VERIFIED; Debian-Gate nicht im Workflow |
+| AP08 | Dokumentationsfortschreibung VERIFIED im Auftrag | Endgültige Support-/Releasezusagen fehlen bewusst |
+| AP09 | VERIFIED Humble/Jammy/Python3.10/amd64 | Keine neue Multi-Distro-/Architekturprüfung |
+| AP10 | Finales Audit VERIFIED; Releasegesamtziel BLOCKED / NOT READY | R14–R24/R27/R29 und externe offizielle Nachweise bleiben offen |
+
+### 22.14 Konkrete offizielle Quellen und Abrufstand
+
+Alle folgenden Quellen wurden am **19.10.2026** lesend geprüft. Lizenzquellen für jede deklarierte Dependency stehen zusätzlich einzeln in22.5. Wo historische Lizenzbelege aus11 verwendet werden, werden sie ausdrücklich als solche bezeichnet; externe LiDAR-Repositories wurden in diesem Auftrag weder geändert noch erneut als Deploymentstand geprüft. Quellenkopien/Hashes in sources/index.json, extra-sources.json, ros-license-index.json und buildfarm-source-index.json unter /tmp/r3d-v4-ap10-final. Die Links sind die dauerhafte Referenz; temporäre Logs sind ergänzende Rohbelege.
+
+| Quelle | Konkrete URL | Belegter Gegenstand |
+|---|---|---|
+| ROS Index | [Contribute](https://index.ros.org/contribute/) und [Add repository](https://index.ros.org/contribute/add_repo/) | Sourceindexierung und Binaryrelease getrennt |
+| Humble Sourceindex | [Index Your Packages](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/How-To-Guides/Releasing/Index-Your-Packages.rst) | Publicsource/Lizenz/Namen/Sourceeintrag/Review |
+| rosdistro Review | [REVIEW_GUIDELINES](https://raw.githubusercontent.com/ros/rosdistro/master/REVIEW_GUIDELINES.md) | Lizenz/Publicrepo/Metadata/Review; Systemkeys statt Pipbinaryrelease |
+| rosdistro Contribution | [CONTRIBUTING](https://raw.githubusercontent.com/ros/rosdistro/master/CONTRIBUTING.md) | Source-CI-Version als Branch und Metadatenregeln |
+| REP144 | [Original](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-0144.rst) | Paketnamen/Präfixkonventionen |
+| REP149 | [Original](https://raw.githubusercontent.com/ros-infrastructure/rep/master/rep-0149.rst) | Format3/RequiredTags/Dependencyrollen/Version |
+| Erster Bloomrelease | [First Time Release](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/How-To-Guides/Releasing/First-Time-Release.rst) | Release-Team/Repo/Changelog/Version/Track/Release-PR |
+| Bloomtrack | [Release Track](https://raw.githubusercontent.com/ros2/ros2_documentation/humble/source/How-To-Guides/Releasing/Release-Track.rst) | Upstream-/Releasekonfiguration und Reftrennung |
+| Bloom Pythonregeln | [ament_python/rules.em](https://raw.githubusercontent.com/ros-infrastructure/bloom/master/bloom/generators/debian/templates/ament_python/rules.em) | Toleriertes dh_auto_test; zusätzlich tatsächliche R28-generated/rules gelesen |
+| Buildfarmprozess | [Release jobs](https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm/master/doc/jobs/release_jobs.rst) | Clean Source-/Binaryjobs/Dependencies/Import/Sync |
+| Humble Farmtarget | [amd64](https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/humble/release-build.yaml), [arm64 getrennt](https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/humble/release-ubuntu-arm64-build.yaml) | Konfigurierte Ziele, keine Jobausführung |
+| Humble Datenbank | [distribution.yaml](https://raw.githubusercontent.com/ros/rosdistro/master/humble/distribution.yaml) | Snapshot ohne R3D-Eintrag; Hash22.9 |
+| Apache/Rechte | [ASF](https://www.apache.org/licenses/LICENSE-2.0), [UrhG69b](https://www.gesetze-im-internet.de/urhg/__69b.html) | Lizenzbedingungen versus ungeklärte tatsächliche Vertragslage |
+
+### 22.15 Tatsächliche Auditprüfungen, Schutz und Commitzuordnung
+
+**Neue Auditprüfungen:** inventarisierter Git-/Datei-/Header-/Objekt-/Installationsumfang; enger Secretscan; Source-/Debianhashvergleich; ELF-NEEDED-Analyse; 3 Manifestparse/validate ohne Warnungen; XML-/Setupversionsvergleich; 3 RST-/catkin_pkg-Changelogparses (keine versionierten Einträge, Forthcoming im Text); CI-Shell-/YAML-/Pinprüfung; offizieller Quellen-/rosdistro-Abgleich; repräsentative vier fehlgeschlagene Vorinstalltests als erwartete Gegenprobe. Ein temporärer Changelog-APIversuch mit nicht unterstütztem skip_forthcoming-Argument scheiterte; Methodensignatur geprüft und tatsächlicher unveränderter Parser verwendet, kein Reportergebnis erfunden. Das betrifft nur die Auditprobe, keine Paketänderung.
+
+**Übernommene frühere Nachweise:** Colcon358 Berichte/349 eindeutigePythonfälle,343 sourcefreieRuntimefälle,R28 4CTest/5xUnit,13PreprocessorBuild,243PlannerBuild+93Installpflichten,336+13vollständigeDebianRuntime,13Gatekontrollen und tatsächlicher Negativrunner1 stammen aus21. Keine volleColcon-/Debian-/Hardwareprüfung in diesem Audit erneut ausgeführt. Kein Grund dafür, weil Build-/Produkt-/Test-/Manifest-/Changelogdateien unverändert sind. Diese Abgrenzung wird durch Byte-/Hashvergleich gestützt.
+
+Vier fokussierte lokale Auditcommits sind vorgesehen/erzeugt: Herkunft/Lizenzen,Version/Wartung,offizielleAbläufe undabschließendeForschungsbewertung. Tatsächliche bereits erzeugte SHAs:
+
+- `3c68fe95372ee78e0f0f9a44fd5a5545d761410c` – docs(legal): audit source provenance and distribution rights; Parent `c2e6d067537e840340157f9f1cfb6af03e0a9381`.
+
+- `dee26d16974de975f0fa07e3954c2109bb9c9552` – docs(release): evaluate versioning and maintenance decisions; Parent `3c68fe95372ee78e0f0f9a44fd5a5545d761410c`.
+
+- `c6c16477ed08e2883b52c410350142abfdec9b56` – docs(release): audit official ROS release prerequisites; Parent `dee26d16974de975f0fa07e3954c2109bb9c9552`.
+
+Der Abschlusscommit trägt den eindeutigen Subject `docs(research): consolidate final V4 readiness evaluation`. Seine eigene SHA wird ohne Amend über Git und den Abschlussbericht angegeben. Vor/nach jedem Commit werden Branch/Status/Diffcheck/Stat/Dateiliste/Parent geprüft. Keine selbstreferenzielle SHA durch Historyrewrite.
+
+Die abschließenden Prüfungen und Schutzwerte werden nach ihrer tatsächlichen Ausführung unten ergänzt. Ein eventueller offener Releasegate bleibt auch bei einem bestandenen Audit offen.
