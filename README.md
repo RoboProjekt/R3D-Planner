@@ -389,3 +389,10 @@ release wrapper now validates the actual reports and complete test identities,
 rejecting failures, errors, skips and missing evidence independently of Bloom.
 Installation-dependent checks run in a mandatory fresh Debian runtime container.
 Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
+
+
+The final local release audit is recorded in `docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md`,
+section 22. Local R28 verification does not automatically integrate the additional
+Debian test gate into the official ROS Buildfarm. Rights, public source scope,
+release version/ownership and the official test-phase contract remain separate
+decisions before publication. No official release has been performed.

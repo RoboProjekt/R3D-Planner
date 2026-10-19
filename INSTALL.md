@@ -527,3 +527,14 @@ replace the former literal `/install/` pathname assumption.
 These results are local technical evidence. Remote GitHub Actions, the final
 release version, public V4 source, ROS Index/Bloom/Buildfarm operations and legal
 publication clearance remain separate, explicitly unperformed gates.
+
+
+### Boundary of the local release gate
+
+`run_humble_debian.sh` sets the build-phase selection and validates complete
+post-install results locally. Standard Bloom-generated rules do not automatically
+invoke this wrapper, and the GitHub workflow currently runs only `run_humble.sh`.
+Before an official release, approve and verify how the build/install test contract
+and strict failure checks will operate in that release process. A successful local
+gate is not an official Buildfarm result. The final audit and decision list are in
+section 22 of the central development protocol.

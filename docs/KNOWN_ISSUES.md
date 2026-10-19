@@ -171,19 +171,17 @@ launched by this workspace.
 - **Next step:** Determine its intended role before removing,
   registering, or consolidating it.
 
-## 15. The local workstation has a Python environment conflict
+## 15. Historical workstation Python conflict (V3 observation)
 
-- **Location:** local development environment, not project source
-- **Current behavior:** An isolated build on the local workstation stops during
-  setup metadata inspection: system `packaging` is 21.3 while an installed
-  entry point requires `packaging>=23.2`. SciPy 1.8.0 also warns about
-  pip-visible NumPy 1.26.4. The Go2W does not have this conflict.
-- **Impact:** The isolated V3 build succeeds with system Python and `PYTHONNOUSERSITE=1`.
-  The SciPy/NumPy warning remains; the global environment is not repaired by
-  this configuration refactor. The stack
-  builds and runs in the deployed Go2W ROS 2 Humble environment.
-- **Next step:** Repair the local workstation's apt/pip environment
-  separately.
+- **Location:** the historical local apt/pip environment, not project source.
+- **Recorded observation:** system `packaging` 21.3 conflicted with an entry
+  point requiring `packaging>=23.2`; SciPy 1.8.0 also warned about pip-visible
+  NumPy 1.26.4. This records the earlier V3 investigation, not a new V4 host test.
+- **Current V4 evidence:** isolated Humble/Jammy containers use system Python 3.10
+  and the recorded apt science packages; clean builds and the documented CI/R28
+  tests passed. The host environment was not repaired or reverified by V4.
+- **Next step:** investigate a native host conflict separately if reproducing it;
+  do not infer current hardware deployment status from the container results.
 
 ## 16. Package-level lint passes; combined raw pytest collection remains unsuitable
 

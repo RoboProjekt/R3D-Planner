@@ -92,3 +92,18 @@ release wrapper now validates the actual reports and complete test identities,
 rejecting failures, errors, skips and missing evidence independently of Bloom.
 Installation-dependent checks run in a mandatory fresh Debian runtime container.
 Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
+
+
+## Final audit decision boundary (19 October 2026)
+
+The final AP10 audit is in section 22 of the central protocol. R28 remains locally
+verified; its extra test-phase selection and mandatory post-install gate are not
+automatically installed in an official Bloom/Buildfarm workflow. The current
+GitHub workflow also does not run the Debian gate. Approve and verify this
+integration before claiming equivalent official test enforcement.
+
+All packages remain 0.0.1 with Forthcoming changelogs. A common 0.1.0 initial public
+prerelease is a recommendation, not an authorized version change. Rights, public
+Git-history scope, maintainer responsibility, support/EOL terms and release timing
+remain developer decisions. Four historical PCD blobs are reachable from V4,
+including two older root-level maps; a PCD-free tip does not clear the history.

@@ -1520,6 +1520,8 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
 
+**Abschlussnachtrag:** V4-044 VERIFIED alsMetadaten-/Versions-/Wartungsaudit. KeineVersionswahlvollzogen,0.1.0nurEmpfehlung;D01–D13folgen. KonkreteDokukorrekturen undQuellen22.6–22.8;alteTestergebnissebleibenVorleistungen. Vorgängercommit `3c68fe95372ee78e0f0f9a44fd5a5545d761410c` enthältV4-043.
+
 ### V4-045 - ROSIndex, Bloom und Buildfarm gegen aktuelle offizielle Quellen prüfen
 
 **Datum:**19. Oktober2026. **AP:**AP07/AP10. **Prüfgegenstand/Dateien:**ROSIndex/rosdistro/REP144/REP149/Buildfarm/Bloomprimärquellen;lokaleCI-/ReleasewrapperundgenerierteRegeln;Änderungen ausschließlich bestehendeDokumentation. **Eingang:**saubererV4 c2e6d067537e840340157f9f1cfb6af03e0a9381;Baseline c65642fe56015556f696364a724cb5b976a27888;letzteID042. **Status:**IN PROGRESS vor Dokumentationsänderungen. **Commit:**geplanterSubject `docs(release): audit official ROS release prerequisites`,tatsächlicheSHA nachErzeugung.
@@ -4852,3 +4854,48 @@ BSD-3Texte verlangenSource-/Binarynoticeerhalt undenthaltenEndorsementgrenzen,MI
 Die drei vorhandenenR28-.debs erneutnurlesend inventarisiert:174reguläreDateien imvereinigtenEntpackbaum,18PYC (neu erzeugteBytecode-/Interfaceressourcen, nichtdie9altenSource-PYC gleichgesetzt),0PCD,keineNumPy/SciPy/Open3D/NetworkX/PyYAML-Implementation. readelf -d derInterface-.so weist dynamischeNEEDEDaufu.a.libfastcdr.so.1,libc.so.6,libstdc++.so.6,libgcc_s.so.1,libpython3.10.so.1.0 undROS/nav_msgs/rosidl/rcutils aus. AusdynamischenEinträgenfolgtkeinevollständigeAusschließungjeglicherstatischerEinbindung. ExakteNative-/Compiler-/DDS-/transitiveBinärnoticeprüfung undAptcopyrightdateien fürdastatsächlichkünftigeBundle bleiben NOT VERIFIED/R14; Generatortemplate-/Typesupportrechteeinbeziehen. DasistkonkreterLieferumfangsprüfbedarf,keinbelegterLizenzkonflikt derexternenImportnutzung.
 
 BloomsaktuelleR28-debian/copyright-Dateienverweisen generischaufSourceheader/Repository; eigenevollständigeApachetexte sindzusätzlichimPaketshare. GenerischeCopyrightmetadaten sindkeinVollinventarundkeinBeweisfürrechtmäßigeMitverteilung. BeiöffentlicherDebian-/Bundleverteilung tatsächlichenScopeundNoticesfachlichprüfen. Lizenz-/Provenienzaudit TECHNICALLY VERIFIED; Rechte-/Vertrags-/Dokumenten-/Datenfreigabenweiterhin REQUIRES LEGAL REVIEW/RIGHTS NOT VERIFIED.
+
+
+### 22.6 Paketmetadaten und Versionskonsistenz
+
+Neues Audit liest alle3Manifeste,2Setups/Cfgs,CMake und3Changelogs; Version/Lizenz/Maintainer/Author/URLs/Dependencies/Installregeln gegen vorhandeneDebianmetadata verglichen. KeineManifest-/Setup-/CMake-/Interface-/Versionsänderung. REP144-Namen lowercase/underscore,beginnenmitBuchstabe,mindestens2Zeichen,keineDoppelunderscores; konsistentesr3d_PrÄfix. Keine erforderlicheUmbenennung. GitHubslugR3D-Planner istkeineROS-Paketkennung; vorgeschlagener spätererrosdistroRepositorykey r3d_planner wäre Metadatenbezeichner,keineRepo-Umbenennung.
+
+| Metadatum | r3d_planner | r3d_preprocessor | r3d_interfaces | Bewertung / Grenze |
+|---|---|---|---|---|
+| package.xml-Format |3|3|3| UnterstütztesManifestformat; erneutcatkin_pkg-Validierung unten |
+| Paketname |r3d_planner|r3d_preprocessor|r3d_interfaces| REP144lexikalischkonform,keinGlobalnamensreservierungsbeweis |
+| Version |0.0.1|0.0.1|0.0.1| alleDevversionen gültig;V4istkein4.0.0 |
+| Setupversion |0.0.1|0.0.1|nichtzutreffend| CMakeproject(r3d_interfaces) ohneeigenesVersionsliteral;XMLmaßgeblich |
+| Maintainer |bauya/baau1001@stud.hs-kl.de|bauya/baau1001@stud.hs-kl.de|bauya/baau1001@stud.hs-kl.de| Syntaktischvorhanden,konsistent;Zustellbarkeit/langfristigeBefugnis NICHTgeprüft |
+| Author |BastianAumer|BastianAumer|BastianAumer| Attribution,keinevollständigeRechtebestätigung |
+| License |Apache-2.0|Apache-2.0|Apache-2.0| SPDXundTextevorhanden;Rechte separat |
+| Beschreibung/URLs |fachlich/Repository/Bugtracker|fachlich/Repository/Bugtracker|fachlich/Repository/Bugtracker| keineTODO-Beschreibung;URLbezug keinePublicV4-Verfügbarkeit |
+| Buildtyp |ament_python|ament_python|ament_cmake| vorhandeneBuildsystemebeibehalten |
+| InstallierterVertrag |5EntryPoints/4Launches/3YAML/Marker/Lizenz/Changelog|2EntryPoints/Module/Marker/Lizenz/Changelog|ROSIDL/Python/C++/Typesupport/Exports/Header/Message/README/Lizenz/Changelog| BelegteR28Artefakte;kein neuerBuild |
+| Testintegration |pytest/Lints/Installedmarker|pytest/Lints|BUILD_TESTING/4expliziteCTestchecks| R28lokalerVertragbesteht;offizielleAnbindung22.9 |
+| InternePeers |Interface+PreprocessorRuntime;InterfaceTest|keinPlannerdependency|nav_msgs/rosidl-Providerextern| vorhandenergerichteterGraph,keinezyklischePeerabhängigkeit |
+| Changelog |Forthcoming|Forthcoming|Forthcoming| keinfreigegebenesVersion/Datum/Tag |
+
+Die vorhandenen36externenKeys und tatsächlichenInstall-/Check-/BuildDepends-Ergebnisse21bleiben gültigeVorleistungen. Kein neuesrosdepinstall behauptet; jetzigeManifeste bytegleichzumdamaligenStand. setup install_requires ausschließlichsetuptools istbeiROS/rosdep-SteuerungkeinbelegterFehler,keinePip-VerteilungderScienceimports eingeführt. PeerVersionen sindnichtmanifestseitigauf0.0.1gepinnt; gemeinsamgetesteterSatzbelegt,nichtbeliebigeVersionsmischung. Entwicklungsversionsguard scripts/ci/check.py verlangt0.0.1 bewusst; bei spätererfreigegebenerVersionsänderung mussdieserGuard zusammenmitXML/Setup/Changelog geprüftwerden,istjetztkeineVersionsinkonsistenz.
+
+### 22.7 Entscheidungsvorlage Releaseversion und Changelogs
+
+| Option | TechnischeEignung | Bedeutung / Empfehlung | Noch erforderlicheFreigabe |
+|---|---|---|---|
+| A:0.0.1 | gültigesdreiteiligesVersionsschema,entsprichtheutigemStand | möglichalsfrüherEntwicklungsrelease;geringsteMetadatenänderung;istnichtautomatischschonveröffentlicht | expliziteWahl,versioniertesChangelog/Datum,konkreterRef/Tag |
+| B:0.1.0 | gültigesSchemafürfunktionalenVorabrelease | **Empfehlung** fürerstenöffentlichnutzbarenVorabstandmitdokumentiertinstabilenVerträgen;keinebehaupteteROS-Pflicht | Entwicklerentscheid,3XML/2Setup/Guard/ChangelogkonsistentändernundbetroffeneBuild-/Testsnachholen |
+| C:anderebegründete0.x.y | möglichbei erklärterReleasepolitik | nurbeisachlichemVersionsgrund;4.0.0ausBranchnameableiten istunbegründet;1.0.0würdejetztunbelegteStabilitätnahelegen | gewähltesSchema/Kompatibilitäts-/Updatepolitikfreigeben |
+
+GemeinsameVersionierungaller3Paketeempfohlen wegenM01-Schema/gekoppeltenVerbrauchern undgemeinsamerAbnahme,obwohlROSkeineallgemeineGleichversionspflichtfürbeliebigeReposfestlegt. FürUpdates nachvollziehbareVersionssteigerung/Releaseinkrement undAPI-/Schemaänderungsprüfung vorsehen; keineimmutableTags nachträglichverschieben. BreakingChanges inTopics/Parametern/Message/Geometrieverträgen benötigenMigrationshinweiseundkoordinierteVerbraucher. KeineSemVer-/ABI-Garantieerfunden:dieausdrücklichePolicy fehltalsöffentlicheZusageundmussbeschlossenwerden.
+
+Alle3CHANGELOG.rst sindnutzbarepaketbezogeneForthcoming-Übersichten. Planner nennt bestehendeA*/Graphfunktionen ausdrücklichalsVorbestand,PreprocessorebensodiePCD-/Traversierbarkeitsalgorithmen; Interface dokumentiertdessenV4-Neuanlage. R28Test-/Dependencyänderungen stehenimpassendenPaket. KeineoffizielleReleaseversion,keinReleasedatum,keineöffentlichgetaggteVersion; dasistfürunveröffentlichteEntwicklungkonsistentundvorBloomgezieltaufzulösen,nichtimAuditzuerraten. Das678kB-Forschungsprotokoll ersetztkeinenknappenöffentlichenPaket-Changelog. RST-Parseundcatkin_pkg.changelog prüfenuntenFormalitätundForthcoming-Erkennung; menschlicheInhaltsprüfungbleibtgetrennt.
+
+### 22.8 Maintainer, Support, CI und Dokumentationskonsistenz
+
+Maintainerangaben inXML/Setup stimmenüberein;GitHubBugtracker istangegeben. MAINTENANCE/CONTRIBUTING enthaltenbereitsHumble/Jammy/Python3.10/amd64-Umfang,unstabileEntwicklung,keinAPI/ABI-/QualityLevel-/SLA-Versprechen,SecuritykontaktüberMaintainer,keinephysischeSicherheitszusage. KeinzweiterMaintainer,keineKontaktzustellbarkeit,keinReleaseTeamzugriffundkeinefinanzierteLangzeitwartung nachgewiesen. Support-/EOL-/Reaktionsfristen/Securityzuständigkeit/Vertretung sindbewusst**REQUIRES USER DECISION**,keineerfundeneuniverselleIndexpflichtoderautomatischeEOL-ZusageausROSUpstreamdaten.
+
+Workflow .github/workflows/ros2-humble.yml: pushaufmain/V4,pull_request,workflow_dispatch;contents:read;ubuntu-22.04;35min;CheckoutSHA3d3c42e5aac5ba805825da76410c181273ba90b1 mitpersist-credentials:false. Offizielles action.yml dieseskonkretenSHA neuabgerufen,vorhanden,Node24;damitkeinbelegterungültigerPin. TatsächlicheGitHubhostedRunnerausführung/Checkoutvollfunktionbleiben NOT REMOTELY VERIFIED. Keinrelease-/publish-/tagtrigger/Schreibtoken. Workflowführtnurrun_humble.sh aus,nichtdenzusätzlichenDebianrunner. FürspäterenPublicbranchBranchfilterbewusstprüfen; bestehendeFilterfürV4/main sindjetztkeinFehler. Debian-Release-GateexplizitalsfreizugebendePflichtstufevorReleaseeinbinden;keineTriggerhieraktiviert.
+
+GeleseneAnleitungen:README,INSTALL,ARCHITECTURE,CONFIGURATION,KNOWN_ISSUES,MAINTENANCE,CONTRIBUTING,3PaketREADMEs,3Changelogs,QuickReference/Filters/NotizenundhistorischeDokumentation. M01/M02/Geometrie/Sensortimeout/TF/NullTwistwerdenbereitsalsSoftwarevertragmitsynthetischenInputsbezeichnet. Hardware-Notstopp,Motorwatchdog,Arbitration,Bremsweg,SensorausfallphysikundKollisionsfreiheitwerdennichtalsdurchV4zertifiziertbehauptet. ParameternamenwieSafetyRadius sindkeineSicherheitszertifizierung;keineAlgorithmusänderungabgeleitet. HistorischeGo2W-Betriebsangaben bleibenVorbestand,keineaktuelleV4Hardwareabnahme.
+
+**GezielteDokumentationskorrekturen:** r3d_preprocessor/Filters.txt behauptetnochAusgabenebenderEingabe; tatsächlichesoutput.py nutztoutput_dir oderXDG/home-DatenpfadundverweigertÜberschreiben. NurText/Tabelleergänzt,keineImplementierung. KNOWN_ISSUES15trenntealtenV3Host-PythonbefundnichtklarvomaktuellenV4-Containernachweis;alsdatiertehistorischeBeobachtungpräzisiert,keinHostreparatur-/Go2W-Neutestbehauptung. README/INSTALL/MAINTENANCEerhaltenklareVerweiseaufdieoffizielleGategrenze22.9;keineReleasefreigabeoderneueFunktion. AlleChangelogs/Metadaten/Produktdateienbleibenunverändert.

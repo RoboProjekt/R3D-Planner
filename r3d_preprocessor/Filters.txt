@@ -26,6 +26,7 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args \
 | Parameter | Default | Unit | Meaning |
 |---|---:|---|---|
 | `pcd_path` | `environment.pcd` | path | Input point cloud; `~` is expanded |
+| `output_dir` | empty | path | Output directory; empty uses the user data directory |
 | `voxel_size_cm` | 5.0 | cm | Output voxel edge length |
 | `max_step_height_cm` | 25.0 | cm | Maximum connectable step height |
 | `min_step_height_cm` | 5.0 | cm | Boundary between flat and step connections |
@@ -43,4 +44,7 @@ ros2 run r3d_preprocessor pcd_analyser --ros-args \
 | `fill_plane_search_radius` | 2 | voxels | Plane-fill neighborhood radius |
 | `fill_plane_min_neighbors` | 4 | count | Required traversable neighbors for filling |
 
-`pcd_analyser` writes `<input>_analysed.pcd` beside the input file.
+`pcd_analyser` writes `<input-stem>_analysed.pcd` into `output_dir`.
+With an empty `output_dir`, it uses `$XDG_DATA_HOME/r3d_preprocessor` when
+XDG_DATA_HOME is absolute, otherwise `~/.local/share/r3d_preprocessor`.
+Existing output files and symlinks are refused; input data is preserved.
