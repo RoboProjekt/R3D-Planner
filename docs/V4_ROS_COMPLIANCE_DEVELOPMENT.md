@@ -1,10 +1,12 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 19. Oktober 2026; fortgeführt bis V4-047 (AP10-Audit in22, erneute Dokumentationsprüfung in22.16, R28-Abnahme in21). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 19. Oktober 2026; fortgeführt bis V4-048 (AP10-Audit in22, erneute Dokumentationsprüfung in22.16, R28-Abnahme in21). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 
-**Lesehinweis zum aktuellen Stand:** Die aktuellen Übersichten stehen in4 und7–9; die maßgeblichen Release-Gates und Entscheidungen in22.10–22.12. Die Einträge in5 dokumentieren den jeweiligen damaligen Plan und dessen spätere Abnahme. Ältere Initialisierungs-, Rückstellungs- und Zwischenbewertungen sind historische Aussagen. Die erneute Prüfung22.16 korrigiert nur aktuelle Darstellung und Querverweise; sie verändert keine historischen Testergebnisse.
+**Aktuelle Fortschreibung:** Kapitel23 hat für die lokale Historien-/main-Migration und die neue Entwicklererklärung Vorrang vor den datierten Bewertungen in4,7–9 und22. Allgemeine offene Professorenfreigaben in früheren Abschnitten sind historische Befunde und keine erneut gestellte Voraussetzung. Originale Commit-SHAs gelten als historische Nachweise; die bereinigten Zuordnungen stehen in23.5 und COMMIT_MIGRATION_MAP.tsv.
+
+**Lesehinweis zum bisherigen Stand:** Die aktuellen Übersichten stehen in4 und7–9; die maßgeblichen Release-Gates und Entscheidungen in22.10–22.12. Die Einträge in5 dokumentieren den jeweiligen damaligen Plan und dessen spätere Abnahme. Ältere Initialisierungs-, Rückstellungs- und Zwischenbewertungen sind historische Aussagen. Die erneute Prüfung22.16 korrigiert nur aktuelle Darstellung und Querverweise; sie verändert keine historischen Testergebnisse.
 
 ## 1. Zielsetzung
 
@@ -1548,6 +1550,10 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 **Ausgang/Befund:** Formale Vollständigkeit ersetzt keine semantische Konsistenz. Aktuelle Übersichten enthalten teils ältere Querverweise; R26 wird in einem erläuternden Satz fälschlich einer Hardwarepflicht zugeordnet. Die lineare Schreibweise Interface→Preprocessor→Planner verwechselt eine zulässige lokale Reihenfolge mit dem tatsächlichen Dependencygraph. Die neue Auditdarstellung enthält zahlreiche zusammengezogene Wörter. **Ziel/Entscheidung:** ausschließlich aktuelle Übersicht und Audittext präzisieren, Zählräume der 349 Bestandsfälle und zwei neuen Interface-Headerfälle trennen, Commitzuordnung aktualisieren und Lesbarkeit verbessern. Historische Ereignisse V4-001–046, Testergebnisse und Kapitel11/20/21 unverändert erhalten. **Prüfverfahren:** Datei-/Git-/Querverweisvergleich, vorhandene XML-Berichte, Tabellen-/ID-/Commit-/Hashprüfung; keine neuen funktionalen Tests oder Releaseaktionen. **Ergebnisse/Nachweise:** nach tatsächlicher Ausführung in22.16 ergänzen. R28 bleibt lokal verifiziert, R29 für die offizielle Prozessanbindung offen; keine Rechte-/Versions-/Produktentscheidung.
 
 **Abschlussnachtrag:** VERIFIED für die erneute Dokumentationsprüfung. Fünf unzutreffende Dateiheaderzuordnungen, die Darstellung des Dependencygraphen, der R26-Verweis und aktuelle Querverweise sind korrigiert. 349 erhaltene Fälle der Pythonpakete und zwei Interface-Headerfälle sind als unterschiedliche Zählräume erklärt. 45 tatsächlich vorhandene eigene Apache-Kommentarheader wurden gegen die Tabelle geprüft; keine Aussage über rechtliche Lizenzierungsbefugnisse daraus abgeleitet. Struktur-/Metadatencheck und die unabhängige Dokumentprüfung jeweils Exit0; alle97 anderen getrackten Dateien sowie Ereignisse001–046 unverändert. Verfahren, Befunde und Grenzen in22.16. Commit über den eindeutigen Subject `docs(review): reconcile V4 audit documentation` auflösbar; tatsächliche SHA im Abschlussbericht, kein Amend.
+
+### V4-048 - Unterbrochene Migration fortsetzen, vier historische PCD-Blobs entfernen und main vorbereiten
+
+**Datum:** 19. Oktober 2026 (Europe/Berlin). **AP:** AP01/AP08/AP10. **Eingang:** sauberer ursprünglicher V4 `cf6486dc88aeba8a051fee0b2865a21434a0ca39`, letzte ID047; keine vorhandene Migration oder Sicherung dieses Auftrags. **Betroffene Branches:** ausschließlich separate Kandidatenkopie, bereinigte V1/V2/V3/V4/main und vorhandene technische Refs. Das ursprüngliche Repository bleibt unverändert. **Dateien:** dieses Protokoll und technisches Commit-Mapping; vier freigegebene Blobs in historischen Trees. **Fragestellung/Begründung:** Rohkarten sollen im geplanten öffentlichen Graphen nicht mehr erreichbar sein, ohne Forschungsnachweise oder Funktionen zu verlieren. **Verfahren:** vollständige private Sicherung/Restore, vier Blob-IDs filtern, bekannten Tree-Ref gesondert bereinigen, alle 59 Commit-Trees und Metadaten vergleichen, unabhängige Objektübertragung und lokale main-Referenzmigration. **Kommandos/Exitcodes/Mapping:**23.1–23.7. **Ergebnis:** VERIFIED für lokale Git-Migration, alle übrigen Bestandsdateien bytegleich. Vollständige Humble-/Debian-Neuvalidierung bleibt vor Übernahme erforderlich. **Gates:** R15 lokal bereinigt, R16 Eigenanteil laut verbindlicher Entwicklererklärung geklärt; R17 öffentlich offen, R26/R28 historische lokale Nachweise erhalten, R29 weiter BLOCKED. **Commit:** `docs(git): document historical PCD cleanup and main migration`; reale SHA wird im nächsten Eintrag/Abschlussbericht angegeben. Keine selbstreferenzielle SHA. **Grenzen:** keine Veröffentlichung, keine neue Rechtebehauptung zu fremden Bestandteilen, keine Hardwareprüfung.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -5115,3 +5121,195 @@ Die tatsächlich ausgeführten Abschlussprüfungen und Schutzwerte stehen im fol
 
 
 **Abschluss der Nachprüfung:** `/usr/bin/python3 -B /tmp/r3d-v4-doc-review/review_checks.py` und `/usr/bin/python3 -B scripts/ci/check.py .` bestanden mit Exit0. Erneut geprüft wurden 98 Inventarpfade, 45 tatsächlich vorhandene eigene Apache-Kommentarheader, 29 eindeutige Gates, 47 fortlaufende V4-IDs, reale Commitreferenzen und die Zählung anhand vorhandener XML-Berichte. Nur dieses Dokument wurde geändert; alle97 übrigen getrackten Dateien sind bytegleich zum Eingang c47483d. Ereignisse001–046, Lizenzkapitel und historische Kapitel20/21 sind unverändert. Quellcode, Manifeste, Nachrichten, Launches, Konfiguration und Tests blieben unangetastet. Die Prüfung erzeugt keinen neuen funktionalen Testnachweis und schließt keine offenen Rechte- oder Releasegates. Rohbeleg: /tmp/r3d-v4-doc-review/verification.json. Nach dem lokalen Dokumentationscommit erneut Cleanstatus/Branch/Refschutz prüfen.
+
+
+## 23. Fortsetzung der lokalen Historienbereinigung und main-Migration – 19. Oktober 2026
+
+### 23.1 Auftrag, Wiederaufnahme und verbindliche Entwicklererklärung
+
+Dieser Abschnitt setzt den unterbrochenen Auftrag fort. Hauptauftrag, vorrangiges Addendum, Fortsetzungsauftrag und ausdrückliche Chatantwort autorisieren die Entfernung **aller vier** inventarisierten PCD-Dateien und identischer historischer Kopien. Keine weiteren eigenständigen Dateien sind freigegeben. Die Wiederaufnahme prüfte Originalstatus, letzte15 Commits, sämtliche Refs/Tags/Worktrees, lokale Projekt-/Backup-/tmp-Verzeichnisse sowie bestehende Testnachweise. Es existierten alte Prüfartefakte, jedoch kein Backup oder Filter-Mapping dieses Migrationsauftrags und keine uncommittierte Arbeit. Original: `cf6486dc88aeba8a051fee0b2865a21434a0ca39`, V4, sauber,98 getrackte Dateien, keine ungetrackten oder ignorierten Arbeitsdateien,59 erreichbare Commits, keine Mergecommits, keine Tags, ein Worktree. Remote-Tracking-Refs sind lokale Snapshots; kein Fetch und keine neue Serverbestandsaufnahme.
+
+**Verbindliche Entwicklererklärung:** Bastian Aumer erklärt nach Klärung mit dem betreuenden Professor, die relevanten Rechte an seinen eigenen Softwarebestandteilen zu besitzen und als Maintainer und Lizenzgeber zu handeln. Apache-2.0 bleibt verbindlich. Die grundsätzliche Veröffentlichungsbefugnis für diesen Eigenentwicklungsanteil gilt auf Grundlage dieser Erklärung als geklärt; eine allgemeine zusätzliche Professorenfreigabe wird nicht erneut verlangt. Das ist eine dokumentierte Erklärung, keine unabhängige Vertragsprüfung und keine pauschale Freigabe fremder Software, Bilder, Dokumente oder nativer Binärbundles. Die vorhandenen OSRF-Notices und sämtliche Lizenztexte bleiben unverändert. Konkrete R14-Pflichten, insbesondere die früher identifizierten Modification Notices, werden nicht stillschweigend als erledigt erklärt.
+
+### 23.2 Vier freigegebene Karten und tatsächlicher historischer Umfang
+
+| Pfad im späteren Layout | Frühere identische Kopie | Blob-ID | Bytes | Commits mit Datei im Tree |
+|---|---|---|---:|---:|
+| `maps/RoboLab_map.pcd` | kein weiterer Pfad gefunden | `0f760dbb08e09e6b11a3b6302fc904009b1ffb91` |5937352|1|
+| `maps/map_2.pcd` | kein weiterer Pfad gefunden | `53272d686c5258212d8be8b18d9715ec90a2b59f` |2190903|1|
+| `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | `ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` |19284059|16|
+| `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | `ros2_r3d_planner_ws/src/r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` |8905560|15|
+
+Beide Rootkarten standen nur in `ca9f44930a44391577c8fd822c0d7f557fcd9da4`; sie verschwanden im folgenden Commit `ce4af0b9ac0dcf751b0b858e019ffc3ea042e3e0`. Die zwei Preprocessorkarten waren zusätzlich im unten genannten Codex-Tree enthalten. Identität wurde anhand Blob-ID und SHA-256 belegt, nicht aus ähnlichen Namen abgeleitet. Inventar mit vollständigen Commitlisten, Pfaden, Größen, Hashes und Erreichbarkeit liegt privat in `inventory.json`; ergänzte vollständige Original-Ref-Prüfung berücksichtigt auch den Tree-Ref. Sämtliche fünf lokalen Branches und fünf eigentlichen Remote-Tracking-Branches erreichen historisch alle vier Karten; `origin/HEAD` aliasiert `origin/main`. Keine Tags betroffen. Aktuelle fünf Branch-Tips waren bereits PCD-frei; der historische Graph war es nicht.
+
+Die Inventur prüfte alle erreichbaren Commit-Trees und Blobinhalte auf Dateiendungen sowie tatsächliche PCD-Header, anschließend den nicht-Commit-Tree und den gesamten Objektgraphen. Eine erste ungebundene Textsuche traf PCD-Headerstrings in Python-Testquelltexten; die Prüfung wurde auf echte Headerzeilen präzisiert. Diese Testdateien wurden nicht entfernt. Keine zusätzlichen eigenständigen Punktwolken-/Bagdateien, Bilddateien oder LFS-Pointer gefunden. Kein `.gitattributes`-/LFS-Verwaltungsnachweis im erfassten Graphen; die vier Karten sind normale Git-Blobs. Das Ergebnis gilt für den lokalen vollständigen Refbestand, nicht für unbekannte Server- oder Forkrefs.
+
+### 23.3 Private vollständige Sicherung und tatsächliche Wiederherstellung
+
+Sicherungsdatum:19.10.2026, Europe/Berlin. Privates Verzeichnis (Modus0700): `/home/bauya/Documents/R3D-private-backups/20261019-cf6486d`. Es liegt außerhalb beider Repositorys und ist **kein Veröffentlichungsartefakt**. Das Bundle und die unveränderte Vollkopie enthalten die alten Rohkarten weiterhin. Nicht löschen oder mitpushen.
+
+| Sicherung/Nachweis | Wert |
+|---|---|
+| Bundle | `original-all.bundle`, 33690057 Bytes |
+| Bundle SHA-256 | `e5868e0d0ac7c74e9a491f9c27097b5d83bcb2a23cb96143517965fc7161215c` |
+| Zusätzliche Vollkopie | `original-repository/`, einschließlich .git, Reflogs, Konfiguration und Working Tree; 682 Dateien im Hashmanifest |
+| Kopie-Hashmanifest | `repository-copy-sha256.json`, SHA-256 `ed411dacd7de1a825497f9ac8e2fdbe058ef9b1cfcf7c325b855e9ce1133d955` |
+| Restore | `restore-verification.git`, tatsächlicher unabhängiger Mirrorrestore aus Bundle |
+| Ergebnis |59/59 Commitobjekte,11/11 Refobjekte, Baseline/V4-HEAD und vier Kartengrößen geprüft; `git fsck --full` Exit0 |
+| Arbeitsdateien | keine ungetrackten/ignorierten Dateien; Vollkopie sichert auch den gesamten vorhandenen Arbeitsbaum |
+
+Tatsächlich ausgeführt: `git bundle create <backup>/original-all.bundle --all`, `git bundle verify <bundle>`, `git bundle list-heads <bundle>`, unabhängige vollständige Dateikopie, `git clone --mirror <bundle> <restore>`, explizites `git symbolic-ref HEAD refs/heads/V4`, `git cat-file -e <original>^{commit}` für alle59 Commits und `git fsck --full`; alle erforderlichen Prüfungen Exit0. Die symbolische Form von `origin/HEAD` ist zusätzlich im Inventar und in der Vollkopie gesichert; ein Bundle allein ist keine Sicherung der vollständigen lokalen Konfiguration oder aller Reflogs. Restoreanleitung: Bundlehash prüfen, in ein neues privates Verzeichnis klonen, HEAD auf V4 und `refs/remotes/origin/HEAD` auf `refs/remotes/origin/main` setzen, Refwerte mit inventory.json und Objekte mit fsck prüfen. Für eine exakte Rekonstruktion lokaler Einstellungen die Vollkopie anhand ihres Hashmanifests verwenden. Niemals diese alte Historie in den bereinigten Graphen mergen.
+
+### 23.4 Isolierter Filter, Sonderreferenz und Integritätsprüfung
+
+Offizielle Dokumentation vor Ausführung gelesen: [git-filter-repo](https://github.com/newren/git-filter-repo/blob/d7b75aca907380f608892cc289e616f195427b99/Documentation/git-filter-repo.txt). Unverändertes Standalone-Skript, Upstreamcommit `d7b75aca907380f608892cc289e616f195427b99`, SHA-256 `39d35fb2c35637a9d555353b6a8b53a223a227d3beb61a0ac7e1180bfa5572f1`. Nur nach/tmp geladen; keine Host-Pip-/Aptinstallation. Der erste Download im eingeschränkten Netzwerk scheiterte; der erlaubte lesende Abruf gelang anschließend. Git2.34.1 und System-Python3.10 wurden verwendet.
+
+Filter in privater separater Mirror-Kopie `/home/bauya/Documents/R3D-private-backups/20261019-cf6486d/filter-stage.git`:
+
+```bash
+/usr/bin/python3 <tool>/git-filter-repo \
+  --strip-blobs-with-ids <tool>/approved-blobs.txt \
+  --prune-empty never --prune-degenerate never \
+  --preserve-commit-hashes --preserve-commit-encoding \
+  --replace-refs delete-no-add --refs <alle elf inventarisierten Refnamen>
+```
+
+Die Blob-Allowlist enthält exakt vier IDs aus23.2. Kein größenbasierter Filter und keine weitere Dateientfernung. `--refs` verhindert automatische Refumbenennungen/-auslassungen; seine partielle Betriebsart behält zunächst alte unerreichbare Objekte. Deshalb wurde anschließend **nur der erreichbare bereinigte Graph mit `git clone --mirror --no-local` unabhängig übertragen**, keine Objektdatenbank kopiert. Original- und Backupobjekte wurden nicht geprunt. Die59 alten Commits wurden alle beibehalten, einschließlich durch Datenentfernung leer gewordener historischer Commits; keine neu erzeugten leeren Dokumentationscommits. Alle59 IDs ändern sich. Commitnachrichten einschließlich alter SHA-Texte, Autor-/Committeridentität, Zeitstempel und auf neue IDs abgebildete Eltern bleiben identisch.
+
+**Sonderfall:** `refs/codex/turn-diffs/checkpoints/4b1759b9a9cb0f9d99ef418bf64ff381/e9928f091d648021a964032569705c15/1791812879840/9bb0185a-f5da-4442-8c31-86209d1e8ad6` zeigte auf Tree `1ae5f9eb3cb691297d50cfbd0faec791038256ca`, nicht auf einen60. Commit. Der Filter änderte ihn nicht. Ein früher Commit-Mapping-Assert brach deshalb berechtigt ab. Der bekannte Tree wurde gezielt mit rekursiven `git ls-tree -z`/`git mktree -z`-Operationen um genau die beiden freigegebenen Karten bereinigt und per `git update-ref <known-ref> <new-tree> <old-tree>` ersetzt. Neuer Tree: `a2ef7c5ec031d350038a7b7fd9b19a6e50b3f73d`. Eine zunächst versuchte Bare-Indexoperation scheiterte ohne Worktree; sie änderte keine Refs. Der anschließende Vergleich bestätigt jeden anderen Blob und Dateimodus identisch. Keine unbekannte Referenz automatisch gelöscht.
+
+Beim Entfernen des ausschließlich lokalen Clone-Remotes entfernte Git auch dessen Trackingrefs. Die Schlussprüfung erkannte den zunächst hängenden `origin/HEAD`-Alias. Alle inventarisierten Tracking-Snapshots wurden explizit mit bereinigten Hashes wiederhergestellt, einschließlich Alias. Danach `git fsck --full` Exit0. Diese lokalen `origin/*`-Namen stellen keine neu abgefragte GitHubhistorie dar; der Kandidat hat **keinen konfigurierten Remote**.
+
+Prüfergebnis vor Dokumentationsänderungen:59/59 vollständige Commit-Trees entsprechen exakt Original minus erlaubten Blob-Einträgen,59/59 Nachrichten/Metadaten/Elternketten erhalten; ursprüngliche98 aktuelle Dateien vollständig bytegleich; vier Karten weder erreichbar noch mit `git cat-file -e <blob>` im Kandidaten vorhanden; alle Refklassen geprüft. Kein Shared-Object-/Alternates-Mechanismus. Vollständiger Vergleich wird vor Abschluss wiederholt. Private Berichte und verwendete Hilfsskripte unter dem Sicherungsverzeichnis; diese enthalten keine Veröffentlichungskonfiguration.
+
+### 23.5 Dauerhaftes Commit-Mapping und Forschungsbaseline
+
+Vollständiges originales Werkzeugmapping: privat `commit-map.tsv` und öffentlich vorgesehene rein technische Datei [COMMIT_MIGRATION_MAP.tsv](COMMIT_MIGRATION_MAP.tsv), jeweils SHA-256 `604d809e4923c969edc8e7c12d01c0674b97063137939fed9f3529a69517c534`. Zusätzlicher privater Datensatz `commit-mapping-details.json` enthält je Commit Subject, neue Entwicklungs-IDs, ursprüngliche Erreichbarkeit und tatsächlich entfernte Pfade. Keine PCD-Inhalte oder alten Git-Objekte in diesen Mappingdateien. Der Codex-Tree wird gesondert in23.4 abgebildet.
+
+| Bedeutender Stand | Original | Bereinigt |
+|---|---|---|
+| Forschungsbaseline | `c65642fe56015556f696364a724cb5b976a27888` | `96e48afd6ea94b2f77c503c8ea8914df9abc0303` |
+| Vollständiger V4-Eingang einschließlich047 | `cf6486dc88aeba8a051fee0b2865a21434a0ca39` | `3157f7e8b42be62c47b97860eaab7020a02afefd` |
+| Bisheriger main-Tip | `51a08ed3da1bd43f06d89c6a84bbbd540aaf5861` | `7ae1019be87a22890caed7d19079ec34210a8f32` |
+| R28-Abschluss | `c2e6d067537e840340157f9f1cfb6af03e0a9381` | `240aef9f515b5f38aac2c7e3a19000f976bcb2c8` |
+
+Alle alten V4-001–047-Einträge bleiben bytegleich. Historische Aussagen sind durch die Migration nicht nachträglich falsch; sie referenzieren tatsächlich damalige Objekte. Das unveränderte historische33-Seiten-PDF bleibt Originalnachweis mit SHA-256 `8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383`. Seine alten Referenzen werden über dieses Mapping und die private Sicherung nachvollzogen; im bereinigten Repository dürfen alte Commitobjekte fehlen. Die bereinigte Baseline ist technisch vom exakten Originaltree minus Kartendateien abgeleitet und kein beliebig neu gewählter Ausgangspunkt.
+
+Die folgende vollständige59-Zeilen-Zuordnung ergänzt die unveränderten Ereignisse. „ID“ bedeutet im Commit neu eingeführte Journalüberschrift; ein Gedankenstrich ist keine Löschung früherer Entwicklungsarbeit. Mehrere spätere Übernahmen desselben Texts können dieselbe ID berühren; der private Datensatz hält die konkreten Ref-/Pfadbezüge fest.
+
+| Originalcommit | Bereinigter Commit | Unverändertes Subject | Neue Journal-ID |
+|---|---|---|---|
+| `ca9f44930a44391577c8fd822c0d7f557fcd9da4` | `e7cea1c0eb27d1f6950976dd7bb723a35226752e` | Added R3D-Planner source code and test maps | — |
+| `ce4af0b9ac0dcf751b0b858e019ffc3ea042e3e0` | `f2ea96b7cfaf296677ab290af445584f3cf9d80e` | Added newest Version of R3D-Planner | — |
+| `a24a3d3a18930b678359056ee69f18e9940bb0f5` | `fc577a21c3bbb0a4cfe06c53be535b03c40bccee` | Added PCD support | — |
+| `253ff81110561bb20c83cb66569b71eca8f665b1` | `738c88b2a7f6b3cf2c401daa288ee42116448caf` | docs: document repository architecture and setup | — |
+| `7a4c0cfda336763e6b32d69718e43d38eef5fb7c` | `95c1858257a1d0b354925aa91aaf7d499ab7ed76` | docs: rewrite documentation in maintainer voice | — |
+| `0306f8f4f3bb88e0b3fa76ca5bf5093d6aae7b9a` | `712e8d556d90ebd326bb3129da0a043216c8b711` | docs: turn README into usage guide | — |
+| `01348f3285a0e7582f70cc5f2ed3d1bf4b7f904b` | `bb085f42f17fc28c3b88b18a1230c9ad35459e0b` | docs: anonymize workspace paths | — |
+| `91ccb1a824e7d2d7163433f13594d6c07855b1c5` | `35d595ddc0d525c72ffe0c6f904fc5cc5593972d` | chore(data): remove bundled PCD example maps | — |
+| `337bbd3d2b956f58a87d17e3c1c77e812cd333ac` | `e97742ef284b42a5db96369a393803ce70020018` | refactor: create PCD-only V2 workflow | — |
+| `3e5360a94e5783ed6ef09426ed5d66175f3097c3` | `699a02800ca7f1155dfdbe096d6e242114f4bed1` | docs: rewrite documentation in maintainer voice | — |
+| `cf0c527b587b387c56c69ae4c90a98d180f2d22d` | `f8a64f3925003cdbaa7fb6a7dd4e1c0ce67effbb` | docs: turn README into usage guide | — |
+| `3abd002e8cc9e7a26cacaf43a5c20b1822664f14` | `ede5904d20fad09ea000bd8c3b6954cf00831417` | docs: validate reference and anonymize paths | — |
+| `3752404a08867e9e6f3725300b88e148d4d5be37` | `28d42e2271951c81008637f602734ec05e1dc38e` | Introduce V3 robot configuration and standard odometry interface | — |
+| `c65642fe56015556f696364a724cb5b976a27888` | `96e48afd6ea94b2f77c503c8ea8914df9abc0303` | docs: add standardized author and repository source headers | — |
+| `51a08ed3da1bd43f06d89c6a84bbbd540aaf5861` | `7ae1019be87a22890caed7d19079ec34210a8f32` | chore(data): remove bundled PCD example maps | — |
+| `a914f0e4cd793f1ed7f35501e09a7ca865914b67` | `1d6d312e519cf673894fc4df35ef5d3ff4e43996` | chore(data): remove bundled PCD example maps | — |
+| `cc2f5bef269b3dcb1664bc52bba1d9c0be1bd1ca` | `73d5454c23065302105ecf82b243702c99bda717` | chore(data): remove bundled PCD example maps | — |
+| `d355db9bbb284024fad0d1295ba768cd0001a5ee` | `76ce66405438caa80e27f5b0356049180a370a2d` | docs(v4): initialize ROS compliance development protocol | V4-001 |
+| `9f11996f6d6d5fda5f38ffb5866fb6d736983668` | `8e4d3e86c21ee1e78b940d62d21ec67050497013` | docs(license): document license evaluation and copyright attribution | V4-002, V4-003 |
+| `87e213889638ff92cbee85b76fdb95a916c71193` | `71a30fceffe74734820f39b1053fe3222cee6987` | chore(license): adopt Apache-2.0 for R3D packages | V4-004 |
+| `3aee536078ce495749d8afdcaf0141dca5c5bfcb` | `fce3286a1a8277d07577af9dc512799ea24afca1` | refactor(data): remove bundled PCD maps | V4-005 |
+| `78afba0667c658df3e37e14f64b2df4b26075e86` | `daa9c6f89cfa688499f2e6d94574cc905b22ebf3` | chore(license): finalize licensing verification | V4-006 |
+| `0d267f593100f385e989525273ff9b81c8c36748` | `e80bdee566ffd3c45434273184132724f4f36e8f` | docs(history): track historical development baseline | V4-007 |
+| `d2e05e696f259be155d943f80de4a7c849be53ae` | `5423942d4012e076d725c2eddc27ef1181a02329` | fix(ros): standardize ROS package metadata | V4-008, V4-009 |
+| `b8967211a2a6696f3bfebdd32e8793a315d6eb86` | `787c3b9be9ed13f895b74184782b7aad2144c6e8` | docs(data): record historical branch map cleanup | V4-010 |
+| `d177d3052d9554b3a2a9a160a7a79ddb52c94e6f` | `d5d99124ca5ab72971dc876336eb7865a54cd02e` | fix(deps): correct ROS dependencies and rosdep keys | V4-011 |
+| `e204fee7e71aa915d76245223fb78003e268d158` | `5787baefaa24116f6085b79d58f93208c469b180` | docs(deps): record AP03 verification and commit references | — |
+| `7a476588ba3e50550074c14920b95d3658e45a03` | `31e99696d43edaaccbc446a4e75e56b9e3941948` | test(deps): verify rosdep installation on Humble | V4-012 |
+| `c702da4ac241f3173d3732da3bdd1a754a04d949` | `38bcac5b048e5422844f3bf0726321d1fd04a98d` | fix(install): support source-independent ROS installation | V4-013 |
+| `370cf5f9246791c570600fffceab637c3c4b564b` | `f9654524c8558f2b3dd50e934762129339aeb38e` | fix(config): separate PCD input and output paths | V4-014 |
+| `bb578b36fc6ac72dddb043f35a474fe15c25da30` | `b7b30e292ce7415a9d287544c650cf562e2ed756` | test(quality): resolve lint and copyright checks | V4-015 |
+| `22be9830e8d783a9a5a9dffc62e3ddfe223c179c` | `c43a45778b8eb7681098881b95fb4e014eda96ff` | test(install): add clean installation regression coverage | V4-016 |
+| `60bbe44622deb7f3671b52403a435f648852d23d` | `9081f1d3a96a8c4f2cbe444d184b202f1953998f` | docs(ros): inventory interfaces and propose migration | V4-017 |
+| `add819661cc2405823b0c8f31b1ea7b1e7efe9e8` | `92999290c43ac17468dcbf5fe951381d3a507655` | test(ros): bound parameter discovery retries | V4-018, V4-019 |
+| `11d594aa5dca45293d14aed185a07a21fcb16d8e` | `ebddaee58b7257b23f46e54be4baa0fa8e240c5e` | fix(ros): decode PointCloud2 fields and row padding | — |
+| `410ed3aa2de53cccfa55935468d3283c887385b4` | `c6134e512e5421f62d31654395fc37e6cf289f25` | fix(ros): replace quaternion flags with atomic path metadata | V4-020, V4-021 |
+| `35f547f6cbb681f1acb727af250a8b1dad34136c` | `369f4c4b19e66383b0e1bdd6c9fac3e41b53e0e0` | fix(action): validate results and support cooperative cancellation | V4-022 |
+| `45d14766b0bd885182cf81284c99ef31b82d1d23` | `53517e3869bba84491ee1a8fa1c9ff976417ebdc` | fix(ros): compose namespaces and validate interface inputs | V4-023 |
+| `2dd10975faa726c994cd75ed43c0a97eec61ab2f` | `92dcb40e11555b0d6db7d7ba69bf71b7391b5886` | ci: prepare isolated Humble build and runtime verification | V4-024 |
+| `be44bf4a9fe8a9a9fe86ead03552850b3017903f` | `3ac986f9c0d96e713cec81ef535250191d8a74ab` | docs: align usage and maintenance metadata with V4 interfaces | V4-025 |
+| `b91cdb909491aa511dde221cba156e4585aed400` | `35b5c5b6bb359a1c2c7bc1c8f064b2582e04aa7c` | docs(compat): record native Jazzy and Lyrical investigation | V4-026 |
+| `aae71c37f4bb663ec408ca0f4487a5c747cda327` | `7ca67b2327d20dd40c1911b7d946a73602bc8227` | docs(release): prepare scoped readiness and release gates | V4-027 |
+| `04d080b15f9d744086085ccac88d2850d8d555c5` | `9817c70c8470c16d8d255a8f44273a21a46c719e` | docs(v4): record final regression and research assessment | V4-028 |
+| `103f0f539c43f2029f773e1e157b56cf3a65b015` | `1cbc074ec6330e9dd1eefa882b8df9084166dfc8` | feat(follower): define monitored obstacle input contract | V4-029, V4-030 |
+| `40b5315c38bf507d53627b9efb698841b8ebb980` | `d97c18be4350330a30fad62041dd7d9ec01a01a8` | fix(follower): enforce monitored stop and recovery | V4-031 |
+| `2f3e1ef690a81da67ebefd0ac7eb8e77852ee309` | `87af9edec54ca011b18c6accf598e17dcb0e78c2` | docs(ros): finalize M02 and Humble release scope | V4-032 |
+| `100116706dcae755bde4b492c8aca295557746b9` | `8440b3d55ddf5d8c6798f292de3de57e571d1ee4` | fix(filter): retain height-qualified near obstacles | V4-033, V4-034 |
+| `9d1ea22846b5bca8e0767b67b81e731c73c6bd69` | `48bc650dd5501e9729a4a41768929dc9919efffd` | test(ros): verify local obstacle geometry end to end | V4-035, V4-036 |
+| `34d00a6dfec165acc940a332d253739cbd833219` | `650610c7564aca5aadb47182dcad5772de02e71f` | docs(release): finalize Humble geometry and packaging assessment | V4-037 |
+| `b62f71868d3e7c9d9b2f013734d274c39418b31e` | `19cf54b6fac41e80b9d1187555fa3cc4c3da8808` | docs(v4): record verified geometry and packaging commits | — |
+| `71c877f980112c8a34e7a4369ae7edf4887f3f05` | `11d1cbd47c0bfa0629cae1fe554d0471e13f2746` | fix(test): separate build-time and installed ROS checks | V4-038, V4-039, V4-040, V4-041, V4-042 |
+| `ec51e9cd2ae957b968be24ca2c9dadfd19abdb44` | `53902404e83a73e467e8b37ffbabe3c245817b6b` | fix(lint): scope interface checks and declare build test dependencies | — |
+| `5feff014bcb493c5f8bdb9ece20051f912fcd100` | `06c5f725aae8d63c657a108c415e23fe24a7d198` | test(release): enforce Debian build and installed test results | — |
+| `c2e6d067537e840340157f9f1cfb6af03e0a9381` | `240aef9f515b5f38aac2c7e3a19000f976bcb2c8` | docs(release): verify Humble Debian build-time tests | — |
+| `3c68fe95372ee78e0f0f9a44fd5a5545d761410c` | `cc9dd8cd31cc7979e4e476548bfb5a8277980a63` | docs(legal): audit source provenance and distribution rights | V4-043, V4-044, V4-045, V4-046 |
+| `dee26d16974de975f0fa07e3954c2109bb9c9552` | `28ddb42e845d3d3c029598925b0ab0aa02245b7a` | docs(release): evaluate versioning and maintenance decisions | — |
+| `c6c16477ed08e2883b52c410350142abfdec9b56` | `e8d9ea11e76f9bd9b1e48139bbcedec8f8d8297d` | docs(release): audit official ROS release prerequisites | — |
+| `c47483d243f7db43e7d7c2718396d2dfc1b8858e` | `93995baf25c3b6c00505d180f0227afa20e32da2` | docs(research): consolidate final V4 readiness evaluation | — |
+| `cf6486dc88aeba8a051fee0b2865a21434a0ca39` | `3157f7e8b42be62c47b97860eaab7020a02afefd` | docs(review): reconcile V4 audit documentation | V4-047 |
+
+### 23.6 Lokaler main und bereinigte Refstruktur
+
+Originalmain enthielt ausschließlich den zusätzlichen Cleanupcommit `51a08ed…` gegenüber der gemeinsamen Baseline; er war kein Vorfahr des aktuellen V4. Deshalb kein Fast-Forward und kein Merge. Der Inhalt dieses Cleanupziels ist im aktuellen V4 bereits enthalten; es gab keine zusätzliche zu rettende funktionale main-Änderung. Der neue Kandidaten-main wurde per gezieltem lokalen `git update-ref refs/heads/main 3157f7e8b42be62c47b97860eaab7020a02afefd 7ae1019be87a22890caed7d19079ec34210a8f32` gesetzt. Zuvor bleibt der bereinigte alte main unter `refs/research/main-before-v4` erhalten. Dieser Forschungsref ist nicht Teil einer pauschalen Pushfreigabe.
+
+| Ref | Originaltip | Bereinigter Snapshot / Rolle |
+|---|---|---|
+| `refs/codex/turn-diffs/checkpoints/4b1759b9a9cb0f9d99ef418bf64ff381/e9928f091d648021a964032569705c15/1791812879840/9bb0185a-f5da-4442-8c31-86209d1e8ad6` | `1ae5f9eb3cb691297d50cfbd0faec791038256ca` | `a2ef7c5ec031d350038a7b7fd9b19a6e50b3f73d` |
+| `refs/heads/V1` | `91ccb1a824e7d2d7163433f13594d6c07855b1c5` | `35d595ddc0d525c72ffe0c6f904fc5cc5593972d` |
+| `refs/heads/V2` | `cc2f5bef269b3dcb1664bc52bba1d9c0be1bd1ca` | `73d5454c23065302105ecf82b243702c99bda717` |
+| `refs/heads/V3` | `a914f0e4cd793f1ed7f35501e09a7ca865914b67` | `1d6d312e519cf673894fc4df35ef5d3ff4e43996` |
+| `refs/heads/V4` | `cf6486dc88aeba8a051fee0b2865a21434a0ca39` | `3157f7e8b42be62c47b97860eaab7020a02afefd` |
+| `refs/heads/main` | `51a08ed3da1bd43f06d89c6a84bbbd540aaf5861` | `7ae1019be87a22890caed7d19079ec34210a8f32` |
+| `refs/remotes/origin/HEAD` | `c65642fe56015556f696364a724cb5b976a27888` | `96e48afd6ea94b2f77c503c8ea8914df9abc0303` |
+| `refs/remotes/origin/V1` | `01348f3285a0e7582f70cc5f2ed3d1bf4b7f904b` | `bb085f42f17fc28c3b88b18a1230c9ad35459e0b` |
+| `refs/remotes/origin/V2` | `3abd002e8cc9e7a26cacaf43a5c20b1822664f14` | `ede5904d20fad09ea000bd8c3b6954cf00831417` |
+| `refs/remotes/origin/V3` | `3752404a08867e9e6f3725300b88e148d4d5be37` | `28d42e2271951c81008637f602734ec05e1dc38e` |
+| `refs/remotes/origin/main` | `c65642fe56015556f696364a724cb5b976a27888` | `96e48afd6ea94b2f77c503c8ea8914df9abc0303` |
+
+Die Tabellenzeile main bezeichnet die direkte Filterzuordnung des alten main. Tatsächlicher neuer main zeigt auf den bereinigten vollständigen V4-Eingang plus nachfolgende ausschließlich beauftragte Dokumentations-/Bildcommits. V4 wird nach Abschluss auf denselben endgültigen Stand gesetzt; historische V1/V2/V3 bleiben auf den genannten bereinigten Tips. Keine Tags erzeugt. Originalrepo `/home/bauya/Desktop/Gits/Github/R3D-Planner` bleibt auf ursprünglichem V4 unverändert; es enthält bewusst weiterhin alte Objekte/Refs/Reflogs. Deshalb keine riskante Teilübernahme dorthin: nach erfolgreicher kompletter Validierung ist **`/home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate` die vorbereitete neue lokale Hauptarbeitskopie**. Endgültiger HEAD im Abschlussbericht, bekannte vorhergehende Commits im nachfolgenden Dokumentationseintrag.
+
+### 23.7 Veröffentlichungsgrenzen und späterer technischer Synchronisationsplan
+
+Dieser Auftrag ist ausschließlich lokal. Kein Push/Force-Push, kein Release-Tag, keine Sichtbarkeitsänderung, kein GitHubrelease, keine ROS-Index-PR, kein Bloomrelease oder Farmjob. R3D_null und Hardware unverändert. Die private Sicherung und Filterstaging enthalten weiterhin Rohdaten; niemals mitveröffentlichen. Im Kandidaten ist die Datenentfernung für **alle** vorhandenen Refs geprüft, einschließlich technischer Tree-/Researchrefs und Tracking-Snapshots. Nur main/V4/V3/V2/V1 sind als spätere öffentliche Branch-Allowlist vorgesehen; keine Tags vorhanden. Codex-/Research-/Trackingrefs werden nicht automatisch veröffentlicht.
+
+Später, erst nach gesonderter Freigabe: Serverrefs und eventuelle Pull-/Tagrefs lesend neu inventarisieren; betroffene Mitwirkende und Forkbesitzer koordinieren; Remotezustand und Schutzregeln prüfen; exakt freigegebene Branch-Allowlist und erwartete alte Remote-SHAs bestätigen. Je Branch nur explizite Refänderung mit lease gegen den frisch geprüften alten Wert, niemals Mirrorpush oder unbedingten Force-Push. Falls der Serverzustand abweicht, neu prüfen. Anschließend frischer unabhängiger Serverclone mit vollständiger Ref-/Pfad-/Blobprüfung und Remote-CI; aus alten Klonen nicht mergen, sondern neu klonen. Alte Klone/Forks, GitHub-Caches und nicht abrufbare Serverrefs können die alten Daten behalten; gegebenenfalls Plattformunterstützung für Bereinigung anfragen. **Lokale Bereinigung beweist keine Löschung im Internet.** Dieser Plan führt keine Remoteaktion aus und ist keine entsprechende Autorisierung.
+
+### 23.8 Aktuelle Releasebewertung nach den Entwicklerentscheidungen
+
+| Bereich/Gates | Aktueller Status und Abgrenzung |
+|---|---|
+| R01–R11, R13, R25–R28 | bisher lokal technisch verifiziert; komplette neue Humble-/Debianprüfung des main noch auszuführen und getrennt zu berichten |
+| R12 Remote-CI | NOT VERIFIED; gültiger bestehender Workflow ist kein tatsächlicher GitHub-Lauf |
+| R14 Fremd-/Binärpflichten | konkrete bisher dokumentierte Verpflichtungen bleiben offen; keine neue globale juristische Freigabe behauptet |
+| R15 historische Karten | LOCALLY VERIFIED: vier freigegebene Blobs entfernt; öffentliche Migration weiterhin nicht ausgeführt |
+| R16 eigene Software | verbindliche Entwicklererklärung akzeptiert; allgemeine Professorenfreigabe geklärt. Fremde Anteile/Dokument-/Bild-/Bundleumfang nur konkret prüfen |
+| R17 öffentlicher Hauptref | lokal main vorbereitet; öffentlich weiterhin BLOCKED bis separater Publikationsfreigabe und tatsächlicher Synchronisation |
+| R18/R19 |0.0.1 unverändert; endgültige Releaseversion und datierte Released-Changelogs nicht freigegeben |
+| R20/R21/R22/R27 | ROS Index, offizieller Bloom, Farm und öffentliche Debianauslieferung nicht durchgeführt/nicht verifiziert |
+| R23/R24 | endgültige Supportzusagen und Veröffentlichung bleiben Nutzerentscheidungen; Maintainerrolle Bastian Aumer nun bestätigt |
+| R26 | bezeichnet Debianinstallation/Runtime-Artefaktherkunft, keine Hardwareabnahme |
+| R28 | LOCALLY VERIFIED aus21; vollständige Wiederholungsprüfung für den neuen main erforderlich |
+| R29 | weiterhin BLOCKED: strikte offizielle Prozessanbindung fehlt, siehe23.9 |
+
+### 23.9 Tatsächliche Bedeutung und offene Abnahme R29
+
+Die lokale Pipeline wählt buildzeitfähige Tests, sammelt JUnit und erzwingt strikte Ergebnis-/Identitätskontrolle sowie eine zweite vollständige Source-freie Installationstestphase gegen die exakten .debs. Das ist die vorhandene R28-Leistung. Generierte normale Bloomregeln enthalten dennoch `dh_auto_test || true`; Wrapperauswahl/-Reportgate und Pflichtpostinstallphase werden durch Veröffentlichung oder main-Migration nicht automatisch Teil offizieller Jobs. Der vorhandene GitHubworkflow startet nur `run_humble.sh`. Ein grüner Remote-Lauf dieses Workflows wäre nützlich, würde allein R29 jedoch ebenfalls nicht schließen.
+
+Erforderlicher gesonderter Folgeauftrag: dauerhafte geeignete Testintegration/Releasekonfiguration und verbindliche Auswahl/Report-/Fehlerweitergabe festlegen und implementieren; alle Installationspflichten gegen exakt zugeordnete Releaseartefakte erhalten. Positive UND negative Abnahme, fehlende Berichte/Tests müssen fehlschlagen, Fallidentitäten vollständig. Welche Stufe Farm und welche Releasefreigabeprozess erzwingt, muss verbindlich entschieden werden. Lokale Vorbereitung kann vor Veröffentlichung erfolgen; reale Remote-CI/akzeptierte Releasejobs und offizielle Artefaktursprünge können nur durch die entsprechenden später autorisierten externen Vorgänge belegt werden. Kein offizieller Bloom-/Buildfarm-Lauf in diesem Auftrag. R29 ist ein offener Projektprüfvertrag, kein universelles ROS-Index-Verbot. Keine R29-Implementierung oder Navigationsänderung hier.
+
+### 23.10 Erhaltene Architektur und noch ausstehende neue Prüfungen
+
+Paketabhängigkeiten (Verbraucher → Provider): `r3d_planner → r3d_interfaces` und `r3d_planner → r3d_preprocessor`. Interface und Preprocessor sind unabhängig; eine serielle lokale Baufolge ändert diesen Graphen nicht. Drei Pakete0.0.1/Apache-2.0,17 Produktionsmodule, ROSIDL-Schema, CMake/Setup/Manifeste, Launch/YAML/Robotprofile, CI-/Debian-/Gateskripte und Tests bleiben unverändert. Root- und drei Paketlizenzen identischer SHA-256 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`. Fünf korrigierte Headerklassifikationen und sämtliche048-vorherigen Entwicklungseinträge bleiben erhalten; zusätzliche Dokument-/Bilddateien sind gesonderte beauftragte Ergänzungen, keine rückwirkende Änderung des98-Dateien-Inventars.
+
+Historische Vergleichswerte:358 Colcon-Berichtseinträge =349 Berichte der beiden Pythonpakete +4 CTest-Darstellungen +5 Interface-xUnitfälle; darunter2 zusätzliche Interface-Header-pytestfälle. Insgesamt351 pytest-Fälle, keine358 unabhängigen Pythonfälle. Normale Source-freiphase343, Debianpostinstall349 (=336 Planner+13 Preprocessor), buildzeit243 Planner+93 explizite Installationspflichten/13 Preprocessor,4 Interface-CTestläufe mit5 xUnitfällen;13 getrennte Gatekontrollen. Diese Werte bleiben historisch und werden nicht als neue Ausführung ausgegeben. Neue `bash scripts/ci/run_humble.sh`, `bash scripts/ci/run_humble_debian.sh`, Gatekontrollen und genaue Commit-/Ergebniszuordnung werden im nächsten Abschnitt ergänzt. Ausschließlich Humble/Jammy/Python3.10/amd64; keine neue Multi-Distro-Pflicht.
