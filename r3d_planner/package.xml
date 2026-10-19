@@ -45,6 +45,26 @@
   <test_depend>ros2launch</test_depend>
   <test_depend>ros2param</test_depend>
 
+  <!-- Runtime APIs imported during build-time test collection/execution. -->
+  <test_depend>rclpy</test_depend>
+  <test_depend>rcl_interfaces</test_depend>
+  <test_depend>nav2_msgs</test_depend>
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>nav_msgs</test_depend>
+  <test_depend>sensor_msgs</test_depend>
+  <test_depend>sensor_msgs_py</test_depend>
+  <test_depend>std_msgs</test_depend>
+  <test_depend>std_srvs</test_depend>
+  <test_depend>visualization_msgs</test_depend>
+  <test_depend>tf2_ros_py</test_depend>
+  <test_depend>ament_index_python</test_depend>
+  <test_depend>python3-numpy</test_depend>
+  <test_depend>python3-scipy</test_depend>
+  <test_depend>python3-networkx</test_depend>
+  <test_depend>python3-open3d</test_depend>
+  <test_depend>python3-yaml</test_depend>
+  <test_depend>r3d_interfaces</test_depend>
+
   <export>
     <build_type>ament_python</build_type>
   </export>

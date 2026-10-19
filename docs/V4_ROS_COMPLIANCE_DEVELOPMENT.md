@@ -4606,3 +4606,5 @@ Frühere erfolglose Wrapperversuche bleiben nachvollziehbar: Buildparent zunäch
 ### 21.10 Commitzuordnung und abschließender Schutz
 
 Commit- und abschließende Schutzbelege werden nach den tatsächlichen fokussierten lokalen Commits ergänzt. Keine selbstreferenzielle SHA durch Amend, kein Historyrewrite. Der abschließende reine Protokollcommit ist über seinen eindeutigen Subject und die Git-Historie auflösbar.
+
+**Tatsächlicher lokaler Commit:** `71c877f980112c8a34e7a4369ae7edf4887f3f05` – fix(test): separate build-time and installed ROS checks; Parent `b62f71868d3e7c9d9b2f013734d274c39418b31e`. Explizite Dateiliste/Branch/Index/Diffprüfung vor und nach Commit bestanden. Kein Push/andererBranch/Rewrite. Die technischen Abnahmen in21.6 beziehen sich auf den gemeinsam geprüften Endstand; einzelne Zwischencommits wurden nicht als separat vollständig grün behauptet.
