@@ -1506,6 +1506,32 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 
 **Abschlussnachtrag vom19.10.2026:** VERIFIED für aktualisierte Benutzer-/Entwicklungsdokumentation und lokaleR28-Abnahme. README/INSTALL/MAINTENANCE/CONTRIBUTING/KNOWN_ISSUES/ARCHITECTURE, dreiPaketREADMEs und dreiForthcoming-Changelogs aktualisiert. TatsächlicheVorher-/Nachherzählung, Artefakthashes, Befehle/Exitcodes, AP-/Releasegrenzen und Schutzprüfung in21.6–21.10. R28lokalVERIFIED; AP10gesamtBLOCKED/IndexundoffiziellerReleaseNOT READY. Historische001–037/22Lizenzunterkapitel/PDF bleiben unverändert; keine neueVeröffentlichungs-/Support-/Hardwarefreigabe.
 
+### V4-043 - Sourceprovenienz, Lizenzen und historischen Distributionsumfang auditieren
+
+**Datum:**19. Oktober2026. **AP:**AP01/AP08/AP10. **Prüfgegenstand/Dateien:**98versionierteDateien, vollständigesProtokoll, Gitobjekte, aktuelle/entpackteDebianressourcen, Fremdtemplates und offizielleLicensequellen;Änderungen ausschließlich bestehendeDokumentation. **Eingang:**saubererV4 c2e6d067537e840340157f9f1cfb6af03e0a9381;Baseline c65642fe56015556f696364a724cb5b976a27888;letzteID042. **Status:**IN PROGRESS vor Dokumentationsänderungen. **Commit:**geplanterSubject `docs(legal): audit source provenance and distribution rights`,tatsächlicheSHA nachErzeugung.
+
+**Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
+
+**Abschlussnachtrag:** Auditumfang V4-043 VERIFIED als technischeInventur/Quellennachweis. 98Dateien einzeln erfasst,36Dependencies berücksichtigt,4historischePCDblobsbelegt; Geheimnismusterscan0Treffer begrenzt,keineRechtsfreigabe. Befehle/Quellen/Nachweise22.2–22.5, Rohbelege /tmp/r3d-v4-ap10-final. KeineDateien/Lizenzen/Historybereinigt.
+
+### V4-044 - Versions-, Changelog- und Wartungsentscheidungen vorbereiten
+
+**Datum:**19. Oktober2026. **AP:**AP02/AP08/AP10. **Prüfgegenstand/Dateien:**3Manifeste,2Setups,CMake,3Changelogs,MAINTENANCE/CONTRIBUTING/Benutzeranleitungen;Änderungen ausschließlich bestehendeDokumentation. **Eingang:**saubererV4 c2e6d067537e840340157f9f1cfb6af03e0a9381;Baseline c65642fe56015556f696364a724cb5b976a27888;letzteID042. **Status:**IN PROGRESS vor Dokumentationsänderungen. **Commit:**geplanterSubject `docs(release): evaluate versioning and maintenance decisions`,tatsächlicheSHA nachErzeugung.
+
+**Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
+
+### V4-045 - ROSIndex, Bloom und Buildfarm gegen aktuelle offizielle Quellen prüfen
+
+**Datum:**19. Oktober2026. **AP:**AP07/AP10. **Prüfgegenstand/Dateien:**ROSIndex/rosdistro/REP144/REP149/Buildfarm/Bloomprimärquellen;lokaleCI-/ReleasewrapperundgenerierteRegeln;Änderungen ausschließlich bestehendeDokumentation. **Eingang:**saubererV4 c2e6d067537e840340157f9f1cfb6af03e0a9381;Baseline c65642fe56015556f696364a724cb5b976a27888;letzteID042. **Status:**IN PROGRESS vor Dokumentationsänderungen. **Commit:**geplanterSubject `docs(release): audit official ROS release prerequisites`,tatsächlicheSHA nachErzeugung.
+
+**Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
+
+### V4-046 - Releasegates, Entwicklerentscheidungen und wissenschaftlichen V4-Vergleich konsolidieren
+
+**Datum:**19. Oktober2026. **AP:**AP01–AP10/AP08. **Prüfgegenstand/Dateien:**R01–R28 samt neuenbelegtenGates;D01–D13;22Aspekte gegenBaseline;Abschluss-/Schutzprüfung;Änderungen ausschließlich bestehendeDokumentation. **Eingang:**saubererV4 c2e6d067537e840340157f9f1cfb6af03e0a9381;Baseline c65642fe56015556f696364a724cb5b976a27888;letzteID042. **Status:**IN PROGRESS vor Dokumentationsänderungen. **Commit:**geplanterSubject `docs(research): consolidate final V4 readiness evaluation`,tatsächlicheSHA nachErzeugung.
+
+**Ausgang/Anforderungen:** bestehende lokale358Berichtseinträge/349Pythonidentitäten/343Sourcefrei/R28/13Gatekontrollen sind Vorleistungen,keine neuenAudittests. **Verfahren/Quellen:** Vollinventar/Hash-/Git-/Header-/Manifest-/Installregelprüfung,Nachweiseaus21,aktuelleoffiziellePrimärquellen mitAbrufdatum19.10.2026;gezieltekleineAuditprobe nurbei neuerAussage. **Ziel/Entscheidung:**technische/rechtliche/dokumentierteErklärung/organisatorische/externeProzessstände trennen;keinProduktcode,neueDependency,Version/Lizenzwahl,Release/Push/Tag/andererBranch/Hardware/R3D_null. **Ergebnisse/Nachweise/offeneFragen:**erstnach tatsächlicherPrüfung in22 ergänzen;fehlendeRechte REQUIRES LEGAL REVIEW,fehlendeEntscheidung REQUIRES USER DECISION,externeJobs NOT VERIFIED. HistorischeEvents/Ergebnisse/PDF unverändert. **NächsteMaßnahme:**genanntenPrüfumfang auswerten,belegteDokuwidersprüche korrigieren und fokussiert lokal committen.
+
 ## 6. Test- und Validierungsergebnisse
 
 `NOT STARTED` bedeutet in dieser Tabelle nicht ausgeführt, auch wenn historische Ergebnisse vorliegen. `VERIFIED` bezieht sich ausschließlich auf den benannten tatsächlichen Prüfumfang. Insbesondere wird ein statischer Parserlauf nicht als funktionaler ROS-Test gewertet. Alle hier neuen Prüfungen datieren vom 13. Oktober 2026.
@@ -4621,3 +4647,208 @@ Hash-/Ref-/Eventschutz bestätigt: historischeBaseline c65642fe56015556f696364a7
 Zusätzliche ursprüngliche Interface-xUnit/CTest-Rohberichte unddrei reproduziertefehlerhafteBaseline.debs vorCleanup nach /tmp/r3d-v4-r28/baseline-evidence gesichert undgehasht (14Dateien+sha256.json). DieseBaselineartefakte sind keinegrüneReleaseabnahme. Danach ausschließlich eigener Reproduktionscontainer6cb959c459b30fe1bcab4e10667288bb6c9f16324311e028ce6fba5c9521f923 nachID-/Labelprüfung entfernt; cleanup.json belegt Entfernen/Inspect-Nichtvorhandensein. FrischeCI-/Release-Runner entfernen ihre jeweils selbst erzeugtenContainerIDs automatisch. KeineImages/fremdenContainer/Hostpakete entfernt odergeändert; ursprüngliche/positive/negativeLogs, XMLs undgehashteDebianartefakte bleiben inbenannten/tmp-Pfaden erhalten.
 
 **Abschlusscommit fürV4-042:** `docs(release): verify Humble Debian build-time tests`; enthält aktuelleBenutzer-/Maintenance-/Paketdokumentation,3Forthcoming-Changelogs unddiesenNachtrag. EigenevolleSHA wird ohneAmend imAbschlussbericht undinGit ausgegeben; Zuordnung per `git log V4 --format='%H %s'` eindeutig. Nach Commit erneutBranch/Cleanstatus/Parentkette/geänderteDateien/Schutzinvarianten prüfen, ohne weiterenImplementierungsauftrag zu beginnen. R28lokalVERIFIED, AP10gesamtBLOCKED/öffentlicheIndex-/Bloom-/FarmfreigabeNOT READY; keinePush-/Veröffentlichungs-/Hardware-/andereBranch-/R3D_null-Aktion.
+
+
+## 22. AP10 – Finales Humble-Release-Readiness-Audit (19. Oktober 2026)
+
+### 22.1 Auftrag, Eingang und Nachweisgrenzen
+
+Auftrag b7810860 autorisiert Audit, bestehendeDokumentationskorrekturen undlokaleAuditcommits,keineVeröffentlichung/Produkt-/Versions-/Lizenzänderung. Vollständiger678829Byte-Protokolleingang und98Dateihashes in /tmp/r3d-v4-ap10-final gesichert;42historischeEvents bleiben geschützt. AnfangsHEAD entsprichtNutzerangabe,Gitstatussauber,V4,keineTags,nurursprünglicherWorktree,keineAGENTS-Anweisungengefunden. VorhandeneR28-/CIartefakte bleiben gehashteVorleistungen undwerden nichtalsneu ausgeführteAudittests dargestellt. HistorischeKapitel1–21beschreiben weiterhin ihren jeweiligenStand;dieaktuelleAuditentscheidungwirdhier konsolidiert.
+
+
+### 22.2 Vollständiges dateibezogenes Inventar des Eingangstrees
+
+Snapshot c2e6d067537e840340157f9f1cfb6af03e0a9381: **98getrackteDateien/1548445Byte**, darunter47Pythondateien,9getracktePYC,3XML,3YAML,3RST,4Shellskripte,1Message,1Workflow,1PDF. Keine separaten Bild-/Grafikdateien, vendortenLibrarytrees,Submodule oderPCDs im aktuellenTree identifiziert. PDF-Inhalte/Abbildungen haben damit nicht automatisch geklärte Rechte. Gitobjekte, Source-Tree, Paket-Source und Binärinstallation sind getrennte Mengen.
+
+Die folgende vollständigeListe erfasst jeden getrackten Eingangspfad. **Herkunftscodes:** E=Eigenanteil laut Entwicklererklärung/Projektattribution und dokumentierterV4-Fortführung,keine unabhängigeRechteprüfung; O=OSRF-Testtemplate; G=generiertes/trivialesGerüst; P=Projekt-/Dokumentations-/Konfigurationsbestand mit individuell nicht abschließend belegterUrheberschaft; B=historischerBytecode; H=historischesPDF. Git-Erstablage ist mit `git log --reverse --format=%H -- <Pfad>` fürjedenPfad in inventory.json nachvollziehbar, beweist jedoch nicht Urheberschaft. **Lizenzspalte** beschreibt tatsächlicheDateiheader/Manifest/Originaltext,keinen neuenGrant. Root-Apache gilt weiterhin nur für autorisierteEigenanteile; fehlenderEinzelheader allein ist keinROS-Verstoß.
+
+**Verteilungswege:** S=im versioniertenTree unddamit grundsätzlich in einem vollständigen freigegebenenTree-Archiv; I=im untersuchtenDebianpaket installiert; Q=Source-/Buildtest/Tool,keinBinarypfad; Bneu=entsprechenderBytecode neu erzeugt,altegetrackteBytes nichtgleichgesetzt. Paket-Sourceexporte können sich vom vollständigenRepoarchiv unterscheiden; außerhalbPaketwurzel liegendeForschungsdokumente werden dadurch nicht automatisch binärverteilt. KeineSourceveröffentlichung/Archiverzeugung ausgeführt.
+
+| Eingangspfad | Herkunft / Lizenzbeleg | Tatsächlicher bzw. vorgesehener Weg | Offener Prüfpunkt |
+|---|---|---|---|
+| `.github/workflows/ros2-humble.yml` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `CONTRIBUTING.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `INSTALL.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `LICENSE` | P; vollständigerApache-2.0-Text | S; nicht installiert | Lizenztext technisch geprüft; Befugnisse separat |
+| `MAINTENANCE.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `README.md` | E; BastianAumer/Apache-2.0-Header | S; nicht installiert | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `README_r3d_planner.txt` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/ARCHITECTURE.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/CONFIGURATION.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/KNOWN_ISSUES.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/R3D_Planner_Development_History.pdf` | H; separateRechte NOT VERIFIED | S; nicht installiert | Text-/Bild-/Forschungsrechte und Distributionsabsicht bestätigen |
+| `docs/README_AUDIT.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/REFERENCE_COMPARISON.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/V3_IMPLEMENTATION.md` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md` | E; BastianAumer/Apache-2.0-Header | S; nicht installiert | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_interfaces/CHANGELOG.rst` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_interfaces/CMakeLists.txt` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_interfaces/LICENSE` | P; vollständigerApache-2.0-Text | S; I | Lizenztext technisch geprüft; Befugnisse separat |
+| `r3d_interfaces/README.md` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_interfaces/msg/PathWithMetadata.msg` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_interfaces/package.xml` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_interfaces/test/test_source_headers.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/CHANGELOG.rst` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_planner/LICENSE` | P; vollständigerApache-2.0-Text | S; I | Lizenztext technisch geprüft; Befugnisse separat |
+| `r3d_planner/README.txt` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_planner/config/planner_config.yaml` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_planner/config/r3d_planner_params.yaml` | P; kein belegter einzelnerDateigrant | S; I | Installiertes legacyNav2-Fragment mitPlatzhaltern; Herkunft/Beispielstatus klären,kein gestartetesSubsystem |
+| `r3d_planner/config/robots/Go2W.yaml` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_planner/launch/follower.launch.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/launch/map.launch.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/launch/planner.launch.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/launch/preprocessor.launch.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/package.xml` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/points.txt` | P; kein belegter einzelnerDateigrant | S; nicht installiert | StandortbezogeneKoordinaten/Versuchsnotizen: Publikationsabsicht/Inhaltsrechte bestätigen |
+| `r3d_planner/r3d_planner/__init__.py` | G; ohne Einzelgrant | S; I | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_planner/r3d_planner/__pycache__/__init__.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/__pycache__/r3d_local_filter.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/__pycache__/r3d_path_follower.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/__pycache__/r3d_path_test.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/__pycache__/r3d_pcd_path.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/__pycache__/r3d_rviz_interface.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_planner/r3d_planner/cloud.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/configuration.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/launching.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/obstacle_monitor.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/odometry.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/path_metadata.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/r3d_local_filter.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/r3d_path_follower.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/r3d_path_test.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/r3d_pcd_path.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/r3d_planner/r3d_rviz_interface.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/resource/r3d_planner` | G; ohne Einzelgrant | S; I | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_planner/setup.cfg` | G; ohne Einzelgrant | S; Q | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_planner/setup.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/conftest.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/installation_contract.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_action_interface.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_composition_interface.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_configuration.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_copyright.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `r3d_planner/test/test_flake8.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `r3d_planner/test/test_installation.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_metadata_interface.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_obstacle_geometry.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_obstacle_monitor.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_obstacle_monitor_ros.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_planner/test/test_pep257.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `r3d_planner/test/test_pointcloud.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/CHANGELOG.rst` | P; kein belegter einzelnerDateigrant | S; I | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_preprocessor/Filters.txt` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_preprocessor/LICENSE` | P; vollständigerApache-2.0-Text | S; I | Lizenztext technisch geprüft; Befugnisse separat |
+| `r3d_preprocessor/README.txt` | P; kein belegter einzelnerDateigrant | S; nicht installiert | Dokument-/Config-/Ressourcenrechte bestätigen |
+| `r3d_preprocessor/package.xml` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/r3d_preprocessor/__init__.py` | G; ohne Einzelgrant | S; I | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_preprocessor/r3d_preprocessor/__pycache__/__init__.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_preprocessor/r3d_preprocessor/__pycache__/r3d_pcd_analyser.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_preprocessor/r3d_preprocessor/__pycache__/r3d_pcd_publisher.cpython-310.pyc` | B; kein eigener Rechtegrant | S; Bneu statt alterBytes | AlteBytes nicht für Release nötig; künftiger Ausschluss nur nach Freigabe |
+| `r3d_preprocessor/r3d_preprocessor/output.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_analyser.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_publisher.py` | E; BastianAumer/Apache-2.0-Header | S; I | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py` | E; BastianAumer/Apache-2.0-Header | S; I | Alternativer nichtregistrierterPublisher; wird alsModul mitinstalliert, fachlicheAbsicht dokumentiert offen |
+| `r3d_preprocessor/resource/r3d_preprocessor` | G; ohne Einzelgrant | S; I | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_preprocessor/setup.cfg` | G; ohne Einzelgrant | S; Q | Trivialität/Gerüstzuordnung, kein zusätzlicher Rechteinhaber erfunden |
+| `r3d_preprocessor/setup.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/test/test_copyright.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `r3d_preprocessor/test/test_flake8.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `r3d_preprocessor/test/test_output.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `r3d_preprocessor/test/test_pep257.py` | O; OSRF/Apache-2.0-Originalheader | S; Q | Hinweise erhalten; bei2Copyrighttests Modification Notice prüfen |
+| `scripts/ci/check.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/debian_inside.sh` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/debian_release.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/debian_smoke.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/inside.sh` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/release_gate.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/run_humble.sh` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/run_humble_debian.sh` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+| `scripts/ci/tests/test_release_gate.py` | E; BastianAumer/Apache-2.0-Header | S; Q | Vertrags-/Lizenzierungsbefugnis nicht unabhängig geprüft |
+
+Fremdmaterial wurde nicht allein ausSpeicherort/Commitautor bestimmt. Importinventar/Manifeste/Setup/CMake zeigen externeLibraries alsDependencies, keine identifizierten kopiertenScience-Libraryimplementierungen. Nicht belegte zusätzlicheCode-/Dokumentübernahmen bleiben NOT VERIFIED; eine textuelle/Historyprüfung ist kein Plagiats- oder Vollprovenienzbeweis. git shortlog --all weist eine gespeicherteIdentität Basti aus; daraus keineAlleinurheberschaft ableiten. Der Entwickler erklärt in11.10 Alleinentwicklung vonPlanner/Preprocessor; Hochschul-/Arbeitsvertragslage ist nicht dokumentiert. Aus Studien-E-Mail/Projektname wird keinRechteträger abgeleitet.
+
+Enger Geheimnisscan des98Datei-Eingangstrees aufPrivate-Key-PEM,GitHub-Tokenformate undAWS-Keyformate: **0Treffer**, Exit0. KeineTokenwerte gespeichert/ausgegeben. Das ist keinevollständigeHistorien-/Entropie-/Geheimnisfreiheitserklärung. DokumentierteLocalpfade/IPs/Maintainerkontakt/points.txt sind getrennt aufgewollteVeröffentlichung zu prüfen; standortbezogeneVersuchsnotizen sind keine bewiesenen Zugangsdaten. Buildlogs/temporäreAudits liegen ausschließlichin/tmp,kein getrackterBuild-/Logtree. Neun historischePYC sind bestehendegenerierteArtefakte undwurden nicht entfernt.
+
+### 22.3 Rechte, Drittanteile und Lizenzbefugnisse
+
+**Vier getrennte Zustände:** LIZENZTEXT VORHANDEN ist technischbelegt; HERKUNFT DOKUMENTIERT kann eineErklärung/Gitableitung sein; RECHTEVERHÄLTNIS GEKLÄRT undVERÖFFENTLICHUNG ERLAUBT benötigen zuständigeBerechtigte. KeineKategorie ersetzt dieandere.
+
+| Komponente | Herkunft / bekannter Bezug | Lizenznachweis / Mitverteilung | OffeneFrage / Status |
+|---|---|---|---|
+| Eigenfunktionscode/Launches/Setup | Entwicklererklärung11.10, persönlicheAttributionBastianAumer, V4-Implementierungsnachweise | Apache-2.0-Header/Root/Pakettexte; eigeneModule imBinary | TECHNICALLY VERIFIED Kennzeichnung; RIGHTS NOT VERIFIED fürVertrags-/Institutionenbefugnisse |
+| NeueV4Tests/CI/Interfaces | dokumentierteV4Entwicklung, BastianAumer-Attribution | eigeneApacheheader;Tests/CI Source,ROSIDLArtefakte Binary | TechnischeZuordnung belegt; unabhängigeRechtefreigabe nichtdurchGit ersetzt |
+| SechsOSRFTemplates | OpenSourceRoboticsFoundation,2015/2017, traditionelleApacheheader | Source/Testverteilung;Originalhinweise erhalten | SOURCE IDENTIFIED; zweiCopyrighttests angepasst, explizitefilebezogeneModificationNotice prüfen |
+| ZweiangepassteCopyrighttests | r3d_planner/test/test_copyright.py; r3d_preprocessor/test/test_copyright.py, Baseline→V4Diff | Skipentfernung undKommentar imV4-015, unveränderteOSRF-Header | Apache4(b) verlangt Änderungshinweise; Kommentar beschreibtAktivierung,aber keineeindeutigeÄnderungsattribution. REQUIRES LEGAL REVIEW/gezielteNoticeentscheidung; keinefremdenDateien hier verändert |
+| YAML/LegacyNav2fragment/Texts | ursprünglicherProjektbestand, individuelleAutoren nichtbelegt | zentraleConfig/Profil/Legacyfragment mitinstalliert;Textdateien überwiegendSource | RIGHTS NOT VERIFIED; keineHerkunft ausNav2ähnlicherSyntax allein abgeleitet |
+| HistorischesPDF/Forschungsprotokoll | dokumentiertehistorischeForschung/Versionierung, PDFhash bekannt | vollständigerRepo-Tree enthältbeide,3ROS-Binaries nicht | Dokument-/Bild-/Daten-/institutionelleFreigabe NOT VERIFIED |
+| lidar_slam_ros2/lidar_odom | getrennteProjekte; Notice11.15 mitkonkretenanalysiertenSHAs | historischBSD-2-Clause;NDT/PCL-Dateibedingungen getrennt | ImR3DTree/Build/Manifestruntime nichtenthalten; keineerzwungeneLizenzübertragung. ExternesDeployment/Bundlerechte NOT VERIFIED |
+| NDT/PCL imexternenLiDARprojekt | dokumentierteFremdableitung11.13–11.15 | BSD-2-/BSD-3-Dateibedingungen lautfrüheremNachweis,keineR3DKopie | Nurbei tatsächlichergemeinsamerVerteilung konkretprüfen; externkeineDatei/Notice angewandt |
+| Bibliotheken/Systemruntime | deklarierte/gelinkteexternePakete | eigeneR3D-.debs enthaltenkeineScienceimplementierung | Abhängigkeitsnutzung vs tatsächlichesBundle trennen; Vollbinary-/Containerdistribution separatprüfen |
+
+ApacheOriginaltext bei [ASF](https://www.apache.org/licenses/LICENSE-2.0), Abruf19.10.2026: Weitergabe verlangt unteranderem Lizenzmitgabe,ErhaltrelevanterHinweise undÄnderungskennzeichnung; NOTICE-Bedingung knüpft an vorhandenesNOTICE an. FehlendezusätzlicheNOTICE-Datei allein ist keinuniversellerROS-/Apachefehler. KeinneuesNOTICE/Lizenzgrant angewandt. [§69bUrhG](https://www.gesetze-im-internet.de/urhg/__69b.html), Abruf19.10.2026, betrifft Arbeitnehmerprogramme unterseinenVoraussetzungen; obdiesesProjekt darunterfällt ist ausdemRepo **Not Determinable**. Benötigtwerden konkreteVereinbarungen/Autorisierungen,keineunterstellteArbeitgeberrechte. Patent-/Marken-/Dokumenten-/Datenfragen werden nichtdurch SPDX geheilt.
+
+### 22.4 Historische Gitdaten und alternative Veröffentlichungsumfänge
+
+Neue vollständigePfad-/Objektinventur: neben denbeiden bekanntenPreprocessor-PCDs sind zweiälterePCDs inV4s erreichbarerAncestry vorhanden. git rev-list --objects --all, git cat-file -s undpfadbezogenesgit log bestätigen diefolgenden **vier**unterschiedlichenBlobs; Inhalte wurden nicht alsneueBeispiele kopiert oderöffentlichbereitgestellt.
+
+| HistorischerPfad | Gitblob | Byte | AktuellerStatus / Rechtebezug |
+|---|---|---|---|
+| `r3d_preprocessor/maps/voxel_05_minhits_7.pcd` | `33c0cea4ff7e7ae55bcbbf0ded436cf0c7fb7a5c` | 19284059 | Erreichbar inV4-Historie; aktiverV4Tree ohnePCD; Selbstauskunft nichtpauschal aufneuePfadfunde übertragen |
+| `r3d_preprocessor/maps/voxel_05_minhits_7_analysed.pcd` | `2bc0be5f7d1f5c5e2aa77ba44a5f798558ff8744` | 8905560 | Erreichbar inV4-Historie; aktiverV4Tree ohnePCD; Selbstauskunft nichtpauschal aufneuePfadfunde übertragen |
+| `maps/RoboLab_map.pcd` | `0f760dbb08e09e6b11a3b6302fc904009b1ffb91` | 5937352 | Erreichbar inV4-Historie; aktiverV4Tree ohnePCD; Selbstauskunft nichtpauschal aufneuePfadfunde übertragen |
+| `maps/map_2.pcd` | `53272d686c5258212d8be8b18d9715ec90a2b59f` | 2190903 | Erreichbar inV4-Historie; aktiverV4Tree ohnePCD; Selbstauskunft nichtpauschal aufneuePfadfunde übertragen |
+
+Diebeiden älterenRootpfade wurden ca9f44930a44391577c8fd822c0d7f557fcd9da4 eingebracht undce4af0b9ac0dcf751b0b858e019ffc3ea042e3e0 entfernt. Rechte/Inhalt dieserzusätzlichenFunde wurden bislang nichtseparat bestätigt; R15/D04 decken nun allevierBlobs ab,keineneueDatenbereinigung durchgeführt. LokaleaktuelleTrees V1/V2/V3/V4/main sindweiterhinPCDfrei. Unveränderteorigin/main/V1/V2/V3-Trackingtrees enthaltenweiterhindiebekanntenzweiPreprocessor-PCDs; Trackingdaten sindkeinefrischeServerzustandsprüfung.
+
+VollständigeGitveröffentlichung kannältereBlobs/Refs erreichbar machen; ein datenfreierTip allein beweistkeinedatenfreieHistorie. Ein späterautorisierterTree-Sourceexport enthältkeinefrühergelöschtenDateien,aber enthältalle imgewähltenTree getracktenPYC/PDF/Notizen sofern nichtbewusstandersabgegrenzt. Ein nachgesonderterFreigabe aufgebauter saubererPublikationszweig/neuesRepo wäre eineweitereOption ohneUmschreibungdesResearchrepos,brauchtjedochvollständigeLizenz-/Notice-/AttributionsmitnahmeundklareRückverfolgbarkeit. KeinArchiv/Pubbranch/neuesRepo/Rewrite erzeugt. Sourceindex/Bloom/Gitclone und3Binärpakete sindverschiedeneVerteilungsgegenstände; BinaryfreiheiterlaubtkeinenunbedenklichenGitpushschluss.
+
+### 22.5 Inventar der36externenManifestkeys und konkreter Binärumfang
+
+Alle36bereitsdeklarierteKeys werdenunten berücksichtigt; Lizenzbelege liegen **nichtalsvendorteLibrarytexte imR3DRepo**,sondern in denverlinkten offiziellenQuellen. ROS-Manifeste wurden am19.10.2026 ausHumblebranches gelesen; derenTipversion ist nichtautomatisch dieexakteAptrevision desfrüherenBuilds. Science-Lizenztexte wurden passendzu1.21.5/1.8.0/0.14.1/2.4/5.4.1 abgerufen. GanzeROS2Distribution ist keinWerk miteinereinheitlichenLizenz. SPDXnormalisierungApache-2.0 erfolgtbei ausgeschriebenemApacheLicense2.0; pauschalesBSD wirdnurbeikorrespondierendemDateitext als3Clause konkretisiert.
+
+| Dependency / Komponente | Verwendung / Mitverteilung | BekannteLizenz und konkreteoffizielleQuelle | OffenerPrüfpunkt / Status |
+|---|---|---|---|
+| `action_msgs` (action_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rcl_interfaces/humble/action_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_cmake` (ament_cmake) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_cmake/humble/ament_cmake/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_cmake_copyright` (ament_cmake_copyright) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_cmake_copyright/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_cmake_lint_cmake` (ament_cmake_lint_cmake) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_cmake_lint_cmake/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_cmake_pytest` (ament_cmake_pytest) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_cmake/humble/ament_cmake_pytest/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_cmake_xmllint` (ament_cmake_xmllint) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_cmake_xmllint/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_copyright` (ament_copyright) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_copyright/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_flake8` (ament_flake8) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_flake8/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_index_python` (ament_index_python) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ament/ament_index/humble/ament_index_python/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ament_pep257` (ament_pep257) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0, MIT; [Quelle](https://raw.githubusercontent.com/ament/ament_lint/humble/ament_pep257/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `geometry_msgs` (geometry_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/geometry_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `launch` (launch) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/launch/humble/launch/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `launch_ros` (launch_ros) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/launch_ros/humble/launch_ros/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `nav2_msgs` (nav2_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache-2.0; [Quelle](https://raw.githubusercontent.com/ros-navigation/navigation2/humble/nav2_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `nav_msgs` (nav_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/nav_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-networkx` (NetworkX2.4) | externerPythonimport,keinLibrarysource imR3D-.deb | BSD-3-Clause; [Quelle](https://raw.githubusercontent.com/networkx/networkx/networkx-2.4/LICENSE.txt) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-numpy` (NumPy1.21.5) | externerPythonimport,keinLibrarysource imR3D-.deb | BSD-3-Clause; [Quelle](https://raw.githubusercontent.com/numpy/numpy/v1.21.5/LICENSE.txt) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-open3d` (Open3D0.14.1) | externerPythonimport,keinLibrarysource imR3D-.deb | MIT; [Quelle](https://raw.githubusercontent.com/isl-org/Open3D/v0.14.1/LICENSE) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-pytest` (pytest6.2.5) | Testwerkzeug | MIT; [Quelle](https://raw.githubusercontent.com/pytest-dev/pytest/6.2.5/LICENSE) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-scipy` (SciPy1.8.0) | externerPythonimport,keinLibrarysource imR3D-.deb | BSD-3-Clause; [Quelle](https://raw.githubusercontent.com/scipy/scipy/v1.8.0/LICENSE.txt) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-setuptools` (setuptools59.6.0) | Build/Pythonpackaging | MIT; [Quelle](https://raw.githubusercontent.com/pypa/setuptools/v59.6.0/LICENSE) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `python3-yaml` (PyYAML5.4.1) | externerPythonimport,keinLibrarysource imR3D-.deb | MIT; [Quelle](https://raw.githubusercontent.com/yaml/pyyaml/5.4.1/LICENSE) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `rcl_interfaces` (rcl_interfaces) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rcl_interfaces/humble/rcl_interfaces/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `rclpy` (rclpy) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rclpy/humble/rclpy/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ros2cli` (ros2cli) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/ros2cli/humble/ros2cli/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ros2launch` (ros2launch) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/launch_ros/humble/ros2launch/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `ros2param` (ros2param) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/ros2cli/humble/ros2param/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `rosgraph_msgs` (rosgraph_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rcl_interfaces/humble/rosgraph_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `rosidl_default_generators` (rosidl_default_generators) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rosidl_defaults/humble/rosidl_default_generators/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `rosidl_default_runtime` (rosidl_default_runtime) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/rosidl_defaults/humble/rosidl_default_runtime/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `sensor_msgs` (sensor_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/sensor_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `sensor_msgs_py` (sensor_msgs_py) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | BSD inManifest; BSD-3-Clause imgeprüftenDateiheader; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/sensor_msgs_py/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `std_msgs` (std_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/std_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `std_srvs` (std_srvs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/std_srvs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `tf2_ros_py` (tf2_ros_py) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | BSD inManifest; BSD-3-Clause imgeprüftenDateiheader; [Quelle](https://raw.githubusercontent.com/ros2/geometry2/humble/tf2_ros_py/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+| `visualization_msgs` (visualization_msgs) | ROSBuild-/Test-/Runtimeprovider lautManifest;keinevendorteImplementation | Apache License 2.0; [Quelle](https://raw.githubusercontent.com/ros2/common_interfaces/humble/visualization_msgs/package.xml) | SOURCE IDENTIFIED; exakteApt-/transitiveBundlebedingungen nichtvollständigverifiziert |
+
+Fürsensor_msgs_py belegt [point_cloud2.py](https://raw.githubusercontent.com/ros2/common_interfaces/humble/sensor_msgs_py/sensor_msgs_py/point_cloud2.py) WillowGarage/3-Clause-Bedingungen; fürtf2_ros_py [buffer.py](https://raw.githubusercontent.com/ros2/geometry2/humble/tf2_ros_py/tf2_ros/buffer.py) ebenfalls. Das istkeineLizenzbehauptung überalleFiles einesgesamtenUpstreamrepos. ament_pep257 nenntApacheundMIT,deshalbnichtaufApachealleinreduziert. rosidl_generator_c istbelegterApacheProvider,Meta-Keysrosidl_default_* sindnichtalleTransitivkomponenten. KeineunbelegteGesamtrechtsfreigabe fürROS2/nav2/CommonInterfaces.
+
+BSD-3Texte verlangenSource-/Binarynoticeerhalt undenthaltenEndorsementgrenzen,MIT verlangtHinweismitnahme beiKopien/substanziellenAnteilen. Ein externerImport/Dependencyeintrag allein löstkeinepauschalePflichtaus,alleLibrarylizenzen insR3DSourceRepo zukopieren. TatsächlichgebündelteBibliotheken/Wheels/Container/Images können zusätzlicheBedingungenhaben; Open3D/SciPy-SystempaketeenthaltenweitereKomponenten. KeineLibraryneulizenzierung/Versionspins/Vendor-/Pipänderung.
+
+Die drei vorhandenenR28-.debs erneutnurlesend inventarisiert:174reguläreDateien imvereinigtenEntpackbaum,18PYC (neu erzeugteBytecode-/Interfaceressourcen, nichtdie9altenSource-PYC gleichgesetzt),0PCD,keineNumPy/SciPy/Open3D/NetworkX/PyYAML-Implementation. readelf -d derInterface-.so weist dynamischeNEEDEDaufu.a.libfastcdr.so.1,libc.so.6,libstdc++.so.6,libgcc_s.so.1,libpython3.10.so.1.0 undROS/nav_msgs/rosidl/rcutils aus. AusdynamischenEinträgenfolgtkeinevollständigeAusschließungjeglicherstatischerEinbindung. ExakteNative-/Compiler-/DDS-/transitiveBinärnoticeprüfung undAptcopyrightdateien fürdastatsächlichkünftigeBundle bleiben NOT VERIFIED/R14; Generatortemplate-/Typesupportrechteeinbeziehen. DasistkonkreterLieferumfangsprüfbedarf,keinbelegterLizenzkonflikt derexternenImportnutzung.
+
+BloomsaktuelleR28-debian/copyright-Dateienverweisen generischaufSourceheader/Repository; eigenevollständigeApachetexte sindzusätzlichimPaketshare. GenerischeCopyrightmetadaten sindkeinVollinventarundkeinBeweisfürrechtmäßigeMitverteilung. BeiöffentlicherDebian-/Bundleverteilung tatsächlichenScopeundNoticesfachlichprüfen. Lizenz-/Provenienzaudit TECHNICALLY VERIFIED; Rechte-/Vertrags-/Dokumenten-/Datenfreigabenweiterhin REQUIRES LEGAL REVIEW/RIGHTS NOT VERIFIED.
