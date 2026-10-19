@@ -1,0 +1,33 @@
+// Copyright 2026 Bastian Aumer
+// SPDX-License-Identifier: Apache-2.0
+// Technical diagram derived from the current repository; no experimental data.
+digraph R3D {
+ graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.38", ranksep="0.6", dpi=120, fontname="DejaVu Sans", label="R3D-Planner | ROS 2 Humble | schematic data flow", labelloc=t, fontsize=19];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fa", color="#44617b", fontname="DejaVu Sans", fontsize=12, margin="0.16,0.12"];
+ edge [fontname="DejaVu Sans", fontsize=10, color="#456075", arrowsize=0.7];
+ input [label="User-owned PCD", fillcolor="#f5f5f5"];
+ analyser [label="r3d_preprocessor\npcd_analyser\nclearance / floor / narrow / stairs"];
+ classified [label="Analyzed PCD\nexternal user data",fillcolor="#f5f5f5"];
+ map [label="r3d_preprocessor\npcd_server"];
+ rviz [label="External RViz2 GUI",fillcolor="#f5f5f5"];
+ rviznode [label="r3d_planner\nrviz_interface (optional)"];
+ planner [label="r3d_planner\npcd_path_planner\nweighted graph + A*"];
+ follower [label="r3d_planner\npath_follower\nseparate explicit launch"];
+ filter [label="r3d_planner\nlocal_filter (optional)"];
+ odom [label="External odometry + TF\nmap / odom / base + sensor",fillcolor="#f5f5f5"];
+ sensor [label="External PointCloud2 sensor",fillcolor="#f5f5f5"];
+ adapter [label="External command adapter\nTwist consumer",fillcolor="#f5f5f5"];
+ input -> analyser; analyser -> classified;
+ classified -> planner [label="file input"];
+ classified -> map; map -> rviz [label="/map_pointcloud"];
+ rviz -> rviznode [label="point / pose goals"];
+ rviznode -> planner [label="ComputePathToPose\naction"];
+ planner -> rviz [label="/global_path +\n/planned_path"];
+ planner -> follower [label="/global_path_metadata\nPathWithMetadata\nPath + bool[] narrow"];
+ sensor -> filter [label="configured topic"];
+ filter -> follower [label="/local/filtered_obstacles"];
+ filter -> rviz [label="obstacles / cliff / stairs",style=dashed];
+ odom -> planner [style=dashed,label="online pose"];
+ odom -> follower [style=dashed,label="pose + timestamped TF"];
+ follower -> adapter [label="configured cmd_vel"];
+}

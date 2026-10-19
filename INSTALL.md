@@ -1,5 +1,12 @@
 # Installation, Build, and Startup
 
+Current local source: use the cleaned `main` checkout at
+`/home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate`. It includes the
+complete V4 implementation. This candidate has not been pushed; cloning the
+public repository does not yet obtain this prepared main. Earlier V4 references
+below describe the same development payload. Historical map data are excluded
+from the cleaned history; bring your own permitted PCD inputs.
+
 ## Reference environment
 
 The installation commands use:

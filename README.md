@@ -7,11 +7,11 @@ The preprocessor classifies clearance and traversability; the planner reconstruc
 a weighted 3D graph and computes A* paths through the standard
 `nav2_msgs/action/ComputePathToPose` action.
 
-The complete original navigation stack, including sensor integration and TF,
-has run successfully on a Unitree Go2W. V3 introduces centralized runtime
-configuration and a source-independent Odometry input. This refactor has
-non-motion workstation tests; it still needs deployment regression testing on
-the Go2W. Other ROS distributions are not supported.
+The current local main includes the V4 ROS interface, obstacle-monitoring and
+filter-geometry changes. The original navigation stack was previously demonstrated
+on a Unitree Go2W; the current V4/main checks are workstation software tests.
+Deployment on the robot still requires separate validation. The supported target
+is Ubuntu 22.04 Jammy, ROS 2 Humble, Python 3.10 and amd64.
 
 | Package | Role | Executables |
 |---|---|---|
@@ -35,11 +35,41 @@ Author of the own software: Bastian Aumer; existing maintainer contact:
 `bauya <baau1001@stud.hs-kl.de>`. Authorized own software uses Apache-2.0;
 existing third-party notices retain their original attribution and conditions.
 
-V4 is currently developed locally. The project has no official ROS Index
-registration or Bloom/Buildfarm release; `0.0.1` is not a released ROS version.
-V4 bundles no PCD maps and requires user-provided inputs. The public V3 source
-remains available; the V4 installation instructions below require the existing
-local V4 checkout.
+The cleaned local `main` is the intended future development and release source.
+This migration has **not** been pushed to GitHub. The prepared checkout is
+`/home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate`; the original
+checkout remains unchanged as a historical development copy. V1–V4 research
+branches are retained on the cleaned history. There is no official ROS Index,
+Bloom or Buildfarm release; `0.0.1` remains a development version.
+
+The four legacy example maps and their identical historical copies have been
+removed from this local candidate's reachable Git history. Supply your own
+permitted PCD inputs. Local cleanup does not establish removal from GitHub,
+other clones, forks or caches. Historical commit references remain documented
+through the [commit migration record](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#235-dauerhaftes-commit-mapping-und-forschungsbaseline).
+
+## Architecture at a glance
+
+![Schematic ROS data flow of the current R3D-Planner](docs/images/r3d_dataflow.png)
+
+This reproducible technical diagram represents the current nodes, file inputs,
+action and path contracts. It is **not a screenshot or navigation test result**.
+The offline analyzer writes user-owned data; the planner loads the analyzed PCD.
+The follower consumes the atomic path/flag message. Filter and RViz input are
+optional; follower startup is separate. Dashed arrows show additional ROS inputs
+or visualization. Topic labels show defaults; launch remapping and configuration
+are described below. Package dependencies are separate from this data flow:
+`r3d_planner` depends on `r3d_interfaces` and `r3d_preprocessor`; those two provider
+packages are independent. The diagram source is
+[docs/images/r3d_dataflow.dot](docs/images/r3d_dataflow.dot), authored for this
+repository under Apache-2.0 and reproducible with `dot -Tpng`.
+
+No suitable original screenshots were found in the local Git history; the
+unchanged historical PDF contains no embedded raster images. Actual RViz,
+classified-cloud, global-path, stair-clearance and robot-dimension views are
+still needed. The [image acquisition plan](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#2311-readme-abbildung-und-konkreter-bildbedarfsplan)
+specifies content, provenance and version labels. No synthetic application
+screenshots or legacy PCD data are included as substitutes.
 
 ## Installation
 
@@ -49,7 +79,7 @@ use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
 Sensor drivers, odometry, global localization and the robot command adapter
 remain external. No specific SLAM package is a dependency.
 
-For the local V4 checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
+For the cleaned local main checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
 below a workspace's `src` directory. The public V3 branch does not contain the
 AP03 manifest corrections. Use the native Humble system interpreter, with no
 Conda or unrelated workspace overlays:

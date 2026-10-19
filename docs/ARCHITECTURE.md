@@ -74,8 +74,9 @@ See [CONFIGURATION.md](CONFIGURATION.md) for schema, units and validation.
 V4 contains no bundled PCD maps. The user supplies the analysis input and
 classified planning file through `maps.pcd_path` and `maps.map_name`.
 The shipped values are unset; installation is independent of these files.
-The two older example maps remain part of historical Git versions, not the
-active V4 tree. General PCD analysis, classification, loading and planning remain.
+The four legacy example maps were removed from the cleaned local candidate
+history. The private original backup still contains them; no public migration
+has been performed. General PCD analysis, classification, loading and planning remain.
 
 | File | Content |
 |---|---|
