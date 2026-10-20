@@ -4,9 +4,9 @@
 
 All three packages currently use 0.0.1 as an unreleased development version;
 V4 is a branch name, not version 4.0.0. Package changelogs use Forthcoming and
-contain no release tag/date. The cleaned local main is the selected future
-development source. Public synchronization, release version, tag and Bloom track
-remain separate decisions. The current CI metadata guard
+contain no release tag/date. The cleaned public main is the development source;
+public V1–V3 retain cleaned historical versions and V4 remains local. Source
+migration is complete; release version, tag and Bloom track remain separate decisions. The current CI metadata guard
 checks the research development version; review that guard with an authorized
 version change. Keep package.xml/setup.py versions consistent.
 
@@ -29,9 +29,11 @@ Go2W operation predates these V4 changes and is not a V4 deployment regression.
 Other distributions/platforms are investigation targets, not supported by a
 Humble test. Refer to INSTALL.md and the compatibility matrix in the protocol.
 
-The CI workflow is implemented and locally reproducible, but NOT REMOTELY
-VERIFIED until an authorized push and actual GitHub Actions run. Do not display a
-successful remote badge without evidence. Coverage and hardware certification
+The complete Humble/Debian CI workflow was verified on GitHub, including report
+identities and source binding. Main requires pull requests and the current
+successful `humble` check from GitHub Actions. Protection applies to administrators
+and blocks force pushes and deletion. Positive and negative control PRs confirmed
+the check and actual merge blocking; neither test PR was merged. See protocol25. Coverage and hardware certification
 are not available. M02 obstacle monitoring/TF stop behavior is implemented as an opt-in feature;
 a fresh published path or cloud is not a guarantee of physical safety.
 
@@ -50,9 +52,12 @@ facilities outside the current repository.
 ## Release gates
 
 Source indexing, rosdep resolution, Bloom, Buildfarm jobs and Debian delivery are
-separate checks. The cleaned main remains local: no public migration, ROS Index
-PR, release tag,
-Bloom track or successful farm job is created by this project work. Root/package
+separate checks. Public main/V1/V2/V3 migration is complete. There is no ROS Index
+PR, release tag, Bloom track or official farm result. Official ROS Index/rosdistro
+registration, Bloom release, release Buildfarm jobs/public ROS Debian packages,
+release tags and GitHub Releases are frozen until successful current Unitree
+Go2W hardware tests **and separate subsequent authorization**. Neither is supplied
+by the synthetic software tests or source publication. Root/package
 Apache-2.0 notices are implemented. The developer has confirmed licensing
 authority over his own software after consultation with the supervising professor.
 The four legacy PCD blobs were removed from every local candidate ref, including
@@ -84,10 +89,11 @@ See central protocol section18.8 for commands, exact images and remaining work.
 The only current development/release target is ROS2 Humble, Ubuntu22.04 Jammy,
 Python3.10 with the verified apt dependencies. Jazzy/Lyrical/Rolling are deferred,
 so lack of multi-distribution support is not a Humble release blocker. Their
-previous investigation results remain dated evidence. AP07 retains the Humble
-workflow and an unverified remote status; AP09 is assessed against Humble.
-AP10 still requires rights/public-source/version/release-organization and
-external release checks. M02 monitoring does not close these separate gates.
+previous investigation results remain dated evidence. AP07 now includes actual Humble remote CI and enforced Required Checks;
+AP09 is assessed against Humble.
+AP10 still requires concrete redistribution obligations, release-version/support
+decisions, current Go2W validation and the subsequently authorized official
+release checks. M02 monitoring does not close these separate gates.
 
 
 Local Debian packaging was also exercised for all three packages: peer-aware Bloom
@@ -109,19 +115,21 @@ remain diagnostic entry points; this command does not authorize a release.
 The final AP10 audit is in section 22 of the central protocol. R28 remains locally
 verified; its extra test-phase selection and mandatory post-install gate are not
 automatically installed in an official Bloom/Buildfarm workflow. R29 now supplies package-native Jammy build reports and a mandatory combined
-workflow entry point. The workflow and pinned report archival are prepared
-locally but have not run remotely. Configure and verify Required Checks and
-the official process before claiming equivalent external test enforcement.
+workflow entry point. The workflow and pinned report archival have now been
+exercised remotely with actual positive/negative Required-Check evidence
+(section25). This verifies the binding GitHub project preflight; official ROS
+Source/Binary Buildfarm execution remains separate and unverified.
 
 All packages remain 0.0.1 with Forthcoming changelogs. A common 0.1.0 initial public
 prerelease is a recommendation, not an authorized version change. Own-code
 licensing authority and the local cleaned main/history scope are now
 confirmed; Bastian Aumer remains maintainer and licensor of his own parts.
 The candidate has no legacy PCD blobs in any reachable ref or its object database.
-Public synchronization, concrete third-party redistribution obligations,
-support/EOL terms and release timing remain separate. See section23 of the
-central protocol for the full mapping, private backup, new successful Humble and
-Debian checks, and the still-open official test-integration gate R29.
+Public source synchronization is complete. Concrete third-party redistribution
+obligations, support/EOL terms and official release timing remain separate.
+Section23 preserves the mapping/private backup/local tests; section25 records
+public migration and the accepted binding GitHub R29 preflight, with official
+ROS Farm execution separately unverified/frozen.
 
 
 ## R29 local preflight boundary (20 October 2026)
@@ -134,6 +142,8 @@ gate. The original thirteen controls remain; the complete current gate suite
 contains37 cases. No generated Bloom rule is patched and no test is replaced by
 a skip. The local proof is preparation, not a maintainer release decision.
 Official Source/PR test jobs, release binary jobs, Jenkins report handling and
-repository publication have distinct semantics. Their actual configuration and
-results still require authorized external verification. R29 overall remains
-BLOCKED; see the complete acceptance matrix in protocol section24.
+repository publication have distinct semantics. R29 is accepted for the binding
+GitHub project preflight demonstrated in protocol25 under the unchanged24.9
+criteria. This is not an official ROS Buildfarm claim. R22/R27 and the official
+ROS release remain unverified/frozen; hardware and subsequent release approval
+remain mandatory. Chapter24 retains its historical pre-publication status.

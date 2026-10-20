@@ -1,6 +1,6 @@
 # Contributing
 
-The cleaned local main contains the V4 development and is not an official ROS
+The public main contains the V4 development and is not an official ROS
 release. Do not publish a research checkout, data, tags or releases without the
 maintainer's authorization.
 Use a focused change with a concrete issue, interface impact and suitable tests.
@@ -43,6 +43,11 @@ committed checkout. It executes both existing runners and requires every test
 phase plus exact source/report/archive identity. The full gate-control suite is
 part of the Debian build container. Package-native pybuild hooks handle the
 build/install split; do not reintroduce wrapper-only selection or skip tests.
-The prepared GitHub job runs this same command; Remote CI and Required Checks
-remain unverified until separately authorized and actually configured. No release
-or publication trigger is introduced. Maintainer release approval remains manual.
+The GitHub job runs this same command. Changes to main require a pull request and
+the successful current `humble` check from GitHub Actions; protection includes
+administrators and disallows force pushes/deletion. Positive and negative
+control PRs were verified without merging either probe. Do not bypass these rules
+for documentation. No release trigger is introduced. Official ROS publication,
+release tags and GitHub Releases require successful current Go2W hardware tests
+and a separate subsequent authorization. The public V4 branch does not exist;
+start future changes from the cleaned public main.

@@ -7,7 +7,7 @@ The preprocessor classifies clearance and traversability; the planner reconstruc
 a weighted 3D graph and computes A* paths through the standard
 `nav2_msgs/action/ComputePathToPose` action.
 
-The current local main includes the V4 ROS interface, obstacle-monitoring and
+The public main includes the V4 ROS interface, obstacle-monitoring and
 filter-geometry changes. The original navigation stack was previously demonstrated
 on a Unitree Go2W; the current V4/main checks are workstation software tests.
 Deployment on the robot still requires separate validation. The supported target
@@ -35,17 +35,25 @@ Author of the own software: Bastian Aumer; existing maintainer contact:
 `bauya <baau1001@stud.hs-kl.de>`. Authorized own software uses Apache-2.0;
 existing third-party notices retain their original attribution and conditions.
 
-The cleaned local `main` is the intended future development and release source.
-This migration has **not** been pushed to GitHub. The prepared checkout is
-`/home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate`; the original
-checkout remains unchanged as a historical development copy. V1–V4 research
-branches are retained on the cleaned history. There is no official ROS Index,
-Bloom or Buildfarm release; `0.0.1` remains a development version.
+The public `main` is the current development source. Public `V1`, `V2` and `V3`
+retain the cleaned historical research versions; `V4` remains a local historical
+reference. Migration was completed on 20 October 2026. The complete Humble/Debian
+workflow has run on GitHub and its `humble` check is required for pull requests
+to protected `main`, including administrator changes. Positive and deliberately
+failing test PRs verified the check and merge blocking; see the
+[public migration and CI record](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#25-öffentliche-git-migration-remote-ci-und-release-freeze-20-oktober-2026).
+
+This is a public source repository, **not an official ROS release**. All packages
+remain `0.0.1` with Forthcoming changelogs. ROS Index/rosdistro registration,
+Bloom releases, official release Buildfarm jobs/public ROS Debian packages,
+release tags and GitHub Releases are frozen until successful current Unitree
+Go2W hardware tests **and a separate subsequent maintainer authorization**.
+No current V4/main hardware validation has been performed.
 
 The four legacy example maps and their identical historical copies have been
-removed from this local candidate's reachable Git history. Supply your own
-permitted PCD inputs. Local cleanup does not establish removal from GitHub,
-other clones, forks or caches. Historical commit references remain documented
+removed from the reachable histories of the four published source branches.
+Supply your own permitted PCD inputs. Old direct GitHub commit URLs remain
+accessible; this does not establish removal from server caches, clones or forks. Historical commit references remain documented
 through the [commit migration record](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#235-dauerhaftes-commit-mapping-und-forschungsbaseline).
 
 ## Architecture at a glance
@@ -79,7 +87,7 @@ use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
 Sensor drivers, odometry, global localization and the robot command adapter
 remain external. No specific SLAM package is a dependency.
 
-For the cleaned local main checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
+For the public main checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
 below a workspace's `src` directory. The public V3 branch does not contain the
 AP03 manifest corrections. Use the native Humble system interpreter, with no
 Conda or unrelated workspace overlays:
@@ -397,7 +405,7 @@ V4 development and release preparation target only ROS 2 Humble on Ubuntu22.04
 Jammy with Python3.10 and the verified apt dependency set. Jazzy, Lyrical and
 Rolling are postponed; their recorded limitations are not blockers for the
 Humble release. The distribution investigation above is historical evidence,
-not a multi-distribution support promise. No push or release has been performed.
+not a multi-distribution support promise. The source migration is public; no official ROS release has been performed.
 
 
 Local obstacle geometry: the filter now additionally retains finite, height-qualified
@@ -427,6 +435,9 @@ remain diagnostic entry points; this command does not authorize a release.
 The historical audit and migration are recorded in sections22/23 of the central
 protocol; section24 records R29 implementation and acceptance. Native Jammy
 pybuild test selection/reporting and the mandatory combined workflow are now
-prepared locally. Official Bloom/farm enforcement, Remote CI and Required Checks
-remain unverified. R29 overall remains blocked pending the external acceptance
-steps. Package version0.0.1 and the Humble-only target are unchanged.
+operational in the binding GitHub project preflight. Actual remote reports and
+positive/negative Required-Check probes are recorded in section25; R29 is accepted
+in the unchanged section24.9 project-preflight scope. Official ROS Buildfarm
+execution remains unverified and the ROS release frozen pending current Go2W
+hardware tests and separate subsequent authorization. Package version0.0.1 and
+the Humble-only target are unchanged.
