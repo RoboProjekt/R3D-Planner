@@ -165,3 +165,10 @@ def test_native_phase_has_no_ordinary_pytest_deselection(tmp_path, package, phas
         cases = list(ET.parse(source/'build-tests.xml').iter('testcase'))
         assert len(cases) == 2-required
         assert not any(case.find('skipped') is not None for case in cases)
+
+
+@pytest.mark.parametrize('prefix', ['test/', '.pybuild/cpython3_3.10/build/test/',
+                                   '/work/package/.pybuild/cpython3_3.10/build/test/'])
+def test_pybuild_node_identity_preserves_case_and_parameters(prefix):
+    node = prefix+'test_output.py::test_invalid_input[missing]'
+    assert RELEASE.canonical_nodes([node]) == ['test_output.py::test_invalid_input[missing]']

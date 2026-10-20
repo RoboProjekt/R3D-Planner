@@ -66,6 +66,17 @@ def collect(directory, logfile, marker=None):
     return nodes
 
 
+def canonical_nodes(nodes):
+    """Match pytest root variations to the existing package-local case identity."""
+    result = []
+    for node in nodes:
+        filename, separator, case = node.partition('::')
+        if not separator or not filename.endswith('.py'):
+            raise ValueError('Invalid pytest node identity: ' + node)
+        result.append(Path(filename).name + '::' + case)
+    return result
+
+
 def ownership_tree(path):
     """Grant only the temporary build and result trees to the ordinary test user."""
     uid = int(os.environ['R3D_TEST_UID'])
@@ -167,11 +178,9 @@ def build(source, results, failure_probe):
             coverage(expected, actual+deferred)
             phase = json.loads((directory/'build-phase.json').read_text())
 
-            def canonical(nodes):
-                return [node.removeprefix('test/') for node in nodes]
-            coverage(expected, canonical(phase['expected']))
-            coverage(actual, canonical(phase['selected']))
-            coverage(deferred, canonical(phase['installed_required']))
+            coverage(expected, canonical_nodes(phase['expected']))
+            coverage(actual, canonical_nodes(phase['selected']))
+            coverage(deferred, canonical_nodes(phase['installed_required']))
             shutil.copyfile(directory/'build-phase.json', results/(name+'-build-phase.json'))
             shutil.copytree(source/name/'test', exports/name/'test')
             data = {'expected': expected, 'build_cases': actual, 'installed_required': deferred}
