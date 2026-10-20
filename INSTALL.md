@@ -1,11 +1,13 @@
 # Installation, Build, and Startup
 
-Current local source: use the cleaned `main` checkout at
-`/home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate`. It includes the
-complete V4 implementation. This candidate has not been pushed; cloning the
-public repository does not yet obtain this prepared main. Earlier V4 references
-below describe the same development payload. Historical map data are excluded
-from the cleaned history; bring your own permitted PCD inputs.
+Current source: clone the public `main` of
+[RoboProjekt/R3D-Planner](https://github.com/RoboProjekt/R3D-Planner). It includes
+the complete V4 implementation. Public V1–V3 retain historical versions; there
+is no public V4 branch. The four legacy PCD blobs are excluded from the published
+branch histories; bring your own permitted PCD inputs. This is a development
+source publication, not a ROS Index/Bloom/binary release. Current Go2W hardware
+tests and separate subsequent authorization are required before any official
+ROS release, release tags or GitHub Release.
 
 ## Reference environment
 
@@ -18,8 +20,9 @@ The installation commands use:
   r3d_interfaces, and `colcon`
 
 ROS 2 Humble is the supported ROS distribution. Other ROS distributions are
-not supported. The complete stack has run successfully on a Unitree Go2W with
-the documented TF and sensor integration.
+not supported. An earlier stack was demonstrated on a Unitree Go2W with the
+documented TF and sensor integration. Current V4/main software checks use
+synthetic inputs; current Go2W hardware validation is still required.
 
 Installation uses a native ROS 2 workspace. The isolated verification used the
 official `ros:humble-ros-base` image; Docker is not a runtime requirement. No
@@ -135,20 +138,18 @@ Replace `<path-to-workspace>` with the absolute path of the ROS 2 workspace in
 every command in this guide. Angle-bracket placeholders are not literal shell
 syntax and must not be copied unchanged.
 
-The following procedure targets the local V4 checkout with the corrected AP03
-manifests. V4 has not been pushed; do not assume an upstream V4 branch exists.
-The public V3 checkout still has historical dependency declarations and requires
-its separate historical installation instructions. Place your existing local V4
-checkout under `src`, or clone from the local repository:
+The following procedure targets the public main with the corrected manifests.
+The public V3 checkout retains its historical dependency declarations and requires
+its historical installation instructions. Clone main under the workspace src:
 
 ```bash
 mkdir -p <path-to-workspace>/src
-git clone --branch V4 <path-to-local-R3D-Planner> <path-to-workspace>/src/R3D-Planner
+git clone --branch main https://github.com/RoboProjekt/R3D-Planner.git <path-to-workspace>/src/R3D-Planner
 cd <path-to-workspace>
 ```
 
-Replace `<path-to-local-R3D-Planner>` with the existing local repository path.
-No upstream branch checkout or push is part of this procedure.
+Replace `<path-to-workspace>` with your workspace path. Do not merge old,
+unfiltered clones into this history. No push is needed to install the source.
 
 ## rosdep
 
@@ -419,11 +420,14 @@ container receives only the read-only install tree, tests and manifest copies;
 no source or build tree is mounted. Temporary logs/artifacts stay under the
 printed `/tmp/r3d-ci.*` directory. Only containers created by this run are removed;
 no images, host packages, ROS installation or Conda environment are changed.
-The same command is configured in `.github/workflows/ros2-humble.yml`.
+The full workflow in `.github/workflows/ros2-humble.yml` invokes the combined
+`bash scripts/ci/run_humble_release.sh`, which additionally requires the complete
+Debian build, post-installation and source/report binding gates.
 
 Local reproduction passed the full suite (358 reported colcon records) (0 failure/skip) and343
-source-free cases. This is not a GitHub Actions result. The workflow remains
-IMPLEMENTED / NOT REMOTELY VERIFIED while V4 is local and no push is authorized.
+source-free cases. These historical local results are separate from the actual
+GitHub Actions and positive/negative Required-Check evidence now recorded in
+central protocol section25. The full `humble` check is required on protected main.
 
 ## Distribution investigation (15 October 2026)
 
@@ -539,9 +543,11 @@ permanent project workaround. Build-time source checks and installed checks have
 different contracts; a neutral working directory and the registered ROS prefix
 replace the former literal `/install/` pathname assumption.
 
-These results are local technical evidence. Remote GitHub Actions, the final
-release version, public V4 source, ROS Index/Bloom/Buildfarm operations and legal
-publication clearance remain separate, explicitly unperformed gates.
+These historical results are local technical evidence. Actual GitHub source
+publication and remote CI are recorded separately in section25 of the central
+protocol. Official ROS Index/Bloom/Buildfarm publication remains frozen pending
+current Go2W hardware tests and a separate subsequent authorization. Concrete
+redistribution obligations remain separate from the technical software tests.
 
 
 ### Boundary of the local release gate
@@ -554,11 +560,13 @@ Debian archives before installation. The combined runner produces a final
 after both phases pass. Save the printed result directories together; they remain
 local technical evidence and are not a signed remote attestation.
 
-The GitHub workflow is prepared to execute the combined gate and preserve reports
-with pinned official Actions. It has not been run remotely. Configure and verify
-branch protection/required status checks separately after authorization. Normal
+The GitHub workflow executes this combined gate and preserves reports with
+pinned official Actions. Actual remote reports, source hashes, positive and
+negative PR checks were verified; protected main requires the `humble` check
+from the GitHub Actions app, current with main, including administrators. Normal
 Bloom-generated rules still tolerate test failures and do not invoke the R3D
 post-install gate automatically. Source/PR jobs and release binary jobs are
 separate farm mechanisms. No actual official job or publication is claimed.
-See section24 of the central protocol for R29 criteria, limitations and the
-future external acceptance sequence.
+See section24 of the central protocol for the unchanged R29 criteria and
+section25 for actual GitHub acceptance, the remaining official Farm boundary
+and the Go2W release freeze.
