@@ -479,12 +479,18 @@ the 45 configuration cases now runnable without source resources.
 
 ## Local Debian release gate (Humble / Jammy / amd64)
 
-Run both independent checks before considering local release readiness:
+Use a clean committed checkout and run the mandatory combined check:
 
 ```bash
-bash scripts/ci/run_humble.sh
-bash scripts/ci/run_humble_debian.sh
+bash scripts/ci/run_humble_release.sh
 ```
+
+This executes both existing runners in full and validates their actual reports,
+case identities and artifact binding. The individual `run_humble.sh` and
+`run_humble_debian.sh` entry points remain available for diagnosis; one alone is
+not the complete release preflight. No publication or maintainer approval is
+performed by this command. The combined and Debian runners require a clean
+candidate so their recorded commit/tree/file hashes identify the tested input.
 
 The Debian runner uses fresh containers, readonly source/probe mounts and ordinary
 build/test users. It uses the official Bloom peer-package generator and installs
@@ -495,7 +501,8 @@ changed. The generated Bloom `debian/rules` files are kept unchanged.
 
 The planner's `installed` pytest marker describes a real resource requirement.
 It is inherited through the explicit `installed_share` fixture; it never skips
-a default test run. Before installation, the Debian phase selects `not installed`:
+a default test run. The package-native Jammy pybuild hook defers marked
+installation requirements without an external selection flag:
 243 planner tests run and 93 installation-dependent tests are deferred. The
 preprocessor runs all 13 build tests. The interface runs four explicit CTest
 checks: copyright, CMake lint, XML lint and source headers (two cases).
@@ -524,8 +531,9 @@ bash scripts/ci/run_humble_debian.sh --failure-probe
 
 It inserts a failing test only into a private temporary package copy. A nonzero
 exit proves propagation through the actual two-stage entry point; it never alters
-repository tests. Thirteen separate unit controls cover report rejection and
-coverage matching (`/usr/bin/python3 -m pytest scripts/ci/tests -q` in a suitable
+repository tests. The original thirteen controls retain report rejection and
+coverage matching; the full suite now has 37 cases including 24 R29 controls
+(`/usr/bin/python3 -m pytest scripts/ci/tests -q` in a suitable
 Python/pytest environment). No test deactivation or generated-template edit is a
 permanent project workaround. Build-time source checks and installed checks have
 different contracts; a neutral working directory and the registered ROS prefix
@@ -538,10 +546,19 @@ publication clearance remain separate, explicitly unperformed gates.
 
 ### Boundary of the local release gate
 
-`run_humble_debian.sh` sets the build-phase selection and validates complete
-post-install results locally. Standard Bloom-generated rules do not automatically
-invoke this wrapper, and the GitHub workflow currently runs only `run_humble.sh`.
-Before an official release, approve and verify how the build/install test contract
-and strict failure checks will operate in that release process. A successful local
-gate is not an official Buildfarm result. The final audit and decision list are in
-section 22 of the central development protocol.
+Package-native test hooks generate the Debian phase inventory and JUnit without
+`PYBUILD_TEST_ARGS` or `PYBUILD_TEST_PYTEST`. The Debian runner requires complete
+build/install identities and checks source, run ID, test/manifest hashes and exact
+Debian archives before installation. The combined runner produces a final
+`release-evidence.json` with source identity and hashes of actual evidence only
+after both phases pass. Save the printed result directories together; they remain
+local technical evidence and are not a signed remote attestation.
+
+The GitHub workflow is prepared to execute the combined gate and preserve reports
+with pinned official Actions. It has not been run remotely. Configure and verify
+branch protection/required status checks separately after authorization. Normal
+Bloom-generated rules still tolerate test failures and do not invoke the R3D
+post-install gate automatically. Source/PR jobs and release binary jobs are
+separate farm mechanisms. No actual official job or publication is claimed.
+See section24 of the central protocol for R29 criteria, limitations and the
+future external acceptance sequence.

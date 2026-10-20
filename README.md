@@ -418,11 +418,15 @@ generated rules retain their tolerant test exit behavior. The required local
 release wrapper now validates the actual reports and complete test identities,
 rejecting failures, errors, skips and missing evidence independently of Bloom.
 Installation-dependent checks run in a mandatory fresh Debian runtime container.
-Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
+For the complete local preflight use `bash scripts/ci/run_humble_release.sh`
+from a clean committed checkout. It runs both ordinary CI and the complete
+Debian gate, then validates source/report/artifact identity. Individual runners
+remain diagnostic entry points; this command does not authorize a release.
 
 
-The final local release audit is recorded in `docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md`,
-section 22. Local R28 verification does not automatically integrate the additional
-Debian test gate into the official ROS Buildfarm. Rights, public source scope,
-release version/ownership and the official test-phase contract remain separate
-decisions before publication. No official release has been performed.
+The historical audit and migration are recorded in sections22/23 of the central
+protocol; section24 records R29 implementation and acceptance. Native Jammy
+pybuild test selection/reporting and the mandatory combined workflow are now
+prepared locally. Official Bloom/farm enforcement, Remote CI and Required Checks
+remain unverified. R29 overall remains blocked pending the external acceptance
+steps. Package version0.0.1 and the Humble-only target are unchanged.

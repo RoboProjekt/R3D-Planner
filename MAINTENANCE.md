@@ -98,16 +98,20 @@ generated rules retain their tolerant test exit behavior. The required local
 release wrapper now validates the actual reports and complete test identities,
 rejecting failures, errors, skips and missing evidence independently of Bloom.
 Installation-dependent checks run in a mandatory fresh Debian runtime container.
-Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
+For the complete local preflight use `bash scripts/ci/run_humble_release.sh`
+from a clean committed checkout. It runs both ordinary CI and the complete
+Debian gate, then validates source/report/artifact identity. Individual runners
+remain diagnostic entry points; this command does not authorize a release.
 
 
 ## Final audit decision boundary (19 October 2026)
 
 The final AP10 audit is in section 22 of the central protocol. R28 remains locally
 verified; its extra test-phase selection and mandatory post-install gate are not
-automatically installed in an official Bloom/Buildfarm workflow. The current
-GitHub workflow also does not run the Debian gate. Approve and verify this
-integration before claiming equivalent official test enforcement.
+automatically installed in an official Bloom/Buildfarm workflow. R29 now supplies package-native Jammy build reports and a mandatory combined
+workflow entry point. The workflow and pinned report archival are prepared
+locally but have not run remotely. Configure and verify Required Checks and
+the official process before claiming equivalent external test enforcement.
 
 All packages remain 0.0.1 with Forthcoming changelogs. A common 0.1.0 initial public
 prerelease is a recommendation, not an authorized version change. Own-code
@@ -118,3 +122,18 @@ Public synchronization, concrete third-party redistribution obligations,
 support/EOL terms and release timing remain separate. See section23 of the
 central protocol for the full mapping, private backup, new successful Humble and
 Debian checks, and the still-open official test-integration gate R29.
+
+
+## R29 local preflight boundary (20 October 2026)
+
+Use `bash scripts/ci/run_humble_release.sh` on a clean committed candidate.
+The package-native build phase, full independent Debian runtime, case identities,
+source commit/tree/file hashes, fresh run context and archive/report hashes are
+checked together. Errors, missing phases or stale/replaced exports reject the
+gate. The original thirteen controls remain; the complete current gate suite
+contains37 cases. No generated Bloom rule is patched and no test is replaced by
+a skip. The local proof is preparation, not a maintainer release decision.
+Official Source/PR test jobs, release binary jobs, Jenkins report handling and
+repository publication have distinct semantics. Their actual configuration and
+results still require authorized external verification. R29 overall remains
+BLOCKED; see the complete acceptance matrix in protocol section24.

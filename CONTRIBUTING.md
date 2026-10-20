@@ -36,3 +36,13 @@ all such tests must run in the mandatory post-install stage. Do not use source
 fallbacks, skips or Bloom's tolerated dh_auto_test exit as a green result. Review
 case identities and reports, and keep the deliberately failing temporary-copy
 probe nonzero. No generated release repository or public template is edited here.
+
+
+For a release candidate run `bash scripts/ci/run_humble_release.sh` from a clean
+committed checkout. It executes both existing runners and requires every test
+phase plus exact source/report/archive identity. The full gate-control suite is
+part of the Debian build container. Package-native pybuild hooks handle the
+build/install split; do not reintroduce wrapper-only selection or skip tests.
+The prepared GitHub job runs this same command; Remote CI and Required Checks
+remain unverified until separately authorized and actually configured. No release
+or publication trigger is introduced. Maintainer release approval remains manual.
