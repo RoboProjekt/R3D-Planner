@@ -430,3 +430,5 @@ pybuild test selection/reporting and the mandatory combined workflow are now
 prepared locally. Official Bloom/farm enforcement, Remote CI and Required Checks
 remain unverified. R29 overall remains blocked pending the external acceptance
 steps. Package version0.0.1 and the Humble-only target are unchanged.
+
+<!-- Temporary positive Required-Check probe; never merged. -->
