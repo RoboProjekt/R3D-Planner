@@ -1,7 +1,7 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 20. Oktober 2026; fortgeführt bis V4-055 (aktuelle lokale Historien-/main-Migration und neue Humble-/Debian-Abnahme in23; historische Audits in21/22). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 20. Oktober 2026; fortgeführt bis V4-056 (aktuelle lokale Historien-/main-Migration und neue Humble-/Debian-Abnahme in23; historische Audits in21/22). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
 
 **Aktuelle R29-Fortsetzung:** Kapitel24 führt die ab20.10.2026 autorisierten Arbeiten auf Kandidaten-main fort. Kapitel23 bleibt unveränderter Migrationsnachweis; V4 bleibt künftig auf2655f1d und wird nicht automatisch nachgeführt.
@@ -1586,6 +1586,10 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 ### V4-055 - Erfolgreichen R29-Gesamtlauf zuordnen und reproduzierbare Nutzung abschließen
 
 **Datum:**20. Oktober2026. **AP/Gate:**AP06/AP07/AP08/AP09/AP10, R26/R28/R29. **Eingang:** a0b7412a1f98d93520abe6a1ef51892711fecc5d. **Tatsächliche Ausführung:** bash scripts/ci/run_humble_release.sh,326,71s, Exit0; /tmp/r3d-release.90ghgsp2, /tmp/r3d-ci.jiZllqmW, /tmp/r3d-debian.kM5HshPO.358Colcon-Berichte/349Pythonpaketfälle plus2Interface-Header,343Sourcefrei,243+93Plannerbuild/13Preprocessorbuild,336+13Postinstall,37Gatekontrollen;0FAIL/ERROR/SKIP. Lauf-/Source-/Export-/Archiv-/Reportbindung gemeinsam bestanden. **Dateien/Entscheidung:** INSTALL/README/MAINTENANCE/CONTRIBUTING auf verbindlichen neuen Einstieg und sauberen Commit als Voraussetzung nachführen. Eine verbliebene E128-Einrückung ausschließlich in der neuen parametrisierten Gatekontrolle korrigieren, keine Testlogik oder Identität ändern. **Verfahren:** gezielte37Kontrollen/Lint/Metadaten erneut; anschließend abschließender quellengebundener vollständiger Kombinationslauf dieses bereinigten Implementierungsstands plus Negativprobe. So werden nicht lediglich spätere Sourceänderungen einem älteren Lauf zugeschrieben. **Vorher/Nachher:** erfolgreiche technische erste Abnahme, aber veraltete Nutzeraufrufe und ein Helper-Stilbefund → nachvollziehbarer einziger Vorabaufruf und bereinigter Testsource. **Status:** COMPLETED für Anleitung/Format; tatsächliche endgültige Abnahme in24 nach Ausführung. **Quellen:** offizielle Mechanismen aus24.3; lokale Ergebnisse nicht mit offiziellen Jobs verwechseln. **Grenzen:** V4 unverändert2655f1d, keine Veröffentlichung/Remote-/Farmaktion; R29 externe Abnahme weiter offen. **Commit:** `docs(ci): finalize R29 release validation usage`; reale SHA nach Erzeugung. Produktions-/Schema-/Versions-/Lizenzdaten unverändert.
+
+### V4-056 - Quellengebundene R29-Abnahme und externe Freigabegrenzen abschließen
+
+**Datum:**20. Oktober2026. **AP/Gates:**AP06–AP10, R26/R28/R29. **Ausgang:** sauberer main 8f96970f18cff6ccafcbb0a684456e93986f98e6; V4 unverändert2655f1db419aea08bb488691032149e5e41eb789. **Datei:** ausschließlich dieses zentrale Protokoll. **Fragestellung/Entscheidung:** tatsächliche finale Quellen-/Test-/Archivbindung, alte Fallidentitäten und externe Abnahmegrenzen belegen. **Befehle/Umgebung:** bash scripts/ci/run_humble_release.sh und --failure-probe-Debianrunner, beide auf exakt genanntem Commit; gepinnte Humble/Jammy/amd64/Python3.10-Container. Vollständige normale CI, standardmäßige native Debian-Buildtests, frische komplette Postinstallation,37 Gate-/Integrationskontrollen; ergänzende unveränderte offizielle Sourcejobskripte lokal. **Ergebnisse/Exits:** positiver Gesamteinstieg0,358Berichte/349Pythonpaketfälle+2Header/343Runtime;4CTest/243+93Planner/13Preprocessorbuild und336+13Postinstall. Negative Kontrolle13PASS/1absichtlicherFAIL, Dpkg0/Runner1, keine Runtime. Keine künstlichen Skips. **Betroffene Quellen/Begründung:** offizielle Mechanismen/Versionsbelege24.3, Vergleich und Kriterien24.6–24.10, technische JSONs und Integritätsprüfung. **Vorher/Nachher:** R29 vollständig offen → lokale Vorbereitung/Fehlerwirksamkeit technisch VERIFIED; operative offizielle Anbindung NOT VERIFIED, Gesamtgate BLOCKED. **Nachweise:** neue Rohpfade/Archivhashes/Source-IDs unten; keine alten Läufe als neue ausgegeben. **Git:** tatsächliche Implementierungscommits24.11; eigener finaler SHA im Abschlussbericht und externem final-state.json, kein Amend/Rewrite. **Status:** VERIFIED für den beauftragten lokalen Vorbereitungs-/Nachweisumfang; R28 weiter LOCALLY VERIFIED. **Grenzen:** keine fremden Refs/Remotes/Backups, keine Veröffentlichung/Index/Bloom/Farm/Hardware/R3D_null; AP10 öffentlich weiterhin offen.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -5524,3 +5528,180 @@ Die zusätzliche lokale Farmprobe verwendete unveränderte offizielle Skripte au
 Der tatsächliche Humble-ReleaseBuildFile-/SourceBuildFile-Parser bestätigt Jammy/amd64, run_package_tests=true, build_tool=colcon, test_commits_default=true und test_pull_requests_default=false. Die tatsächlichen ROS2-Publisherpatterns wurden ebenfalls aus der unveränderten offiziellen Funktion ermittelt. Unbekannte Attribute eines ersten temporären Parseraufrufs wurden durch die reale API nachgeprüft; kein erfundenes Konfigurationsergebnis.
 
 Abschließende Nutzungs-/Formatkorrekturen055 erhalten eine neue Quellenreferenz. Deren vollständiger neuer Lauf wird separat zugeordnet, die obigen Ergebnisse bleiben datierte vorherige Nachweise. Das abschließende Dokumentationscommit kann seine eigene SHA nicht enthalten; tatsächlicher finaler HEAD im Abschlussbericht und externer technischer final-state.json.
+
+
+### 24.6 Tatsächliche endgültige Ausführung und unveränderte Testidentitäten
+
+**Getesteter sauberer Commit:** `8f96970f18cff6ccafcbb0a684456e93986f98e6` (Nutzungsabschluss055). `bash scripts/ci/run_humble_release.sh` Exit0, 368.01s, Ergebnis `/tmp/r3d-release.3jb3f3zm`. Dieser Einstieg hat **beide** vorhandenen vollständigen Runner tatsächlich neu gestartet. Normale Rohbelege `/tmp/r3d-ci.gYvTnM7S`, Debian `/tmp/r3d-debian.MVWFVq8N`. Die folgenden Werte stammen aus diesem Lauf, nicht aus23 oder dem ersten erfolgreichen a0b7412-Lauf. Späteres Abschlusscommit verändert ausschließlich dieses Dokument; keine Selbst-SHA-Schleife.
+
+| Phase / tatsächlicher Befehl | PASS / Darstellung | FAIL | ERROR | SKIP | Exit |
+|---|---|---:|---:|---:|---:|
+| rosdep install/check; Copy-Colconbuild |3 Pakete, gültige Metadaten/ROSIDL/Lizenzressourcen |0|0|0|0|
+| run_humble.sh: colcon test und test-result |358 Berichtseinträge |0|0|0|0|
+| Pythonpakete |336 Planner +13 Preprocessor |0|0|0|0|
+| Interface |4 CTest-Läufe,5 xUnitfälle einschließlich2 Header-pytestfälle |0|0|0|0|
+| normale Source-freiphase |343 eindeutige Fälle |0|0|0|0|
+| Gate-/R29-Kontrollen im Debianbuilder |37 =13 unverändert erhaltene +24 neue Fälle |0|0|0|0|
+| native Debian-Preprocessorbuildphase |13 |0|0|0|0|
+| native Debian-Plannerbuildphase |243;93 weitere explizite Installpflichten |0|0|0|0|
+| vollständige Debianpostinstallation |336 Planner +13 Preprocessor |0|0|0|0|
+| dpkg-/ROS-/Ressourcen-/Typesupportsmoke |3 tatsächliche installierte Archive und korrekte Herkunft |0|0|0|0|
+| gesamte aktuelle Quellen-/Report-/Artefaktprüfung |vollständig, 93 Nachweishashes unabhängig nachgeprüft |0|0|0|0|
+
+358Berichte enthalten349Pythonpaketberichte plus4CTestdarstellungen plus5Interface-xUnitfälle; darunter2zusätzliche echte Header-pytestfälle. Insgesamt351pytest-Fälle über drei Pakete; keine358unabhängigenPythonfälle. Die37Gates gehören getrennt zur CI-Infrastruktur. Build-/Postinstallphasen überlappen;243+336 werden nicht als579unabhängige Plannerfälle addiert. Alle349ursprünglichen Pythonpaketidentitäten,343normalen Runtimeidentitäten,243/13Buildidentitäten,93Installationspflichten und336/13Postinstallidentitäten stimmen mit den vorliegenden ursprünglichen Nachweisen aus23 überein. Test-Zählsemantik bleibt unverändert.
+
+Die native Phase lief ohne PYBUILD_TEST_ARGS/PYBUILD_TEST_PYTEST. Tatsächliches build-phase.json aus der realen .pybuild-Struktur deckt die komplette Discovery und beide ausgewählten Gruppen exakt ab. Die normalen/default-/Colcon-/Postinstallphasen werden nicht automatisch reduziert. Quelle/Schema/Launch/YAML/Robotprofile und sämtliche bisherigen funktionalen Testdateien bleiben unverändert; nur die ausdrücklich dokumentierten Testkonfigurations-/CIhelfer wurden ergänzt/geändert. Sämtliche17Produktionsmodule sind bytegleich zum Eingang2655f1d und zu den tatsächlich erzeugten Debian-Pythondateien.
+
+Version bleibt0.0.1; drei lokale unsigned .debs0.0.1-0jammy/amd64. Tatsächliche Artefakte:
+
+| Paket / Datei | Bytes | SHA-256 |
+|---|---:|---|
+| `ros-humble-r3d-interfaces_0.0.1-0jammy_amd64.deb` | 47776 | `c8e5a16d9e4306ab16932ce5507469557827cfb027350c615ac43ced58bc7952` |
+| `ros-humble-r3d-preprocessor_0.0.1-0jammy_amd64.deb` | 21530 | `1663ed32d454958ef7fba5718d02143e4c571eebdb507b64c50823c1239da2e6` |
+| `ros-humble-r3d-planner_0.0.1-0jammy_amd64.deb` | 53432 | `d8da8ef9b969a1dfcfc509ee376525594747e988735b8bf0109953224b51e942` |
+
+Keine PCD-Datei in den Archiven. Vergleich bezieht sich auf tatsächliche Archivbytes, nicht nur gleiche Versionen. Vor Installation werden Lauf-ID, Commit/Tree, vollständige Exportfilesets und SHA256 geprüft; danach dpkg-Dateieigentum, Entpack-/Modulvergleich, Manifest-/Schema-/Ressourcenherkunft und erneut archivbezogene Hashes. Native/Runtime-Rohberichte,36unveränderte externe Manifestkeys und ihre tatsächliche vollständige Installation/check bleiben zielbezogen; keine neuen ROS-Dependencies. Docker-/Apt-/Pythonumgebung ist aus den Runnerpins, neuen environment-*.json und phasenspezifischen Logs nachvollziehbar. Image wie23.12; SystemPython3.10.12, Ubuntu22.04.5, NumPy1.21.5/SciPy1.8.0/Open3D0.14.1/NetworkX2.4/PyYAML5.4.1. Keine Hostpaket-/Conda-/ROSänderung.
+
+**Tatsächliche negative Kontrolle auf demselben Commit:** `bash scripts/ci/run_humble_debian.sh --failure-probe`, Rohpfad `/tmp/r3d-debian.plBiAF8P`.13PASS/1absichtlicherFAIL,0ERROR/0SKIP. Dpkgbuild0, zwingender Runner1 und kein Runtimeverzeichnis. Der äußere Prüfdriver wertet dieses erwartete Scheitern als erfolgreiche Negativkontrolle; es ist kein grün umgedeuteter Projekttest. Die temporäre Testdatei wurde ausschließlich in einer privaten Kopie erzeugt und nie eingecheckt.
+
+Gesicherte Zwischenstände: erster88d6c7e-Gesamtlauf normal358/343, danach echter Identitätsdarstellungsfehler im Auswerter/Exit1; gezielt unter054 korrigiert. Zweiter a0b7412-Gesamtlauf vollständig0, dann reine Nutzungs-/E128-Formatkorrektur055; jetzt vollständige finale Abnahme auf8f96970. Alle37Kontrollen und zusätzlicher Helper-Flake8-Lauf bestanden. Keine Fehlerausgabe unterdrückt oder fehlgeschlagene Probe gelöscht. Hilfs-/Parser-/Setupversuche sind Diagnoseversuche, keine zusätzlichen bestandenen ROSfälle.
+
+### 24.7 Testgruppenvergleich: lokale Prüfung und tatsächlicher offizieller Mechanismus
+
+N = normaler vorhandener Humble-Runner, D = vorhandener Debianrunner mit nativer Phase und frischer Runtime, R = neuer verbindlicher Kombinationseinstieg. Alle verwenden Humble/Jammy/amd64/SystemPython3.10. „Vorbereitet“ ist kein externer Erfolg; lokal vollständig geprüft bedeutet nicht universelle offizielle Pflicht.
+
+| Testgruppe | Runner / Phase | Benötigte Umgebung | Report | Fehlerverhalten | Offizielle ROS-Phase | Belegte Integration | Noch fehlend | Maßnahme / Bewertung |
+|---|---|---|---|---|---|---|---|---|
+| Metadaten | N/check.py, D/Generator | XML/ament/Setup | Log/JSON | Gate bricht ab | Indexreview/Generator/Build | lokal gültig | öffentlicher Review | lokal VERIFIED; extern offen |
+| rosdep | N/D Build+Runtime | Apt/rosdep | Logs/Exits | nichtnull | Source-/Binaryabhängigkeiten | tatsächliche install/check | Farmdependencyumgebung | lokal VERIFIED |
+| Clean-Build | N und D | frische Container | Logs/Exits | nichtnull | Source-/Binaryjobs |3 Pakete gebaut | tatsächlicher Job | lokal VERIFIED |
+| ROSIDL | N/D/Runtime | Generator/Typesupport | CTest/pytest/Smoke | Gate nichtnull | CMakebuild, Source-/Binaryjob | Generierung/Import/CDR/Ressourcen | externer Job-/Artifactnachweis | lokal VERIFIED |
+| Python-Unit | N, D-Build | Source/Buildtree | JUnit/Phasen-JSON | striktes Gate | Sourcejob; nativer Debianpytest | Auswahl/Reports paketnativ | externe Verankerung | lokal VERIFIED |
+| ROS-Integration | N/D/Runtime | rclpy, isoliertes DDS | JUnit | Gate nichtnull | vor allem Source-/PR-Jobs | vorhandene Fälle erhalten | konkrete Jobläufe | lokal VERIFIED |
+| TF | N/D/Runtime | synthetische zeitgestempelte TF | JUnit | Gate nichtnull | Source-/PR-Tests | unveränderte Fälle | Remote-/Farmberichte | lokal VERIFIED |
+| QoS | N/D/Runtime | DDS/Durability | JUnit | Gate nichtnull | Source-/PR-Tests | unverändert geprüft | Remote-/Farmberichte | lokal VERIFIED |
+| Actions | N/D/Runtime | Nav2-Humbleaction/ROSIDL | JUnit | Gate nichtnull | Source-/PR-Tests | Success/Abort/Cancelbestand | externer Lauf | lokal VERIFIED |
+| PointCloud2 | N/D/Runtime | synthetische Layouts/Frames | JUnit | Gate nichtnull | Source-/PR-Tests | bestehende Decoder-/Framefälle | externer Lauf | lokal VERIFIED |
+| M01 | N/D/Runtime | Interface+Planner+Follower | JUnit/Smoke | Gate nichtnull | Paketset/Sourcejobs | atomare Metadaten/Quaternionbestand | externe Consumer-/Jobabnahme | lokal VERIFIED |
+| M02 | N/D/Runtime | synthetische Clock/TF/Cloud | JUnit | Gate nichtnull | Source-/PR-Tests | Optional-/Stop-/Recoverybestand | externer Lauf; Hardware nicht Gegenstand | lokal VERIFIED |
+| Filter/Follower-Geometrie | N/D/Runtime | synthetische Sensor-/Basisdaten | JUnit | Gate nichtnull | Source-/PR-Tests |48 ursprüngliche Fälle erhalten | externer Lauf | lokal VERIFIED |
+| Lints | N/D, Helper-Flake8 | deklarierte Linter | xUnit/JUnit/Log | Projektgate strikt | Source-/Buildtests | aktiv, nicht pauschal abgeschaltet | Jenkins-Auswertung tatsächlich prüfen | lokal VERIFIED |
+| Copyright | N/D, Interface | vorhandene Notice-/Headerdateien | xUnit/JUnit | Projektgate strikt | Source-/Buildtests | technischer Nachweis erhalten | konkrete Rechte keine Testentscheidung | lokal VERIFIED |
+| Buildzeit | D/Standard-dh_auto_test | echte Builddepends, eigener Target nicht vorinstalliert | JUnit/CTest/Phasen-JSON | D strikt, Bloom allein tolerant | nativer Binarybuild |243/13 und4CTest | offizieller Operativnachweis | lokal vorbereitet VERIFIED |
+| Installationspflichten | D/frische Runtime | echte eigene Shares/EntryPoints | JUnit+Inventar | fehlende Phase scheitert | separater Pflichtjob nötig | alle93 enthalten | verbindlicher externer Releasejob | lokal VERIFIED |
+| Source-frei | N/zweiter Container | installierte Copyressourcen | JUnit343 | Gate nichtnull | kein automatisch gleicher Releasebinarytest | tatsächliche Sourcefreiheit | separater externer Check | lokal VERIFIED |
+| Debianruntime | D/zweiter Container | exakte .debs/dpkg/Abhängigkeiten | JUnit349+SmokeJSON | Gate nichtnull | separater Postinstall-/Projektcheck | tatsächliche Archive/Owner | operative externe Pflicht | lokal VERIFIED |
+| Fallidentitäten | D und R | vollständige Discovery/Reports | JSON/Counter/JUnit | Verlust/Extrafall nichtnull | kein automatisch gleiches Farmgate | dynamische Sammlung/Phasendeckung | externer Vertrag | lokal VERIFIED |
+| Negative Gatekontrolle | D-Probe und37Kontrollen | nur private Testkopien/Reports | fehlgeschlagenesJUnit, Exits | Dpkg0/Gate1 | Zusatzgate vor Release | tatsächlich ausgeführt | externer positiver/negativer Joblauf | lokal VERIFIED |
+
+Keine vollständige A*/Traversierbarkeits-/Sicherheits-/Coveragezertifizierung aus der Zahl der Fälle ableiten. Vorbestand bleibt Vorleistung; R29 verbessert Testintegration/Evidenz, keine Navigation.
+
+### 24.8 Gezielte R29-Prüfkategorien und verbindliche GATE-A–O
+
+| Kategorie | Prüfmethode / tatsächlicher Nachweis | Ergebnis / Status |
+|---|---|---|
+| R29-T01 Phasen | offizielle Docs/Code und24.3-Phasenmatrix | Mechanismen zum Quellenstand VERIFIED |
+| R29-T02 Bloom | unveränderte Templates/erzeugte Regeln und echte negative Dpkg0-Probe | Toleranz reproduziert VERIFIED |
+| R29-T03 lokales Gate | tatsächliche komplette N/D/R-Ausführung und JSONs | VERIFIED |
+| R29-T04 Fehler | absichtlicher realer pytest-FAIL sowie Fehler-/CTestkontrollen | striktes Gate1 VERIFIED |
+| R29-T05 fehlender Report | ursprüngliche CLI-Kontrolle missing/empty, fehlende Runtime | Ablehnung VERIFIED |
+| R29-T06 SKIP | ursprünglicher synthetischer Skipbericht | Ablehnung VERIFIED; kein echter Projekt-Skip versteckt |
+| R29-T07 Identitätsverlust | Coverage-/Duplicate-/Countkontrollen und vollständige Counter | Ablehnung/Erhaltung VERIFIED |
+| R29-T08 Phasenabdeckung | native expected/selected/installed_required plus volle Postinstallliste | exakte Abdeckung VERIFIED |
+| R29-T09 Kandidatenbindung | Source/Tree/Dateihashes, .deb-SHA/Owner/Entpackvergleich, Austauschkontrollen | VERIFIED |
+| R29-T10 Aktualität | frische Verzeichnisse/Run-ID, vollständige Neuaufrufe und veraltete Kontextkontrollen | VERIFIED lokal, keine böswillige Attestierungsgarantie |
+| R29-T11 offizielle Konfiguration | tatsächlicher unveränderter Release-/Sourceparser und Publisherfunktion | Quellenbewertung VERIFIED; Deployment nicht geprüft |
+| R29-T12 Isolation | gepinnte frische N/D-Container, echte getrennte Farmbuild-/Testcontainer | VERIFIED im lokalen Umfang |
+| R29-T13 Trigger | YAML-/Pin-/Permissionsprüfung und keine Publikationsbefehle | lokal VERIFIED, keine Remoteausführung |
+| R29-T14 Grenzen | Artefaktclassification/local-vs-official-Matrix und R29-Status | dokumentiert VERIFIED |
+| R29-T15 externer Ablauf | konkrete Handlungskette24.10 mit Verantwortungs-/Freigabegrenzen | Vorbereitung VERIFIED, Umsetzung offen |
+
+| Gate | Verbindliche Prüfung | Tatsächlicher lokaler Nachweis | Grenze |
+|---|---|---|---|
+| GATE-A | gültige Metadaten | N/check.py und D/Generator | Review separat |
+| GATE-B | rosdep | N/D tatsächliche install/check | neuer Releaseindex später prüfen |
+| GATE-C | Clean-Colconbuild | N/3Pakete | keine Fremdplattform |
+| GATE-D | vollständige ROS-Testbasis |349+2Pytestfälle,358Berichte | keine Vollcoverage |
+| GATE-E | Sourcefreie Installation |343 Fälle | Prefixvertrag begrenzt |
+| GATE-F | lokale Debianerzeugung |3 Archive | kein offizieller Bloomrelease |
+| GATE-G | Buildtests |243/13+4CTest und Inventar | native Bloomregel allein tolerant |
+| GATE-H | Pflichtpostinstall |336+13 vollständig | separater externer Pflichtjob fehlt |
+| GATE-I | Debianruntime | dpkg/ROSIDL/Owner/Entpackvergleich | kein öffentlicher Aptnachweis |
+| GATE-J | Identitäten | dynamische Discovery und Counter | keine bloße Zählfreigabe |
+| GATE-K | Negativkontrolle |37 Kontrollen und tatsächlicher Dpkg0/Gate1-Lauf | erwartetes Scheitern sauber getrennt |
+| GATE-L | keine verbotenen PCDs | Source-/Install-/Debianprüfung und Gitobjektschutz | öffentliche alte Kopien nicht entfernt |
+| GATE-M | Lizenz-/Paketressourcen | bestehende Install-/Smokechecks | technische Mitnahme keine Rechtsgesamtfreigabe |
+| GATE-N | Dokumentation | Metadaten/Links/IDs/Schutzvergleich | historische Nachweise erhalten |
+| GATE-O | Maintainerreleasefreigabe | bewusst nicht automatisiert | REQUIRES USER DECISION; nicht aus Gate0 ableiten |
+
+### 24.9 R29-Abnahmematrix und aktuelle Release-Gates
+
+| Kriterium | Anforderung | Lokaler Nachweis | Externer Nachweis | Tatsächlich geprüft | Technischer Status | Offene Maßnahme / Freigabebedarf |
+|---|---|---|---|---|---|---|
+| R29-A | offizielle Mechanismen verstehen |24.3, Parser/Code/Versionen | Deploydetails fehlen | ja, Quellenstand | VERIFIED lokal | bei externem Auftrag eingesetzte Konfiguration prüfen |
+| R29-B | korrekte Testintegration | native Hooks/N/D/R/volle Fälle | echter Source-/PR-Lauf fehlt | ja lokal | VERIFIED lokal | autorisierten Remotecheck ausführen |
+| R29-C | striktes Debiangate | positive/negative reale Runner | operativer externer Pflichtcheck fehlt | ja lokal | VERIFIED lokal | gewählten Releaseprozess verbindlich konfigurieren |
+| R29-D | vollständige Reports | JUnit/CTest/Inventare/Hashes | extern publizierte Reports fehlen | ja lokal | VERIFIED lokal | Upload-/Reportauswertung im echten Job prüfen |
+| R29-E | Fehler wirksam |37Kontrollen und Dpkg0/Gate1 | tatsächliche Required-Check-Wirkung fehlt | ja lokal | VERIFIED lokal | externe positive UND negative Prüfung |
+| R29-F | Farmnähe | unveränderte offizielle Build-/Testskripte, getrennte Dependencies/Container,358Berichte | kein vollständiger GBP-/Jenkins-/Binaryjob | ja, begrenzter Umfang | LOCAL BUILDFARM-LIKE VALIDATION VERIFIED | Grenzen beibehalten; echte Jobs später |
+| R29-G | Remote-GitHubprozess | Workflow/Archivschritt/Pins vorbereitet | kein tatsächlicher Lauf/Branchschutz | nur Datei/Code | NOT VERIFIED | Public-/Remoteauftrag und konfigurierte Required Checks |
+| R29-H | offizielle Farm | Quellen/Flags/Abhängigkeiten lokal bewertet | echte Source-/Binaryjobs fehlen | nein extern | NOT VERIFIED | Teil R22 und gegebenenfalls gewählter R29-Prozessabnahme |
+| R29-I | externe Ergebnisse bewerten | Rezept/Identitäts-/Herkunftsprüfer vorhanden | noch keine externe Job-/Artifactreferenz | nein extern | NOT VERIFIED | autorisierte aktuelle Reports/Artefakte prüfen |
+| R29-J | wirksame offizielle Anbindung abnehmen | lokale technische Vorbereitung erfüllt | Prozessentscheidung und operative Pflicht noch nicht belegt | teilweise | BLOCKED | Maintainer-/Releaseprozess festlegen und Wirksamkeit belegen |
+
+**R29 lokal: LOCAL PREPARATION VERIFIED. Offizielle Integration: NOT VERIFIED. Gesamt: BLOCKED.** Das ist keine neue universelle ROS-Vorschrift. Die tatsächliche R29-Definition verlangt die dauerhafte Auswahl, vollständige Pflichtpostinstallprüfung und wirksame strikte Freigabe im gewählten Prozess. Die technische Implementierung ist lokal belegt; eine Workflowdatei beweist keine aktiven Required Checks oder akzeptierte externe Prozessentscheidung. R29-H/Farmauslieferung ist nicht automatisch eine zwingende R29-Bedingung: je vereinbartem Verfahren kann die wirksame Projektvorabprüfung vor einem offiziellen Binaryrelease abgenommen werden. Für R22/offizielle Farmclaims sind tatsächliche Jobs erforderlich. Öffentliche Aptpakete und vollständiger ROSrelease werden nicht pauschal zur Voraussetzung jeder R29-Teilabnahme erklärt.
+
+Historische Tabellen22.10/23.8 bleiben datierte Nachweise. Folgende Tabelle führt die bestehenden Gate-IDs aktuell fort:
+
+| Gate | Aktueller Status20.10.2026 | Nachweis / offene Maßnahme |
+|---|---|---|
+| R26 Debianinstallation/Runtimeherkunft | LOCALLY VERIFIED erneut | exakte3 Archive, installierte Owner/Versionen/Hashes/ROSIDL; keine Hardwarepflicht |
+| R28 lokale Debian-Testvalidierung | LOCALLY VERIFIED erneut | native243+93/13, vollständige336+13Postinstall,37Kontrollen, tatsächlicher Negativrunner |
+| R29 offizielle Testphasen-/Fehlerwirksamkeit | BLOCKED gesamt | lokale Vorbereitung VERIFIED; operative externe Pflicht/Abnahme NOT VERIFIED |
+| R12 Remote CI | NOT VERIFIED | kombinierter Workflow und gezielte Reportarchivierung vorbereitet, kein Run |
+| R14 konkrete Fremd-/Bundlepflichten | unverändert offen | keine neue pauschale Professorenfrage; bekannte konkrete Rechte-/Noticeaufgaben bleiben separat |
+| R15 lokale Kartenbereinigung | VERIFIED erhalten | vier verbotene Blobs weiterhin abwesend; Publicmigration nicht erfolgt |
+| R16 Eigenentwicklungsbefugnis | verbindliche Erklärung erhalten | eigene Software geklärt, keine neue allgemeine Freigabe verlangt |
+| R17/R20 | öffentlicher Candidate/Index weiterhin offen | keine öffentliche Synchronisation oder Index-PR |
+| R18/R19/R23/R24 | REQUIRES USER DECISION | tatsächliche Releaseversion/Datum, Support und Publikation nicht autorisiert |
+| R21/R22/R27 | offiziell NOT READY/NOT VERIFIED | kein Bloom-/Farm-/Sync-/öffentlicher Aptnachweis |
+
+AP06 lokal VERIFIED einschließlich erhaltener349Identitäten und neuer37Infrastrukturkontrollen; AP07 LOCAL PREPARATION VERIFIED/NOT REMOTELY VERIFIED; AP08 beauftragte Dokumentation VERIFIED; AP09 Humble/Jammy/Python3.10/amd64 unverändert VERIFIED; AP10 öffentliche Gesamtfreigabe weiterhin BLOCKED/NOT READY. Neue Distributionen sind kein zusätzlicher Humbleblocker. Paketversion/Lizenz/Navigation unverändert.
+
+### 24.10 Konkrete externe Handlungskette und Verantwortung
+
+1. Maintainer entscheidet ausdrücklich, welche Kombination aus erforderlichem GitHubcheck, lokalem Releaseprüfgate und gegebenenfalls Farm-/separatem Postinstalljob die verbindliche Testfreigabe bildet. GATE-O bleibt eine menschliche Entscheidung.
+2. Vor Publikation weiterhin konkrete R14-Pflichten sowie Source-/Releaseumfang, Version/Datum, Team und Berechtigungen klären. Eigenentwicklungsbefugnis ist bereits erklärt; keine erneute allgemeine Professorenfreigabe.
+3. Erst mit gesonderter Freigabe die bereits vorbereitete bereinigte Public-main-Migration durchführen; keine alte Historie aus Klonen/Forks mergen. Dieser R29-Auftrag verändert keine Remote-Refs oder Remotekonfiguration.
+4. Den kombinierten Workflow auf dem tatsächlichen Zielcommit ausführen, Rohberichte/Run-Kontext/Artifacthashes abrufen und gegen genau diesen Commit/Tree prüfen. Ein alter grüner Run für einen anderen Commit zählt nicht. PR- und main-Läufe getrennt zuordnen.
+5. Branchschutz/Rulesets und benötigten Statuscheck nach tatsächlichem ersten Jobnamen konfigurieren und durch autorisierte positive/negative Kontroll-PRs verifizieren. Kein lokaler Dateibefund beweist diese Einstellungen. Der derzeitige Jobkey ist humble; den tatsächlichen Checknamen extern bestätigen.
+6. Falls Sourceindex/Sourcejobs gewünscht: public HTTPS-Gitquelle/Zielbranch und rosdistro-Sourceeintrag freigeben; Commit-/PR-Testoptionen bewusst entscheiden, Review abwarten. Humble-PRdefaultfalse aktiviert keine automatische PRabnahme.
+7. Vor autorisiertem Bloomrelease den exakt eingefrorenen Releaseversion-/Changelog-/Tagstand erneut mit dem kombinierten Gate prüfen; vollständige Build-/Postinstallpflicht und Negativwirkung erhalten. Release-Repository/Track/Peers und dauerhafte Testphasenentscheidung reviewen. Keine generierten Regeln ad hoc als Freigabeworkaround patchen.
+8. Bei später autorisierter offizieller Farm: tatsächliche Source-/Binary-/gegebenenfalls Source-/PR-Testjobs, eingesetzte Konfiguration, Reports und exakte Artefaktherkunft auswerten. Fehlende oder nur UNSTABLE bewertete Prüfungen nicht als Projektfreigabe behandeln. Pflichtpostinstall separat wirksam durchführen, wenn im offiziellen Job nicht enthalten.
+9. Erst nach erfüllten konkreten Prozess-/Artefaktkriterien R29 operativ abnehmen beziehungsweise für R22/R27 offizielle Jobs/Sync/Aptlieferung bestätigen. Keine vorweggenommene VERIFIED-Bewertung und keine Veröffentlichung durch diesen Plan.
+
+### 24.11 Commit- und Nachweisintegrität
+
+Neue main-Commits:
+
+- 88d6c7ef8d9d30006ff87da60563be496915a6dc – ci(ros): bind mandatory Humble release test phases; IDs052/053 und technische Erstimplementierung.
+- a0b7412a1f98d93520abe6a1ef51892711fecc5d – fix(ci): normalize native pybuild test identities; ID054 und reale Layoutregression. Erster kompletter Erfolg diesem Commit zugeordnet.
+- 8f96970f18cff6ccafcbb0a684456e93986f98e6 – docs(ci): finalize R29 release validation usage; ID055, Aufrufanleitungen und reine Helper-Einrückung. Abschließender vollständiger positiver/negativer Teststand.
+- Nachfolgender docs(research): record R29 local and external acceptance enthält ausschließlich dieses Abschlussprotokoll/ID056. Dessen tatsächlicher finaler SHA steht im Abschlussbericht und privaten technischen final-state.json; kein Amend oder Historyrewrite.
+
+Alle alten001–051-Ereignisse und historische Kapitel11–23 bleiben bytegleich; insbesondere Gitmapping/Migrations-/Lizenzentscheidung und PDF. V4 und alle historischen/Tracking-/Research-/Codexrefs bleiben exakt am Eingang; nur main entwickelt sich vorwärts. 59-Zeilen-Mapping und drei ROSmanifeste/Setups/CMake/Schemata/Launch/YAML/Robotprofile/Lizenztexte sowie17Produktionsmodule bleiben unverändert. Vier verbotene PCD-Blobs bleiben im gesamten erreichbaren Graphen und der Objektdatenbank abwesend. Originalrepository und alte private Sicherung wurden nicht verändert. Aktuelle konkrete Schutzprüfung und finale SHAs im externen final-state.json; alle Forschungsaussagen sind in diesem einzigen Protokoll fortgeschrieben.
+
+Dauerhafte zusätzliche technische Rohbelegsicherung ist separat unter `/home/bauya/Documents/R3D-release-validation/20261020-r29` vorgesehen: aktuelle/erfolglose/negative Runnerlogs und Reports, Kontext-/Hash-/Exits, unveränderte offizielle Quellenstände, lokale Farmreproduktion und Abschlussprüfungen. Diese neue Sicherung ist außerhalb des Kandidaten und **ändert nicht** die private Originalsicherung20261019-cf6486d. Es werden keine alten PCD-Dateien oder alten Gitobjekte importiert. Keine zweite parallele Forschungsdarstellung; technische JSON-/Hashdaten sind Prüfnachweise.
+
+Nach der tatsächlichen finalen Schutz-/Link-/ID-/Lintprüfung werden ausschließlich die dokumentierten finalen Änderungen lokal committed. Kein Push/Force-Push, keine öffentliche Branchänderung, keine Veröffentlichung, keine neue Remotekonfiguration/Tags, kein offizieller Bloom-/Farm-/Indexrelease, keine reale Roboterbewegung und keine R3D_null-Änderung.
+
+
+### 24.12 Tatsächlich bestandene Abschluss- und Schutzprüfung
+
+`acceptance_checks.py` Exit0: alle349 ursprünglichen Pythonpaketidentitäten,343Sourcefreiidentitäten, native243/13Build- und93Installpflichten sowie vollständige336/13Postinstallfälle unverändert;93versiegelte Nachweishashes tatsächlich geprüft. Drei konkrete .debs ohne PCDs,17Produktionsmodule direkt aus Archivtarstreams bytegleich zum Source. Tatsächliche positive und negative neue Runner auf8f96970;37Kontrollfälle, keine unerwarteten FAIL/ERROR/SKIP. Die lokale Farmprobe hat dieselben349Paketidentitäten, ihre streng ausgewerteten358Berichte sind getrennt als LOCAL BUILDFARM-LIKE klassifiziert.
+
+`final_checks.py` Exit0:56fortlaufendeJournal-IDs,15R29-Prüfkategorien,10R29-Abnahmekriterien und15Vorabgates; Markdown-/Tabellen-/Link-/ASTprüfung und Helper-Flake8 ohne Befund. Alte001–051-Ereignisse und historische Kapitel11–23 bytegleich. Alle nicht autorisierten Bestandsdateien,17Produktionsmodule, Schemata/Manifeste/Setups/CMake/Launch/YAML/Profile/Lizenzen und das Gitmapping geschützt. PDF-SHA256 weiterhin8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383; Mapping-SHA256604d809e4923c969edc8e7c12d01c0674b97063137939fed9f3529a69517c534. Vier verbotene Blobs direkt und im erreichbaren Pfadgraphen abwesend. AlleNicht-main-Refs einschließlich V4 und Konfiguration/Remotefreiheit unverändert. Gitfsck und Diffcheck0. Nach dem getesteten8f96970 ausschließlich dieses Abschlussdokument verändert.
+
+Das Originalrepository wurde zusätzlich nur lesend gegen seinen vorherigen98-Dateien-/Config-/HEAD-Nachweis geprüft: unverändertcf6486dc88aeba8a051fee0b2865a21434a0ca39, sauber. Originalbundle unveränderter SHA256e5868e0d0ac7c74e9a491f9c27097b5d83bcb2a23cb96143517965fc7161215c. Keine Datei der alten Sicherung wurde beschrieben. Neue technische Belege werden separat archiviert; deren tatsächlicher Abschlussmanifest-Hash und endgültiger main-HEAD stehen im externen final-state.json und Abschlussbericht, ohne selbstreferenzielle Änderung dieses Commits.
+
+V4-052 bis056 sind für ihren beschriebenen lokalen Analyse-/Implementierungs-/Abnahmeumfang VERIFIED. Das ändert nicht R29 gesamt: lokale Vorbereitung VERIFIED, offizielle operative Anbindung NOT VERIFIED, Gesamtstatus BLOCKED. R26/R28 bleiben lokal verifiziert; AP10 öffentlich NOT READY. Abschlusscommit enthält nur dieses Protokoll; danach erneut Cleanstatus/Refschutz/fsck/Dateivergleich prüfen. Kein Push/Force-Push/Veröffentlichen, keine öffentlichen Branchänderungen, keine offizielle ROS-Index-/Bloom-/Farmaktion, keine neue Remotekonfiguration, kein Tag, keine reale Roboterbewegung und keine R3D_null-Änderung.
