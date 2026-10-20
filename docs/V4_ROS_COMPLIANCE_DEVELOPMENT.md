@@ -1,8 +1,10 @@
 # R3D-Planner V4
 # ROS 2 Compliance Development
 
-Stand: 20. Oktober 2026; fortgeführt bis V4-056 (aktuelle lokale Historien-/main-Migration und neue Humble-/Debian-Abnahme in23; historische Audits in21/22). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
+Stand: 20. Oktober 2026; fortgeführt bis V4-057 (aktuelle lokale Historien-/main-Migration und neue Humble-/Debian-Abnahme in23; historische Audits in21/22). M01 bleibt erhalten, M02 ist ausdrücklich freigegeben, implementiert und auf Humble verifiziert. Verbindliches einziges Entwicklungs-/Releaseziel: ROS2 Humble / Ubuntu22.04 Jammy / Python3.10. Historische Abschnitte beschreiben ihren jeweils datierten Entwicklungsstand; der aktuelle Überblick steht in4,7–9 und22. Historische Rückstellungen und Distributionsbefunde bleiben datierte frühere Entwicklungsstände. Dieses Dokument ist das einzige zentrale Entwicklungsprotokoll für V4. Es trennt den historischen Bestand, geplante Maßnahmen, tatsächlich durchgeführte Änderungen und deren Nachweise. Die Erstinitialisierung verändert ausschließlich dieses Dokument und legt den Branch V4 an. Sie enthält keine Implementierung der Arbeitspakete AP01 bis AP10.
 
+
+**Aktueller Auftrag20.10.2026:** Kapitel25 dokumentiert den autorisierten öffentlichen Git-Migrations-/CI-Auftrag in drei sequenziellen Phasen. Aktueller Stand: Phase1 geprüft, Veröffentlichung/Remote-CI noch nicht ausgeführt. Kapitel25 hat für diesen neuen Auftrag Vorrang; ältere datierte Pushverbote bleiben historische Grenzen. Offizieller ROS-Release einschließlich Index/Bloom/Buildfarm/Tags ist bis erfolgreichen Go2W-Hardwaretests **und** gesonderter späterer Freigabe gesperrt. Keine Hardwaretests in diesem Auftrag.
 
 **Aktuelle R29-Fortsetzung:** Kapitel24 führt die ab20.10.2026 autorisierten Arbeiten auf Kandidaten-main fort. Kapitel23 bleibt unveränderter Migrationsnachweis; V4 bleibt künftig auf2655f1d und wird nicht automatisch nachgeführt.
 
@@ -1590,6 +1592,10 @@ Nur freigegebene additive Konfiguration und opt-in Stopüberwachung. Default dea
 ### V4-056 - Quellengebundene R29-Abnahme und externe Freigabegrenzen abschließen
 
 **Datum:**20. Oktober2026. **AP/Gates:**AP06–AP10, R26/R28/R29. **Ausgang:** sauberer main 8f96970f18cff6ccafcbb0a684456e93986f98e6; V4 unverändert2655f1db419aea08bb488691032149e5e41eb789. **Datei:** ausschließlich dieses zentrale Protokoll. **Fragestellung/Entscheidung:** tatsächliche finale Quellen-/Test-/Archivbindung, alte Fallidentitäten und externe Abnahmegrenzen belegen. **Befehle/Umgebung:** bash scripts/ci/run_humble_release.sh und --failure-probe-Debianrunner, beide auf exakt genanntem Commit; gepinnte Humble/Jammy/amd64/Python3.10-Container. Vollständige normale CI, standardmäßige native Debian-Buildtests, frische komplette Postinstallation,37 Gate-/Integrationskontrollen; ergänzende unveränderte offizielle Sourcejobskripte lokal. **Ergebnisse/Exits:** positiver Gesamteinstieg0,358Berichte/349Pythonpaketfälle+2Header/343Runtime;4CTest/243+93Planner/13Preprocessorbuild und336+13Postinstall. Negative Kontrolle13PASS/1absichtlicherFAIL, Dpkg0/Runner1, keine Runtime. Keine künstlichen Skips. **Betroffene Quellen/Begründung:** offizielle Mechanismen/Versionsbelege24.3, Vergleich und Kriterien24.6–24.10, technische JSONs und Integritätsprüfung. **Vorher/Nachher:** R29 vollständig offen → lokale Vorbereitung/Fehlerwirksamkeit technisch VERIFIED; operative offizielle Anbindung NOT VERIFIED, Gesamtgate BLOCKED. **Nachweise:** neue Rohpfade/Archivhashes/Source-IDs unten; keine alten Läufe als neue ausgegeben. **Git:** tatsächliche Implementierungscommits24.11; eigener finaler SHA im Abschlussbericht und externem final-state.json, kein Amend/Rewrite. **Status:** VERIFIED für den beauftragten lokalen Vorbereitungs-/Nachweisumfang; R28 weiter LOCALLY VERIFIED. **Grenzen:** keine fremden Refs/Remotes/Backups, keine Veröffentlichung/Index/Bloom/Farm/Hardware/R3D_null; AP10 öffentlich weiterhin offen.
+
+### V4-057 - Öffentliche Migration prüfen und verbindlichen Release-Freeze festhalten
+
+**Datum:**20. Oktober2026, ab08:46UTC. **AP/Gates:**AP07/AP08/AP09/AP10, G01–G16, R15/R17/R29. **Ausgang:** sauberer Kandidaten-main ead7a70550e9e9172aca4537bfede356fbbee6f9; V4 unverändert2655f1db419aea08bb488691032149e5e41eb789. **Frage/Entscheidung:** ausdrücklich autorisierte öffentliche Migration ausschließlich main/V1/V2/V3 erst nach vollständigem Preflight; danach echte CI und Required Checks, kein ROS-Release. **Betroffene Dateien/Refs:** dieses Protokoll und öffentliche Source-Refs; Original/Backup unverändert. **Befehle/Funktionen:** git status/show-ref/fsck/diff/ls-remote/rev-list/ls-tree/cat-file; lesende GitHub-REST-Abfragen Repository/Branches/Tags/alle PRs/Rulesets/Branchregeln/Schutz/Hooks/Forks/Workflows/Actionsrechte/Releases. Keine alten Remoteobjekte in Kandidaten importiert. **Umgebung/Nachweise:** Host/System-Python3.10, Git/gh; technische unveränderliche Eingangssnapshots unter/tmp/r3d-public-20261020; lokaler Graph-/59-Tree-Mapping-/PDF-/Backup-/Restorevergleich Exit0. Öffentliche HEADs alle bekannt, vier ungeschützte Branches, keine Tags/PRs/Hooks/Forks/Workflows/Rulesets; Adminrecht vorhanden. Erwartete Schutz-404 ausdrücklich „Branch not protected“, kein fehlendes Zugriffsrecht. Pinned Actions tatsächlich existent geprüft. **Ergebnis:** Phase1 technisch bestanden; G01 nach diesem Dokumentationscommit erneut prüfen. Phase2/3 noch nicht durchgeführt. **Freigabe:** Nutzerauftrag autorisiert genaue refgebundene atomare Migration, keine allgemeine Force-/Mirror-/Securitylockerung. **Freeze/Version:**0.0.1/Forthcoming unverändert; offizielle ROS-Veröffentlichung erst nach erfolgreichem Go2W-Test plus neuer Freigabe; keine hardware/go2w-/hardware/g1-Branches jetzt. **Fehlversuche:** keine Remote-Mutation; erwartete Schutz-404 kein Testfehler. **Commit:** docs(release): record public migration preflight; tatsächliche SHA beim nachfolgenden Ereignis. **Status/Grenze:** VERIFIED Preflight; keine Aussage über noch nicht ausgeführte Remote-CI/Farm/Hardware. Details25.1–25.5.
 
 ## 6. Test- und Validierungsergebnisse
 
@@ -5705,3 +5711,60 @@ Nach der tatsächlichen finalen Schutz-/Link-/ID-/Lintprüfung werden ausschlie�
 Das Originalrepository wurde zusätzlich nur lesend gegen seinen vorherigen98-Dateien-/Config-/HEAD-Nachweis geprüft: unverändertcf6486dc88aeba8a051fee0b2865a21434a0ca39, sauber. Originalbundle unveränderter SHA256e5868e0d0ac7c74e9a491f9c27097b5d83bcb2a23cb96143517965fc7161215c. Keine Datei der alten Sicherung wurde beschrieben. Neue technische Belege werden separat archiviert; deren tatsächlicher Abschlussmanifest-Hash und endgültiger main-HEAD stehen im externen final-state.json und Abschlussbericht, ohne selbstreferenzielle Änderung dieses Commits.
 
 V4-052 bis056 sind für ihren beschriebenen lokalen Analyse-/Implementierungs-/Abnahmeumfang VERIFIED. Das ändert nicht R29 gesamt: lokale Vorbereitung VERIFIED, offizielle operative Anbindung NOT VERIFIED, Gesamtstatus BLOCKED. R26/R28 bleiben lokal verifiziert; AP10 öffentlich NOT READY. Abschlusscommit enthält nur dieses Protokoll; danach erneut Cleanstatus/Refschutz/fsck/Dateivergleich prüfen. Kein Push/Force-Push/Veröffentlichen, keine öffentlichen Branchänderungen, keine offizielle ROS-Index-/Bloom-/Farmaktion, keine neue Remotekonfiguration, kein Tag, keine reale Roboterbewegung und keine R3D_null-Änderung.
+
+
+## 25. Öffentliche Git-Migration, Remote-CI und Release-Freeze, 20. Oktober 2026
+
+### 25.1 Auftrag, Reihenfolge und Referenzschutz
+
+Der neue Nutzerauftrag autorisiert drei nacheinander abzunehmende Phasen: (1) vollständiger lesender Publicpreflight, (2) bereinigte main/V1/V2/V3 veröffentlichen, (3) vollständigen Humbleworkflow, tatsächliche Required Checks sowie positive/negative Kontroll-PRs prüfen. Nur diese Sourceveröffentlichung ist freigegeben. Kein weiterer Historyfilter, keine Originalobjekte in den Kandidaten, kein Mirrorpush, kein V4-Push, keine unbekannten Remotecommits überschreiben. Bestehende Schutzregeln dürften nur nach weiterer ausdrücklicher Zustimmung gelockert werden; hier existieren keine.
+
+Kandidatenpfad bleibt /home/bauya/Desktop/Gits/Github/R3D-Planner-release-candidate. Eingang ead7a70550e9e9172aca4537bfede356fbbee6f9, main sauber, Gitfsck/diffcheck0. V4 bleibt2655f1db419aea08bb488691032149e5e41eb789. Originalrepo sauber cf6486dc88aeba8a051fee0b2865a21434a0ca39. Alle17Produktionsmodule, ROS-Schema/M01/M02/Geometrie/Algorithmen/TF/QoS/Actions/YAML/Robotprofile/Manifeste/Lizenzen unverändert; erlaubter Arbeitsumfang Git/CI/Dokumentation.
+
+### 25.2 Tatsächlicher öffentlicher Eingang,08:46UTC
+
+Repository [RoboProjekt/R3D-Planner](https://github.com/RoboProjekt/R3D-Planner) ist öffentlich, User-owned, aktiv, Default main. Angemeldeter Account RoboProjekt hat admin/maintain/push/pull. Frische Git-Advertisement und REST-Branchabfrage bestätigen genau vier Branches, keine Tags oder speziellen beworbenen/PR-Refs. Alle PRs einschließlich geschlossener:0; Forkliste0, forks_count0. Keine Releases, Actionsworkflows, Repositoryhooks, Rulesets oder effektiven Branchregeln. Alle vier Branches protected=false; jeweilige Protection-API antwortet404 „Branch not protected“. Keine bisherigen Required Checks oder Schutzlockerung. Actions aktiviert, default_workflow_permissions=read, PR-Reviewapproval durch Actions=false, allow_auto_merge=false. Keine ungeprüften Release-Trigger. Die Hooksabfrage speichert nur ID/Typ/Events/Aktivstatus; keine Secrets/Token aufgezeichnet.
+
+GitHub-interne nicht beworbene Objekte, historische Klone und Caches sind keine kontrollierten Branchrefs. Keine vollständige serverseitige Löschgarantie. Selbst nach erfolgreicher Umschaltung können alte direkte Commit-/Blob-URLs, private Klone oder später entstehende Forks alte Daten behalten. Kein Support-/Fork-Löschauftrag. Siehe [GitHub zur Historienentfernung](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository). Keine erneute Veröffentlichung alter Objekte zur Kontrolle.
+
+### 25.3 Vollständige Migrationsmatrix und Pushvertrag
+
+| Remote-Ref | Frisch geprüfter alter Remote-HEAD | Bereinigter lokaler Ref / neues Ziel | Aktion / Force | Erwartung und Verifikation |
+|---|---|---|---|---|
+| refs/heads/main | c65642fe56015556f696364a724cb5b976a27888 | main; Eingang ead7a70550e9e9172aca4537bfede356fbbee6f9 plus dieser reine Preflightcommit | atomarer expliziter refgebundener force-with-lease | aktueller freigegebener main; git ls-remote und unabhängiger Fetch/Treevergleich |
+| refs/heads/V1 | 01348f3285a0e7582f70cc5f2ed3d1bf4b7f904b | V1:35d595ddc0d525c72ffe0c6f904fc5cc5593972d | dieselbe atomare Transaktion; explizite Lease | genau bereinigter historischer Tip, git ls-remote |
+| refs/heads/V2 | 3abd002e8cc9e7a26cacaf43a5c20b1822664f14 | V2:73d5454c23065302105ecf82b243702c99bda717 | dieselbe atomare Transaktion; explizite Lease | genau bereinigter historischer Tip, git ls-remote |
+| refs/heads/V3 | 3752404a08867e9e6f3725300b88e148d4d5be37 | V3:1d6d312e519cf673894fc4df35ef5d3ff4e43996 | dieselbe atomare Transaktion; explizite Lease | genau bereinigter historischer Tip, git ls-remote |
+
+Alle vier benötigen einen nicht-fast-forward Austausch wegen bereits abgeschlossener Bereinigung. Unveränderte lokale origin/* sind bereinigte Tracking-Snapshots und KEINE aktuellen Serverwerte. Exakte erwartete SHAs stammen aus der frischen Serverabfrage; unmittelbar vor Push erneute Gleichheitsprüfung. Nur vier explizite Refspecs, --atomic und je --force-with-lease=refs/heads/NAME:ALTSHA. Kein --force, --all, --tags oder --mirror. Technische refs/codex, refs/research, refs/remotes und V4 werden nicht übertragen. Ein neuer Remote darf nun ausdrücklich konfiguriert werden, mit Fetchumfang nur der vier Sourcebranches; vor der Migration kein Fetch der alten Historie.
+
+### 25.4 Sicherheitsgates vor Veröffentlichung
+
+| Gate | Tatsächlicher Nachweis / Ergebnis |
+|---|---|
+| G01 | Eingang main sauber; nach Preflightcommit nochmals zwingend sauber prüfen |
+| G02 | git fsck --full und diff --check Exit0 |
+| G03 | main/V1/V2/V3/V4 vorhanden, bekannte lokale HEADs |
+| G04 | alle vier verbotenen Blobs im Graphen der vier Publikationsrefs und in Kandidatenobjektdatenbank abwesend; keine PCD-Pfade |
+| G05 |59 Mappingpaare jeweils originaler Tree minus ausschließlich freigegebene Blobs == bereinigter Tree |
+| G06 | privates Originalbundle vorhanden, SHA256e5868e0d0ac7c74e9a491f9c27097b5d83bcb2a23cb96143517965fc7161215c unverändert |
+| G07 | frühere Restoreprüfung59Commits/11Refs tatsächlich dokumentiert; Restore-fsck erneut0; Backup unverändert |
+| G08 | frische ls-remote/REST-Abfrage08:46UTC; unmittelbar vor Push wiederholen |
+| G09 | alle vier Remote-HEADs exakt bekannte Ausgangs-SHAs; keine unbekannte Änderung |
+| G10 | keine Protection/Rulesets; Admin-/Pushrecht vorhanden; keine Lockerung erforderlich |
+| G11 | ausschließlich main/V1/V2/V3, Default main; V4 bleibt lokal |
+| G12 | keine bisherigen Workflows/Webhooks/Releases oder ungeprüften Release-Trigger |
+| G13 | bestehender vollständiger Workflow statisch geprüft, offizielle Pins existent; Hosted Ubuntu22.04/Dockeramd64,35min; echte Laufbarkeit erst Phase3 |
+| G14 | alle drei Manifeste0.0.1; keine Versions-/Changelogänderung |
+| G15 | Workflow nur Test-/Reportschritte; kein ROS-/rosdistro-/Bloom-/Farm-Publish |
+| G16 | kein GitHubrelease-/Tagtrigger und kein Releaseauftrag |
+
+PDF weiter8c3603ec2dac85c5cabcca7ae7e85c8d8c709663fa02fabd09039274a2b35383, Mapping604d809e4923c969edc8e7c12d01c0674b97063137939fed9f3529a69517c534. Originalrepo/Backup unverändert; keine Fremdbranchänderung im Original. Aktuell65Commits von den vier Publikationsrefs erreichbar, weitere lokale technische/historische Refs nicht eingeschlossen. Rohbelege /tmp/r3d-public-20261020/local-before.json, local-verification.json und getrennte REST-/Git-Snapshots; dauerhafte Sicherung am Abschluss separat, nicht in alter Sicherung.
+
+### 25.5 Verbindlicher ROS-Release-Freeze und weitere Entwicklungsphase
+
+Alle Pakete bleiben0.0.1 mit Forthcoming. Öffentlicher Source und erfolgreicher CI-Check sind **kein offizieller ROS-Release**. ROS-Index-/rosdistro-Registrierung, offizieller Bloomrelease, Release-Buildfarmjobs/öffentliche ROS-Debs, Release-Tags und GitHub-Releases bleiben gesperrt bis (a) erfolgreiche dokumentierte Unitree-Go2W-Hardwaretests des aktuellen Stands und (b) separate spätere Nutzerfreigabe. Diese Bedingungen sind kumulativ. Lokale unsigned Test-Debs im bestehenden Testgate sind keine öffentliche Paketdistribution. Keine Hardwaretests oder Bewegung jetzt.
+
+Nach Abschluss soll derselbe finale öffentliche/verifizierte main als gemeinsame spätere Basis hardware/go2w und hardware/g1 dienen; beide Branches werden jetzt nicht angelegt. Konfigurierbare Go2W/G1-Profile und Wiederverwendung einer Go2W-analysierten Karte auf G1 sind spätere Forschungsfragen, keine jetzt implementierten Fähigkeiten oder Blocker. Physische Geometrie/clearance/Frames/Sensoren/Regler und konkretes Mapverfahren müssten vor Wiederverwendung geprüft werden. YAML-Portabilität ersetzt keine Hardwareabnahme. Humble/Jammy/Python3.10/amd64 bleibt das einzige Ziel; Jazzy/Lyrical/Rolling bleiben aufgeschoben und blockieren diesen Humbleauftrag nicht.
+
+AP06/R26/R28 bleiben lokal verifiziert; AP07 wartet hier noch auf echte Remote-CI und Schutzabnahme; AP08 wird mit diesem Protokoll fortgeführt; AP09 Humble-only unverändert; AP10 Sourceveröffentlichung autorisiert, offizieller ROS-Release bewusst eingefroren. R29-Definition24.9 unverändert: dauerhafte Phasenauswahl, striktes Reportgate, vollständige Pflichtpostinstallation und wirksame Prozessbindung. Tatsächliche GitHub- und Farmnachweise bleiben getrennt; noch keine vorweggenommene neue R29-VERIFIED-Bewertung.
