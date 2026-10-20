@@ -27,6 +27,9 @@ jobs:
             /tmp/r3d-release.*/
             /tmp/r3d-ci.*/build-results/**/pytest.xml
             /tmp/r3d-ci.*/build-results/**/*.xunit.xml
+            /tmp/r3d-ci.*/build-results/**/Test.xml
+            /tmp/r3d-ci.*/manifests/
+            /tmp/r3d-ci.*/install/*/share/*/package.xml
             /tmp/r3d-ci.*/runtime-results/*.xml
             /tmp/r3d-debian.*/**/*.xml
             /tmp/r3d-debian.*/**/*.json
