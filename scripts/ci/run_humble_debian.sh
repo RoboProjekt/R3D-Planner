@@ -28,6 +28,7 @@ results=$(mktemp -d /tmp/r3d-debian.XXXXXXXX)
 image=ros:humble-ros-base@sha256:860e53793ccf575e5369b5e9a19939de2bfcfb46a299954d06f54f2af54fed19
 builder_uid=$(id -u)
 if [ "$builder_uid" = 0 ]; then builder_uid=1000; fi
+/usr/bin/python3 -B "$repo/scripts/ci/release_context.py" capture "$repo" "$results/source-context.json"
 created=()
 cleanup() {
   for container in "${created[@]}"; do docker rm -f "$container" >/dev/null 2>&1 || true; done
@@ -39,7 +40,7 @@ created+=("$cid")
 docker start --attach "$cid" 2>&1 | tee "$results/build-driver.log"
 test "$(docker inspect --format '{{.State.ExitCode}}' "$cid")" -eq 0
 mkdir "$results/runtime-results"
-cid=$(docker create --label codex.task=r3d-debian-gate --mount "type=bind,src=$results/debs,dst=/debs,readonly" --mount "type=bind,src=$results/tests,dst=/release-tests,readonly" --mount "type=bind,src=$results/manifests,dst=/manifests,readonly" --mount "type=bind,src=$results/build-evidence.json,dst=/build-evidence.json,readonly" --mount "type=bind,src=$repo/scripts/ci,dst=/release-tools,readonly" --mount "type=bind,src=$results/runtime-results,dst=/results" -e R3D_TEST_UID="$builder_uid" -e ROS_DOMAIN_ID=95 -e ROS_LOCALHOST_ONLY=1 -e RMW_IMPLEMENTATION=rmw_fastrtps_cpp -e PYTHONNOUSERSITE=1 "$image" bash /release-tools/debian_inside.sh runtime)
+cid=$(docker create --label codex.task=r3d-debian-gate --mount "type=bind,src=$results/debs,dst=/debs,readonly" --mount "type=bind,src=$results/tests,dst=/release-tests,readonly" --mount "type=bind,src=$results/manifests,dst=/manifests,readonly" --mount "type=bind,src=$results/build-evidence.json,dst=/build-evidence.json,readonly" --mount "type=bind,src=$results/source-context.json,dst=/source-context.json,readonly" --mount "type=bind,src=$repo/scripts/ci,dst=/release-tools,readonly" --mount "type=bind,src=$results/runtime-results,dst=/results" -e R3D_TEST_UID="$builder_uid" -e ROS_DOMAIN_ID=95 -e ROS_LOCALHOST_ONLY=1 -e RMW_IMPLEMENTATION=rmw_fastrtps_cpp -e PYTHONNOUSERSITE=1 "$image" bash /release-tools/debian_inside.sh runtime)
 created+=("$cid")
 docker start --attach "$cid" 2>&1 | tee "$results/runtime-driver.log"
 test "$(docker inspect --format '{{.State.ExitCode}}' "$cid")" -eq 0

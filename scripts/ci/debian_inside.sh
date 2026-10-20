@@ -29,8 +29,10 @@ mkdir -p /results /work/runtime
 chown r3dtest:r3dtest /results /work/runtime
 if [ "$1" = build ]; then
   apt-get install -y --no-install-recommends python3-bloom fakeroot debhelper dh-python python3-all python3-pytest
+  su --shell /bin/bash r3dtest -c 'python3 -B -m pytest -p no:cacheprovider --junitxml=/results/gate-controls.xml /r3d-source/scripts/ci/tests -q'
   python3 /r3d-source/scripts/ci/debian_release.py build "${@:2}"
 else
+  python3 /release-tools/release_context.py verify-exports /build-evidence.json /source-context.json /debs /release-tests /manifests
   apt-get install -y --no-install-recommends /debs/*.deb
   apt-get check
   rosdep install --from-paths /manifests --ignore-src --rosdistro humble --os=ubuntu:jammy -y

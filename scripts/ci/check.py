@@ -49,7 +49,9 @@ def check(root):
     steps = workflow['jobs']['humble']['steps']
     assert steps[0]['uses'] == 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
     assert steps[0]['with']['persist-credentials'] is False
-    assert steps[1]['run'] == 'bash scripts/ci/run_humble.sh'
+    assert steps[1]['run'] == 'bash scripts/ci/run_humble_release.sh'
+    assert steps[2]['uses'] == 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
+    assert steps[2]['if'] == 'always()'
     documents = [root/'README.md', root/'INSTALL.md', root/'r3d_interfaces/README.md']
     documents += list((root/'docs').glob('*.md'))
     for document in documents:

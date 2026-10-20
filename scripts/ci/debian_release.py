@@ -28,6 +28,7 @@ import shutil
 import subprocess
 
 from release_gate import coverage, ctest, junit
+from release_context import bind_exports, verify_exports, verify_source
 
 PACKAGES = ('r3d_interfaces', 'r3d_preprocessor', 'r3d_planner')
 
@@ -95,6 +96,8 @@ def build(source, results, failure_probe):
     from bloom.generators.debian.generate_cmd import place_template_files, process_template_files
     from bloom.generators.rosdebian import RosDebianGenerator
 
+    context = json.loads((results/'source-context.json').read_text())
+    verify_source(context, source)
     work = Path('/work/debian-release')
     work.mkdir(parents=True)
     packages = {name: parse_package(source/name) for name in PACKAGES}
@@ -104,7 +107,7 @@ def build(source, results, failure_probe):
     generator.packages = packages
     exports = results/'tests'
     exports.mkdir()
-    evidence = {}
+    evidence = {'_context': context}
     for name, package in packages.items():
         destination = work/name
         shutil.copytree(source/name, destination, ignore=shutil.ignore_patterns(
@@ -145,12 +148,8 @@ def build(source, results, failure_probe):
         if name != 'r3d_interfaces':
             expected = collect(directory, results/(name+'-collection.log'))
         report = directory/'build-tests.xml'
-        environment = os.environ.copy()
-        environment['PYBUILD_TEST_PYTEST'] = '1'
-        environment['PYBUILD_TEST_ARGS'] = (
-            '-p no:cacheprovider -m "not installed" --junitxml='+str(report))
         run(['dpkg-buildpackage', '-us', '-uc', '-b'],
-            results/(name+'-build.log'), directory, user=True, env=environment)
+            results/(name+'-build.log'), directory, user=True)
         if name == 'r3d_interfaces':
             shutil.copytree(directory/'.obj-x86_64-linux-gnu/Testing', results/'interface-ctest')
             shutil.copytree(directory/'.obj-x86_64-linux-gnu/test_results',
@@ -166,6 +165,14 @@ def build(source, results, failure_probe):
                 deferred = collect(directory, results/(name+'-installed-collection.log'),
                                    'installed')
             coverage(expected, actual+deferred)
+            phase = json.loads((directory/'build-phase.json').read_text())
+
+            def canonical(nodes):
+                return [node.removeprefix('test/') for node in nodes]
+            coverage(expected, canonical(phase['expected']))
+            coverage(actual, canonical(phase['selected']))
+            coverage(deferred, canonical(phase['installed_required']))
+            shutil.copyfile(directory/'build-phase.json', results/(name+'-build-phase.json'))
             shutil.copytree(source/name/'test', exports/name/'test')
             data = {'expected': expected, 'build_cases': actual, 'installed_required': deferred}
         candidates = list(work.glob('ros-humble-'+name.replace('_', '-')+'_*.deb'))
@@ -187,6 +194,9 @@ def build(source, results, failure_probe):
     for name in PACKAGES:
         (results/'manifests'/name).mkdir()
         shutil.copyfile(source/name/'package.xml', results/'manifests'/name/'package.xml')
+    verify_source(context, source)
+    evidence['_exports'] = bind_exports(results, context)
+    (results/'build-evidence.json').write_text(json.dumps(evidence, indent=2))
     print('DEBIAN_BUILD_TEST_GATE_PASS')
 
 
@@ -197,6 +207,8 @@ def runtime(results):
             raise ValueError('Source/build overlay in runtime: ' + path)
     record_environment(results, 'runtime')
     reference = json.loads(Path('/build-evidence.json').read_text())
+    context = json.loads(Path('/source-context.json').read_text())
+    verify_exports(reference, context, '/debs', '/release-tests', '/manifests')
     summary = {}
     for name in ('r3d_preprocessor', 'r3d_planner'):
         directory = Path('/release-tests')/name
@@ -214,6 +226,7 @@ def runtime(results):
     run(['/usr/bin/python3', '/release-tools/debian_smoke.py', '/debs', str(results)],
         results/'smoke.log', user=True)
     (results/'installed-evidence.json').write_text(json.dumps(summary, indent=2))
+    (results/'source-context.json').write_text(json.dumps(context, indent=2))
     print('DEBIAN_INSTALLED_TEST_GATE_PASS')
 
 
@@ -229,7 +242,8 @@ def main():
     for name in ('DEB_BUILD_OPTIONS', 'DEB_BUILD_PROFILES'):
         if 'nocheck' in os.environ.get(name, '').split():
             raise ValueError('nocheck is forbidden in the release validation')
-    if os.environ.get('PYTEST_ADDOPTS'):
+    if any(os.environ.get(name) for name in (
+            'PYTEST_ADDOPTS', 'PYBUILD_TEST_ARGS', 'PYBUILD_TEST_PYTEST')):
         raise ValueError('External pytest selection flags are not allowed')
     if args.phase == 'build':
         build(args.source, args.results, args.failure_probe)
