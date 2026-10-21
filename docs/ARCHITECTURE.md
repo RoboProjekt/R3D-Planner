@@ -230,13 +230,17 @@ odometry, or the sensor installation.
    base frame at measurement time before this existing ROI test.
 3. Transform the configured Odometry base pose into map and use XY/yaw.
 4. Select a path point at least 0.5 m ahead.
-5. Reduce speed and turning in narrow areas; otherwise command at most 0.35 m/s
-   and 0.6 rad/s.
+5. Apply the selected robot profile's linear/normal-angular velocity limits
+   (Go2W:0.35 m/s and0.6 rad/s), retaining the existing narrow/turning factors
+   and separate narrow steering cap. Reject incompatible narrow tuning at startup.
 6. Publish `geometry_msgs/msg/Twist` to `/cmd_vel` every 0.1 s.
 
 The controller does not directly process path Z, `/stair_detect`, or the cliff
 wall. It completes a path at 0.2 m XY distance from the goal. Values are
-loaded from the central path_follower section. Missing or stale pose input
+loaded from the central path_follower section except the two speed limits,
+which come exclusively from robot.velocity_limits. The follower validates the
+selected profile before command startup, rejects conflicting ROS overrides and
+exposes matching read-only speed parameters. Missing or stale pose input
 produces a zero Twist, but external command supervision remains necessary.
 
 ## Node and executable mapping

@@ -23,6 +23,10 @@ source install/setup.bash
 ## Configure and use
 
 Edit r3d_planner/config/planner_config.yaml; robot_config selects robots/Go2W.yaml.
+The selected profile owns robot.velocity_limits.max_linear_speed (Go2W0.35 m/s)
+and max_angular_speed (Go2W0.6 rad/s), not global path_follower. Both must be
+finite positive numbers; startup conflicts and missing/invalid values are rejected.
+Keep the existing narrow steering cap within the profile angular maximum.
 V4 bundles no PCD maps. Set maps.pcd_path/maps.map_name to your own suitable
 input/classified output; the selected path must be configured and exist.
 Copied installs can set R3D_CONFIG_DIR to a user-owned central YAML/robot directory.
