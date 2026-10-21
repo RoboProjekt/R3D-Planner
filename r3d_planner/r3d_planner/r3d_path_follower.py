@@ -36,7 +36,8 @@ from geometry_msgs.msg import Twist
 from r3d_interfaces.msg import PathWithMetadata
 from sensor_msgs.msg import PointCloud2
 from .cloud import read_xyz
-from .configuration import MONITOR_DEFAULTS, monitoring_settings
+from .configuration import (ConfigurationError, MONITOR_DEFAULTS, load_robot_profile,
+                            monitoring_settings, number, ros_parameters, validate_velocity_tuning)
 import math
 from .odometry import OdometryInput
 from .path_metadata import metadata_qos, validate_metadata
@@ -45,11 +46,24 @@ from .obstacle_monitor import ObstacleMonitor
 
 class PathFollower(Node):
     def __init__(self):
+        profile_path, profile = load_robot_profile()
+        limits = ros_parameters(profile['velocity_limits'])
         super().__init__('r3d_path_follower')
+        try:
+            for key, value in limits.items():
+                self.declare_parameter(key, value, ParameterDescriptor(read_only=True))
+                actual = self.get_parameter(key).value
+                number(actual, 'robot.velocity_limits.' + key)
+                if actual != value:
+                    raise ConfigurationError(f'{key}: ROS override conflicts with '
+                                             f'selected robot profile {profile_path}')
+                setattr(self, key, actual)
+        except Exception:
+            super().destroy_node()
+            raise
 
         # --- PARAMETER ---
-        defaults = {'lookahead_distance': 0.5, 'max_linear_speed': 0.35,
-                    'max_angular_speed': 0.6, 'stop_distance': 0.6, 'goal_tolerance': 0.2,
+        defaults = {'lookahead_distance': 0.5, 'stop_distance': 0.6, 'goal_tolerance': 0.2,
                     'control_period_sec': 0.1, 'obstacle_x_min': 0.1,
                     'obstacle_half_width': 0.3, 'max_angular_speed_narrow': 0.2,
                     'angle_threshold': 0.5, 'steering_gain': 1.5,
@@ -58,6 +72,15 @@ class PathFollower(Node):
         for key, value in defaults.items():
             self.declare_parameter(key, value)
             setattr(self, key, self.get_parameter(key).value)
+        try:
+            validate_velocity_tuning({key: getattr(self, key) for key in (
+                'max_angular_speed_narrow', 'narrow_speed_factor', 'turning_speed_factor')},
+                limits)
+        except ConfigurationError:
+            super().destroy_node()
+            raise
+        self.get_logger().info(f'Robot velocity limits from {profile_path}: '
+                               f'{self.max_linear_speed} m/s, {self.max_angular_speed} rad/s')
         self.odometry = OdometryInput(self)
         monitoring = {}
         for key, value in MONITOR_DEFAULTS.items():

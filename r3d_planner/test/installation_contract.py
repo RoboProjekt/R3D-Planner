@@ -26,3 +26,9 @@ def assert_installed_module(package, filename):
     location = Path(filename).resolve()
     assert location.is_relative_to(prefix), (package, str(location), str(prefix))
     return location
+
+
+def synthetic_velocity_profile():
+    """Supply explicit legacy test inputs to isolated controller unit harnesses."""
+    return 'synthetic-unit-profile', {'velocity_limits': {
+        'max_linear_speed': 0.35, 'max_angular_speed': 0.6}}

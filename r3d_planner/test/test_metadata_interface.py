@@ -30,6 +30,8 @@ from rclpy.serialization import serialize_message, deserialize_message
 from r3d_interfaces.msg import PathWithMetadata
 from std_msgs.msg import Header
 
+from installation_contract import synthetic_velocity_profile
+
 from r3d_planner.path_metadata import build_path, metadata_qos, validate_metadata
 from r3d_planner.r3d_path_follower import PathFollower
 
@@ -97,7 +99,9 @@ def make_follower():
     def init(node, *args, **kwargs):
         kwargs['parameter_overrides'] = [Parameter('cmd_vel_topic', value='/m01_test/cmd_vel')]
         original(node, *args, **kwargs)
-    with patch.object(Node, '__init__', init):
+    with patch.object(Node, '__init__', init), patch(
+            'r3d_planner.r3d_path_follower.load_robot_profile',
+            side_effect=synthetic_velocity_profile):
         node = PathFollower()
     node.timer.cancel()
     return node

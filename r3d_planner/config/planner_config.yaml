@@ -70,8 +70,6 @@ rviz_interface:
 # Used only by the explicitly started follower.launch.py (can command motion).
 path_follower:
   lookahead_distance: 0.5
-  max_linear_speed: 0.35
-  max_angular_speed: 0.6
   stop_distance: 0.6
   goal_tolerance: 0.2
   control_period_sec: 0.1

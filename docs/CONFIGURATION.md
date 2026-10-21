@@ -4,11 +4,14 @@
 
 `r3d_planner/config/planner_config.yaml` is the central entry point. Its
 `robot_config` path is relative to that directory and must stay inside it.
-`robots/Go2W.yaml` owns geometry and robot interfaces; central sections own
+`robots/Go2W.yaml` owns geometry, robot interfaces and velocity limits; central sections own
 algorithm settings. `shared` is forwarded to both analysis and reconstruction.
 There is no merge precedence between competing definitions: the schema rejects
-misplaced, missing, unknown and duplicate keys. Launch parameters override the
-deliberate standalone-node defaults; defaults never override YAML.
+misplaced, missing, unknown and duplicate keys. Other launch parameters override
+the deliberate standalone-node defaults; defaults never override YAML. The two
+profile-owned speed limits have no standalone fallback: the follower validates
+the selected profile before its command publisher/timer, accepts only identical
+startup ROS values, and declares both visible speed parameters read-only.
 
 The loader reads both files anew on each launch and logs their resolved paths.
 With optional developer `colcon build --symlink-install`, module and configuration
@@ -37,6 +40,8 @@ change, regenerate the analyzed PCD before planning.
 | `geometry.robot_narrow_radius_cm` | 30.0 | Tight collision radius, cm |
 | `geometry.robot_radius_cm` | 40.0 | Normal safety radius, cm |
 | `geometry.robot_base_clearance_cm` | 10.0 | Collision-check lower clearance above floor, cm |
+| `velocity_limits.max_linear_speed` | 0.35 | Positive finite forward speed bound, m/s |
+| `velocity_limits.max_angular_speed` | 0.6 | Positive finite normal steering bound, rad/s |
 | `odometry.topic` | `/lidar_odometry` | Standard `nav_msgs/msg/Odometry` input |
 | `odometry.odom_frame` | `odom` | Required Odometry header frame |
 | `odometry.base_frame` | `base_link` | Required Odometry child frame |
@@ -182,8 +187,6 @@ identity. Use an external global localizer if this assumption is not satisfied.
 | `path_follower` key | Default | Unit / effect |
 |---|---:|---|
 | `lookahead_distance` | 0.5 | m; target selection distance |
-| `max_linear_speed` | 0.35 | m/s; maximum forward speed |
-| `max_angular_speed` | 0.6 | rad/s; normal steering limit |
 | `stop_distance` | 0.6 | m; obstacle corridor upper X bound |
 | `goal_tolerance` | 0.2 | m; XY goal completion distance |
 | `control_period_sec` | 0.1 | s; control timer period |
@@ -193,6 +196,45 @@ identity. Use an external global localizer if this assumption is not satisfied.
 | `steering_gain` | 1.5 | 1/s; angular error to yaw rate |
 | `narrow_speed_factor`, `turning_speed_factor` | 0.4, 0.3 | dimensionless factors, >0 and <=1 |
 
+The two speed bounds are mandatory under the selected robot's `velocity_limits`,
+not in this global table. All other existing Go2W robot fields remain unchanged:
+
+```yaml
+# Excerpt within the existing robot mapping; retain name/geometry/odometry/topics.
+robot:
+  velocity_limits:
+    max_linear_speed: 0.35  # m/s
+    max_angular_speed: 0.6  # rad/s
+```
+
+Both values require finite strictly positive int/float YAML scalars; int spelling
+is normalized to ROS double. Null, bool, string, negative, NaN/Infinity, container,
+missing and duplicate definitions are rejected. Zero is deliberately unsupported:
+it was already invalid under the original positive-value schema, and the narrow
+rotation branch has an independent angular cap. Stop through the existing stop/
+monitoring contracts; do not use a zero profile as a new controller mode.
+
+Normal mode keeps `linear.x = max_linear_speed` or that value times
+`turning_speed_factor`; `angular.z` keeps its existing steering clamp. Narrow mode
+keeps zero or `max_linear_speed * narrow_speed_factor` in X and its separate
+`max_angular_speed_narrow` clamp in Z. `linear.y` remains zero; there is no new
+planar-vector clamp. The narrow cap must be <= the selected profile angular limit,
+and both speed factors must remain <=1. An incompatible profile/tuning pair is
+rejected at startup, never silently capped or substituted. A future robot needing
+an angular maximum below the existing narrow tuning needs a separately reviewed
+compatible tuning configuration; this migration does not invent its values.
+
+Profile selection and path confinement are unchanged. The common profile reader
+validates once per load; the launch and child follower processes each read their
+own current selected files. Matching ROS startup values forwarded by launch are
+accepted, conflicting overrides are rejected, and runtime writes of either speed
+parameter fail. This intentionally changes their former override priority to make
+the selected profile authoritative. Invalid profiles fail before any command
+publisher exists. Direct `ros2 run` uses the same selected profile without needing
+a map file merely to construct the follower; full launch retains its existing
+map validation. To migrate an older external configuration, remove both global
+keys and add them to its chosen robot profile; no fallback or automatic rewrite.
+
 Controller settings are general tuning values, but must be checked against the
 selected robot's limits. Missing/stale Odometry or missing global TF produces a
 zero Twist; this does not replace an external command watchdog.
@@ -200,7 +242,9 @@ zero Twist; this does not replace an external command watchdog.
 ## Add or select another robot
 
 1. Copy `robots/Go2W.yaml` to a new file under the same directory.
-2. Set its name, dimensions, odometry topic/frames, cloud and command topics.
+2. Set its name, dimensions, odometry topic/frames, cloud/command topics and validated
+   finite positive `velocity_limits` for that robot. Do not copy Go2W speeds as
+   evidence of another robot's safe operating limits.
 3. Change `robot_config` in the central YAML to the new relative filename.
 4. Recheck sensor axes, PointCloud2 binary layout and controller safety limits.
 5. Restart preprocessing to regenerate the map, then restart the planner.
