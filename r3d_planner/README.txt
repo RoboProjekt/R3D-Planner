@@ -8,7 +8,11 @@ package boundaries and existing generic interface names are retained on V4.
 
 The stable entry point is config/planner_config.yaml. robot_config selects a
 relative robots/<robot>.yaml. The default robots/Go2W.yaml owns robot dimensions,
-Odometry topic/frames and hardware cloud/command topics. The central file owns
+Odometry topic/frames, hardware cloud/command topics and robot.velocity_limits.
+Go2W retains max_linear_speed0.35 m/s and max_angular_speed0.6 rad/s.
+Its profile also owns max_angular_speed_narrow0.2 rad/s and
+narrow_speed_factor0.4, giving 0.14 m/s forward in narrow areas. All four
+keys are removed from global path_follower; zero/rotation-only stops remain valid. The central file owns
 shared graph settings, map paths, preprocessing, perception and controller tuning.
 
 ```bash
@@ -37,7 +41,12 @@ restart. With a copy build, edit user configuration rather than package share.
 V4 ships no PCD maps. Set the selected maps.pcd_path/maps.map_name to your own
 file; empty shipped values fail explicitly without a fallback. See ../docs/CONFIGURATION.md for all keys, units, validation,
 ownership and robot-selection instructions. Direct ros2 run is developer-only
-and does not automatically load the central YAML.
+and does not automatically load all central tuning. The follower does load the
+selected robot profile for its mandatory finite positive velocity limits. Those
+ROS parameters are read-only; conflicting startup overrides, missing/invalid
+profiles or tuning above the profile bounds abort before command startup.
+Zero limits are unsupported. Profile selection uses R3D_CONFIG_DIR or the normal
+source/ament-share lookup; no hard-coded Go2W fallback exists.
 
 ## Nodes
 

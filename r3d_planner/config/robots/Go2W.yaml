@@ -5,6 +5,11 @@ robot:
     robot_narrow_radius_cm: 30.0
     robot_radius_cm: 40.0
     robot_base_clearance_cm: 10.0
+  velocity_limits:
+    max_linear_speed: 0.35  # m/s
+    max_angular_speed: 0.6  # rad/s
+    max_angular_speed_narrow: 0.2  # rad/s
+    narrow_speed_factor: 0.4  # linear speed = max_linear_speed * factor
   odometry:
     topic: /lidar_odometry
     odom_frame: odom

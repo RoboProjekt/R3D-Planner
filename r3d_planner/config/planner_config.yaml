@@ -70,17 +70,13 @@ rviz_interface:
 # Used only by the explicitly started follower.launch.py (can command motion).
 path_follower:
   lookahead_distance: 0.5
-  max_linear_speed: 0.35
-  max_angular_speed: 0.6
   stop_distance: 0.6
   goal_tolerance: 0.2
   control_period_sec: 0.1
   obstacle_x_min: 0.1
   obstacle_half_width: 0.3
-  max_angular_speed_narrow: 0.2
   angle_threshold: 0.5
   steering_gain: 1.5
-  narrow_speed_factor: 0.4
   turning_speed_factor: 0.3
   # Startup-only: independent of components.live_filter.enabled.
   obstacle_monitoring:

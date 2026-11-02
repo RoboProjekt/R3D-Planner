@@ -40,7 +40,7 @@ from std_msgs.msg import Header
 from sensor_msgs.msg import PointCloud2
 from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
 
-from installation_contract import assert_installed_module
+from installation_contract import assert_installed_module, synthetic_velocity_profile
 
 from r3d_planner.cloud import create_cloud_xyz32
 from r3d_planner.path_metadata import metadata_qos
@@ -69,7 +69,9 @@ class Harness:
             kwargs['cli_args'] = ['--ros-args', '-r', '/global_path_metadata:=metadata']
             kwargs['parameter_overrides'] = [Parameter(k, value=v) for k, v in overrides.items()]
             original(node, *args, **kwargs)
-        with patch.object(Node, '__init__', init):
+        with patch.object(Node, '__init__', init), patch(
+                'r3d_planner.r3d_path_follower.load_robot_profile',
+                side_effect=synthetic_velocity_profile):
             self.follower = PathFollower()
         self.observer = Node('observer', namespace=self.namespace)
         self.executor = SingleThreadedExecutor()

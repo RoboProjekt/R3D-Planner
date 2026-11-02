@@ -158,8 +158,8 @@ r3d_planner/config/
 ```
 
 `robot_config: robots/Go2W.yaml` selects the robot. Robot geometry, odometry
-topic/frames, sensor input and command topic belong exclusively to that robot
-YAML. General settings belong to the central file; shared graph settings are
+topic/frames, sensor input, command topic and velocity limits belong exclusively
+to that robot YAML. General settings belong to the central file; shared graph settings are
 forwarded to both analysis and planning. Unknown, duplicate or missing keys and
 invalid values fail at startup.
 
@@ -172,7 +172,22 @@ invalid values fail at startup.
 | `components` | Independent Live Filter and RViz-interface launch switches |
 | `live_filter` | Sensor-coordinate perception thresholds |
 | `rviz_interface` | XY matching radius and optional calibration TF ownership |
-| `path_follower` | Lookahead, speed limits and controller thresholds; explicit motion launch only |
+| `path_follower` | Lookahead, general turning factor and controller thresholds; explicit motion launch only |
+
+The selected profile owns `robot.velocity_limits.max_linear_speed` (m/s) and
+`robot.velocity_limits.max_angular_speed` (rad/s). Go2W retains **0.35 m/s** and
+**0.6 rad/s**. The same profile also owns `max_angular_speed_narrow: 0.2`
+(rad/s) and `narrow_speed_factor: 0.4`: narrow forward speed remains
+**0.14 m/s**. All four keys are absent from global `path_follower` settings.
+The follower reads the selected profile at startup, validates all finite positive
+values and exposes matching read-only ROS parameters. Missing/invalid values,
+leftover global keys during launch, or conflicting startup overrides abort startup;
+there is no Go2W fallback. Zero limits are unsupported. The existing independent
+`max_angular_speed_narrow` must not exceed the profile's normal angular limit and
+`narrow_speed_factor` must not exceed 1. Inconsistent profiles are rejected.
+Reduced speed is not an enforced minimum: rotation-only and safety stops still
+produce zero forward commands. General `turning_speed_factor` stays global. Select another permitted
+profile with `robot_config`, then restart; no G1 limits or hardware support are implied.
 
 See [the full parameter reference](docs/CONFIGURATION.md) for names, units,
 validation, default values and adding a robot.

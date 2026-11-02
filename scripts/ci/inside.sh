@@ -54,7 +54,7 @@ for name in ['conftest.py','installation_contract.py','test_configuration.py',
              'test_installation.py','test_pointcloud.py','test_metadata_interface.py',
              'test_action_interface.py','test_composition_interface.py',
              'test_obstacle_monitor.py','test_obstacle_monitor_ros.py',
-             'test_obstacle_geometry.py']:
+             'test_obstacle_geometry.py','test_velocity_limits.py']:
  shutil.copyfile(Path('/work/ci/src/r3d_planner/test')/name,root/'runtime-tests'/name)
 shutil.copyfile('/work/ci/src/r3d_preprocessor/test/test_output.py',root/'runtime-tests/test_output.py')
 for name in ['r3d_interfaces','r3d_preprocessor','r3d_planner']:

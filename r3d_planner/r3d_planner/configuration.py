@@ -139,14 +139,9 @@ def ros_parameters(values, integer_keys=()):
             for key, value in values.items()}
 
 
-def load_configuration(path=None, mode='planner'):
-    if mode not in ('planner', 'preprocessor', 'map', 'follower'):
-        raise ConfigurationError(f'Unknown launch mode: {mode}')
-    path = Path(path).resolve() if path else default_config_path()
-    cfg = read_yaml(path)
-    keys(cfg, ['robot_config', 'maps', 'shared', 'preprocessing', 'planner',
-               'components', 'live_filter', 'rviz_interface', 'path_follower'], str(path))
-    text(cfg['robot_config'], 'robot_config')
+def _read_robot_profile(path, cfg):
+    """Resolve and validate one selected robot, including mandatory velocity limits."""
+    text(cfg.get('robot_config'), 'robot_config')
     robot_path = Path(cfg['robot_config'])
     if robot_path.is_absolute():
         raise ConfigurationError('robot_config must be relative to planner_config.yaml')
@@ -156,8 +151,19 @@ def load_configuration(path=None, mode='planner'):
     robot = read_yaml(robot_path)
     keys(robot, ['robot'], str(robot_path))
     robot = robot['robot']
-    keys(robot, ['name', 'geometry', 'odometry', 'topics'], 'robot')
+    keys(robot, ['name', 'geometry', 'odometry', 'topics', 'velocity_limits'], 'robot')
     text(robot['name'], 'robot.name')
+    keys(robot['velocity_limits'], ['max_linear_speed', 'max_angular_speed',
+                                    'max_angular_speed_narrow', 'narrow_speed_factor'],
+         'robot.velocity_limits')
+    for key, value in robot['velocity_limits'].items():
+        number(value, 'robot.velocity_limits.' + key)
+    limits = robot['velocity_limits']
+    if limits['narrow_speed_factor'] > 1:
+        raise ConfigurationError('robot.velocity_limits.narrow_speed_factor must be <= 1')
+    if limits['max_angular_speed_narrow'] > limits['max_angular_speed']:
+        raise ConfigurationError('robot.velocity_limits.max_angular_speed_narrow must be <= '
+                                 'robot.velocity_limits.max_angular_speed')
     geometry = robot['geometry']
     keys(geometry, ['robot_height_cm', 'robot_narrow_radius_cm', 'robot_radius_cm',
                     'robot_base_clearance_cm'], 'robot.geometry')
@@ -175,6 +181,31 @@ def load_configuration(path=None, mode='planner'):
     keys(robot['topics'], ['pointcloud', 'cmd_vel'], 'robot.topics')
     for key, value in robot['topics'].items():
         text(value, 'robot.topics.' + key, topic=True)
+    return robot_path, robot
+
+
+def load_robot_profile(path=None):
+    """Read the selected profile once, without requiring a map for a bare follower."""
+    path = Path(path).resolve() if path else default_config_path()
+    return _read_robot_profile(path, read_yaml(path))
+
+
+def validate_velocity_tuning(follower):
+    """Keep general turning tuning within the selected robot speed bound."""
+    number(follower['turning_speed_factor'], 'path_follower.turning_speed_factor')
+    if follower['turning_speed_factor'] > 1:
+        raise ConfigurationError('turning_speed_factor must be <= 1')
+
+
+def load_configuration(path=None, mode='planner'):
+    if mode not in ('planner', 'preprocessor', 'map', 'follower'):
+        raise ConfigurationError(f'Unknown launch mode: {mode}')
+    path = Path(path).resolve() if path else default_config_path()
+    cfg = read_yaml(path)
+    keys(cfg, ['robot_config', 'maps', 'shared', 'preprocessing', 'planner',
+               'components', 'live_filter', 'rviz_interface', 'path_follower'], str(path))
+    robot_path, robot = _read_robot_profile(path, cfg)
+    geometry, odometry = robot['geometry'], robot['odometry']
     keys(cfg['maps'], ['pcd_path', 'map_name'], 'maps')
     selected_key = 'pcd_path' if mode == 'preprocessor' else 'map_name'
     maps = {}
@@ -265,10 +296,10 @@ def load_configuration(path=None, mode='planner'):
     if type(rviz['publish_map_odom']) is not bool:
         raise ConfigurationError('rviz_interface.publish_map_odom must be boolean')
     follower = cfg['path_follower']
-    keys(follower, ['lookahead_distance', 'max_linear_speed', 'max_angular_speed',
+    keys(follower, ['lookahead_distance',
                     'stop_distance', 'goal_tolerance', 'control_period_sec', 'obstacle_x_min',
-                    'obstacle_half_width', 'max_angular_speed_narrow', 'angle_threshold',
-                    'steering_gain', 'narrow_speed_factor', 'turning_speed_factor'],
+                    'obstacle_half_width', 'angle_threshold',
+                    'steering_gain', 'turning_speed_factor'],
          'path_follower', optional=('obstacle_monitoring',))
     monitor = monitoring_settings(follower['obstacle_monitoring']) if (
         'obstacle_monitoring' in follower) else monitoring_settings()
@@ -277,9 +308,7 @@ def load_configuration(path=None, mode='planner'):
         number(value, 'path_follower.' + key)
     if follower['obstacle_x_min'] >= follower['stop_distance']:
         raise ConfigurationError('obstacle_x_min must be < stop_distance')
-    for key in ('narrow_speed_factor', 'turning_speed_factor'):
-        if follower[key] > 1:
-            raise ConfigurationError(key + ' must be <= 1')
+    validate_velocity_tuning(follower)
     # ROS double parameters must remain doubles even if YAML uses integer notation.
     common = dict(ros_parameters(geometry), odometry_topic=odometry['topic'],
                   odom_frame=odometry['odom_frame'], base_frame=odometry['base_frame'])
@@ -306,7 +335,9 @@ def load_configuration(path=None, mode='planner'):
         'path_follower': {'odometry_topic': odometry['topic'],
                           'odom_frame': odometry['odom_frame'],
                           'base_frame': odometry['base_frame'],
-                          **ros_parameters(follower), 'map_frame': planner['map_frame'],
+                          **ros_parameters(follower),
+                          **ros_parameters(robot['velocity_limits']),
+                          'map_frame': planner['map_frame'],
                           'odometry_timeout_sec': float(planner['odometry_timeout_sec']),
                           'cmd_vel_topic': robot['topics']['cmd_vel'],
                           **{'obstacle_monitoring.' + k: v for k, v in monitor.items()}},
