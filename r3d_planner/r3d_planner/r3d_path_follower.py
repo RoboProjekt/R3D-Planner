@@ -65,17 +65,15 @@ class PathFollower(Node):
         # --- PARAMETER ---
         defaults = {'lookahead_distance': 0.5, 'stop_distance': 0.6, 'goal_tolerance': 0.2,
                     'control_period_sec': 0.1, 'obstacle_x_min': 0.1,
-                    'obstacle_half_width': 0.3, 'max_angular_speed_narrow': 0.2,
+                    'obstacle_half_width': 0.3,
                     'angle_threshold': 0.5, 'steering_gain': 1.5,
-                    'narrow_speed_factor': 0.4, 'turning_speed_factor': 0.3,
+                    'turning_speed_factor': 0.3,
                     'cmd_vel_topic': '/cmd_vel'}
         for key, value in defaults.items():
             self.declare_parameter(key, value)
             setattr(self, key, self.get_parameter(key).value)
         try:
-            validate_velocity_tuning({key: getattr(self, key) for key in (
-                'max_angular_speed_narrow', 'narrow_speed_factor', 'turning_speed_factor')},
-                limits)
+            validate_velocity_tuning({'turning_speed_factor': self.turning_speed_factor})
         except ConfigurationError:
             super().destroy_node()
             raise

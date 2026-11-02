@@ -75,10 +75,8 @@ path_follower:
   control_period_sec: 0.1
   obstacle_x_min: 0.1
   obstacle_half_width: 0.3
-  max_angular_speed_narrow: 0.2
   angle_threshold: 0.5
   steering_gain: 1.5
-  narrow_speed_factor: 0.4
   turning_speed_factor: 0.3
   # Startup-only: independent of components.live_filter.enabled.
   obstacle_monitoring:

@@ -232,12 +232,14 @@ odometry, or the sensor installation.
 4. Select a path point at least 0.5 m ahead.
 5. Apply the selected robot profile's linear/normal-angular velocity limits
    (Go2W:0.35 m/s and0.6 rad/s), retaining the existing narrow/turning factors
-   and separate narrow steering cap. Reject incompatible narrow tuning at startup.
+   and separate narrow steering cap. The selected robot profile also owns the
+   narrow factor/cap (Go2W: 0.4 and 0.2 rad/s, giving 0.14 m/s forward).
+   Reject incompatible narrow settings at startup; zero/rotation-only commands remain valid.
 6. Publish `geometry_msgs/msg/Twist` to `/cmd_vel` every 0.1 s.
 
 The controller does not directly process path Z, `/stair_detect`, or the cliff
 wall. It completes a path at 0.2 m XY distance from the goal. Values are
-loaded from the central path_follower section except the two speed limits,
+loaded from the central path_follower section except the four velocity settings,
 which come exclusively from robot.velocity_limits. The follower validates the
 selected profile before command startup, rejects conflicting ROS overrides and
 exposes matching read-only speed parameters. Missing or stale pose input

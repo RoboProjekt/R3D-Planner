@@ -153,10 +153,17 @@ def _read_robot_profile(path, cfg):
     robot = robot['robot']
     keys(robot, ['name', 'geometry', 'odometry', 'topics', 'velocity_limits'], 'robot')
     text(robot['name'], 'robot.name')
-    keys(robot['velocity_limits'], ['max_linear_speed', 'max_angular_speed'],
+    keys(robot['velocity_limits'], ['max_linear_speed', 'max_angular_speed',
+                                    'max_angular_speed_narrow', 'narrow_speed_factor'],
          'robot.velocity_limits')
     for key, value in robot['velocity_limits'].items():
         number(value, 'robot.velocity_limits.' + key)
+    limits = robot['velocity_limits']
+    if limits['narrow_speed_factor'] > 1:
+        raise ConfigurationError('robot.velocity_limits.narrow_speed_factor must be <= 1')
+    if limits['max_angular_speed_narrow'] > limits['max_angular_speed']:
+        raise ConfigurationError('robot.velocity_limits.max_angular_speed_narrow must be <= '
+                                 'robot.velocity_limits.max_angular_speed')
     geometry = robot['geometry']
     keys(geometry, ['robot_height_cm', 'robot_narrow_radius_cm', 'robot_radius_cm',
                     'robot_base_clearance_cm'], 'robot.geometry')
@@ -183,16 +190,11 @@ def load_robot_profile(path=None):
     return _read_robot_profile(path, read_yaml(path))
 
 
-def validate_velocity_tuning(follower, limits):
-    """Reject tuning that could exceed a profile bound without changing the controller."""
-    number(follower['max_angular_speed_narrow'], 'path_follower.max_angular_speed_narrow')
-    if follower['max_angular_speed_narrow'] > limits['max_angular_speed']:
-        raise ConfigurationError('path_follower.max_angular_speed_narrow must be <= '
-                                 'robot.velocity_limits.max_angular_speed')
-    for key in ('narrow_speed_factor', 'turning_speed_factor'):
-        number(follower[key], 'path_follower.' + key)
-        if follower[key] > 1:
-            raise ConfigurationError(key + ' must be <= 1')
+def validate_velocity_tuning(follower):
+    """Keep general turning tuning within the selected robot speed bound."""
+    number(follower['turning_speed_factor'], 'path_follower.turning_speed_factor')
+    if follower['turning_speed_factor'] > 1:
+        raise ConfigurationError('turning_speed_factor must be <= 1')
 
 
 def load_configuration(path=None, mode='planner'):
@@ -296,8 +298,8 @@ def load_configuration(path=None, mode='planner'):
     follower = cfg['path_follower']
     keys(follower, ['lookahead_distance',
                     'stop_distance', 'goal_tolerance', 'control_period_sec', 'obstacle_x_min',
-                    'obstacle_half_width', 'max_angular_speed_narrow', 'angle_threshold',
-                    'steering_gain', 'narrow_speed_factor', 'turning_speed_factor'],
+                    'obstacle_half_width', 'angle_threshold',
+                    'steering_gain', 'turning_speed_factor'],
          'path_follower', optional=('obstacle_monitoring',))
     monitor = monitoring_settings(follower['obstacle_monitoring']) if (
         'obstacle_monitoring' in follower) else monitoring_settings()
@@ -306,7 +308,7 @@ def load_configuration(path=None, mode='planner'):
         number(value, 'path_follower.' + key)
     if follower['obstacle_x_min'] >= follower['stop_distance']:
         raise ConfigurationError('obstacle_x_min must be < stop_distance')
-    validate_velocity_tuning(follower, robot['velocity_limits'])
+    validate_velocity_tuning(follower)
     # ROS double parameters must remain doubles even if YAML uses integer notation.
     common = dict(ros_parameters(geometry), odometry_topic=odometry['topic'],
                   odom_frame=odometry['odom_frame'], base_frame=odometry['base_frame'])

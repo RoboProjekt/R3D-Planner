@@ -92,8 +92,10 @@ def test_installed_schema_and_default_profile(installed_share, monkeypatch):
     central = yaml.safe_load((installed_share/'config/planner_config.yaml').read_text())
     source = installed_share/'config/robots/Go2W.yaml'
     robot = yaml.safe_load(source.read_text())['robot']
-    assert robot['velocity_limits'] == {'max_linear_speed': 0.35, 'max_angular_speed': 0.6}
-    assert not {'max_linear_speed', 'max_angular_speed'} & central['path_follower'].keys()
+    assert robot['velocity_limits'] == {
+        'max_linear_speed': 0.35, 'max_angular_speed': 0.6,
+        'max_angular_speed_narrow': 0.2, 'narrow_speed_factor': 0.4}
+    assert not set(robot['velocity_limits']) & central['path_follower'].keys()
     assert all(type(x) in (int, float) and math.isfinite(x)
                for x in robot['velocity_limits'].values())
     actual_path, selected = load_robot_profile()
@@ -108,9 +110,12 @@ def test_installed_schema_and_default_profile(installed_share, monkeypatch):
     with follower() as node:
         assert node.max_linear_speed == 0.35
         assert node.max_angular_speed == 0.6
+        assert node.max_angular_speed_narrow == 0.2
+        assert node.narrow_speed_factor == 0.4
 
 
-@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed'])
+@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed',
+                                 'max_angular_speed_narrow', 'narrow_speed_factor'])
 @pytest.mark.parametrize('bad', [None, '0.35', -0.1, 0, math.nan, math.inf,
                                  -math.inf, True, False, [], {}])
 def test_invalid_profile_value_never_creates_command_publisher(config, monkeypatch, key, bad):
@@ -127,7 +132,8 @@ def test_invalid_profile_value_never_creates_command_publisher(config, monkeypat
             publish.assert_not_called()
 
 
-@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed'])
+@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed',
+                                 'max_angular_speed_narrow', 'narrow_speed_factor'])
 @pytest.mark.parametrize('fault', ['missing', 'duplicate', 'legacy_global'])
 def test_missing_duplicate_and_old_global_are_not_fallbacks(config, monkeypatch, key, fault):
     """Require each selected profile field even if old global Go2W values remain."""
@@ -176,7 +182,8 @@ def test_wrong_selected_profile_has_no_go2w_fallback(config, monkeypatch, fault)
         PathFollower()
 
 
-@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed'])
+@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed',
+                                 'max_angular_speed_narrow', 'narrow_speed_factor'])
 def test_valid_profile_rejects_leftover_global_values(config, key):
     """Do not assign a precedence to contradictory old global definitions."""
     path, central, robot, save = config
@@ -188,7 +195,8 @@ def test_valid_profile_rejects_leftover_global_values(config, key):
         'velocity_limits'][key]
 
 
-@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed'])
+@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed',
+                                 'max_angular_speed_narrow', 'narrow_speed_factor'])
 @pytest.mark.parametrize('value', [0.9, 0.0, math.nan, math.inf, -0.1, '0.35', True])
 def test_ros_override_cannot_replace_profile(config, monkeypatch, key, value):
     """Reject changed startup values rather than silently accepting another authority."""
@@ -199,7 +207,8 @@ def test_ros_override_cannot_replace_profile(config, monkeypatch, key, value):
             pytest.fail('A conflicting speed override constructed a live follower')
 
 
-@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed'])
+@pytest.mark.parametrize('key', ['max_linear_speed', 'max_angular_speed',
+                                 'max_angular_speed_narrow', 'narrow_speed_factor'])
 def test_ros_profile_values_are_read_only(config, monkeypatch, key):
     """Preserve visible typed ROS parameters without a runtime source conflict."""
     path, central, robot, save = config
@@ -222,7 +231,7 @@ def test_inconsistent_tuning_is_rejected_without_new_clamping(config, monkeypatc
     if fault == 'low_angular':
         robot['robot']['velocity_limits']['max_angular_speed'] = 0.1
     elif fault == 'high_narrow':
-        central['path_follower']['max_angular_speed_narrow'] = 0.7
+        robot['robot']['velocity_limits']['max_angular_speed_narrow'] = 0.7
     else:
         central['path_follower']['turning_speed_factor'] = 1.1
     save()
@@ -230,8 +239,8 @@ def test_inconsistent_tuning_is_rejected_without_new_clamping(config, monkeypatc
     with pytest.raises(ConfigurationError):
         load_configuration(path, mode='follower')
     with pytest.raises(ConfigurationError):
-        with follower({key: central['path_follower'][key] for key in (
-                'max_angular_speed_narrow', 'narrow_speed_factor', 'turning_speed_factor')}):
+        with follower({'turning_speed_factor': central['path_follower'][
+                'turning_speed_factor']}):
             pytest.fail('Inconsistent tuning accepted')
 
 
@@ -283,8 +292,8 @@ def test_profile_restart_invalid_transition_and_integer_spelling(config, monkeyp
     path, central, robot, save = config
     monkeypatch.setenv('R3D_CONFIG_DIR', str(path.parent))
     for linear, angular in [(0.35, 0.6), (0.52, 0.9), (1, 1)]:
-        robot['robot']['velocity_limits'] = {
-            'max_linear_speed': linear, 'max_angular_speed': angular}
+        robot['robot']['velocity_limits'].update(
+            max_linear_speed=linear, max_angular_speed=angular)
         save()
         values = load_configuration(path, mode='follower')['path_follower']
         assert all(type(values[key]) is float for key in (
@@ -303,7 +312,8 @@ def test_synthetic_selected_profile_controls_real_cmd_vel(config, monkeypatch):
     path, central, robot, save = config
     alternate = copy.deepcopy(robot)
     alternate['robot']['name'] = 'SyntheticVelocityTestOnly'
-    alternate['robot']['velocity_limits'] = {'max_linear_speed': 0.52, 'max_angular_speed': 0.9}
+    alternate['robot']['velocity_limits'].update(
+        max_linear_speed=0.52, max_angular_speed=0.9)
     (path.parent/'robots/synthetic.yaml').write_text(yaml.safe_dump(alternate))
     central['robot_config'] = 'robots/synthetic.yaml'
     save()
@@ -329,7 +339,9 @@ def test_synthetic_selected_profile_controls_real_cmd_vel(config, monkeypatch):
 def test_namespaced_installed_launch_uses_selected_profile(config, monkeypatch):
     """Start the installed follower launch and query the effective profiled ROS parameters."""
     path, central, robot, save = config
-    robot['robot']['velocity_limits'] = {'max_linear_speed': 0.52, 'max_angular_speed': 0.9}
+    robot['robot']['velocity_limits'].update(
+        max_linear_speed=0.52, max_angular_speed=0.9,
+        max_angular_speed_narrow=0.12, narrow_speed_factor=0.25)
     robot['robot']['topics']['cmd_vel'] = 'cmd'
     robot['robot']['odometry']['topic'] = 'odom'
     save()
@@ -347,6 +359,8 @@ def test_namespaced_installed_launch_uses_selected_profile(config, monkeypatch):
             values = yaml.safe_load(result.stdout)[remote]['ros__parameters']
             assert values['max_linear_speed'] == 0.52
             assert values['max_angular_speed'] == 0.9
+            assert values['max_angular_speed_narrow'] == 0.12
+            assert values['narrow_speed_factor'] == 0.25
             assert process.poll() is None
         finally:
             if process.poll() is None:
@@ -356,3 +370,53 @@ def test_namespaced_installed_launch_uses_selected_profile(config, monkeypatch):
             except subprocess.TimeoutExpired:
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait(timeout=3)
+
+
+@pytest.mark.parametrize('linear,angular,cap,factor', [
+    (0.52, 0.9, 0.12, 0.25), (0.4, 0.5, 0.3, 0.6)])
+@pytest.mark.parametrize('angle', [0.1, 0.4, 0.8, -0.8])
+def test_selected_profile_controls_narrow_ros_output(config, monkeypatch,
+                                                     linear, angular, cap, factor, angle):
+    """Observe reduced speed, both yaw signs and rotation-only from selected profiles."""
+    path, central, robot, save = config
+    alternate = copy.deepcopy(robot)
+    alternate['robot']['name'] = 'SyntheticNarrowTestOnly'
+    alternate['robot']['velocity_limits'] = {
+        'max_linear_speed': linear, 'max_angular_speed': angular,
+        'max_angular_speed_narrow': cap, 'narrow_speed_factor': factor}
+    (path.parent/'robots/narrow-test.yaml').write_text(yaml.safe_dump(alternate))
+    central['robot_config'] = 'robots/narrow-test.yaml'
+    save()
+    monkeypatch.setenv('R3D_CONFIG_DIR', str(path.parent))
+    with follower(load_configuration(path, mode='follower')['path_follower']) as node:
+        observer = Node('narrow_observer', namespace=node.get_namespace())
+        received = []
+        observer.create_subscription(Twist, node.cmd_vel_topic, received.append, 10)
+        try:
+            path_for(node, angle, narrow=True)
+            deadline = time.monotonic()+5
+            while not received and time.monotonic() < deadline:
+                node.control_loop()
+                rclpy.spin_once(node, timeout_sec=0.01)
+                rclpy.spin_once(observer, timeout_sec=0.02)
+            assert received
+            expected_x = 0.0 if abs(angle) > 0.5 else linear*factor
+            assert received[-1].linear.x == pytest.approx(expected_x)
+            assert received[-1].angular.z == pytest.approx(max(-cap, min(cap, angle*1.5)))
+            assert received[-1].linear.y == 0.0
+        finally:
+            observer.destroy_node()
+
+
+def test_narrow_factor_above_one_fails_before_command_start(config, monkeypatch):
+    """A robot's reduced speed cannot exceed its own maximum forward speed."""
+    path, central, robot, save = config
+    robot['robot']['velocity_limits']['narrow_speed_factor'] = 1.01
+    save()
+    monkeypatch.setenv('R3D_CONFIG_DIR', str(path.parent))
+    with pytest.raises(ConfigurationError):
+        load_configuration(path, mode='follower')
+    with patch.object(PathFollower, 'create_publisher') as publish:
+        with pytest.raises(ConfigurationError):
+            PathFollower()
+        publish.assert_not_called()

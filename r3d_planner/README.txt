@@ -9,8 +9,10 @@ package boundaries and existing generic interface names are retained on V4.
 The stable entry point is config/planner_config.yaml. robot_config selects a
 relative robots/<robot>.yaml. The default robots/Go2W.yaml owns robot dimensions,
 Odometry topic/frames, hardware cloud/command topics and robot.velocity_limits.
-Go2W retains max_linear_speed0.35 m/s and max_angular_speed0.6 rad/s; these keys
-are removed from global path_follower. The central file owns
+Go2W retains max_linear_speed0.35 m/s and max_angular_speed0.6 rad/s.
+Its profile also owns max_angular_speed_narrow0.2 rad/s and
+narrow_speed_factor0.4, giving 0.14 m/s forward in narrow areas. All four
+keys are removed from global path_follower; zero/rotation-only stops remain valid. The central file owns
 shared graph settings, map paths, preprocessing, perception and controller tuning.
 
 ```bash

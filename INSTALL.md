@@ -222,9 +222,10 @@ absolute paths and `~` are also accepted. Set general preprocessing,
 graph, filtering and controller tuning in the central YAML and robot dimensions,
 odometry frames/topic, hardware topics and velocity limits in the robot YAML.
 Under `robot.velocity_limits`, Go2W contains `max_linear_speed: 0.35` (m/s) and
-`max_angular_speed: 0.6` (rad/s). These values are absent from the central
-`path_follower` section. When migrating an external user configuration, move both
-keys to its selected robot profile and remove the old global keys. Missing or
+`max_angular_speed: 0.6` (rad/s), `max_angular_speed_narrow: 0.2` (rad/s),
+and `narrow_speed_factor: 0.4` (reduced forward speed 0.14 m/s). All four
+values are absent from the central `path_follower` section. When migrating an
+external user configuration, move these keys to its selected robot profile and remove the old global keys. Missing or
 invalid profile limits stop startup; no automatic/default migration is performed.
 
 With optional developer `--symlink-install`, runtime reads resolve to live source
@@ -338,7 +339,7 @@ cliff or stair outputs. The external Go2W adapter directly forwards commands
 and can change posture during startup. Validate watchdogs, arbitration, emergency
 stop, sensor freshness and cliff handling independently before motion.
 
-The two speed ROS parameters are read-only and must match the selected profile,
+The four profile-owned velocity ROS parameters are read-only and must match the selected profile,
 including under namespaces or direct `ros2 run` startup. Identical launch-forwarded
 values are accepted; differing startup overrides are rejected before the command
 publisher/timer. The profile loader uses `R3D_CONFIG_DIR` or the existing source/
