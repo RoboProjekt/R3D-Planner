@@ -4,9 +4,6 @@ Changelog for package r3d_preprocessor
 Forthcoming
 -----------
 
-* Declare NumPy and Open3D as test dependencies for the existing PCD output tests;
-  retain analysis and runtime behavior.
-* Existing PCD/voxel/clearance/traversability/stair algorithms retained.
-* Consistent metadata/dependencies and installed license/resources.
-* Separate configurable exclusive PCD output; user-provided input maps only.
-* Active lint/copyright and synthetic output/installation regressions.
+* PCD voxelization, robot-clearance and traversability classification.
+* Color-coded map output with configurable, non-overwriting output paths.
+* PCD map publication for visualization.

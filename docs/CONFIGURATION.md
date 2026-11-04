@@ -11,10 +11,10 @@ misplaced, missing, unknown and duplicate keys. Other launch parameters override
 the deliberate standalone-node defaults; defaults never override YAML. The four
 profile-owned velocity settings have no standalone fallback: the follower validates
 the selected profile before its command publisher/timer, accepts only identical
-startup ROS values, and declares both visible speed parameters read-only.
+startup ROS values, and declares all four visible velocity parameters read-only.
 
 The loader reads both files anew on each launch and logs their resolved paths.
-With optional developer `colcon build --symlink-install`, module and configuration
+With `colcon build --symlink-install`, module and configuration
 symlinks resolve to live source files. New robot files are read directly from
 source and need no rebuild. For a copied installation, set `R3D_CONFIG_DIR`
 to a user-owned directory containing `planner_config.yaml` and `robots/`.
@@ -50,8 +50,7 @@ change, regenerate the analyzed PCD before planning.
 | `topics.pointcloud` | `/hesai_ros_driver/hesai/lidar_points` | Live Filter sensor input |
 | `topics.cmd_vel` | `/cmd_vel` | Explicit follower command output |
 
-The existing centimeter parameter names are retained rather than introducing
-parallel height/tight/safety names with different units. The loader maps
+Robot geometry uses centimetres. The loader maps
 `odometry.topic` to the ROS parameter `odometry_topic` and the frame keys to
 `odom_frame` and `base_frame`. Geometry is forwarded to the preprocessor and
 planner. Only the preprocessor uses it for collision classification; the planner
@@ -59,7 +58,7 @@ does not reinterpret existing PCD colors using new dimensions.
 
 Height and radii must be positive; narrow radius must not exceed normal radius.
 Base clearance is nonnegative and smaller than height. Topics must be valid
-valid relative or absolute ROS topic names; the map, odometry and base frames must be distinct.
+relative or absolute ROS topic names; the map, odometry and base frames must be distinct.
 
 ## Central YAML
 
@@ -67,11 +66,11 @@ valid relative or absolute ROS topic names; the map, odometry and base frames mu
 directory, not the shell working directory. Absolute external map paths are
 also accepted. Preprocessing validates the input exists; planner/map/follower
 launch validates the analyzed file exists. The other map path may not exist yet.
-V4 contains no bundled PCD maps. Both shipped map values are empty. Set the
+No PCD maps are bundled. Both shipped map values are empty. Set the
 selected path to your own suitable PCD before launch; preprocessing requires
 `pcd_path`, while planner/map/follower require `map_name`. The unused value may
 remain empty or refer to a future output. Missing, non-PCD and directory inputs
-fail with the selected key and resolved path; no old example fallback exists.
+fail with the selected key and resolved path; no fallback map is selected.
 Only PCD files are accepted. The analyzer preserves `<input>_analysed.pcd` as
 its filename, but writes it into optional `preprocessing.output_dir`; keep
 `maps.map_name` aligned manually. A nonempty output directory resolves relative
@@ -108,8 +107,8 @@ preprocessing:
   # Keep all other shipped preprocessing keys unchanged.
 ```
 
-No PCD is needed to install either package. Data ownership/permission remains
-the user's responsibility; synthetic test inputs are temporary fixtures.
+No PCD is needed to install the packages. Provide map data that you are
+permitted to use.
 
 | `shared` key | Default | Unit / effect |
 |---|---:|---|
@@ -158,7 +157,7 @@ is a separate explicit motion-producing command.
 | `stair_roi_x_min`, `stair_roi_x_max` | 0.7, 1.1 | m; step ROI X bounds |
 | `stair_roi_width` | 0.5 | m; step ROI half-width |
 | `stair_min_points` | 50 | integer; detection needs strictly more points |
-| `min_reliable_distance` | 0.65 | m; legacy XY radial gate for stair/cliff and far-obstacle classification |
+| `min_reliable_distance` | 0.65 | m; XY radial gate for stair/cliff and far-obstacle classification |
 | `retain_near_obstacles` | true | Startup-only bool; additionally pass height-qualified near returns to the obstacle output |
 | `cliff_roi_x_min`, `cliff_roi_x_max` | 0.7, 1.2 | m; visible-floor X bounds; wall at lower bound |
 | `cliff_width` | 0.4 | m; cliff ROI and wall half-width |
@@ -172,18 +171,18 @@ existing distinct semantics/defaults. Minimum bounds must be below maximum
 bounds. PointCloud2 decoding honors field offsets, numeric XYZ types, endian
 order and point/row padding; extra channels are ignored and NaN/Inf excluded.
 Changing settings does not establish a sensor-to-base transformation or change
-the existing sensor-axis assumptions. The unused legacy `cliff_dist` attribute is not a configuration key.
+the sensor-axis assumptions.
 
 | `rviz_interface` key | Default | Effect |
 |---|---:|---|
 | `action_server_timeout_sec` | 1.0 | s; positive bounded action-server wait, optional for older YAML |
 | `match_radius` | 0.8 | m; maximum XY distance between point and pose selections |
-| `publish_map_odom` | true | Retain legacy static calibration TF; false for external global localization |
+| `publish_map_odom` | true | Publish static calibration TF; false for external global localization |
 
 When calibration TF is disabled, goal selection requires no initial calibration.
 The planner obtains the online start from Odometry, not from an RViz TF lookup.
 The reset service changes only calibration state; it does not remove an existing
-static transform. Legacy calibration still assumes the odometric base pose is
+static transform. Static calibration assumes the odometric base pose is
 identity. Use an external global localizer if this assumption is not satisfied.
 
 | `path_follower` key | Default | Unit / effect |
@@ -197,8 +196,8 @@ identity. Use an external global localizer if this assumption is not satisfied.
 | `steering_gain` | 1.5 | 1/s; angular error to yaw rate |
 | `turning_speed_factor` | 0.3 | General turning factor outside narrow areas, >0 and <=1 |
 
-All four velocity settings are mandatory under the selected robot's `velocity_limits`,
-not in this global table. All other existing Go2W robot fields remain unchanged:
+All four velocity settings are mandatory under the selected robot's
+`velocity_limits`, not in the global controller table:
 
 ```yaml
 # Excerpt within the existing robot mapping; retain name/geometry/odometry/topics.
@@ -212,31 +211,25 @@ robot:
 
 All four values require finite strictly positive int/float YAML scalars; int spelling
 is normalized to ROS double. Null, bool, string, negative, NaN/Infinity, container,
-missing and duplicate definitions are rejected. Zero is deliberately unsupported:
-it was already invalid under the original positive-value schema, and the narrow
-rotation branch has an independent angular cap. Stop through the existing stop/
-monitoring contracts; do not use a zero profile as a new controller mode.
+missing and duplicate definitions are rejected. Zero profile limits are unsupported. Use the stop/monitoring contracts for
+stopping; a velocity profile is not a stop command.
 
-Normal mode keeps `linear.x = max_linear_speed` or that value times
-`turning_speed_factor`; `angular.z` keeps its existing steering clamp. Narrow mode
-keeps zero or `max_linear_speed * narrow_speed_factor` in X and its separate
-`max_angular_speed_narrow` clamp in Z. Both narrow settings now come from the
+Normal mode uses `linear.x = max_linear_speed` or that value times
+`turning_speed_factor`; `angular.z` uses the normal steering clamp. Narrow mode
+uses zero or `max_linear_speed * narrow_speed_factor` in X and its separate
+`max_angular_speed_narrow` clamp in Z. Both narrow settings come from the
 selected robot, not global tuning. Go2W retains 0.14 m/s forward and at most
 0.2 rad/s yaw in narrow areas. These are reduced operating settings, not
 enforced minimum velocities: rotation-only, obstacle/timeout/goal stops and
 zero yaw error still permit zero commands. `linear.y` remains zero; there is no new
 planar-vector clamp. The narrow cap must be <= the selected profile angular limit,
 and both speed factors must remain <=1. An incompatible profile/tuning pair is
-rejected at startup, never silently capped or substituted. A future robot needing
-an angular maximum below the Go2W narrow cap needs its own reviewed
-compatible narrow cap in its robot profile; this migration does not invent its values.
+rejected at startup. Choose a compatible narrow cap for each robot rather
+than copying the Go2W values without checking them.
 
-Profile selection and path confinement are unchanged. The common profile reader
-validates once per load; the launch and child follower processes each read their
-own current selected files. Matching ROS startup values forwarded by launch are
+Matching ROS startup values forwarded by launch are
 accepted, conflicting overrides are rejected, and runtime writes of all four
-profile-owned parameters fail. This intentionally changes their former override priority to make
-the selected profile authoritative. Invalid profiles fail before any command
+profile-owned parameters fail. Invalid profiles fail before any command
 publisher exists. Direct `ros2 run` uses the same selected profile without needing
 a map file merely to construct the follower; full launch retains its existing
 map validation. To migrate an older external configuration, remove the global
@@ -263,27 +256,17 @@ supplies `map -> odom`. A source describing a LiDAR frame rather than the base
 requires an external frame adapter/extrinsic conversion, not merely a topic rename.
 YAML selection is not a claim of physical support for a new platform.
 
-## Developer overrides
+## Direct node execution
 
-Normal operation uses the launch files. Direct `ros2 run` remains available for
-isolated debugging with ordinary ROS parameter overrides, but does not load
-the central YAML automatically. Node defaults preserve standalone compatibility;
-they are not a second normal configuration workflow. Use the logged source
-paths and `ros2 param get /global_graph_planner odometry_topic` to confirm the
-effective configuration.
+Normal operation uses the launch files. Direct `ros2 run` allows ordinary ROS
+parameter overrides for isolated node execution, but does not automatically
+load all central tuning. The follower always loads the selected robot profile
+for its four mandatory velocity settings, including in direct execution.
+Use logged configuration paths and `ros2 param get` to inspect effective values.
 
-
-## M01 path metadata and M02 monitoring
-
-The existing narrow speed/steering parameters now use `PathWithMetadata.narrow`
-at the target waypoint index. They never inspect quaternion fields. Build all
-three packages and upgrade planner/follower together; Path/header/flags are
-validated as one message. Standard `/global_path` remains geometric `nav_msgs/Path`.
-M01 remains independent of the implemented optional M02 monitor. The accepted
-YAML group is `obstacle_monitoring`; the earlier unimplemented proposal name
-`obstacle_monitor` is not an alias. The local filter remains optional.
-See the complete M02 contract below.
-
+Path narrow-area flags come from `PathWithMetadata.narrow`, indexed to its path.
+They are never decoded from orientation fields. See
+[Architecture and ROS interfaces](ARCHITECTURE.md#path-planning-and-metadata).
 
 ## Namespace and QoS contract
 
@@ -292,7 +275,7 @@ root names. Internal absolute topic literals are consistently remapped to
 namespace-relative names, including global_path_metadata and the planning action.
 Explicit absolute robot topics remain global; relative robot topics inherit the
 node namespace. Frame IDs and /tf ownership remain explicitly configured, with
-no automatic TF prefix or new broadcaster.
+no automatic TF prefix.
 
 Live PointCloud2 input uses SensorDataQoS (best-effort, volatile, keep-last5),
 accepting both reliable and best-effort producers. Local outputs remain reliable,
@@ -300,11 +283,10 @@ volatile, depth10; Odometry remains SensorDataQoS, map publication reliable
 transient-local/depth1, metadata reliable transient-local/depth1. Deadline/lifespan
 and liveliness settings retain library defaults; no real-time guarantee is made.
 RViz rejects foreign-frame/nonfinite/invalid-quaternion selections; valid
-orientations are normalized. The new positive action timeout defaults to1s even
-when omitted from older YAML. Obstacle monitoring is separately configured below; it does not depend on RViz.
+orientations are normalized. The action-server timeout defaults to 1 s. Obstacle monitoring is separately configured below; it does not depend on RViz.
 
 
-## Obstacle monitoring (M02, Humble)
+## Obstacle monitoring
 
 The optional follower monitor validates its obstacle input. It is independent of
 `components.live_filter.enabled`: either the R3D filter or an external ROS
@@ -338,21 +320,21 @@ YAML and restart `follower.launch.py` to apply changes. This avoids a partially
 changed timer, topic or monitoring policy during motion. `R3D_CONFIG_DIR` and
 normal installed package-share configuration work as before.
 
-With `enabled: false`, the existing obstacle ROI, path/metadata validation,
-Odometry/global-TF checks and goal stop remain active. No new missing-cloud
-blockade is added, and the original ROS-clock control timer is retained. This
+With `enabled: false`, the obstacle ROI, path/metadata validation,
+Odometry/global-TF checks and goal stop remain active. Missing clouds do not add a
+blockade, and the original ROS-clock control timer is retained. This
 mode does not establish obstacle freshness or correct sensor-to-base geometry.
-`require_transform` has no effect on this legacy mode.
+`require_transform` has no effect while monitoring is disabled.
 
 With `enabled: true`, no movement is allowed until a complete valid current
 measurement has been evaluated. Every regular command is gated, and an invalid
 cloud or detected obstacle also publishes an immediate zero command through the
 same publisher. All six Twist components are zero. State and reason are logged
-on state transitions; no new public status topic is introduced.
+on state transitions; there is no separate public status topic.
 
 | State | Meaning and movement policy |
 |---|---|
-| DISABLED | Legacy obstacle policy, without monitoring guarantees |
+| DISABLED | Direct obstacle policy, without freshness/TF monitoring |
 | WAITING_FOR_DATA | No successful measurement yet; zero command |
 | ACTIVE | Valid current clear input; other controller conditions still apply |
 | BLOCKED | Valid measurement contains an obstacle in the existing stop ROI; zero |
@@ -419,11 +401,9 @@ must preserve measurement stamps and provide suitable base/sensor TF.
 emergency stop. The control period, callback execution and transport add latency;
 a blocked executor, process failure or actuator queue needs independent command
 watchdogs and stop facilities. The internal filter now retains height-qualified near returns by default;
-this fixes the demonstrated radial loss before the follower's stop check.
 Physical sensor coverage, self returns and body clearances still need deployment
 validation; fresh empty output does not prove complete near-field coverage.
-Cliff/stair outputs are still not internal follower stop inputs. No thresholds,
-new navigation algorithm, hardware driver or safety certification were added.
+Cliff/stair outputs are still not internal follower stop inputs. This does not provide a hardware stop or safety certification.
 
 
 ## Local obstacle geometry and near-return retention
@@ -435,7 +415,7 @@ Stair and cliff processing continues using that gated set with the existing
 thresholds. The obstacle height range is strictly `min_height < z < max_height`
 (default 0.05 to 1.0 in the input frame).
 
-With `live_filter.retain_near_obstacles: true` (new default), finite raw points
+With `live_filter.retain_near_obstacles: true` (default), finite raw points
 inside or exactly on the excluded radius are additionally published as obstacles
 when they satisfy that height range. Near points are not suppressed by stair
 classification. The far-obstacle, stair and cliff branches retain their previous
@@ -455,18 +435,15 @@ path_follower:
   obstacle_half_width: 0.3
 ```
 
-This is a partial example, not a complete replacement YAML. Old configurations
-without the new key remain valid and default to true. The key requires a boolean;
+This is a partial example, not a complete replacement YAML. Omitting this optional key uses true. The key requires a boolean;
 null, numbers and strings are rejected. The ROS parameter is read-only after
-startup: edit your `R3D_CONFIG_DIR` copy and restart. Explicit false restores the
-old radial loss on the obstacle output; this compatibility option is not a
-validated sensing or safe-operation mode. The meaning and defaults of existing
-numeric parameters and robot profiles remain unchanged. The new default may
+startup: edit your `R3D_CONFIG_DIR` copy and restart. Explicit false applies the radial exclusion to obstacle output too and can
+remove near obstacles before the follower sees them. Retaining near returns may
 produce additional conservative stops from valid but unwanted self/noise returns;
 use an upstream calibrated self-filter, not a larger exclusion radius as a
 substitute for complete obstacle coverage.
 
-With M02 enabled, the follower transforms XYZ to `robot.odometry.base_frame` at
+With obstacle monitoring enabled, the follower transforms XYZ to `robot.odometry.base_frame` at
 the original measurement time, then stops if **any** point meets the open
 rectangle `obstacle_x_min < x < stop_distance` and `abs(y) < obstacle_half_width`.
 There is no additional Z test: the producer supplies classified obstacles.
@@ -476,25 +453,15 @@ are excluded. XYZ32 serialization rounds decimals: a mathematical boundary must
 be distinguished from its transmitted value. For example, float32(0.6) is
 0.6000000238418579, while the stored ROS double limit is0.6.
 
-Without M02, the existing follower evaluates the same rectangle directly in the
+With obstacle monitoring disabled, the existing follower evaluates the same rectangle directly in the
 received coordinates; correct frame alignment remains the integrator's obligation.
 Filter and monitor switches remain independent. With the filter off, external
-publishers need no new parameter or message type; they must supply classified
-obstacles and fulfill the unchanged M02 frame/time/layout/QoS contract when enabled.
-
-At equal origins, a point (0.59,0,0.2) was previously erased before reaching the
-follower; it now reaches the open stop rectangle. At (0.625,0,0.2), the base-frame
-point remains outside the default stop rectangle, while a sensor-to-base X offset
-of-0.125 places it at0.5 and requires a stop. The offset is a synthetic test,
-not a Go2W calibration. Points outside the rectangle can continue to permit
-software motion when all other conditions hold. Changed stop/filter limits do
-not require synchronizing duplicated parameters: near returns are passed before
-the follower applies its own ROI.
+publishers must supply classified obstacles and fulfill the frame/time/layout/QoS contract when monitoring is enabled.
 
 The robot profile's offline radius, narrow radius, height and base clearance use
 centimetres for PCD classification. They do not define a measured local footprint,
 body-front offset, sensor transform, braking distance or turn envelope. They are
 not automatically reused here. Sensor coverage, height alignment, self filtering,
 body geometry, braking and actuator watchdogs need deployment-specific validation.
-An empty valid cloud is not proof of obstacle-free space. No Cliff/Stair consumer,
-reverse-motion protection or certified safety function is added.
+An empty valid cloud is not proof of obstacle-free space. Cliff/stair handling, reverse-motion protection and a certified safety
+function are outside this controller.

@@ -1,277 +1,103 @@
 # R3D-Planner
 
-## Overview and goals
-
-R3D-Planner is a ROS 2 Humble stack for navigation in voxelized 3D PCD maps.
-The preprocessor classifies clearance and traversability; the planner reconstructs
-a weighted 3D graph and computes A* paths through the standard
+R3D-Planner is a ROS 2 stack for planning paths through voxelized 3D point-cloud
+maps. It classifies traversable space for a configured robot, reconstructs a
+weighted graph and computes A* paths through the standard
 `nav2_msgs/action/ComputePathToPose` action.
 
-The public main includes the V4 ROS interface, obstacle-monitoring and
-filter-geometry changes. The original navigation stack was previously demonstrated
-on a Unitree Go2W; the current V4/main checks are workstation software tests.
-Deployment on the robot still requires separate validation. The supported target
-is Ubuntu 22.04 Jammy, ROS 2 Humble, Python 3.10 and amd64.
+Supported environment: **ROS 2 Humble, Ubuntu 22.04 Jammy, Python 3.10, amd64**.
 
-| Package | Role | Executables |
-|---|---|---|
-| `r3d_interfaces` | Generated PathWithMetadata wire contract | none |
-| `r3d_preprocessor` | PCD analysis and visualization | `pcd_analyser`, `pcd_server` |
-| `r3d_planner` | Planning, perception, RViz input and control | `pcd_path_planner`, `local_filter`, `rviz_interface`, `path_follower`, `path_test` |
+| Package | Purpose |
+|---|---|
+| `r3d_preprocessor` | Classify PCD maps by robot clearance and traversability |
+| `r3d_planner` | Global planning, local point-cloud filtering, RViz input and path following |
+| `r3d_interfaces` | `PathWithMetadata`: a geometric path with per-pose narrow-area flags |
 
-The pipeline is PCD-only. Pickle executables and external Pickle helper scripts
-from V1 are not available here.
+## How it works
 
-## Development metadata
+![R3D-Planner ROS data flow](docs/images/r3d_dataflow.png)
 
-All three packages use the provisional development version `0.0.1`. The two
-executable packages use `ament_python`; `r3d_interfaces` uses `ament_cmake`/rosidl. `r3d_preprocessor` performs offline voxel-based PCD
-clearance/traversability analysis; `r3d_planner` provides graph-based A* planning
-and the existing ROS 2 navigation components listed above.
+The preprocessor writes a classified PCD. The planner loads that file and serves
+path requests. The local filter and RViz interface are optional. The follower
+starts separately and consumes the path with its narrow-area flags.
 
-Repository: [RoboProjekt/R3D-Planner](https://github.com/RoboProjekt/R3D-Planner).
-Bug tracker: [GitHub issues](https://github.com/RoboProjekt/R3D-Planner/issues).
-Author of the own software: Bastian Aumer; existing maintainer contact:
-`bauya <baau1001@stud.hs-kl.de>`. Authorized own software uses Apache-2.0;
-existing third-party notices retain their original attribution and conditions.
-
-The public `main` is the current development source. Public `V1`, `V2` and `V3`
-retain the cleaned historical research versions; `V4` remains a local historical
-reference. Migration was completed on 20 October 2026. The complete Humble/Debian
-workflow has run on GitHub and its `humble` check is required for pull requests
-to protected `main`, including administrator changes. Positive and deliberately
-failing test PRs verified the check and merge blocking; see the
-[public migration and CI record](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#25-öffentliche-git-migration-remote-ci-und-release-freeze-20-oktober-2026).
-
-This is a public source repository, **not an official ROS release**. All packages
-remain `0.0.1` with Forthcoming changelogs. ROS Index/rosdistro registration,
-Bloom releases, official release Buildfarm jobs/public ROS Debian packages,
-release tags and GitHub Releases are frozen until successful current Unitree
-Go2W hardware tests **and a separate subsequent maintainer authorization**.
-No current V4/main hardware validation has been performed.
-
-The four legacy example maps and their identical historical copies have been
-removed from the reachable histories of the four published source branches.
-Supply your own permitted PCD inputs. Old direct GitHub commit URLs remain
-accessible; this does not establish removal from server caches, clones or forks. Historical commit references remain documented
-through the [commit migration record](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#235-dauerhaftes-commit-mapping-und-forschungsbaseline).
-
-## Architecture at a glance
-
-![Schematic ROS data flow of the current R3D-Planner](docs/images/r3d_dataflow.png)
-
-This reproducible technical diagram represents the current nodes, file inputs,
-action and path contracts. It is **not a screenshot or navigation test result**.
-The offline analyzer writes user-owned data; the planner loads the analyzed PCD.
-The follower consumes the atomic path/flag message. Filter and RViz input are
-optional; follower startup is separate. Dashed arrows show additional ROS inputs
-or visualization. Topic labels show defaults; launch remapping and configuration
-are described below. Package dependencies are separate from this data flow:
-`r3d_planner` depends on `r3d_interfaces` and `r3d_preprocessor`; those two provider
-packages are independent. The diagram source is
-[docs/images/r3d_dataflow.dot](docs/images/r3d_dataflow.dot), authored for this
-repository under Apache-2.0 and reproducible with `dot -Tpng`.
-
-No suitable original screenshots were found in the local Git history; the
-unchanged historical PDF contains no embedded raster images. Actual RViz,
-classified-cloud, global-path, stair-clearance and robot-dimension views are
-still needed. The [image acquisition plan](docs/V4_ROS_COMPLIANCE_DEVELOPMENT.md#2311-readme-abbildung-und-konkreter-bildbedarfsplan)
-specifies content, provenance and version labels. No synthetic application
-screenshots or legacy PCD data are included as substitutes.
+Sensor drivers, odometry, global localization and the robot command interface
+are external. The stack has no dependency on a particular SLAM implementation.
 
 ## Installation
 
-Use Ubuntu 22.04, ROS 2 Humble and its Python 3.10 environment.
-Required libraries include Open3D, NetworkX, NumPy, SciPy and PyYAML; ROS inputs
-use standard geometry, navigation and sensor messages, Nav2 actions and TF2.
-Sensor drivers, odometry, global localization and the robot command adapter
-remain external. No specific SLAM package is a dependency.
+Build all three packages in a ROS 2 workspace using the Humble system Python
+environment. Follow [Installation and startup](docs/INSTALL.md) for clone,
+rosdep and colcon commands.
 
-For the public main checkout, follow [INSTALL.md](INSTALL.md) to place all three packages
-below a workspace's `src` directory. The public V3 branch does not contain the
-AP03 manifest corrections. Use the native Humble system interpreter, with no
-Conda or unrelated workspace overlays:
-
-```bash
-cd <path-to-workspace>
-source /opt/ros/humble/setup.bash
-export PYTHONNOUSERSITE=1
-sudo rosdep init  # only if not initialized on this machine
-rosdep update --rosdistro humble
-rosdep install --from-paths src/R3D-Planner \
-  --ignore-src --rosdistro humble --os=ubuntu:jammy -y
-rosdep check --from-paths src/R3D-Planner \
-  --ignore-src --rosdistro humble --os=ubuntu:jammy
-colcon build --packages-up-to r3d_planner
-source install/setup.bash
-```
-
-AP03 verified the original external keys; the current three-package set also
-passes actual rosdep installation and rosdep check
-(exit 0) in two fresh isolated ROS 2 Humble / Ubuntu 22.04.5 containers using
-system Python 3.10.12. Apt NumPy 1.21.5, SciPy 1.8.0, Open3D 0.14.1 and NetworkX
-2.4 worked without the former NumPy/SciPy compatibility warning. The current clean-copy CI
-workspace reported 358 successful colcon test records (0 failures, 0 skips), including active lint and
-copyright checks; a separate container without the source tree passed 343
-installation/output/interface cases. The audit host was unchanged and still lacks apt
-Open3D/NetworkX. These results establish the tested Humble installation scope;
-Remote CI, postponed distributions, hardware deployment and official release remain separate.
-
-Replace angle-bracket placeholders before running commands. Source ROS and the
-workspace once in each new terminal. Optional developer `--symlink-install` makes source
-configuration available at runtime, including newly added robot YAMLs.
-Editing YAML thereafter requires only stopping and restarting the affected launch,
-not rebuilding or sourcing again. Copy installations use the regular installed
-package-share YAML and robot profiles. Set `R3D_CONFIG_DIR` to a user-owned
-configuration directory for editable overrides; no source checkout is required.
-Rebuild a copy installation to refresh its installed templates.
-
-## M01 interface migration
-
-Build and install `r3d_interfaces`, `r3d_preprocessor` and `r3d_planner` together.
-`/global_path` remains `nav_msgs/Path` and the action result contains that same
-geometric path, with normalized XY tangent orientations. Narrow flags are no
-longer encoded in quaternion fields. `/global_path_metadata` carries
-`r3d_interfaces/msg/PathWithMetadata`: the complete Path and exactly one boolean
-per pose, atomically. The follower consumes this message with reliable,
-transient-local, depth-1 QoS; late joining receives both path and flags.
-
-Upgrade planner and follower together. External consumers that decoded
-`orientation.z > 0.5` must use `narrow[index]` on the enriched path instead.
-Inconsistent metadata clears the follower path; there is no legacy decoder.
-M02 obstacle monitoring is implemented as an opt-in follower feature, disabled
-by default. It checks measurement/receipt freshness and timestamped sensor-to-base
-TF, then gates every command and defines automatic recovery after valid new input.
-The local filter remains independently optional. See the
-[monitoring contract](docs/CONFIGURATION.md#obstacle-monitoring-m02-humble).
+No example maps are bundled. Provide your own PCD input and configure the paths
+before starting a launch file.
 
 ## Configuration
 
-The stable entry point is `r3d_planner/config/planner_config.yaml`:
+The entry point is `r3d_planner/config/planner_config.yaml`. Its `robot_config`
+field selects a profile such as `robots/Go2W.yaml`.
 
-```text
-r3d_planner/config/
-├── planner_config.yaml
-├── robots/
-│   └── Go2W.yaml
-└── r3d_planner_params.yaml   # legacy Nav2 fragment, not loaded
+- The central file owns map paths, processing, graph settings and controller tuning.
+- The robot profile owns dimensions, odometry frames/topic, sensor/command topics
+  and velocity settings.
+- For an installed workspace, copy the configuration to a user-owned directory
+  and set `R3D_CONFIG_DIR`; see the [configuration reference](docs/CONFIGURATION.md).
+- YAML changes take effect after restarting the affected launch. Regenerate the
+  analyzed map when robot geometry or processing settings change.
+
+The Go2W profile contains:
+
+```yaml
+robot:
+  velocity_limits:
+    max_linear_speed: 0.35       # m/s
+    max_angular_speed: 0.6       # rad/s
+    max_angular_speed_narrow: 0.2 # rad/s
+    narrow_speed_factor: 0.4
 ```
 
-`robot_config: robots/Go2W.yaml` selects the robot. Robot geometry, odometry
-topic/frames, sensor input, command topic and velocity limits belong exclusively
-to that robot YAML. General settings belong to the central file; shared graph settings are
-forwarded to both analysis and planning. Unknown, duplicate or missing keys and
-invalid values fail at startup.
+This is an excerpt, not a complete profile. Aligned narrow-area travel uses
+`0.35 * 0.4 = 0.14 m/s`; rotation-only and stop commands can still be zero.
+All four settings are required and expose read-only ROS parameters. Conflicting
+startup overrides or invalid configuration abort startup.
 
-| Central section | Ownership |
-|---|---|
-| `maps` | Input PCD and analyzed planning PCD; paths relative to the config directory |
-| `shared` | Voxel size and minimum/maximum graph step heights |
-| `preprocessing` | Density, voxel hit filtering, floor filling, clustering and optional `output_dir` |
-| `planner` | Map frame, odometry age limit, graph costs and path visualization |
-| `components` | Independent Live Filter and RViz-interface launch switches |
-| `live_filter` | Sensor-coordinate perception thresholds |
-| `rviz_interface` | XY matching radius and optional calibration TF ownership |
-| `path_follower` | Lookahead, general turning factor and controller thresholds; explicit motion launch only |
+## Prepare a map
 
-The selected profile owns `robot.velocity_limits.max_linear_speed` (m/s) and
-`robot.velocity_limits.max_angular_speed` (rad/s). Go2W retains **0.35 m/s** and
-**0.6 rad/s**. The same profile also owns `max_angular_speed_narrow: 0.2`
-(rad/s) and `narrow_speed_factor: 0.4`: narrow forward speed remains
-**0.14 m/s**. All four keys are absent from global `path_follower` settings.
-The follower reads the selected profile at startup, validates all finite positive
-values and exposes matching read-only ROS parameters. Missing/invalid values,
-leftover global keys during launch, or conflicting startup overrides abort startup;
-there is no Go2W fallback. Zero limits are unsupported. The existing independent
-`max_angular_speed_narrow` must not exceed the profile's normal angular limit and
-`narrow_speed_factor` must not exceed 1. Inconsistent profiles are rejected.
-Reduced speed is not an enforced minimum: rotation-only and safety stops still
-produce zero forward commands. General `turning_speed_factor` stays global. Select another permitted
-profile with `robot_config`, then restart; no G1 limits or hardware support are implied.
-
-See [the full parameter reference](docs/CONFIGURATION.md) for names, units,
-validation, default values and adding a robot.
-
-## Using the preprocessor: select and analyze a map
-
-V4 bundles no PCD example maps. Provide a suitable PCD that you are entitled
-to use, then set `maps.pcd_path` in your `planner_config.yaml`. Set
-`maps.map_name` to the corresponding `<input-name>_analysed.pcd` before planning.
-Both shipped values are empty; launch fails clearly until the selected input is
-configured and exists. Relative paths resolve against the YAML directory;
-absolute paths and `~` are accepted. No map is downloaded or selected as a fallback.
-Installation does not require map data. See the [configuration reference](docs/CONFIGURATION.md)
-for using an external configuration directory with a copied installation.
+Set `maps.pcd_path` to the input PCD and `preprocessing.output_dir` to the desired
+output directory, then run:
 
 ```bash
 ros2 launch r3d_planner preprocessor.launch.py
 ```
 
-This starts the existing one-shot `r3d_preprocessor/pcd_analyser` node.
-It voxelizes the input, filters weak voxels, checks robot clearance, optionally
-fills floors, and writes `<input-name>_analysed.pcd` in
-`preprocessing.output_dir`. An empty value uses the user data directory
-(`$XDG_DATA_HOME/r3d_preprocessor`, otherwise `~/.local/share/r3d_preprocessor`).
-Inputs may be read-only. Existing outputs are rejected, including symlinks;
-choose a new output directory for another analysis. It publishes no TF or topics.
-Green marks floor, cyan narrow clearance, yellow stair access and magenta
-obstacles.
+The one-shot analyzer writes `<input-name>_analysed.pcd`. Green means floor,
+cyan narrow clearance, yellow stair access and magenta obstacles. Existing
+output files are not overwritten. Set `maps.map_name` to the analyzed file.
 
-| Setting | Location | Meaning |
-|---|---|---|
-| `pcd_path` | `maps` | Source PCD to analyze |
-| `voxel_size_cm` | `shared` | Voxel edge length, cm |
-| `min_step_height_cm`, `max_step_height_cm` | `shared` | Flat boundary and largest step, cm |
-| `robot_height_cm` | robot `geometry` | Collision-cylinder height, cm |
-| `robot_narrow_radius_cm` | robot `geometry` | Tight clearance radius, cm |
-| `robot_radius_cm` | robot `geometry` | Normal safety radius, cm |
-| `robot_base_clearance_cm` | robot `geometry` | Collision check starts above the floor, cm |
-| `min_points_per_sqm`, `min_points_per_voxel` | `preprocessing` | Floor-fill density and occupied-voxel hit threshold |
-| `floor_height_tolerance`, `ground_fill` | `preprocessing` | Planarity tolerance in m and filling switch |
-
-Changing robot dimensions or processing settings requires analyzing the map again,
-but not rebuilding the workspace. A PCD does not carry configuration metadata:
-keep its generating YAML settings with the artifact. Selecting a robot does not
-reclassify an existing PCD automatically.
-
-For an optional map display:
+To display that map:
 
 ```bash
 ros2 launch r3d_planner map.launch.py
 rviz2
 ```
 
-In RViz use fixed frame `map`, PointCloud2 topic `/map_pointcloud`,
-Transient Local durability and RGB8 coloring. The map launch loads the analyzed
-PCD selected in the central configuration.
+In RViz use fixed frame `map`, PointCloud2 topic `/map_pointcloud`, Transient
+Local durability and RGB8 coloring.
 
-## Using the planner: offline and online
+## Plan a path
 
 ```bash
 ros2 launch r3d_planner planner.launch.py
 ```
 
-The launch always starts `pcd_path_planner` and independently starts the
-Live Filter and RViz interface according to:
+This starts the planner and the components selected by
+`components.live_filter.enabled` and `components.rviz_interface.enabled`.
+It does not start RViz, hardware drivers or the follower.
 
-```yaml
-components:
-  live_filter:
-    enabled: true
-  rviz_interface:
-    enabled: true
-```
-
-All four true/false combinations are supported. These switches control node
-startup, not internal disabled logic. The RViz interface is a ROS node, not an
-RViz GUI plugin; start `rviz2` separately. The Path Follower and hardware
-drivers are never included automatically.
-
-### Offline planning
-
-Set both component flags to `false` for a minimal planner. Explicit start
-and goal poses must use `planner.map_frame` (default `map`). No odometry
-or TF is required for this request:
+For planning without hardware, disable both optional components and send an
+explicit start and goal. Replace the example coordinates with positions in your
+map and use the configured map frame:
 
 ```bash
 ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "{
@@ -288,171 +114,38 @@ ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "
 }"
 ```
 
-Coordinates are examples; start and goal snap to the nearest traversable node.
-The action returns a Path and publishes `/global_path`; `/planned_path`
-provides a LINE_STRIP Marker. `planner_id` is accepted but not evaluated.
+The action returns a geometric `nav_msgs/Path`. The planner also publishes
+`/global_path`, `/planned_path` and `/global_path_metadata`. The last message
+contains the path and one narrow-area flag per pose.
 
-### Online planning
+For online planning, `use_start: false` requires fresh configured Odometry and
+timestamped `map -> odom` TF. RViz goal selection and TF ownership are described
+in [Architecture and ROS interfaces](docs/ARCHITECTURE.md).
 
-The robot YAML defines the standard input contract:
-
-```yaml
-odometry:
-  topic: /lidar_odometry
-  odom_frame: odom
-  base_frame: base_link
-```
-
-The external source publishes `nav_msgs/msg/Odometry` with
-`header.frame_id=odom`, `child_frame_id=base_link`, a valid pose and current
-timestamp. It owns `odom -> base_link`. A separate global localization
-source owns `map -> odom`. No odometry node should publish `map -> base_link`.
-The planner does not broadcast any TF and does not depend on
-`lidar_slam_ros2`, KISS-ICP, FAST-LIO or a particular estimator.
-
-Use `use_start: false` to plan from current odometry:
-
-```bash
-ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "{
-  use_start: false,
-  goal: {
-    header: {frame_id: 'map'},
-    pose: {position: {x: 5.0, y: 0.0, z: 2.5}, orientation: {w: 1.0}}
-  }
-}"
-```
-
-The planner transforms the odometry pose using `map -> odom` at its timestamp.
-Missing TF, mismatched frames, invalid or stale odometry aborts the request.
-Only the configured Odometry topic supplies the online pose; a TF-only source
-must also publish Odometry. `path_test` supplies test TF only and is not an
-online odometry simulator.
-
-Enable RViz integration for point/pose goal pairs. With
-`rviz_interface.publish_map_odom: true`, first combine Publish Point and
-2D Pose Estimate for the existing calibration workflow. With an external global
-localizer, set it to `false`; no calibration TF is sent and goals can be
-selected directly through Publish Point and 2D Goal Pose. Keep exactly one
-`map -> odom` publisher. The legacy calibration assumes an identity
-odometric pose; do not use it as a replacement for global localization.
-
-```bash
-ros2 service call /recalibrate_pose std_srvs/srv/Trigger "{}"
-```
-
-For approved motion only:
+## Path following
 
 ```bash
 ros2 launch r3d_planner follower.launch.py
 ```
 
-This starts the existing planar follower with central controller settings and
-the selected robot's Odometry and command topic. It publishes zero velocity
-when pose input is unavailable or stale. It is not a complete safety controller:
-path Z, cliff walls and stair detections do not directly control motion.
-Validate external watchdogs, arbitration, emergency stop and cliff handling
-before enabling the Go2W adapter, which may change posture on startup.
+This separate launch publishes velocity commands. The follower uses XY/yaw,
+not path height, and does not directly consume cliff or stair outputs. Obstacle
+freshness/TF monitoring is optional and disabled by default. Configure it under
+`path_follower.obstacle_monitoring` as described in the
+[configuration reference](docs/CONFIGURATION.md#obstacle-monitoring).
 
-## Further documentation
+Robot integration requires suitable sensor frames, odometry, command watchdogs
+and independent stop facilities. See [Known limitations](docs/KNOWN_ISSUES.md)
+before operating hardware.
 
-- [Installation and verification](INSTALL.md)
+## Documentation
+
+- [Installation and startup](docs/INSTALL.md)
 - [Configuration reference](docs/CONFIGURATION.md)
-- [Architecture and interfaces](docs/ARCHITECTURE.md)
-- [Known limitations](docs/KNOWN_ISSUES.md)
-- [Preprocessor reference](r3d_preprocessor/README.txt)
-- [Planner reference](r3d_planner/README.txt)
-- [Historical V2 deployment comparison](docs/REFERENCE_COMPARISON.md)
+- [Architecture and ROS interfaces](docs/ARCHITECTURE.md)
+- [Known limitations and troubleshooting](docs/KNOWN_ISSUES.md)
 
-## Action result and cancellation scope
+## License
 
-ComputePathToPose succeeds with the geometric Path and measured planning_time,
-aborts with an empty result on invalid frame/position/quaternion, missing/stale
-pose or TF, and unreachable/empty paths. The existing A* checks accepted
-cancellation cooperatively; active requests can reach CANCELED without publishing
-a new path. Cancel or failed replanning does not revoke a previously published
-path or command a robot stop. The four-worker executor permits cancel service
-processing during planning, but makes no real-time or unlimited-concurrency promise.
-Planner IDs remain accepted without plugin selection for compatibility. Humble's
-result has no error_code field and its feedback payload is empty. This is an
-action contract, not a full Nav2 planner plugin/lifecycle integration.
-
-## Namespace composition
-
-All four launches accept an optional namespace argument, for example:
-
-```bash
-ros2 launch r3d_planner planner.launch.py namespace:=robot_a
-```
-
-Internal Path, metadata, marker, map, RViz, action and service names compose
-under that namespace. The empty default preserves root names. Explicit absolute
-robot-profile topics remain global; use relative `odometry`, `cloud` and
-`cmd_vel` names when those robot interfaces should inherit the namespace.
-Direct executables support normal ROS remapping arguments. TF topics/frame IDs
-are not automatically prefixed: configure robot-specific frames and a single
-owner of each transform. Launching the follower remains a separate motion step.
-RViz selections must use map_frame and finite valid poses; action lookup is
-bounded by rviz_interface.action_server_timeout_sec (default 1 s).
-
-## Maintenance
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for focused synthetic reproductions/tests
-and [MAINTENANCE.md](MAINTENANCE.md) for support, version/API/ABI and release gates.
-Each package has a Forthcoming CHANGELOG.rst. None declares a released version.
-
-## Distribution investigation (15 October 2026)
-
-| Target | Current evidence | Support boundary |
-|---|---|---|
-| Humble / Jammy / Python 3.10 amd64 | Clean copy build, rosdep, 358 colcon records and343 unique source-free cases pass | Verified tested scope |
-| Jazzy / Noble / Python 3.12 amd64 | Full rosdep blocked by Open3D; generated interface alone builds and passes five checks plus CDR | Planner/preprocessor not verified |
-| Kilted / Noble | Same official Open3D system rule; no native build/test | Not supported by this evidence |
-| Lyrical / Resolute / Python 3.14 amd64 | All dependencies and three-package build pass; default colcon Python test discovery fails; direct pytest 218 pass /2 lint failures | Partial investigation, no complete support claim |
-| Rolling | Current official image uses Resolute; no native verification | Development target only |
-
-Newer Nav2 actions add error fields and, in Lyrical, viapoints. Their full contract
-is not implemented or verified here. No pip/vendor migration was applied.
-See central protocol section18.8 for commands, exact images and remaining work.
-
-## Current release target
-
-V4 development and release preparation target only ROS 2 Humble on Ubuntu22.04
-Jammy with Python3.10 and the verified apt dependency set. Jazzy, Lyrical and
-Rolling are postponed; their recorded limitations are not blockers for the
-Humble release. The distribution investigation above is historical evidence,
-not a multi-distribution support promise. The source migration is public; no official ROS release has been performed.
-
-
-Local obstacle geometry: the filter now additionally retains finite, height-qualified
-near returns by default (`live_filter.retain_near_obstacles: true`). This prevents
-radial filtering from erasing points before the follower's stop-rectangle test.
-Existing numeric defaults, frames, M01 and optional M02 are unchanged. Explicit
-false restores the documented legacy radial loss. Self returns, sensor coverage
-and robot/body clearances still need deployment validation. The new boolean is
-startup-only; old configurations without it remain valid. See the local geometry
-contract in docs/CONFIGURATION.md (repository root) for formulas and limits.
-
-
-Local Debian packaging was also exercised for all three packages: peer-aware Bloom
-preparation, unsigned package build/install and a fresh source-free runtime probe
-with dpkg file ownership, versions, dependencies and ROS interfaces passed.
-These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
-generated rules retain their tolerant test exit behavior. The required local
-release wrapper now validates the actual reports and complete test identities,
-rejecting failures, errors, skips and missing evidence independently of Bloom.
-Installation-dependent checks run in a mandatory fresh Debian runtime container.
-For the complete local preflight use `bash scripts/ci/run_humble_release.sh`
-from a clean committed checkout. It runs both ordinary CI and the complete
-Debian gate, then validates source/report/artifact identity. Individual runners
-remain diagnostic entry points; this command does not authorize a release.
-
-
-The historical audit and migration are recorded in sections22/23 of the central
-protocol; section24 records R29 implementation and acceptance. Native Jammy
-pybuild test selection/reporting and the mandatory combined workflow are now
-operational in the binding GitHub project preflight. Actual remote reports and
-positive/negative Required-Check probes are recorded in section25; R29 is accepted
-in the unchanged section24.9 project-preflight scope. Official ROS Buildfarm
-execution remains unverified and the ROS release frozen pending current Go2W
-hardware tests and separate subsequent authorization. Package version0.0.1 and
-the Humble-only target are unchanged.
+R3D-Planner is distributed under [Apache-2.0](LICENSE). Source files retain
+their applicable copyright and third-party notices.
