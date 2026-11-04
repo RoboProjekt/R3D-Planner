@@ -1,287 +1,91 @@
-# Known Limitations and Maintenance Notes
+# Known limitations and troubleshooting
 
-These maintenance notes describe the V4 development tree, with retained V3
-architecture and historical limitations explicitly distinguished.
+## Supported environment
 
-## 1. Humble dependency and installation scope verified; other targets remain open
+The supported environment is ROS 2 Humble on Ubuntu 22.04 Jammy, Python 3.10,
+amd64. Other ROS distributions and platforms are not supported by this package's
+installation instructions. Use one consistent ROS system Python environment;
+mixed apt/pip or Conda environments can cause import and dependency conflicts.
 
-- **Location:** manifests, [INSTALL.md](../INSTALL.md), configuration/output modules.
-- **Verified:** real rosdep install and check exit 0 for all three packages in
-  fresh isolated apt containers, without skip keys. The current clean-copy CI
-  reproduction reports 358 successful colcon test records (0 fail, 0 skip), including active lint checks. A
-  separate source-free, read-only installation passes 343 installed/output/interface cases.
-- **Environment boundary:** Ubuntu 22.04.5, Humble, Python 3.10.12, NumPy 1.21.5,
-  SciPy 1.8.0, Open3D 0.14.1, NetworkX 2.4. The original host is unchanged and
-  still lacks apt Open3D/NetworkX; its earlier failure is historical evidence.
-- **Warnings:** NetworkX `np.int` and ament tooling deprecations remain. The old
-  user-site NumPy 1.26.4 / apt SciPy 1.8.0 compatibility warning is absent in
-  the isolated apt set. This does not repair a mixed host environment.
-- **AP09 boundary:** the previously investigated official Open3D key is
-  unavailable for Ubuntu Noble, confirmed in native Jazzy. Lyrical dependencies
-  and build pass, but default colcon Python test discovery and two newer lint
-  checks fail; see central section18.8. No full newer-distro or hardware claim.
-- **Release boundary:** CI is implemented and locally reproduced, but no remote
-  CI run, coverage claim, public V4 ref, official
-  release or complete legal/distribution approval. See the central protocol.
+## Launch fails because a map is missing
 
-## 2. Standalone planner defaults still refer to uninstalled maps
+No PCD maps are bundled. The shipped `maps.pcd_path` and `maps.map_name` values
+are empty. Set the selected path in your full configuration before launching:
+preprocessing needs `pcd_path`; planner, map and follower launches need
+`map_name`. The unused map path may remain empty. Direct `ros2 run` defaults
+are not a substitute for configuring an input map.
 
-- **Location:** `r3d_preprocessor/setup.py`, `r3d_pcd_path.py`
-- **Behavior:** Direct developer `ros2 run` defaults to an uninstalled share map.
-  Normal V3 launch resolves map paths from live central YAML and validates them.
-- **Impact:** Standalone debugging needs an explicit map override. V4 ships no
-  PCD maps; normal launch requires a user-provided selected path in the central YAML.
-  Use `R3D_CONFIG_DIR` for a user-owned configuration in copied installations.
-- **AP04 result:** Regular copy installations resolve installed package-share
-  configuration; an explicit user-owned `R3D_CONFIG_DIR` remains the override.
-  Data provision stays external. Historical Git versions retain the old maps.
+The analyzed PCD contains point coordinates and RGB classes, not the voxel size,
+robot geometry or processing settings used to generate it. Keep those settings
+with the map and regenerate it after changing geometry or preprocessing. The
+planner cannot reclassify stored colors when selecting another robot profile.
+PCD coordinates must already use the configured map frame.
 
-## 3. Planner launch gap resolved; hardware bringup remains external
+## Configuration changes do not take effect
 
-V3 installs central preprocessor/planner launches and optional map/follower
-launches. Live Filter and RViz switches are independent. Sensor drivers,
-Odometry, global localization, robot adapter and safety supervision are not
-launched by this workspace.
+YAML is read at startup. Restart the affected launch after editing it. In a
+regular copy installation, edit a user-owned directory selected by
+`R3D_CONFIG_DIR`, or rebuild to refresh installed templates. All four velocity
+settings belong under `robot.velocity_limits`; old global definitions are
+rejected by launch validation. Those ROS parameters are read-only, so conflicting
+startup overrides cannot replace the selected profile.
 
-## 4. Nav2 YAML is an unattached fragment
+## Planning works offline but fails online
 
-- **Location:** `r3d_planner/config/r3d_planner_params.yaml`
-- **Current behavior:** It contains placeholders and no launch file loads it.
-  `observation_sources` includes `cliff_virtual`, but only `scan_filtered` has
-  a block. The MPPI configuration is partial.
-- **Impact:** The file is not a complete Nav2 configuration and does not prove
-  that `/local/cliff_virtual_wall` reaches a costmap.
-- **Next step:** Align it with the external Nav2 bringup and plugin
-  versions actually used on the robot.
+Explicit-start requests with `use_start: true` need valid map-frame poses and
+no Odometry or TF. Online requests need fresh standard Odometry with the
+configured odom/base frames and `map -> odom` TF at the pose timestamp.
+Invalid, future-dated or stale input causes the request to abort. A source that
+publishes only TF, or Odometry for a sensor rather than the robot base, does not
+meet this contract. Drivers, localization and frame adapters are external.
 
-## 5. Field decoding is corrected; sensor-axis and follower-frame contracts remain
+## RViz calibration or TF is inconsistent
 
-- **Location:** `cloud.py`, `r3d_local_filter.py`, `r3d_path_follower.py`.
-- **Current behavior:** Both consumers honor scalar numeric XYZ fields, offsets,
-  point/row strides and endian order. Organized, padded and extra-channel clouds
-  are supported; nonfinite XYZ is removed even when is_dense claims true.
-  Input bytes are preserved. Empty filter outputs have complete XYZ metadata.
-- **Rejected data:** Missing/non-scalar XYZ, unknown datatypes, inconsistent
-  strides and truncated buffers are logged and rejected, not published as clear.
-- **Remaining frame boundary:** Filter thresholds deliberately use sensor
-  coordinates with X forward, Y lateral, Z up; outputs retain the sensor header.
-  With monitoring enabled, the follower establishes timestamped sensor-to-base
-  TF and bounds measurement/receipt freshness. Default disabled mode retains
-  legacy sensor-coordinate evaluation. The filter still uses sensor axes;
-  calibration is not repaired by monitoring. The demonstrated radial data loss
-  is separately fixed by default near-return retention; physical coverage remains
-  a deployment obligation.
-- **Verification boundary:** Synthetic byte-layout and node-output regressions
-  establish decoding; no new physical sensor calibration or robot test.
+Use one owner for each transform. Set `rviz_interface.publish_map_odom: false`
+when global localization already publishes `map -> odom`. The built-in static
+RViz calibration assumes an identity odometric base pose; it is not a general
+global localizer. `/recalibrate_pose` resets selection state, but does not remove
+an already published static transform. Namespaces do not prefix TF frame IDs.
 
-## 6. Cliff and stair outputs have no internal consumer
+## Action cancellation does not stop a previously accepted path
 
-- **Location:** `r3d_local_filter.py`, `r3d_path_follower.py`
-- **Current behavior:** Nothing internally subscribes to
-  `/local/cliff_virtual_wall` or `/stair_detect`. The follower stops only from
-  `/local/filtered_obstacles`.
-- **Impact:** The standalone follower does not react directly to detected
-  cliffs, and stair messages do not affect motion.
-- **Next step:** Verify an external consumer for the cliff output before the
-  standalone follower controls the robot.
+Canceling a planning request, or receiving an aborted request, does not revoke
+an earlier published path. The follower can continue following that path when
+its own input conditions allow it. Action cancellation is not a robot stop
+interface. `planner_id` is accepted for compatibility and does not select a
+planner plugin. This stack is not a complete Nav2 lifecycle/plugin integration.
 
-## 7. M01 replaces the incompatible legacy narrow encoding
+## Follower and obstacle-input limits
 
-- **Implemented:** Standard Path/action-result orientations are normalized
-  geometric headings. The follower uses complete PathWithMetadata messages,
-  not orientation.z flags; invalid metadata clears the path. Reliable,
-  transient-local, depth-1 delivery retains path and flags for late joining.
-- **Migration:** Build all three packages and upgrade planner/follower together.
-  Old external narrow decoders must consume the typed metadata instead.
-- **Remaining boundary:** This is not full Nav2 plugin/lifecycle compatibility
-  or full safety-controller behavior. M02 monitoring is opt-in and keeps these
-  integration limits explicit.
+The follower uses path XY/yaw and ignores path Z. It does not directly consume
+`/stair_detect` or `/local/cliff_virtual_wall`. Independent command watchdogs,
+arbitration and stop facilities are external; a zero Twist is a software command,
+not a demonstrated physical emergency stop.
 
-## 8. Request frame validation added; PCD coordinates remain implicit
+Obstacle freshness/TF monitoring is disabled by default. Without it, the follower
+evaluates received obstacle coordinates directly and does not stop merely because
+cloud input disappears. Enabling monitoring requires a valid current input and
+the configured frame/time contract; missing or invalid input keeps commands zero.
+See [Obstacle monitoring](CONFIGURATION.md#obstacle-monitoring).
 
-- **Location:** `r3d_pcd_path.py`, `r3d_pcd_publisher.py`
-- **Behavior:** V3 rejects goal/explicit-start headers outside the configured map
-  frame and transforms online Odometry via `map -> odom`. PCD points are not
-  transformed and carry no frame metadata. Map publisher uses configured frame.
-- **Impact:** A PCD built in the wrong coordinate system can still be mislabeled.
-- **Next step:** Version map frame and generating configuration with artifacts.
+The local filter uses sensor coordinates with X forward, Y lateral and Z up.
+Its Z thresholds are not automatically heights above the ground. Near-obstacle
+retention does not reconstruct missing returns or prove sensor coverage; self
+returns can cause stops. The follower's open forward rectangle is not a complete
+robot footprint, side/rear/turn envelope or braking-distance model. Offline
+geometry parameters do not supply that local model.
 
-## 9. RViz calibration may conflict with external localization
+## Nav2 configuration fragment
 
-- **Location:** `r3d_rviz_interface.py`
-- **Current behavior:** The node publishes static `map -> odom` using the clicked
-  map point directly and does not explicitly subtract a nonzero
-  `odom -> base_link` pose. The reset service only changes internal state. V3 can disable calibration TF
-  with `publish_map_odom=false` for external global localization.
-- **Impact:** The tested Go2W TF tree uses one authoritative publisher per
-  transform. Adding another localization source can make the tree inconsistent.
-- **Next step:** Preserve the tested publisher ownership and inspect the TF
-  tree after localization changes.
+`r3d_planner/config/r3d_planner_params.yaml` is an incomplete costmap/MPPI
+fragment and is not loaded by the package launch files. It contains no full
+`cliff_virtual` observation-source configuration. Do not treat it as a complete
+Nav2 bringup or as an internal consumer of cliff detections.
 
-## 10. The path follower is not a complete safety controller
+## Diagnostics
 
-- **Location:** `r3d_path_follower.py`
-- **Current behavior:** Controller tuning is central YAML, but path Z is ignored and velocity is
-  published directly on the selected command topic. Missing/stale Odometry or
-  global TF now produces a zero command; no external command watchdog is added. Emergency stop,
-  command watchdog and command mux are absent. Planner-action cancellation is
-  implemented, but does not stop a previously published follower path.
-- **Impact:** The inspected Go2W adapter forwards `/cmd_vel` to the Unitree
-  SportClient without implementing these protections. Running `path_follower`
-  without independently validated safeguards remains hazardous.
-- **Next step:** Verify command timeout, arbitration, velocity limits, and
-  emergency-stop behavior before motion and after controller/interface changes.
-
-## 11. PCD metadata is insufficient for reproducible reconstruction
-
-- **Location:** `pcd_analyser`, `pcd_path_planner`
-- **Current behavior:** The analyzed PCD stores points and RGB classes, while voxel
-  size and step heights are forwarded from one shared YAML section. The filename does not encode
-  these settings.
-- **Impact:** Shared settings prevent per-node duplication, but settings that do not match
-  an older artifact still change keys/connectivity. Geometry forwarded to the
-  planner does not reclassify stored PCD colors.
-- **Next step:** Version settings with maps or add verifiable metadata in a
-  future change.
-
-## 12. Package metadata standardized; release rights remain separate
-
-- **Current state:** all three manifests declare 0.0.1 and Apache-2.0;
-  Python setup metadata agrees. LICENSE files and own source headers are present.
-- **Developer decision:** licensing authority for the own software was confirmed
-  after consultation with the supervising professor; Apache-2.0 is retained.
-  All four legacy map blobs and identical copies were removed from the cleaned
-  local candidate history. The original repository/private backup still retains
-  them, and no public migration has been performed.
-- **Remaining gate:** actual third-party notices, modification notices and rights
-  for concrete binary/document/image distribution remain separate. See section23
-  of the central protocol; no independent legal clearance is claimed.
-
-## 13. Generated bytecode files are tracked
-
-- **Location:** both package `__pycache__` directories
-- **Current behavior:** CPython 3.10 `.pyc` files remain tracked. V2 removed only
-  bytecode belonging to the deleted Pickle components.
-- **Impact:** Binary artifacts can become stale and create noisy diffs.
-- **Next step:** Add an ignore and cleanup policy in a dedicated maintenance
-  change.
-
-## 14. An alternative PCD publisher module is not installed
-
-- **Location:** `r3d_preprocessor/r3d_preprocessor/r3d_pcd_voxel_publisher.py`
-- **Current behavior:** The module duplicates node name `pcd_publisher` and topic
-  `/map_pointcloud`, is not registered in `setup.py`, and publishes XYZ only.
-- **Impact:** Its purpose is unclear and it is not available through normal
-  `ros2 run` discovery.
-- **Next step:** Determine its intended role before removing,
-  registering, or consolidating it.
-
-## 15. Historical workstation Python conflict (V3 observation)
-
-- **Location:** the historical local apt/pip environment, not project source.
-- **Recorded observation:** system `packaging` 21.3 conflicted with an entry
-  point requiring `packaging>=23.2`; SciPy 1.8.0 also warned about pip-visible
-  NumPy 1.26.4. This records the earlier V3 investigation, not a new V4 host test.
-- **Current V4 evidence:** isolated Humble/Jammy containers use system Python 3.10
-  and the recorded apt science packages; clean builds and the documented CI/R28
-  tests passed. The host environment was not repaired or reverified by V4.
-- **Next step:** investigate a native host conflict separately if reproducing it;
-  do not infer current hardware deployment status from the container results.
-
-## 16. Package-level lint passes; combined raw pytest collection remains unsuitable
-
-- **Location:** both `test/` directories and Python sources.
-- **Current result:** Flake8, PEP257 and activated copyright checks all pass;
-  the complete colcon suite has 358 reported colcon records / 0 FAIL / 0 SKIP. Own Apache headers
-  use a form recognized by Humble's checker; original OSRF notices are preserved.
-- **Invocation limitation:** raw combined pytest collection of both package test
-  directories can collide on their existing template filenames. Use `colcon test`
-  (separate package processes), or test package directories separately.
-- **Remaining scope:** comprehensive algorithm/API coverage, remote CI and deployment-specific geometric
-  coverage remain work items. Root runs cannot prove ordinary-user write
-  permissions; the final output tests were run as UID 1000, with no skips.
-
-## 17. Standard Odometry integration requires deployment regression
-
-- **Location:** `r3d_planner/odometry.py`, online action requests and follower
-- **Behavior:** Online start selection uses configured `nav_msgs/msg/Odometry`
-  and global TF, not TF-only `map -> base_link` tracking. The source must
-  provide the configured base child frame, valid current poses and timestamps.
-- **Impact:** A TF-only deployment needs an Odometry output before using V3
-  online planning. Sensor-frame Odometry needs an external base-frame adapter.
-  The planned LiDAR-odometry fork is external and not implemented here.
-- **Next step:** Validate the standardized source, clocks, global TF and pose-loss
-  behavior on Go2W without motion before enabling the follower.
-
-## 18. Discovery timing and cached ROS graph entries in test tooling
-
-- **Location:** non-motion test harness and workstation ROS discovery
-- **Behavior:** Early native asynchronous parameter queries timed out under
-  Cyclone DDS and Fast DDS. CLI queries succeeded, but the CLI daemon and cached
-  discovery leases initially confused node-absence assertions. The final harness
-  uses daemon-free CLI queries with explicit discovery time and recreates its
-  observer after shutdown. All four real launch combinations and parameter
-  reload assertions pass under Fast DDS. No middleware default is changed.
-- **Impact:** A stale graph or too-short discovery window can misreport launch
-  conditions. The early failures do not establish a planner or middleware bug.
-- **Next step:** Use the corrected harness for regression; validate deployment
-  middleware independently on the Go2W.
-
-## Current action behavior after AP05 fixes
-
-Pose/frame/nonfinite checks, empty/unreachable errors, result timing and accepted
-cancellation are covered by real ROS clients. Explicit-start map coordinates do
-not require Odometry/TF. Online requests require the existing fresh pose and TF.
-planner_id is retained as a compatibility field and does not choose a plugin;
-feedback has no Humble payload. Four workers are not a real-time latency guarantee.
-A previous published path remains active after another request aborts/cancels;
-cancellation is not a controller stop command. M02 gates obstacle input
-when explicitly enabled; it does not bind follower motion to action cancellation.
-
-## AP05 composition verification and remaining boundaries
-
-Root and namespaced launch/action/Path exchange and explicit ROS remapping pass
-native tests. Live filter input accepts best-effort and reliable clouds; output
-headers remain sensor-frame labels. RViz validates map-frame finite selections
-and normalizes valid quaternion inputs, with bounded action-server wait. Existing
-Odometry/TF rules reject invalid/future/stale inputs and nonfinite translation.
-M02 now provides optional follower obstacle monitoring and measurement-time
-sensor-to-base TF. It preserves TF ownership. Namespace isolation does not prefix
-TF frames or rewrite explicitly absolute hardware topics.
-
-## Current Humble release scope and M02 limits
-
-Jazzy/Lyrical/Rolling are postponed by explicit user decision. Their recorded
-limitations do not block the Humble/Jammy/Python3.10 release target. M02 is
-implemented and disabled by default; see CONFIGURATION.md for exact semantics.
-When enabled, absent/stale/invalid data or required TF blocks motion until new
-fully valid input and every existing path/pose/goal condition permit recovery.
-Non-advancing stamps cannot refresh clearance. No Cliff/Stair input, command
-watchdog, hardware stop or safety certification is introduced. In particular,
-the demonstrated radial loss before the follower ROI is fixed by default near-return
-retention. Valid fresh input still does not prove complete obstacle coverage.
-
-
-## Local near-return retention and remaining geometry limits
-
-`retain_near_obstacles=true` fixes the reproduced loss of height-qualified near
-returns. False explicitly restores the legacy radial-loss behavior. Finite self
-returns or noise can now cause additional conservative stops; actual sensor minimum
-range and robot self-filter geometry have not been measured. Sensor-Z thresholds,
-far-field stair suppression and separate unused cliff/stair outputs remain the
-existing classification contract. The open forward rectangle is not a complete
-footprint, side/rear/turn envelope or dynamic braking controller. Offline robot
-radius/height parameters are not a local collision model. External obstacle
-publishers and disabled-monitor operation retain their documented obligations.
-These deployment limits are not unimplemented universal ROS Index requirements.
-
-
-Local Debian packaging was also exercised for all three packages: peer-aware Bloom
-preparation, unsigned package build/install and a fresh source-free runtime probe
-with dpkg file ownership, versions, dependencies and ROS interfaces passed.
-These are local artifacts, not an official Bloom or Buildfarm release. Bloom's
-generated rules retain their tolerant test exit behavior. The required local
-release wrapper now validates the actual reports and complete test identities,
-rejecting failures, errors, skips and missing evidence independently of Bloom.
-Installation-dependent checks run in a mandatory fresh Debian runtime container.
-Use `bash scripts/ci/run_humble_debian.sh`; ordinary CI remains a separate check.
+Start with [Installation and startup](INSTALL.md) and verify package discovery,
+the selected YAML paths, action availability, Odometry timestamps and the TF
+tree. Topic and frame defaults are listed in [ARCHITECTURE.md](ARCHITECTURE.md).
+When running tests, use colcon or separate package processes; collecting both
+Python package test directories together can collide on shared template names.

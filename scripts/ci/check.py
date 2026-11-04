@@ -52,7 +52,7 @@ def check(root):
     assert steps[1]['run'] == 'bash scripts/ci/run_humble_release.sh'
     assert steps[2]['uses'] == 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
     assert steps[2]['if'] == 'always()'
-    documents = [root/'README.md', root/'INSTALL.md', root/'r3d_interfaces/README.md']
+    documents = [root/'README.md', root/'docs/INSTALL.md', root/'r3d_interfaces/README.md']
     documents += list((root/'docs').glob('*.md'))
     for document in documents:
         text = document.read_text()
