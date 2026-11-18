@@ -94,8 +94,9 @@ Python package test directories together can collide on shared template names.
 
 ## Stair control deployment
 
-Automatic gait transitions require the external Jetson SDK executable and its
-confirmed exit-code contract. The follower launch stays stopped while the tool,
+Automatic gait transitions require the external Jetson switch executable and
+the separately built SDK guard. The guard verifies BalanceStand and fresh gait
+telemetry before and after the switch tool, including its already-active shortcut. The follower launch stays stopped while the tool,
 Odometry, global TF, planned stair metadata or matching live observations are
 unavailable. SDK failures latch an error requiring the coordinator retry service.
 

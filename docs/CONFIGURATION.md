@@ -509,19 +509,26 @@ The sequence is as follows.
    flagged stair point in map coordinates. Observations need finite coordinates,
    a valid frame and timestamp, and at most 1 s timestamp/receipt age.
 3. Require measured linear speed at most 0.02 m/s and angular speed at most
-   0.03 rad/s continuously for 0.5 s. Invoke the SDK with `eth0 stairs` and keep
-   the follower stopped until exit code 0 confirms the target mode.
-4. Follow the path in stair mode. Flights separated by a landing shorter than
+   0.03 rad/s continuously for 0.5 s. Request a command-publication pause and
+   wait for the follower's fresh acknowledgement for this transition. The SDK
+   guard reads fresh `rt/lf/sportmodestate` in DDS domain 0. After measured
+   standstill, it calls `SportClient::BalanceStand()` once if mode differs from
+   1 and confirms stable mode 1, zero error code and standstill.
+4. Invoke the existing SDK tool with `eth0 stairs`. After its exit code 0,
+   independently verify fresh mode 1, `gait_type=1`, zero error code and
+   standstill through the guard. Keep cmd_vel publication paused throughout.
+   Resume movement only after this final verification.
+5. Follow the path in stair mode. Flights separated by a landing shorter than
    `exit_distance_m` are grouped into one traversal. A following flight already
    within the next approach range also keeps stair mode active.
-5. Once the robot is at least `exit_distance_m` beyond the last flagged point,
+6. Once the robot is at least `exit_distance_m` beyond the last flagged point,
    require a flat following path, path-relative height agreement within 0.1 m,
    height variation at most 0.03 m over at least 0.4 s, and body vertical within
    eight degrees of map vertical. The forward path check extends up to 0.5 m
    ahead, limited by the available path.
-6. Hold movement, verify standstill again, invoke `eth0 normal`, and await exit
-   code 0. Publish `/stair_detect` with `detected: false`, then resume normal
-   following. Only the confirmed normal-mode result clears the traversal event.
+7. Hold movement, verify standstill and pause acknowledgement again, prepare
+   BalanceStand, invoke `eth0 normal`, then verify mode 1 and `gait_type=0`.
+   Publish `/stair_detect` with `detected: false`, then resume normal following. Only the confirmed normal-mode result clears the traversal event.
 
 The controller estimates the base-to-path vertical offset on the initial flat
 approach and keeps it through traversal. Map, Odometry and base TF must preserve
@@ -544,15 +551,18 @@ The external tool is a deployment dependency on the Jetson. Its default absolute
 path is `/home/unitree/go2w_gait_switch/build/go2w_gait_switch`, with `eth0` as
 the default network interface. The tool performs the BalanceStand/motion checks,
 sends neutral-axis wireless-controller button sequences in DDS domain 0, and
-reads the confirmed gait back from `rt/lf/sportmodestate`. The ROS wrapper uses
-literal subprocess arguments and accepts only exit code 0 as success. It does
-not parse the textual `status` output. Its SDK process timeout is 10 s.
-The tool and Unitree SDK remain externally installed dependencies.
+reads the gait back from `rt/lf/sportmodestate`. Its already-active-gait shortcut
+can return zero without checking BalanceStand. The independent guard therefore
+runs before and after every invocation, including already-active gaits. The ROS
+wrapper uses literal subprocess arguments. The total prepare/switch/verify
+process timeout is 20 s.
+The tool and Unitree SDK remain externally installed dependencies. The guard
+uses the public [SportClient API](https://github.com/unitreerobotics/unitree_sdk2/blob/aaf69cb56c9d5ed63d8b284008ec3a8ab999bec1/include/unitree/robot/go2/sport/sport_client.hpp).
 
-The node's startup-only parameters `sdk_executable`, `network_interface` and
-`sdk_timeout_sec` configure that invocation. Launch exposes
-`gait_switch_executable` and `gait_network_interface`. SDK errors, missing
-executables and timeouts latch `ERROR` with movement denied. Inspect `/stair_control`
+The node's startup-only parameters `sdk_executable`, `guard_executable`,
+`network_interface` and `sdk_timeout_sec` configure this sequence. Launch exposes
+`gait_switch_executable`, `gait_guard_executable` and `gait_network_interface`.
+SDK errors, missing executables and timeouts latch `ERROR` with movement denied. Inspect `/stair_control`
 for its detail, correct the cause, then explicitly retry.
 
 ```bash
@@ -562,5 +572,45 @@ ros2 service call /r3d_stair_controller/retry std_srvs/srv/Trigger '{}'
 A retry repeats the outstanding transition after the same input and standstill
 checks. Node shutdown terminates an outstanding SDK subprocess and withdraws
 its permit. Status includes the last SDK-confirmed stair-mode flag. Tracking
-external mode changes requires separate continuous gait feedback. The test suite uses synthetic maps, ROS messages and fake SDK
-executables. Physical mode transitions and stair traversal remain unverified.
+external mode changes requires separate continuous gait feedback. Physical mode transitions and stair traversal remain unverified.
+
+
+### Build the Jetson SDK guard
+
+The guard source and standalone CMake project are installed under the planner's
+`share/r3d_planner/sdk`. Build it on the Jetson against its existing Unitree C++
+SDK. The example prefix matches the provided SDK installation.
+
+```bash
+r3d_share=$(ros2 pkg prefix --share r3d_planner)
+cmake -S "$r3d_share/sdk" -B "$HOME/r3d_gait_guard_build" \
+  -DCMAKE_PREFIX_PATH=/home/unitree/SDK_WS/install/unitree_sdk2 \
+  -DCMAKE_INSTALL_PREFIX="$HOME/.local"
+cmake --build "$HOME/r3d_gait_guard_build"
+cmake --install "$HOME/r3d_gait_guard_build"
+```
+
+The default guard path is `/home/unitree/.local/bin/r3d_go2w_gait_guard`.
+Its `prepare` operation waits for fresh, error-free standstill telemetry, calls
+BalanceStand once when required, and confirms mode 1. `verify_stairs` and
+`verify_normal` independently confirm the final mode, gait, error code and
+standstill. Telemetry needs at least two received samples, receipt age at most
+0.2 s, and continuously valid conditions for 0.5 s before preparation or 0.3 s
+for confirmation. Each telemetry wait is bounded to 4 s. SDK RPC timeout is 3 s.
+
+During preparation and switching, `/stair_control.pause_commands` requests
+suppression of all follower cmd_vel messages, including zero Twist messages.
+The follower echoes a fresh `/stair_command_ack` carrying the exact `path_id`
+and transition `pause_id`. The coordinator waits at most 1 s for that
+acknowledgement before starting a process and requires continuing acknowledgements.
+This prevents its Move(0,0,0) stream from undoing BalanceStand. A lost controller
+heartbeat restores zero-command publication after the normal permit timeout.
+Changed paths, lost pose data, acknowledgement loss or SDK failure abort the
+operation, latch ERROR and restore zero-command publication. Other velocity
+publishers and driver-side watchdogs must cooperate with this pause contract.
+
+The hardware adapter uses the external SDK only in its standalone Jetson build.
+The regular ROS packages install its source and use a configured executable.
+Build the adapter for the Jetson architecture against its installed SDK and
+keep those runtime libraries available. Jetson compilation and physical stair
+traversal remain unverified.

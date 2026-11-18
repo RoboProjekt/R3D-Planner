@@ -213,9 +213,10 @@ def test_sdk_literal_arguments_and_confirmed_exit(tmp_path, exit_code):
     """Forward the documented interface/mode arguments and honor every nonzero exit."""
     record = tmp_path / 'args'
     executable = sdk_script(tmp_path, f'import sys\nfrom pathlib import Path\n'
-                            f'Path({str(record)!r}).write_text(repr(sys.argv[1:]))\n'
+                            f'with Path({str(record)!r}).open("a") as stream:\n'
+                            '    stream.write(repr(sys.argv[1:])+"\\n")\n'
                             f'print("confirmed")\nsys.exit({exit_code})\n')
-    sdk = SdkSwitch(executable, 'eth0', 5.)
+    sdk = SdkSwitch(executable, 'eth0', 5., executable)
     try:
         sdk.start('stairs', time.monotonic())
         with pytest.raises(ValueError):
@@ -226,14 +227,18 @@ def test_sdk_literal_arguments_and_confirmed_exit(tmp_path, exit_code):
             result = sdk.poll(time.monotonic())
             time.sleep(0.01)
         assert result is not None and result[0] is (exit_code == 0)
-        assert record.read_text() == "['eth0', 'stairs']"
+        expected = ["['eth0', 'prepare']"]
+        if exit_code == 0:
+            expected += ["['eth0', 'stairs']", "['eth0', 'verify_stairs']"]
+        assert record.read_text().splitlines() == expected
     finally:
         sdk.close()
 
 
 def test_sdk_timeout_reaps_and_missing_binary_fails(tmp_path):
     """Bound a stalled process and report a missing installation explicitly."""
-    sdk = SdkSwitch(sdk_script(tmp_path, 'import time\ntime.sleep(30)\n'), 'eth0', 0.1)
+    executable = sdk_script(tmp_path, 'import time\ntime.sleep(30)\n')
+    sdk = SdkSwitch(executable, 'eth0', 0.1, executable)
     try:
         sdk.start('normal', 0.)
         process = sdk.process
@@ -249,11 +254,24 @@ def test_sdk_timeout_reaps_and_missing_binary_fails(tmp_path):
 
 def test_sdk_shutdown_reaps_process(tmp_path):
     """Terminate outstanding test commands on node shutdown."""
-    sdk = SdkSwitch(sdk_script(tmp_path, 'import time\ntime.sleep(30)\n'), 'eth0', 5.)
+    executable = sdk_script(tmp_path, 'import time\ntime.sleep(30)\n')
+    sdk = SdkSwitch(executable, 'eth0', 5., executable)
     sdk.start('normal', time.monotonic())
     process = sdk.process
     sdk.close()
     assert process.poll() is not None
+
+
+def test_finished_sdk_stage_cannot_bypass_overall_deadline(tmp_path):
+    """Reject a zero exit observed after the total operation timeout."""
+    executable = sdk_script(tmp_path, 'pass\n')
+    sdk = SdkSwitch(executable, 'eth0', 0.1, executable)
+    try:
+        sdk.start('normal', 0.)
+        sdk.process.wait(timeout=5)
+        assert sdk.poll(0.2) == (False, 'SDK timeout')
+    finally:
+        sdk.close()
 
 
 @pytest.mark.parametrize('executable,interface,timeout', [
@@ -263,3 +281,56 @@ def test_sdk_invalid_configuration(executable, interface, timeout):
     """Reject malformed startup settings before creating a subprocess."""
     with pytest.raises(ValueError):
         SdkSwitch(executable, interface, timeout)
+
+
+@pytest.mark.parametrize('failed_stage', ['prepare', 'stairs', 'verify_stairs'])
+def test_sdk_guard_and_switch_failures_never_report_success(tmp_path, failed_stage):
+    """Reject failures even when the existing switch tool would return zero."""
+    executable = sdk_script(tmp_path, 'import sys\n'
+                            f'sys.exit(7 if sys.argv[2] == {failed_stage!r} else 0)\n')
+    sdk = SdkSwitch(executable, 'eth0', 5., executable)
+    try:
+        sdk.start('stairs', time.monotonic())
+        deadline = time.monotonic() + 5
+        result = None
+        while result is None and time.monotonic() < deadline:
+            result = sdk.poll(time.monotonic())
+            time.sleep(0.01)
+        assert result is not None and result[0] is False
+    finally:
+        sdk.close()
+
+
+def test_installed_cpp_guard_predicates(installed_share, tmp_path):
+    """Compile and run telemetry predicates without linking or contacting an SDK."""
+    import subprocess
+    source = tmp_path / 'rules.cpp'
+    source.write_text('''
+#include "gait_guard.hpp"
+#include <cassert>
+#include <limits>
+int main() {
+  r3d::GaitState state;
+  state.mode = 1;
+  assert(r3d::ready(state, 0));
+  assert(!r3d::ready(state, 1));
+  state.mode = 2;
+  assert(!r3d::ready(state));
+  state.mode = 1;
+  state.error = 1;
+  assert(!r3d::ready(state));
+  state.error = 0;
+  state.velocity[0] = 0.1f;
+  assert(!r3d::ready(state));
+  state.velocity[0] = std::numeric_limits<float>::quiet_NaN();
+  assert(!r3d::stationary(state));
+  state.velocity[0] = 0;
+  state.yaw_speed = 0.1f;
+  assert(!r3d::stationary(state));
+}
+''')
+    binary = tmp_path / 'rules'
+    subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                    '-I' + str(installed_share / 'sdk'), str(source), '-o', str(binary)],
+                   check=True, capture_output=True, text=True)
+    subprocess.run([str(binary)], check=True, timeout=5)

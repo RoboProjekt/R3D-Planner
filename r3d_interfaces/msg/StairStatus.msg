@@ -20,3 +20,5 @@ string state
 bool motion_allowed
 bool stair_mode_active
 string detail
+bool pause_commands
+uint64 pause_id

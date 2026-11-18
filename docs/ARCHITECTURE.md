@@ -149,6 +149,7 @@ Names below are defaults without a namespace.
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | local filter/external → follower | internal output reliable/depth 10; input SensorDataQoS |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | local filter → external | reliable, depth 10 |
 | `/stair_detect` | `r3d_interfaces/msg/StairDetection` | local filter/coordinator → coordinator/external | reliable, depth 10 |
+| `/stair_command_ack` | `r3d_interfaces/msg/StairStatus` | follower → coordinator | reliable, volatile, depth 10 |
 | `/stair_control` | `r3d_interfaces/msg/StairStatus` | coordinator → follower | reliable, volatile, depth 10 |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | follower → external base | reliable, depth 10 |
 | `/clicked_point` | `geometry_msgs/msg/PointStamped` | RViz/external → RViz interface | reliable, depth 10 |
@@ -206,11 +207,15 @@ frame with a current stamp. The point is ignored when `detected` is false.
 The previous PointStamped topic type must be migrated by external consumers.
 
 `StairStatus` carries a stamped header, `path_id`, `state`, `motion_allowed`,
-`stair_mode_active` and `detail`. `path_id` is the SHA-256 of the serialized
+`stair_mode_active`, `detail`, `pause_commands` and `pause_id`. `path_id` is the SHA-256 of the serialized
 complete `PathWithMetadata` message. It binds the permit to geometry, metadata
 and path timestamp. The follower checks both ROS timestamp age and steady
 receipt age. SDK commands execute asynchronously while denied permits continue.
-Only the follower publishes robot velocity commands.
+Only the follower publishes robot velocity commands. A transition-specific
+pause acknowledgement suppresses even zero Twist messages while a standalone
+SDK guard establishes BalanceStand and verifies the gait before and after the
+existing switch tool. The guard source ships with the planner; it is built
+separately on the Jetson against the existing Unitree SDK.
 
 The `PathWithMetadata` wire format now includes `bool[] stairs`. Rebuild and
 source all three packages together on every participating machine. Integrated

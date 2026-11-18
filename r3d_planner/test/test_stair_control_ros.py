@@ -114,8 +114,21 @@ def odometry(node, x, z=0.5, moving=False):
 def tick(node, now, x, z=0.5, moving=False):
     """Advance the production timer callback with fresh data and a deterministic steady clock."""
     odometry(node, x, z, moving)
+    if node.coordinator.switching:
+        acknowledge_pause(node, now)
     with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=now):
         node.tick()
+        if node.pending_mode is not None:
+            acknowledge_pause(node, now)
+            node.tick()
+
+
+def acknowledge_pause(node, now):
+    """Simulate the follower's explicit acknowledgement in controller unit tests."""
+    ack = StairStatus(path_id=node.path_id, pause_commands=True, pause_id=node.pause_id)
+    ack.header = Header(frame_id='map', stamp=node.get_clock().now().to_msg())
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=now):
+        node.pause_callback(ack)
 
 
 def test_generated_detection_and_status_roundtrip():
@@ -265,10 +278,9 @@ def test_detection_tf_and_sdk_failure_retry(controller):
     assert response.success
 
 
-@pytest.mark.parametrize('fault', ['missing', 'denied', 'expired', 'wrong_path', 'wrong_frame',
-                                   'future', 'changed_terrain'])
-def test_actual_follower_permit_gates_all_velocity_commands(fault, installed_share):
-    """Require a fresh exact-path permit and stop immediately when it is revoked."""
+@pytest.fixture
+def gated_follower(installed_share):
+    """Create the actual interlocked follower with isolated velocity output."""
     rclpy.init()
     original = Node.__init__
 
@@ -281,40 +293,102 @@ def test_actual_follower_permit_gates_all_velocity_commands(fault, installed_sha
     with patch.object(Node, '__init__', init):
         node = PathFollower()
     node.timer.cancel()
+    node.cmd_pub = Mock()
     try:
-        node.cmd_pub = Mock()
-        message = metadata(node)
-        node.path_callback(message)
-        node.get_robot_pose = lambda: (0., 0., 0.)
-        status = StairStatus(path_id=path_fingerprint(message), motion_allowed=True)
-        status.header = Header(frame_id='map', stamp=node.get_clock().now().to_msg())
-        node.stair_status_callback(status)
-        node.control_loop()
-        assert node.cmd_pub.publish.call_args.args[0].linear.x > 0
-        if fault == 'missing':
-            node.stair_status = None
-        elif fault == 'denied':
-            status.motion_allowed = False
-            node.stair_status_callback(status)
-            assert node.cmd_pub.publish.call_args.args[0].linear.x == 0
-        elif fault == 'expired':
-            node.stair_status_received -= 1.0
-        elif fault == 'wrong_path':
-            status.path_id = 'other'
-        elif fault == 'wrong_frame':
-            status.header.frame_id = 'odom'
-        elif fault == 'future':
-            status.header.stamp.sec += 10
-        else:
-            changed = copy.deepcopy(message)
-            changed.stairs[0] = True
-            node.path_callback(changed)
-        node.control_loop()
-        command = node.cmd_pub.publish.call_args.args[0]
-        assert command.linear.x == 0 and command.angular.z == 0
+        yield node
     finally:
         node.destroy_node()
         rclpy.shutdown()
+
+
+@pytest.mark.parametrize('fault', ['missing', 'denied', 'expired', 'wrong_path', 'wrong_frame',
+                                   'future', 'changed_terrain'])
+def test_actual_follower_permit_gates_all_velocity_commands(fault, gated_follower):
+    """Require a fresh exact-path permit and stop immediately when it is revoked."""
+    node = gated_follower
+    node.cmd_pub = Mock()
+    message = metadata(node)
+    node.path_callback(message)
+    node.get_robot_pose = lambda: (0., 0., 0.)
+    status = StairStatus(path_id=path_fingerprint(message), motion_allowed=True)
+    status.header = Header(frame_id='map', stamp=node.get_clock().now().to_msg())
+    node.stair_status_callback(status)
+    node.control_loop()
+    assert node.cmd_pub.publish.call_args.args[0].linear.x > 0
+    if fault == 'missing':
+        node.stair_status = None
+    elif fault == 'denied':
+        status.motion_allowed = False
+        node.stair_status_callback(status)
+        assert node.cmd_pub.publish.call_args.args[0].linear.x == 0
+    elif fault == 'expired':
+        node.stair_status_received -= 1.0
+    elif fault == 'wrong_path':
+        status.path_id = 'other'
+    elif fault == 'wrong_frame':
+        status.header.frame_id = 'odom'
+    elif fault == 'future':
+        status.header.stamp.sec += 10
+    else:
+        changed = copy.deepcopy(message)
+        changed.stairs[0] = True
+        node.path_callback(changed)
+    node.control_loop()
+    command = node.cmd_pub.publish.call_args.args[0]
+    assert command.linear.x == 0 and command.angular.z == 0
+
+
+def test_follower_pause_ack_suppresses_zero_twists_and_expires(gated_follower):
+    """Pause cmd_vel during BalanceStand and restore zeros if the controller disappears."""
+    node = gated_follower
+    message = metadata(node)
+    node.path_callback(message)
+    node.get_robot_pose = lambda: (0., 0., 0.)
+    node.stair_ack_publisher = Mock()
+    status = StairStatus(path_id=path_fingerprint(message), pause_commands=True, pause_id=42)
+    status.header = Header(frame_id='map', stamp=node.get_clock().now().to_msg())
+    node.cmd_pub.reset_mock()
+    node.stair_status_callback(status)
+    node.control_loop()
+    node.cmd_pub.publish.assert_not_called()
+    ack = node.stair_ack_publisher.publish.call_args.args[0]
+    assert ack.pause_commands and ack.pause_id == 42 and ack.path_id == status.path_id
+    node.stair_status_received -= 1.0
+    node.control_loop()
+    assert node.cmd_pub.publish.call_args.args[0].linear.x == 0
+
+
+def test_controller_waits_for_exact_pause_ack_before_sdk(controller):
+    """Require an acknowledgement for the current transition and enforce its timeout."""
+    node, sdk = controller
+    node.path_callback(metadata(node))
+    odometry(node, 0.)
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=0.):
+        node.tick()
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=0.51):
+        node.tick()
+    assert node.pending_mode == 'normal' and sdk.requests == []
+    acknowledge_pause(node, 0.6)
+    node.pause_ack.pause_id -= 1
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=0.6):
+        node.tick()
+    assert sdk.requests == []
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=1.6):
+        node.tick()
+    assert node.coordinator.state == 'ERROR' and sdk.requests == []
+
+
+def test_sdk_operation_aborts_when_pause_ack_is_lost(controller):
+    """Stop the external operation if the follower stops confirming its pause."""
+    node, sdk = controller
+    node.path_callback(metadata(node))
+    tick(node, 0., 0.)
+    tick(node, 0.51, 0.)
+    assert sdk.requests == ['normal']
+    odometry(node, 0.)
+    with patch('r3d_planner.r3d_stair_controller.time.monotonic', return_value=1.1):
+        node.tick()
+    assert node.coordinator.state == 'ERROR' and not node.coordinator.switching
 
 
 @pytest.mark.parametrize('value', [0, -1, True, '1', math.inf, None])
@@ -366,6 +440,7 @@ def test_native_dds_detection_permit_and_heartbeat_loss(installed_share):
         kwargs['namespace'] = namespace
         kwargs['cli_args'] = ['--ros-args', '-r', '/stair_control:=permit',
                               '-r', '/stair_detect:=detection',
+                              '-r', '/stair_command_ack:=ack',
                               '-r', '/global_path_metadata:=path']
         if args and args[0] == 'r3d_path_follower':
             kwargs['parameter_overrides'] = [
@@ -401,6 +476,16 @@ def test_native_dds_detection_permit_and_heartbeat_loss(installed_share):
             detection_publisher.publish(detection)
             rclpy.spin_once(node, timeout_sec=0.03)
         assert node.detection.detected
+        node.coordinator.switching = True
+        node.pause_id = 123
+        deadline = time.monotonic() + 6
+        while not node.pause_confirmed(time.monotonic()) and time.monotonic() < deadline:
+            node.publish_status()
+            rclpy.spin_once(follower, timeout_sec=0.02)
+            rclpy.spin_once(node, timeout_sec=0.02)
+        assert node.pause_confirmed(time.monotonic())
+        assert node.pause_ack.pause_id == 123
+        node.coordinator.switching = False
         node.coordinator.state = 'NORMAL'
         node.coordinator.motion_allowed = True
         deadline = time.monotonic() + 6

@@ -243,36 +243,45 @@ class StairCoordinator:
 class SdkSwitch:
     """Run the documented executable asynchronously with bounded process lifetime."""
 
-    def __init__(self, executable, interface, timeout):
+    def __init__(self, executable, interface, timeout,
+                 guard_executable='/home/unitree/.local/bin/r3d_go2w_gait_guard'):
         if not os.path.isabs(executable) or not interface or any(c.isspace() for c in interface):
             raise ValueError('SDK executable must be absolute and interface must be one name')
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError('SDK timeout must be finite and positive')
+        if not os.path.isabs(guard_executable):
+            raise ValueError('SDK guard executable must be absolute')
         self.executable, self.interface, self.timeout = executable, interface, timeout
+        self.guard_executable = guard_executable
         self.process = self.output = None
         self.started = None
+        self.mode = self.stage = None
 
     def start(self, mode, now):
         """Pass literal arguments, without a shell or unbounded output pipe."""
         if mode not in ('stairs', 'normal') or self.process is not None:
             raise ValueError('invalid or concurrent SDK switch')
+        self.mode, self.stage, self.started = mode, 'prepare', now
+        self.spawn(self.guard_executable, 'prepare')
+
+    def spawn(self, executable, operation):
+        """Start one guard or switch stage without a shell."""
         self.output = tempfile.TemporaryFile()
         try:
             self.process = subprocess.Popen(
-                [self.executable, self.interface, mode], stdin=subprocess.DEVNULL,
+                [executable, self.interface, operation], stdin=subprocess.DEVNULL,
                 stdout=self.output, stderr=subprocess.STDOUT, start_new_session=True)
         except Exception:
             self.output.close()
             self.output = None
             raise
-        self.started = now
 
     def poll(self, now):
         """Return a confirmed result, a failure, or None while the tool is running."""
         if self.process is None:
             return None
         code = self.process.poll()
-        timed_out = code is None and now - self.started >= self.timeout
+        timed_out = now - self.started >= self.timeout
         if code is None and not timed_out:
             return None
         if timed_out:
@@ -283,6 +292,16 @@ class SdkSwitch:
         detail = self.output.read().decode('utf-8', errors='replace').strip()
         self.output.close()
         self.output = self.process = None
+        if code == 0 and not timed_out and self.stage != 'verify':
+            executable, operation = self.executable, self.mode
+            self.stage = 'switch' if self.stage == 'prepare' else 'verify'
+            if self.stage == 'verify':
+                executable, operation = self.guard_executable, 'verify_' + self.mode
+            try:
+                self.spawn(executable, operation)
+                return None
+            except (OSError, ValueError) as exc:
+                return False, str(exc)
         return code == 0 and not timed_out, ('SDK timeout' if timed_out else
                                              f'SDK exit {code}: {detail}')
 

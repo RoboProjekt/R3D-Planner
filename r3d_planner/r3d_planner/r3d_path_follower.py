@@ -120,6 +120,7 @@ class PathFollower(Node):
 
         self.stair_subscription = self.create_subscription(
             StairStatus, '/stair_control', self.stair_status_callback, 10)
+        self.stair_ack_publisher = self.create_publisher(StairStatus, '/stair_command_ack', 10)
 
         # --- TF (Transformationen) ---
         # --- CONTROL LOOP ---
@@ -157,12 +158,13 @@ class PathFollower(Node):
     def stair_motion_available(self):
         """Require a fresh permit for this exact path and its classification."""
         status = self.stair_status
-        if status is None or not status.motion_allowed:
+        if status is None:
             return False
         stamp = status.header.stamp.sec + status.header.stamp.nanosec / 1e9
         age = self.get_clock().now().nanoseconds / 1e9 - stamp
         received_age = time.monotonic() - self.stair_status_received
         return (status.path_id == self.current_path_id and bool(self.current_path_id) and
+                status.motion_allowed and
                 status.header.frame_id == self.get_parameter('map_frame').value and
                 0 <= age <= 0.5 and 0 <= received_age <= 0.5)
 
@@ -220,11 +222,31 @@ class PathFollower(Node):
 
     def publish_command(self, message):
         """Recheck monitored clearance immediately before the single command publisher."""
+        if self.stair_control_enabled and self.stair_commands_paused():
+            return
         if self.monitoring_settings['enabled'] and not self.monitor_available():
             message = Twist()
         if self.stair_control_enabled and not self.stair_motion_available():
             message = Twist()
         self.cmd_pub.publish(message)
+
+    def stair_commands_paused(self):
+        """Acknowledge a fresh pause and suppress Move(0,0,0) during SDK transitions."""
+        status = self.stair_status
+        if status is None or not status.pause_commands:
+            return False
+        stamp = status.header.stamp.sec + status.header.stamp.nanosec / 1e9
+        age = self.get_clock().now().nanoseconds / 1e9 - stamp
+        fresh = (status.path_id == self.current_path_id and bool(self.current_path_id) and
+                 status.header.frame_id == self.get_parameter('map_frame').value and
+                 0 <= age <= 0.5 and 0 <= time.monotonic() - self.stair_status_received <= 0.5)
+        if fresh:
+            ack = StairStatus(path_id=self.current_path_id, state='PAUSED',
+                              pause_commands=True, pause_id=status.pause_id)
+            ack.header.frame_id = status.header.frame_id
+            ack.header.stamp = self.get_clock().now().to_msg()
+            self.stair_ack_publisher.publish(ack)
+        return fresh
 
     def destroy_node(self):
         """Remove the clock callback before destroying the node's ROS entities."""

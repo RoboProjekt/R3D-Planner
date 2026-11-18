@@ -40,7 +40,8 @@ class StairController(Node):
         _, robot = load_robot_profile()
         defaults = {**stair_settings(robot.get('stairs')),
                     'sdk_executable': '/home/unitree/go2w_gait_switch/build/go2w_gait_switch',
-                    'network_interface': 'eth0', 'sdk_timeout_sec': 10.0}
+                    'guard_executable': '/home/unitree/.local/bin/r3d_go2w_gait_guard',
+                    'network_interface': 'eth0', 'sdk_timeout_sec': 20.0}
         for key, value in defaults.items():
             self.declare_parameter(key, value, ParameterDescriptor(read_only=True))
         self.coordinator = StairCoordinator(
@@ -48,18 +49,26 @@ class StairController(Node):
             self.get_parameter('exit_distance_m').value)
         self.sdk = SdkSwitch(self.get_parameter('sdk_executable').value,
                              self.get_parameter('network_interface').value,
-                             self.get_parameter('sdk_timeout_sec').value)
+                             self.get_parameter('sdk_timeout_sec').value,
+                             self.get_parameter('guard_executable').value)
         self.odometry = OdometryInput(self)
         self.route = None
         self.path_id = ''
         self.detection = None
         self.detection_received = None
+        self.pause_id = 0
+        self.pause_ack = None
+        self.pause_ack_received = None
+        self.pause_started = None
+        self.pending_mode = None
         self.status_publisher = self.create_publisher(StairStatus, '/stair_control', 10)
         self.detection_publisher = self.create_publisher(StairDetection, '/stair_detect', 10)
         self.path_subscription = self.create_subscription(
             PathWithMetadata, '/global_path_metadata', self.path_callback, metadata_qos())
         self.detection_subscription = self.create_subscription(
             StairDetection, '/stair_detect', self.detection_callback, 10)
+        self.pause_subscription = self.create_subscription(
+            StairStatus, '/stair_command_ack', self.pause_callback, 10)
         self.retry_service = self.create_service(Trigger, '~/retry', self.retry_callback)
         self.timer = self.create_timer(
             0.05, self.tick, clock=Clock(clock_type=ClockType.STEADY_TIME))
@@ -71,9 +80,15 @@ class StairController(Node):
             validate_metadata(message, self.odometry.map_frame, require_stairs=True)
             positions = [(p.pose.position.x, p.pose.position.y, p.pose.position.z)
                          for p in message.path.poses]
-            self.route = StairRoute(positions, message.stairs)
-            self.path_id = path_fingerprint(message)
+            route = StairRoute(positions, message.stairs)
+            path_id = path_fingerprint(message)
+            if self.coordinator.switching and self.path_id != path_id:
+                self.abort_switch('Path changed during gait transition. '
+                                  'Retry after checking the route')
+            self.route, self.path_id = route, path_id
         except ValueError as exc:
+            if self.coordinator.switching:
+                self.abort_switch(str(exc))
             self.route, self.path_id = None, ''
             self.coordinator.hold(str(exc))
         self.coordinator.motion_allowed = False
@@ -83,6 +98,27 @@ class StairController(Node):
         """Store positive and explicit no-stair observations with receipt freshness."""
         self.detection = message
         self.detection_received = time.monotonic()
+
+    def pause_callback(self, message):
+        """Record the follower acknowledgement for this specific pause request."""
+        self.pause_ack = message
+        self.pause_ack_received = time.monotonic()
+
+    def pause_confirmed(self, now):
+        """Reject stale or mismatched acknowledgements before invoking the SDK guard."""
+        ack = self.pause_ack
+        if ack is None or not ack.pause_commands:
+            return False
+        age = (self.get_clock().now() - Time.from_msg(ack.header.stamp)).nanoseconds / 1e9
+        return (ack.pause_id == self.pause_id and ack.path_id == self.path_id and
+                ack.header.frame_id == self.odometry.map_frame and
+                0 <= age <= 0.5 and 0 <= now - self.pause_ack_received <= 0.5)
+
+    def abort_switch(self, detail):
+        """Abort the outstanding operation and restore zero-command publication."""
+        self.sdk.close()
+        self.pending_mode = None
+        self.coordinator.confirmed(False, detail)
 
     def matching_detection(self, steady_now):
         """Transform a fresh sensor observation into the planned map frame."""
@@ -113,6 +149,9 @@ class StairController(Node):
     def tick(self):
         """Keep status alive while the SDK runs and fail closed on missing inputs."""
         now = time.monotonic()
+        if (self.coordinator.switching and self.pending_mode is None and
+                not self.pause_confirmed(now)):
+            self.abort_switch('Follower command-pause acknowledgement expired')
         result = self.sdk.poll(now)
         if result is not None:
             self.coordinator.confirmed(*result)
@@ -134,8 +173,14 @@ class StairController(Node):
             mode = self.coordinator.step(self.route, (pose.x, pose.y, pose.z), stationary,
                                          self.matching_detection(now), now, level=level)
         except Exception as exc:
-            if self.coordinator.state != 'ERROR':
+            if self.coordinator.switching:
+                self.abort_switch(str(exc))
+            elif self.coordinator.state != 'ERROR':
                 self.coordinator.hold(str(exc))
+        if mode is not None:
+            self.pause_id = time.monotonic_ns()
+            self.pause_started = now
+            self.pending_mode = mode
         # Withdraw movement permission before the external command is started.
         self.publish_status()
         if self.coordinator.clear_detection:
@@ -145,11 +190,15 @@ class StairController(Node):
             self.detection_publisher.publish(cleared)
             self.coordinator.clear_detection = False
             self.detection = None
-        if mode is not None:
+        if self.pending_mode is not None and now - self.pause_started > 1.0:
+            self.abort_switch('Follower did not acknowledge command pause within 1 s')
+            self.publish_status()
+        elif self.pending_mode is not None and self.pause_confirmed(now):
             try:
-                self.sdk.start(mode, now)
+                self.sdk.start(self.pending_mode, now)
+                self.pending_mode = None
             except (OSError, ValueError) as exc:
-                self.coordinator.confirmed(False, str(exc))
+                self.abort_switch(str(exc))
                 self.publish_status()
 
     def publish_status(self):
@@ -158,6 +207,8 @@ class StairController(Node):
         message = StairStatus(path_id=self.path_id, state=coordinator.state,
                               motion_allowed=coordinator.motion_allowed,
                               stair_mode_active=coordinator.stair_mode_active,
+                              pause_commands=coordinator.switching,
+                              pause_id=self.pause_id,
                               detail=coordinator.detail)
         message.header.frame_id = self.odometry.map_frame
         message.header.stamp = self.get_clock().now().to_msg()
@@ -174,6 +225,8 @@ class StairController(Node):
 
     def destroy_node(self):
         """Withdraw permission and terminate any outstanding tool on shutdown."""
+        self.sdk.close()
+        self.coordinator.switching = False
         self.coordinator.motion_allowed = False
         try:
             if rclpy.ok(context=self.context):

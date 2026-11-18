@@ -13,7 +13,7 @@ digraph R3D {
  rviznode [label="r3d_planner\nrviz_interface (optional)"];
  planner [label="r3d_planner\npcd_path_planner\nweighted graph + A*"];
  coordinator [label="r3d_planner\nstair_controller\nstop / confirm / resume"];
- sdk [label="External Jetson gait tool\nGo2W SDK",fillcolor="#f5f5f5"];
+ sdk [label="External Jetson SDK guard + gait tool\nGo2W SDK",fillcolor="#f5f5f5"];
  follower [label="r3d_planner\npath_follower\nseparate explicit launch"];
  filter [label="r3d_planner\nlocal_filter (optional)"];
  odom [label="External odometry + TF\nmap / odom / base + sensor",fillcolor="#f5f5f5"];
@@ -34,7 +34,7 @@ digraph R3D {
  odom -> coordinator [style=dashed,label="pose / height / TF"];
  sensor -> filter [label="configured topic"];
  filter -> follower [label="/local/filtered_obstacles"];
- filter -> rviz [label="obstacles / cliff / stairs",style=dashed];
+ filter -> rviz [label="obstacles / cliff",style=dashed];
  odom -> planner [style=dashed,label="online pose"];
  odom -> follower [style=dashed,label="pose + timestamped TF"];
  follower -> adapter [label="configured cmd_vel"];
