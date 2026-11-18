@@ -74,7 +74,7 @@ class FakeSdk:
 
 
 @pytest.fixture
-def controller():
+def controller(installed_share):
     """Construct the production node with a fake transport and isolated ROS names."""
     rclpy.init()
     original = Node.__init__
@@ -267,7 +267,7 @@ def test_detection_tf_and_sdk_failure_retry(controller):
 
 @pytest.mark.parametrize('fault', ['missing', 'denied', 'expired', 'wrong_path', 'wrong_frame',
                                    'future', 'changed_terrain'])
-def test_actual_follower_permit_gates_all_velocity_commands(fault):
+def test_actual_follower_permit_gates_all_velocity_commands(fault, installed_share):
     """Require a fresh exact-path permit and stop immediately when it is revoked."""
     rclpy.init()
     original = Node.__init__
@@ -356,7 +356,7 @@ def test_custom_distances_forwarded_to_installed_follower_launch(installed_share
     assert nodes[1].node_executable == 'path_follower'
 
 
-def test_native_dds_detection_permit_and_heartbeat_loss():
+def test_native_dds_detection_permit_and_heartbeat_loss(installed_share):
     """Pass the new interfaces over DDS and stop after a controller heartbeat disappears."""
     rclpy.init()
     original = Node.__init__
