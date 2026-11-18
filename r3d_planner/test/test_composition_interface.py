@@ -232,7 +232,15 @@ def test_native_namespaced_launch_and_remapping(composed_config, monkeypatch):
             while not paths and time.monotonic() < deadline:
                 rclpy.spin_once(observer, timeout_sec=0.05)
             assert paths and paths[-1] == result.result().result.path
+            expected = {('global_graph_planner', '/r3d_contract'),
+                        ('r3d_rviz_interface', '/r3d_contract')}
+            deadline = time.monotonic() + 10
             names = observer.get_node_names_and_namespaces()
+            while not expected.issubset(names) and time.monotonic() < deadline:
+                assert process.poll() is None, (path.parent / 'namespace-launch.log').read_text()
+                rclpy.spin_once(observer, timeout_sec=0.05)
+                names = observer.get_node_names_and_namespaces()
+            assert expected.issubset(names), (path.parent / 'namespace-launch.log').read_text()
             assert ('global_graph_planner', '/r3d_contract') in names
             assert ('r3d_rviz_interface', '/r3d_contract') in names
             assert not observer.get_publishers_info_by_topic('/global_path')
