@@ -20,7 +20,8 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.parametrize('filename', ['CMakeLists.txt', 'msg/PathWithMetadata.msg'])
+@pytest.mark.parametrize('filename', ['CMakeLists.txt', 'msg/PathWithMetadata.msg',
+                                      'msg/StairDetection.msg', 'msg/StairStatus.msg'])
 def test_own_source_license_header(filename):
     source = Path(__file__).resolve().parents[1] / filename
     text = source.read_text()

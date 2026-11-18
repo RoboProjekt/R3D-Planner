@@ -5,4 +5,6 @@ Forthcoming
 -----------
 
 * PathWithMetadata message containing a geometric Path and index-aligned
-  narrow-area flags, with generated Python and C++ interfaces.
+  narrow-area and stair flags, with generated Python and C++ interfaces.
+* StairDetection and StairStatus interfaces for explicit detections and
+  path-bound gait-transition movement permits.

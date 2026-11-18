@@ -403,7 +403,8 @@ a blocked executor, process failure or actuator queue needs independent command
 watchdogs and stop facilities. The internal filter now retains height-qualified near returns by default;
 Physical sensor coverage, self returns and body clearances still need deployment
 validation; fresh empty output does not prove complete near-field coverage.
-Cliff/stair outputs are still not internal follower stop inputs. This does not provide a hardware stop or safety certification.
+Cliff output handling remains external. Stair-mode transitions use the separate
+coordinator described below.
 
 
 ## Local obstacle geometry and near-return retention
@@ -463,5 +464,103 @@ centimetres for PCD classification. They do not define a measured local footprin
 body-front offset, sensor transform, braking distance or turn envelope. They are
 not automatically reused here. Sensor coverage, height alignment, self filtering,
 body geometry, braking and actuator watchdogs need deployment-specific validation.
-An empty valid cloud is not proof of obstacle-free space. Cliff/stair handling, reverse-motion protection and a certified safety
-function are outside this controller.
+Cliff handling and reverse-motion protection remain external. Stair gait
+coordination is described below.
+
+
+## Go2W stair control
+
+The selected robot profile owns the two route-distance margins.
+
+```yaml
+robot:
+  stairs:
+    approach_distance_m: 1.0
+    exit_distance_m: 1.0
+```
+
+These fields belong alongside `geometry`, `velocity_limits`, `odometry` and
+`topics` in the full profile. Values must be finite positive numbers in metres.
+Older profiles which omit `stairs` use 1.0 m for both margins. Changing the
+profile takes effect after restarting the follower launch. Inspect the effective
+read-only parameters on `/r3d_stair_controller`.
+
+Distances are measured along the 3D planned path. The first and last flagged
+stair waypoints define the flight boundaries. A flag can include the lower
+approach voxel adjacent to a step. Consequently the requested stop is
+approximately the configured distance before the first physical step. Sensor,
+controller, braking and transport effects require deployment validation.
+
+`follower.launch.py` starts `stair_controller` and enables the follower's
+`stair_control_enabled` interlock. The coordinator publishes `/stair_control`
+at 20 Hz. The follower accepts movement only with a permit for the complete
+current path and terrain metadata. A missing, denied, mismatched, future-dated
+or more than 0.5 s old permit keeps all Twist components zero. A steady timer
+also expires permits while simulation time pauses. Direct isolated
+`ros2 run r3d_planner path_follower` defaults `stair_control_enabled` to false.
+The follower launch enables integrated stair operation.
+
+The sequence is as follows.
+
+1. Start on the flat approach with a valid path, fresh Odometry and timestamped
+   map TF. Hold movement and confirm normal gait through the SDK tool.
+2. At `approach_distance_m` before the next planned flight, withdraw movement
+   permission. Require a positive live observation within 0.75 m of the first
+   flagged stair point in map coordinates. Observations need finite coordinates,
+   a valid frame and timestamp, and at most 1 s timestamp/receipt age.
+3. Require measured linear speed at most 0.02 m/s and angular speed at most
+   0.03 rad/s continuously for 0.5 s. Invoke the SDK with `eth0 stairs` and keep
+   the follower stopped until exit code 0 confirms the target mode.
+4. Follow the path in stair mode. Flights separated by a landing shorter than
+   `exit_distance_m` are grouped into one traversal. A following flight already
+   within the next approach range also keeps stair mode active.
+5. Once the robot is at least `exit_distance_m` beyond the last flagged point,
+   require a flat following path, path-relative height agreement within 0.1 m,
+   height variation at most 0.03 m over at least 0.4 s, and body vertical within
+   eight degrees of map vertical. The forward path check extends up to 0.5 m
+   ahead, limited by the available path.
+6. Hold movement, verify standstill again, invoke `eth0 normal`, and await exit
+   code 0. Publish `/stair_detect` with `detected: false`, then resume normal
+   following. Only the confirmed normal-mode result clears the traversal event.
+
+The controller estimates the base-to-path vertical offset on the initial flat
+approach and keeps it through traversal. Map, Odometry and base TF must preserve
+that relationship. Initialize before the first stair waypoint. While a flight
+is active, replans must retain its exit geometry and stair classification.
+Movement is held until a compatible path is available. Plan a landing
+at least `exit_distance_m + path_follower.goal_tolerance` beyond the last stair
+flag so goal stopping leaves room for the full exit margin. A goal closer to the
+flight can be reached while stair mode remains active.
+
+A live observation alone authorizes a switch only when the path confirms the
+staircase. Ensure the live-filter ROI and sensor extrinsics cover the selected
+approach distance. With the default approximately 0.7--1.1 m sensor-X ROI,
+a substantially longer approach margin can stop the robot before the detector
+can see the step. In that case extend the detection ROI consistently. Offline
+step-height bounds and live sensor-Z thresholds remain separately configured.
+Both sets of criteria must cover the intended staircase.
+
+The external tool is a deployment dependency on the Jetson. Its default absolute
+path is `/home/unitree/go2w_gait_switch/build/go2w_gait_switch`, with `eth0` as
+the default network interface. The tool performs the BalanceStand/motion checks,
+sends neutral-axis wireless-controller button sequences in DDS domain 0, and
+reads the confirmed gait back from `rt/lf/sportmodestate`. The ROS wrapper uses
+literal subprocess arguments and accepts only exit code 0 as success. It does
+not parse the textual `status` output. Its SDK process timeout is 10 s.
+The tool and Unitree SDK remain externally installed dependencies.
+
+The node's startup-only parameters `sdk_executable`, `network_interface` and
+`sdk_timeout_sec` configure that invocation. Launch exposes
+`gait_switch_executable` and `gait_network_interface`. SDK errors, missing
+executables and timeouts latch `ERROR` with movement denied. Inspect `/stair_control`
+for its detail, correct the cause, then explicitly retry.
+
+```bash
+ros2 service call /r3d_stair_controller/retry std_srvs/srv/Trigger '{}'
+```
+
+A retry repeats the outstanding transition after the same input and standstill
+checks. Node shutdown terminates an outstanding SDK subprocess and withdraws
+its permit. Status includes the last SDK-confirmed stair-mode flag. Tracking
+external mode changes requires separate continuous gait feedback. The test suite uses synthetic maps, ROS messages and fake SDK
+executables. Physical mode transitions and stair traversal remain unverified.

@@ -57,8 +57,9 @@ planner plugin. This stack is not a complete Nav2 lifecycle/plugin integration.
 
 ## Follower and obstacle-input limits
 
-The follower uses path XY/yaw and ignores path Z. It does not directly consume
-`/stair_detect` or `/local/cliff_virtual_wall`. Independent command watchdogs,
+The follower steers with path XY/yaw. The separately launched stair coordinator
+uses path height and `/stair_detect` to hold motion around confirmed gait
+changes. Cliff-output handling, independent command watchdogs,
 arbitration and stop facilities are external; a zero Twist is a software command,
 not a demonstrated physical emergency stop.
 
@@ -89,3 +90,25 @@ the selected YAML paths, action availability, Odometry timestamps and the TF
 tree. Topic and frame defaults are listed in [ARCHITECTURE.md](ARCHITECTURE.md).
 When running tests, use colcon or separate package processes; collecting both
 Python package test directories together can collide on shared template names.
+
+
+## Stair control deployment
+
+Automatic gait transitions require the external Jetson SDK executable and its
+confirmed exit-code contract. The follower launch stays stopped while the tool,
+Odometry, global TF, planned stair metadata or matching live observations are
+unavailable. SDK failures latch an error requiring the coordinator retry service.
+
+Choose an approach margin which the configured live-filter ROI can observe.
+Include the complete staircase and a sufficiently long upper landing in the
+path. Replans during traversal must preserve the active stair exit and its
+classification. A truncated landing can leave the confirmed stair mode active
+at the goal. Initialize the coordinator on a flat approach before the staircase.
+
+The new `StairDetection` topic type and added `PathWithMetadata.stairs` field
+require rebuilding all participants and migrating external consumers. The
+coordinator clears detection with `detected: false` only after confirmed normal
+mode. The status records the last confirmed command; external manual gait
+changes are not tracked continuously. The current implementation has automated
+synthetic and mock-SDK tests. Hardware mode changes and real stair traversal
+have not been tested in this work.

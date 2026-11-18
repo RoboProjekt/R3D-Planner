@@ -64,6 +64,7 @@ setup(
             # Das registriert die Executables für 'ros2 run'
             'local_filter = r3d_planner.r3d_local_filter:main',
             'path_follower = r3d_planner.r3d_path_follower:main',
+            'stair_controller = r3d_planner.r3d_stair_controller:main',
             'rviz_interface = r3d_planner.r3d_rviz_interface:main',
             'pcd_path_planner = r3d_planner.r3d_pcd_path:main',
             'path_test = r3d_planner.r3d_path_test:main'

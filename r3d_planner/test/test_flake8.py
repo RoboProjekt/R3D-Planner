@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_flake8.main import main_with_errors
+import subprocess
+import sys
+
 import pytest
 
 
 @pytest.mark.flake8
 @pytest.mark.linter
 def test_flake8():
-    rc, errors = main_with_errors(argv=[])
-    assert rc == 0, \
-        'Found %d code style errors / warnings:\n' % len(errors) + \
-        '\n'.join(errors)
+    """Run the unchanged ament checks before the lint worker pool inherits ROS threads."""
+    code = ('from ament_flake8.main import main_with_errors; '
+            'raise SystemExit(main_with_errors(argv=[])[0])')
+    result = subprocess.run([sys.executable, '-c', code], capture_output=True,
+                            text=True, timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr

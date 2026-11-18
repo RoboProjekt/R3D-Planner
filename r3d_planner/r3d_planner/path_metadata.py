@@ -15,7 +15,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Keep geometric orientations separate from atomic traversability metadata."""
+import hashlib
 import math
+
+from rclpy.serialization import serialize_message
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path
 from rclpy.qos import QoSProfile, DurabilityPolicy
@@ -28,13 +31,18 @@ def metadata_qos():
     return QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
 
 
-def build_path(graph, path_ids, header, goal_orientation):
+def build_path(graph, path_ids, header, goal_orientation, min_step_height=None):
     """Build one atomic path with real XY headings and index-aligned flags."""
     path = Path(header=header)
     narrow = []
+    stairs = [graph.nodes[key].get('type') == 'stair_access' for key in path_ids]
     positions = [graph.nodes[key]['pos'] for key in path_ids]
     if not all(math.isfinite(v) for position in positions for v in position):
         raise ValueError('nonfinite graph position')
+    if min_step_height is not None:
+        for index in range(1, len(positions)):
+            if abs(positions[index][2] - positions[index - 1][2]) > min_step_height:
+                stairs[index - 1] = stairs[index] = True
     headings = [None] * len(path_ids)
     next_heading = None
     for index in range(len(path_ids) - 2, -1, -1):
@@ -58,13 +66,15 @@ def build_path(graph, path_ids, header, goal_orientation):
          pose.pose.orientation.z, pose.pose.orientation.w) = q
         path.poses.append(pose)
         narrow.append(graph.nodes[key].get('type') == 'narrow')
-    return PathWithMetadata(path=path, narrow=narrow)
+    return PathWithMetadata(path=path, narrow=narrow, stairs=stairs)
 
 
-def validate_metadata(message, frame):
+def validate_metadata(message, frame, require_stairs=False):
     """Reject mismatched metadata or invalid geometric path contracts."""
     if len(message.path.poses) != len(message.narrow):
         raise ValueError('narrow count must equal pose count')
+    if (require_stairs or message.stairs) and len(message.stairs) != len(message.path.poses):
+        raise ValueError('stairs count must equal pose count')
     if message.path.header.frame_id != frame:
         raise ValueError('path frame does not match map_frame')
     for pose in message.path.poses:
@@ -77,3 +87,8 @@ def validate_metadata(message, frame):
         norm = sum(v * v for v in (q.x, q.y, q.z, q.w))
         if not math.isfinite(norm) or abs(norm - 1) > 1e-6:
             raise ValueError('path quaternion must be normalized')
+
+
+def path_fingerprint(message):
+    """Bind a motion permit to the complete path, stamp and both metadata arrays."""
+    return hashlib.sha256(serialize_message(message)).hexdigest()

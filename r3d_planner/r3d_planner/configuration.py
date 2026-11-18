@@ -139,6 +139,16 @@ def ros_parameters(values, integer_keys=()):
             for key, value in values.items()}
 
 
+def stair_settings(value=None):
+    """Read robot-specific stair margins, retaining defaults for older profiles."""
+    if value is None:
+        return {'approach_distance_m': 1.0, 'exit_distance_m': 1.0}
+    keys(value, ['approach_distance_m', 'exit_distance_m'], 'robot.stairs')
+    for key, item in value.items():
+        number(item, 'robot.stairs.' + key)
+    return ros_parameters(value)
+
+
 def _read_robot_profile(path, cfg):
     """Resolve and validate one selected robot, including mandatory velocity limits."""
     text(cfg.get('robot_config'), 'robot_config')
@@ -151,7 +161,11 @@ def _read_robot_profile(path, cfg):
     robot = read_yaml(robot_path)
     keys(robot, ['robot'], str(robot_path))
     robot = robot['robot']
-    keys(robot, ['name', 'geometry', 'odometry', 'topics', 'velocity_limits'], 'robot')
+    keys(robot, ['name', 'geometry', 'odometry', 'topics', 'velocity_limits'], 'robot',
+         optional=('stairs',))
+    if 'stairs' in robot:
+        keys(robot['stairs'], ['approach_distance_m', 'exit_distance_m'], 'robot.stairs')
+        stair_settings(robot['stairs'])
     text(robot['name'], 'robot.name')
     keys(robot['velocity_limits'], ['max_linear_speed', 'max_angular_speed',
                                     'max_angular_speed_narrow', 'narrow_speed_factor'],
@@ -332,6 +346,12 @@ def load_configuration(path=None, mode='planner'):
                            'map_frame': planner['map_frame'],
                            'odom_frame': odometry['odom_frame']},
         'components': cfg['components'],
+        'stair_controller': {**stair_settings(robot.get('stairs')),
+                             'odometry_topic': odometry['topic'],
+                             'odom_frame': odometry['odom_frame'],
+                             'base_frame': odometry['base_frame'],
+                             'map_frame': planner['map_frame'],
+                             'odometry_timeout_sec': float(planner['odometry_timeout_sec'])},
         'path_follower': {'odometry_topic': odometry['topic'],
                           'odom_frame': odometry['odom_frame'],
                           'base_frame': odometry['base_frame'],

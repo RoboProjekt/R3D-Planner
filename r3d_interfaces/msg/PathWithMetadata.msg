@@ -16,3 +16,5 @@
 # Complete path and index-aligned narrow flags travel atomically.
 nav_msgs/Path path
 bool[] narrow
+# One stair classification per pose, indexed with path and narrow.
+bool[] stairs

@@ -28,7 +28,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import PointCloud2
 from rcl_interfaces.msg import ParameterDescriptor
-from geometry_msgs.msg import PointStamped
+from r3d_interfaces.msg import StairDetection
 import numpy as np
 from .cloud import create_cloud_xyz32, read_xyz
 
@@ -59,7 +59,7 @@ class ObstacleCliffFilter(Node):
         self.pub_cliff = self.create_publisher(PointCloud2, '/local/cliff_virtual_wall', 10)
 
         # NEU: Publisher für Stufenerkennung
-        self.pub_stair_detect = self.create_publisher(PointStamped, '/stair_detect', 10)
+        self.pub_stair_detect = self.create_publisher(StairDetection, '/stair_detect', 10)
 
         # --- PARAMETER ---
         # 1. Hindernis-Filter
@@ -111,7 +111,7 @@ class ObstacleCliffFilter(Node):
             avg_step_z = np.mean(stair_candidate_points[:, 2])
             avg_step_x = np.mean(stair_candidate_points[:, 0])
 
-            stair_msg = PointStamped()
+            stair_msg = StairDetection(detected=True)
             stair_msg.header = msg.header
             stair_msg.point.x = float(avg_step_x)
             stair_msg.point.y = 0.0
