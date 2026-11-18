@@ -37,6 +37,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml', 'LICENSE', 'CHANGELOG.rst']),
+        ('share/' + package_name + '/sdk', glob('sdk/*')),
         # Hier installieren wir die Config Datei, damit launch files sie finden
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         (os.path.join('share', package_name, 'config', 'robots'), glob('config/robots/*.yaml')),
@@ -64,6 +65,7 @@ setup(
             # Das registriert die Executables für 'ros2 run'
             'local_filter = r3d_planner.r3d_local_filter:main',
             'path_follower = r3d_planner.r3d_path_follower:main',
+            'stair_controller = r3d_planner.r3d_stair_controller:main',
             'rviz_interface = r3d_planner.r3d_rviz_interface:main',
             'pcd_path_planner = r3d_planner.r3d_pcd_path:main',
             'path_test = r3d_planner.r3d_path_test:main'

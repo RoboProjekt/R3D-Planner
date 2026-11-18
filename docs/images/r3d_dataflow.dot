@@ -12,6 +12,8 @@ digraph R3D {
  rviz [label="External RViz2 GUI",fillcolor="#f5f5f5"];
  rviznode [label="r3d_planner\nrviz_interface (optional)"];
  planner [label="r3d_planner\npcd_path_planner\nweighted graph + A*"];
+ coordinator [label="r3d_planner\nstair_controller\nstop / confirm / resume"];
+ sdk [label="External Jetson SDK guard + gait tool\nGo2W SDK",fillcolor="#f5f5f5"];
  follower [label="r3d_planner\npath_follower\nseparate explicit launch"];
  filter [label="r3d_planner\nlocal_filter (optional)"];
  odom [label="External odometry + TF\nmap / odom / base + sensor",fillcolor="#f5f5f5"];
@@ -23,10 +25,16 @@ digraph R3D {
  rviz -> rviznode [label="point / pose goals"];
  rviznode -> planner [label="ComputePathToPose\naction"];
  planner -> rviz [label="/global_path +\n/planned_path"];
- planner -> follower [label="/global_path_metadata\nPathWithMetadata\nPath + bool[] narrow"];
+ planner -> follower [label="/global_path_metadata\nPathWithMetadata\nPath + narrow + stairs"];
+ planner -> coordinator [label="/global_path_metadata"];
+ coordinator -> follower [label="/stair_control\npath-bound permit"];
+ coordinator -> sdk [label="stopped gait switch"];
+ sdk -> coordinator [label="confirmed exit code"];
+ filter -> coordinator [label="/stair_detect"];
+ odom -> coordinator [style=dashed,label="pose / height / TF"];
  sensor -> filter [label="configured topic"];
  filter -> follower [label="/local/filtered_obstacles"];
- filter -> rviz [label="obstacles / cliff / stairs",style=dashed];
+ filter -> rviz [label="obstacles / cliff",style=dashed];
  odom -> planner [style=dashed,label="online pose"];
  odom -> follower [style=dashed,label="pose + timestamped TF"];
  follower -> adapter [label="configured cmd_vel"];

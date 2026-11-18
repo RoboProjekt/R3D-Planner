@@ -33,14 +33,14 @@ from rclpy.duration import Duration
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import ParameterDescriptor
 from geometry_msgs.msg import Twist
-from r3d_interfaces.msg import PathWithMetadata
+from r3d_interfaces.msg import PathWithMetadata, StairStatus
 from sensor_msgs.msg import PointCloud2
 from .cloud import read_xyz
 from .configuration import (ConfigurationError, MONITOR_DEFAULTS, load_robot_profile,
                             monitoring_settings, number, ros_parameters, validate_velocity_tuning)
 import math
 from .odometry import OdometryInput
-from .path_metadata import metadata_qos, validate_metadata
+from .path_metadata import metadata_qos, path_fingerprint, validate_metadata
 from .obstacle_monitor import ObstacleMonitor
 
 
@@ -68,9 +68,10 @@ class PathFollower(Node):
                     'obstacle_half_width': 0.3,
                     'angle_threshold': 0.5, 'steering_gain': 1.5,
                     'turning_speed_factor': 0.3,
-                    'cmd_vel_topic': '/cmd_vel'}
+                    'cmd_vel_topic': '/cmd_vel', 'stair_control_enabled': False}
         for key, value in defaults.items():
-            self.declare_parameter(key, value)
+            self.declare_parameter(key, value,
+                                   ParameterDescriptor(read_only=key == 'stair_control_enabled'))
             setattr(self, key, self.get_parameter(key).value)
         try:
             validate_velocity_tuning({'turning_speed_factor': self.turning_speed_factor})
@@ -88,6 +89,9 @@ class PathFollower(Node):
         self.monitoring_settings = monitoring_settings(monitoring)
 
         # --- VARIABLEN ---
+        self.stair_status = None
+        self.stair_status_received = None
+        self.current_path_id = ''
         self.current_path = []
         self.current_narrow = []
         self.obstacle_in_front = False
@@ -114,23 +118,55 @@ class PathFollower(Node):
             PointCloud2, self.monitoring_settings['topic'], self.obstacle_callback,
             qos_profile_sensor_data)
 
+        self.stair_subscription = self.create_subscription(
+            StairStatus, '/stair_control', self.stair_status_callback, 10)
+        self.stair_ack_publisher = self.create_publisher(StairStatus, '/stair_command_ack', 10)
+
         # --- TF (Transformationen) ---
         # --- CONTROL LOOP ---
         self.control_clock = (Clock(clock_type=ClockType.STEADY_TIME)
-                              if self.monitoring_settings['enabled'] else self.get_clock())
+                              if self.monitoring_settings['enabled'] or self.stair_control_enabled
+                              else self.get_clock())
         self.timer = self.create_timer(
             self.control_period_sec, self.control_loop, clock=self.control_clock)
         self.get_logger().info("R3D Path Follower gestartet! Warte auf Pfad...")
 
     def path_callback(self, msg):
         try:
-            validate_metadata(msg, self.get_parameter('map_frame').value)
+            validate_metadata(msg, self.get_parameter('map_frame').value,
+                              require_stairs=self.stair_control_enabled)
         except ValueError as exc:
             self.current_path, self.current_narrow = [], []
+            self.current_path_id = ''
+            if self.stair_control_enabled:
+                self.publish_command(Twist())
             self.get_logger().warning(f'Path metadata rejected: {exc}')
             return
         self.current_path, self.current_narrow = list(msg.path.poses), list(msg.narrow)
+        self.current_path_id = path_fingerprint(msg)
+        if self.stair_control_enabled:
+            self.publish_command(Twist())
         self.get_logger().info(f"Neuer Pfad empfangen mit {len(self.current_path)} Punkten.")
+
+    def stair_status_callback(self, message):
+        """Apply explicit stops immediately; permits expire independently of ROS time."""
+        self.stair_status = message
+        self.stair_status_received = time.monotonic()
+        if self.stair_control_enabled and not self.stair_motion_available():
+            self.publish_command(Twist())
+
+    def stair_motion_available(self):
+        """Require a fresh permit for this exact path and its classification."""
+        status = self.stair_status
+        if status is None:
+            return False
+        stamp = status.header.stamp.sec + status.header.stamp.nanosec / 1e9
+        age = self.get_clock().now().nanoseconds / 1e9 - stamp
+        received_age = time.monotonic() - self.stair_status_received
+        return (status.path_id == self.current_path_id and bool(self.current_path_id) and
+                status.motion_allowed and
+                status.header.frame_id == self.get_parameter('map_frame').value and
+                0 <= age <= 0.5 and 0 <= received_age <= 0.5)
 
     def obstacle_callback(self, msg):
         if self.monitoring_settings['enabled']:
@@ -186,9 +222,31 @@ class PathFollower(Node):
 
     def publish_command(self, message):
         """Recheck monitored clearance immediately before the single command publisher."""
+        if self.stair_control_enabled and self.stair_commands_paused():
+            return
         if self.monitoring_settings['enabled'] and not self.monitor_available():
             message = Twist()
+        if self.stair_control_enabled and not self.stair_motion_available():
+            message = Twist()
         self.cmd_pub.publish(message)
+
+    def stair_commands_paused(self):
+        """Acknowledge a fresh pause and suppress Move(0,0,0) during SDK transitions."""
+        status = self.stair_status
+        if status is None or not status.pause_commands:
+            return False
+        stamp = status.header.stamp.sec + status.header.stamp.nanosec / 1e9
+        age = self.get_clock().now().nanoseconds / 1e9 - stamp
+        fresh = (status.path_id == self.current_path_id and bool(self.current_path_id) and
+                 status.header.frame_id == self.get_parameter('map_frame').value and
+                 0 <= age <= 0.5 and 0 <= time.monotonic() - self.stair_status_received <= 0.5)
+        if fresh:
+            ack = StairStatus(path_id=self.current_path_id, state='PAUSED',
+                              pause_commands=True, pause_id=status.pause_id)
+            ack.header.frame_id = status.header.frame_id
+            ack.header.stamp = self.get_clock().now().to_msg()
+            self.stair_ack_publisher.publish(ack)
+        return fresh
 
     def destroy_node(self):
         """Remove the clock callback before destroying the node's ROS entities."""

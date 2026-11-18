@@ -28,6 +28,7 @@ points belong to `r3d_planner`.
 | `r3d_planner/local_filter` | `obstacle_cliff_filter` | Local obstacle, stair and cliff outputs |
 | `r3d_planner/rviz_interface` | `r3d_rviz_interface` | RViz selections, calibration TF and action requests |
 | `r3d_planner/path_follower` | `r3d_path_follower` | Planar path following and velocity commands |
+| `r3d_planner/stair_controller` | `r3d_stair_controller` | Stopped, SDK-confirmed stair gait transitions and path-bound motion permits |
 | `r3d_planner/path_test` | `r3d_path_test` | Static identity `odom -> base_link` test TF; no Odometry |
 
 `r3d_pcd_voxel_publisher.py` is not registered as a console executable. Use
@@ -40,7 +41,7 @@ points belong to `r3d_planner`.
 | `preprocessor.launch.py` | One-shot PCD analyzer |
 | `map.launch.py` | Classified PCD publisher |
 | `planner.launch.py` | Planner and independently optional local filter/RViz interface |
-| `follower.launch.py` | Separate motion-producing follower |
+| `follower.launch.py` | Follower and stair coordinator with movement interlock |
 
 The central `planner_config.yaml` selects `robots/Go2W.yaml` or another relative
 profile. Robot geometry, topics, frames and velocity settings have one owner in
@@ -89,10 +90,13 @@ and a LINE_STRIP visualization on `/planned_path`.
 ```text
 nav_msgs/Path path
 bool[] narrow
+bool[] stairs
 ```
 
-`narrow[i]` describes `path.poses[i]`. The complete path and exactly one flag per
-pose travel atomically. Quaternion fields represent geometry, never flags.
+`narrow[i]` and `stairs[i]` describe `path.poses[i]`. The complete path and both
+index-aligned classifications travel atomically. Stair flags include yellow
+`stair_access` nodes and endpoints of traversed edges above the flat-height
+threshold. Quaternion fields represent geometry, never flags.
 Invalid metadata clears the follower path. Planner and follower must use the
 same generated interface.
 
@@ -124,10 +128,11 @@ sensor-to-base TF are validated before this test. Without monitoring, received
 coordinates are evaluated directly. See
 [Obstacle monitoring](CONFIGURATION.md#obstacle-monitoring).
 
-The follower is planar: it ignores path Z and does not directly consume cliff
-walls or stair detections. Missing path, invalid metadata, unavailable/stale
-pose, detected obstacles or an enabled monitor without valid input produce
-zero commands. Hardware watchdogs and stop facilities remain external.
+The follower steers in XY/yaw. Its separate stair coordinator evaluates height
+and live stair detections and supplies the path-bound movement interlock.
+Missing path, invalid metadata, unavailable/stale pose, denied or expired stair
+permits, detected obstacles or an enabled obstacle monitor without valid input
+produce zero commands. Hardware watchdogs and stop facilities remain external.
 
 ## Topics
 
@@ -143,7 +148,9 @@ Names below are defaults without a namespace.
 | `/hesai_ros_driver/hesai/lidar_points` | `sensor_msgs/msg/PointCloud2` | external → local filter | SensorDataQoS |
 | `/local/filtered_obstacles` | `sensor_msgs/msg/PointCloud2` | local filter/external → follower | internal output reliable/depth 10; input SensorDataQoS |
 | `/local/cliff_virtual_wall` | `sensor_msgs/msg/PointCloud2` | local filter → external | reliable, depth 10 |
-| `/stair_detect` | `geometry_msgs/msg/PointStamped` | local filter → external | reliable, depth 10 |
+| `/stair_detect` | `r3d_interfaces/msg/StairDetection` | local filter/coordinator → coordinator/external | reliable, depth 10 |
+| `/stair_command_ack` | `r3d_interfaces/msg/StairStatus` | follower → coordinator | reliable, volatile, depth 10 |
+| `/stair_control` | `r3d_interfaces/msg/StairStatus` | coordinator → follower | reliable, volatile, depth 10 |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | follower → external base | reliable, depth 10 |
 | `/clicked_point` | `geometry_msgs/msg/PointStamped` | RViz/external → RViz interface | reliable, depth 10 |
 | `/initialpose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | RViz/external → RViz interface | reliable, depth 10 |
@@ -158,6 +165,7 @@ robot-configurable. Optional obstacle monitoring can use another input topic.
 | Name | Type | Server |
 |---|---|---|
 | `/compute_path_to_pose` | `nav2_msgs/action/ComputePathToPose` | global planner |
+| `/r3d_stair_controller/retry` | `std_srvs/srv/Trigger` | stair coordinator |
 | `/recalibrate_pose` | `std_srvs/srv/Trigger` | RViz interface |
 
 ROS parameter services are additional standard node interfaces.
@@ -186,3 +194,32 @@ marker, map, RViz, action and service names follow that namespace. Relative
 robot topics do too; explicit absolute robot topics remain global. TF frame
 IDs are not automatically prefixed. Direct executables support ordinary ROS
 remapping. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for integration boundaries.
+
+
+## Stair gait interfaces
+
+`StairDetection` carries `std_msgs/Header header`, `bool detected` and
+`geometry_msgs/Point point`. The local filter publishes positive observations
+in the original cloud frame and timestamp. The coordinator transforms them
+into the map frame and matches them to planned stair geometry. After the
+confirmed return to normal gait, it publishes `detected: false` in the map
+frame with a current stamp. The point is ignored when `detected` is false.
+The previous PointStamped topic type must be migrated by external consumers.
+
+`StairStatus` carries a stamped header, `path_id`, `state`, `motion_allowed`,
+`stair_mode_active`, `detail`, `pause_commands` and `pause_id`. `path_id` is the SHA-256 of the serialized
+complete `PathWithMetadata` message. It binds the permit to geometry, metadata
+and path timestamp. The follower checks both ROS timestamp age and steady
+receipt age. SDK commands execute asynchronously while denied permits continue.
+Only the follower publishes robot velocity commands. A transition-specific
+pause acknowledgement suppresses even zero Twist messages while a standalone
+SDK guard establishes BalanceStand and verifies the gait before and after the
+existing switch tool. The guard source ships with the planner; it is built
+separately on the Jetson against the existing Unitree SDK.
+
+The `PathWithMetadata` wire format now includes `bool[] stairs`. Rebuild and
+source all three packages together on every participating machine. Integrated
+stair control requires exactly one stair flag per pose. Isolated follower
+operation with its stair interlock disabled also accepts a rebuilt publisher
+which leaves that array empty. Standard `/global_path` and action-result Path
+geometry retain normalized quaternion orientations.

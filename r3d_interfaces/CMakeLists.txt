@@ -18,9 +18,13 @@ project(r3d_interfaces)
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PathWithMetadata.msg"
-  DEPENDENCIES nav_msgs
+  "msg/StairDetection.msg"
+  "msg/StairStatus.msg"
+  DEPENDENCIES nav_msgs std_msgs geometry_msgs
 )
 ament_export_dependencies(rosidl_default_runtime)
 install(FILES LICENSE README.md CHANGELOG.rst DESTINATION share/${PROJECT_NAME})

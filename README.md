@@ -19,7 +19,8 @@ Supported environment: **ROS 2 Humble, Ubuntu 22.04 Jammy, Python 3.10, amd64**.
 
 The preprocessor writes a classified PCD. The planner loads that file and serves
 path requests. The local filter and RViz interface are optional. The follower
-starts separately and consumes the path with its narrow-area flags.
+starts separately and consumes the path with its terrain flags. Its launch also
+starts the Go2W stair-mode coordinator.
 
 Sensor drivers, odometry, global localization and the robot command interface
 are external. The stack has no dependency on a particular SLAM implementation.
@@ -116,7 +117,7 @@ ros2 action send_goal /compute_path_to_pose nav2_msgs/action/ComputePathToPose "
 
 The action returns a geometric `nav_msgs/Path`. The planner also publishes
 `/global_path`, `/planned_path` and `/global_path_metadata`. The last message
-contains the path and one narrow-area flag per pose.
+contains the path and index-aligned narrow-area and stair flags.
 
 For online planning, `use_start: false` requires fresh configured Odometry and
 timestamped `map -> odom` TF. RViz goal selection and TF ownership are described
@@ -128,8 +129,11 @@ in [Architecture and ROS interfaces](docs/ARCHITECTURE.md).
 ros2 launch r3d_planner follower.launch.py
 ```
 
-This separate launch publishes velocity commands. The follower uses XY/yaw,
-not path height, and does not directly consume cliff or stair outputs. Obstacle
+This separate launch starts the follower and stair coordinator. The follower
+publishes velocity commands using XY/yaw. The coordinator checks path height,
+live detections and the robot pose, stops around each gait switch, and requires an
+SDK-confirmed result. Configure the before/after distances under `robot.stairs`.
+See [Go2W stair control](docs/CONFIGURATION.md#go2w-stair-control). Obstacle
 freshness/TF monitoring is optional and disabled by default. Configure it under
 `path_follower.obstacle_monitoring` as described in the
 [configuration reference](docs/CONFIGURATION.md#obstacle-monitoring).

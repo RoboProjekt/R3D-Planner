@@ -40,7 +40,7 @@ def configured_nodes(context, mode):
     names = ['global_path', 'global_path_metadata', 'planned_path', 'compute_path_to_pose',
              'clicked_point', 'initialpose', 'goal_pose', 'recalibrate_pose',
              'local/filtered_obstacles', 'local/cliff_virtual_wall', 'stair_detect',
-             'map_pointcloud']
+             'map_pointcloud', 'stair_control', 'stair_command_ack']
 
     def configured_node(**kwargs):
         return Node(namespace=namespace, remappings=[('/' + name, name) for name in names],
@@ -50,8 +50,20 @@ def configured_nodes(context, mode):
         actions.append(configured_node(package='r3d_preprocessor', executable='pcd_analyser',
                                        parameters=[cfg['preprocessor']], output='screen'))
     elif mode == 'follower':
+        sdk_parameters = {
+            'sdk_executable': context.launch_configurations.get(
+                'gait_switch_executable', '/home/unitree/go2w_gait_switch/build/go2w_gait_switch'),
+            'guard_executable': context.launch_configurations.get(
+                'gait_guard_executable', '/home/unitree/.local/bin/r3d_go2w_gait_guard'),
+            'network_interface': context.launch_configurations.get(
+                'gait_network_interface', 'eth0')}
+        actions.append(configured_node(package='r3d_planner', executable='stair_controller',
+                                       parameters=[cfg['stair_controller'], sdk_parameters],
+                                       output='screen'))
         actions.append(configured_node(package='r3d_planner', executable='path_follower',
-                                       parameters=[cfg['path_follower']], output='screen'))
+                                       parameters=[cfg['path_follower'],
+                                                   {'stair_control_enabled': True}],
+                                       output='screen'))
     elif mode == 'map':
         actions.append(configured_node(package='r3d_preprocessor', executable='pcd_server',
                                        parameters=[{'pcd_path': cfg['planner']['map_name'],
@@ -70,7 +82,19 @@ def configured_nodes(context, mode):
 
 
 def description(mode):
-    return LaunchDescription([
+    arguments = []
+    if mode == 'follower':
+        arguments = [
+            DeclareLaunchArgument('gait_switch_executable',
+                                  default_value='/home/unitree/go2w_gait_switch/build/'
+                                  'go2w_gait_switch',
+                                  description='Absolute path to the Jetson gait-switch tool'),
+            DeclareLaunchArgument('gait_guard_executable',
+                                  default_value='/home/unitree/.local/bin/r3d_go2w_gait_guard',
+                                  description='Absolute path to the SDK gait guard'),
+            DeclareLaunchArgument('gait_network_interface', default_value='eth0',
+                                  description='Ethernet interface used by the Go2W SDK')]
+    return LaunchDescription(arguments + [
         DeclareLaunchArgument('namespace', default_value='',
                               description='Optional ROS namespace; TF frame IDs remain explicit'),
         OpaqueFunction(function=configured_nodes, kwargs={'mode': mode})])

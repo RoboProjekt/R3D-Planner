@@ -6,11 +6,12 @@ This `ament_cmake`/rosidl package generates
 ```text
 nav_msgs/Path path
 bool[] narrow
+bool[] stairs
 ```
 
-`narrow[i]` belongs to `path.poses[i]`. The complete geometric path and exactly
-one flag per pose travel atomically. Quaternion components represent normalized
-geometric orientations, not flags. The planner publishes `/global_path_metadata`
+`narrow[i]` and `stairs[i]` belong to `path.poses[i]`. The geometric path and
+both indexed flag arrays travel atomically. Quaternion components represent
+normalized geometric orientations. The planner publishes `/global_path_metadata`
 with reliable, transient-local, keep-last-1 QoS; the follower requests the same
 profile. Invalid lengths, headers, frames or geometry clear the follower path.
 
@@ -20,3 +21,10 @@ the same geometry. Build this package together with `r3d_planner` and
 The generated messages, typesupport, headers, manifest and license are installed.
 
 License: [Apache-2.0](LICENSE).
+
+
+The package also generates `StairDetection` with an explicit `detected` boolean
+and stamped point, and `StairStatus` with a path-bound motion permit and gait
+transition state. See [Stair gait interfaces](../docs/ARCHITECTURE.md#stair-gait-interfaces).
+Rebuild all three packages and migrate external consumers when updating from
+the previous two-field metadata and PointStamped stair topic.

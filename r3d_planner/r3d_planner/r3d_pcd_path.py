@@ -287,7 +287,8 @@ class GlobalGraphPlanner(Node):
                 raise ValueError('No path found')
             from std_msgs.msg import Header
             header = Header(frame_id=map_frame, stamp=self.get_clock().now().to_msg())
-            metadata = build_path(self.graph, path_ids, header, request.goal.pose.orientation)
+            metadata = build_path(self.graph, path_ids, header, request.goal.pose.orientation,
+                                  self.min_stair_height)
             if cancelled():
                 goal_handle.canceled()
                 return complete()

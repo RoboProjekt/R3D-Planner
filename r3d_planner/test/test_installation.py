@@ -30,7 +30,7 @@ import yaml
 LICENSE_SHA = 'cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30'
 EXECUTABLES = {
     'r3d_planner': ['local_filter', 'path_follower', 'path_test',
-                    'pcd_path_planner', 'rviz_interface'],
+                    'pcd_path_planner', 'rviz_interface', 'stair_controller'],
     'r3d_preprocessor': ['pcd_analyser', 'pcd_server'],
 }
 pytestmark = pytest.mark.installed

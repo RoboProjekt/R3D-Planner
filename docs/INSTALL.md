@@ -153,10 +153,30 @@ Absolute robot topics and TF frame IDs are not automatically prefixed.
 ros2 launch r3d_planner follower.launch.py
 ```
 
-The planner launch never starts this motion-producing node automatically.
+This launch starts the follower and `stair_controller`. Run it on the Jetson
+with the SDK tool and the separately built SDK guard available. See
+[Build the Jetson SDK guard](CONFIGURATION.md#build-the-jetson-sdk-guard).
+The coordinator first confirms normal gait at standstill, then authorizes the follower for the current path. It needs fresh
+Odometry and global TF. Planned stairs also need fresh `/stair_detect`
+observations and their sensor-to-map TF. Keep the local filter enabled or
+supply equivalent `r3d_interfaces/msg/StairDetection` observations.
+
+The documented SDK path and Ethernet interface can be selected at launch.
+
+```bash
+ros2 launch r3d_planner follower.launch.py \
+  gait_switch_executable:=/home/unitree/go2w_gait_switch/build/go2w_gait_switch \
+  gait_guard_executable:=/home/unitree/.local/bin/r3d_go2w_gait_guard \
+  gait_network_interface:=eth0
+```
+
+Set `robot.stairs.approach_distance_m` and `robot.stairs.exit_distance_m`
+in the selected robot profile. Both default to 1.0 m. See
+[Go2W stair control](CONFIGURATION.md#go2w-stair-control) for the startup,
+acknowledgement, failure and reset contracts.
+
 Configure robot interfaces, velocity limits, obstacle input and independent
-watchdog/stop facilities before hardware use. The follower is planar and does
-not directly stop from cliff or stair outputs. Optional obstacle monitoring is
+watchdog/stop facilities before hardware use. Optional obstacle monitoring is
 configured separately from the local filter. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ## Inspect the running system

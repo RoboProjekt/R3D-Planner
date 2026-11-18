@@ -174,7 +174,7 @@ def test_generated_package_resources():
     assert (share / 'package.xml').is_file()
     assert (share / 'msg/PathWithMetadata.msg').is_file()
     schema = PathWithMetadata.get_fields_and_field_types()
-    assert set(schema) == {'path', 'narrow'}
+    assert set(schema) == {'path', 'narrow', 'stairs'}
 
 
 def test_planner_action_result_and_both_ros_publications_match(tmp_path):
