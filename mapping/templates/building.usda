@@ -1,0 +1,266 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary cameraSettings = {
+            dictionary Perspective = {
+                double3 position = (-13.162802856853835, -13.897524170011359, 0.5419835180993066)
+                double3 target = (-12.889380631821902, -11.965208167202313, 0.9794708346545045)
+            }
+            string boundCamera = "/World/Kameras/Lyra_Treppe"
+        }
+        dictionary renderSettings = {
+            bool "rtx-transient:dlssg:enabled" = 0
+            int "rtx:post:aa:op" = 4
+            bool "rtx:post:histogram:enabled" = 0
+            int "rtx:post:tonemap:op" = 2
+        }
+    }
+    defaultPrim = "World"
+    doc = "Z-up building scene with physics material, lighting, camera bookmarks and robot spawn points."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def Xform "Gebaeude"
+    {
+    }
+
+    def Scope "Materialien"
+    {
+        def Material "Gebaeudekontakt" (
+            apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            float physics:dynamicFriction = 0.65
+            float physics:restitution = 0
+            float physics:staticFriction = 0.8
+        }
+    }
+
+    def PhysicsScene "Physik"
+    {
+        vector3f physics:gravityDirection = (0, 0, -1)
+        float physics:gravityMagnitude = 9.81
+    }
+
+    def "Licht"
+    {
+        def DomeLight "Umgebung"
+        {
+            float inputs:intensity = 0.12
+        }
+
+        def SphereLight "Innen_00"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (-3.8972755608227363, -7.339873514101849, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_01"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (2.0604450328503168, -8.050904686220205, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_02"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (8.01816562652337, -8.76193585833856, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_03"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (13.975886220196422, -9.472967030456918, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_04"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (19.933606813869474, -10.183998202575273, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_05"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (25.891327407542526, -10.895029374693628, 4.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_06"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (-12.760941324340688, -11.569285912135378, 3.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_07"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (-13.317915742500068, -16.23616704384593, 2.65)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_08"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (-8.811583529952502, -8.012240366755718, 1.85)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def SphereLight "Innen_09"
+        {
+            color3f inputs:color = (1, 0.97, 0.92)
+            bool inputs:enableColorTemperature = 0
+            float inputs:intensity = 1800
+            float inputs:radius = 0.2
+            custom bool primvars:doNotCastShadows = 1
+            double3 xformOp:translate = (-0.2280280168152452, -3.5983333952744436, 1.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def "Startpunkte"
+    {
+        def Xform "Start_EG"
+        {
+            float xformOp:rotateZ = -96.80584
+            double3 xformOp:translate = (0, 0, -0.5718467235565186)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
+        }
+
+        def Xform "Start_1OG"
+        {
+            float xformOp:rotateZ = -6.805841
+            double3 xformOp:translate = (3.0474732053615057, -8.219057553187206, 2.426420211791992)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
+        }
+    }
+
+    def "Kameras"
+    {
+        def Camera "Flur_1OG"
+        {
+            float2 clippingRange = (0.05, 100)
+            float exposure = 0
+            float exposure:fStop = 1
+            float exposure:iso = 0
+            float exposure:responsivity = 1
+            float exposure:time = 1
+            float focalLength = 19
+            float horizontalAperture = 24
+            float verticalAperture = 14
+            matrix4d xformOp:transform = ( (0.06836209101571415, 0.9976605758031933, 0, 0), (-0.061389330960832905, 0.004206543921172378, 0.9981050320644721, -0), (0.995770041001506, -0.06823254704523374, 0.06153328341295815, 0), (2.9511593888653267, -8.519762805472466, 3.49, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "Treppenaufgang"
+        {
+            float2 clippingRange = (0.05, 100)
+            float exposure = 0
+            float exposure:fStop = 1
+            float exposure:iso = 0
+            float exposure:responsivity = 1
+            float exposure:time = 1
+            float focalLength = 19
+            float horizontalAperture = 24
+            float verticalAperture = 14
+            matrix4d xformOp:transform = ( (0.9999714663395578, -0.007554237665995987, 2.1684043449710084e-19, 0), (-0.001085746321396463, -0.14372268772622152, 0.989617405964384, 0), (-0.007475805083061392, -0.9895891685573547, -0.14372678877760894, 0), (-13.289063170616544, -15.403720331379786, 0.4699999999999995, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "Lyra_Treppe"
+        {
+            float2 clippingRange = (0.06, 100)
+            float exposure = 0
+            float exposure:fStop = 1
+            float exposure:iso = 0
+            float exposure:responsivity = 1
+            float exposure:time = 1
+            float focalLength = 20
+            float horizontalAperture = 21.082954
+            float horizontalApertureOffset = -0.28931016
+            float verticalAperture = 15.8154955
+            float verticalApertureOffset = -0.026399983
+            matrix4d xformOp:transform = ( (0.9883152267508285, -0.14805208911030762, 0.03624350262507893, 0), (-0.06740240564777557, -0.21123279866558078, 0.9751090300478201, 0), (-0.13671111251596668, -0.9661580014045223, -0.21874365827759895, 0), (-13.162802856853835, -13.897524170011359, 0.5419835180993066, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "Lyra_Podest"
+        {
+            float2 clippingRange = (0.06, 100)
+            float exposure = 0
+            float exposure:fStop = 1
+            float exposure:iso = 0
+            float exposure:responsivity = 1
+            float exposure:time = 1
+            float focalLength = 20
+            float horizontalAperture = 21.082954
+            float horizontalApertureOffset = -0.28931016
+            float verticalAperture = 15.8154955
+            float verticalApertureOffset = -0.026399983
+            matrix4d xformOp:transform = ( (0.9875359528891334, -0.156035500837539, -0.02063163177577151, 0), (-0.02746068962011087, -0.2998826891150228, 0.9535807691510625, 0), (-0.15497952212128097, -0.9411287346837954, -0.30042977960837797, 0), (-12.735937598110251, -8.230833941292884, 3.0004416403730905, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Camera "Lyra_Flur"
+        {
+            float2 clippingRange = (0.06, 100)
+            float exposure = 0
+            float exposure:fStop = 1
+            float exposure:iso = 0
+            float exposure:responsivity = 1
+            float exposure:time = 1
+            float focalLength = 20
+            float horizontalAperture = 21.082954
+            float horizontalApertureOffset = -0.28931016
+            float verticalAperture = 15.8154955
+            float verticalApertureOffset = -0.026399983
+            matrix4d xformOp:transform = ( (-0.25622128763452734, -0.9666036535212827, 0.005294219698325612, 0), (0.23179951088189826, -0.05612489033389598, 0.9711431323136268, 0), (-0.9384133622864814, 0.25005474137539874, 0.2384386457725865, 0), (-5.729004476225053, -7.486083094348295, 2.9094092486499474, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+    }
+}

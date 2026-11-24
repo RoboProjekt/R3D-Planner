@@ -1,0 +1,11 @@
+data:
+  min_range: 0.65
+  max_range: 35.0
+  deskew: true
+mapping:
+  voxel_size: 0.2
+registration:
+  max_num_threads: 1
+adaptive_threshold:
+  initial_threshold: 0.3
+  min_motion_th: 0.03
